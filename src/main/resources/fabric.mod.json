@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "astrarre",
+  "version": "${version}",
+  "name": "Astrarre",
+  "description": "Astrarre api implementaton on fabric",
+  "authors": [
+    "HalfOf2",
+    "Astrarre"
+  ],
+  "license": "LGPLv3",
+  "icon": "assets/api/icon.png",
+  "environment": "*",
+  "depends": {
+    "fabricloader": ">=0.10.8",
+    "fabric": "*",
+    "minecraft": "1.16.4"
+  }
+}
