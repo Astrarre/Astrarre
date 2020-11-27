@@ -40,6 +40,7 @@ import net.minecraft.world.WorldAccess;
 		"ResultOfMethodCallIgnored"
 })
 public class AbstractTest {
+
 	private static final Properties PROPERTIES = new Properties();
 
 	static {
