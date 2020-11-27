@@ -44,6 +44,7 @@ public class AbstractTest {
 
 	static {
 		try {
+			
 			InputStream stream = AbstractTest.class.getResourceAsStream("/gradle_info.properties");
 			if(stream == null) {
 				throw new IllegalStateException("Run this one more time (AbstractTest#main)");
