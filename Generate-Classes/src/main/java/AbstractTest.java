@@ -63,7 +63,6 @@ public class AbstractTest {
 			classpath.add(file);
 		}
 
-		System.out.println(PROPERTIES.getProperty("minecraft"));
 		AbstracterLoader.INSTANCE.addURL(new File(PROPERTIES.getProperty("minecraft")).toURI().toURL());
 
 		// settings
