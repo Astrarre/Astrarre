@@ -1,6 +1,19 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url = "https://dl.bintray.com/astrarre/maven" }
+    }
+
+    dependencies {
+        classpath 'io.github.astrarre:astrarre-stripper:1.0.1'
+    }
+}
+
 plugins {
     id 'fabric-loom' version '0.5.42'
     id 'maven-publish'
+    id "com.jfrog.bintray" version "1.8.4"
+    id 'java-library'
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
@@ -10,27 +23,26 @@ archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
 
+
 repositories {
     mavenCentral()
-    maven {url = "https://dl.bintray.com/astrarre/maven"}
+    maven { url = "https://dl.bintray.com/astrarre/maven" }
 }
 
-wrapper {
-    gradleVersion = '6.7.1'
-    distributionType = Wrapper.DistributionType.ALL
-}
-
-minecraft {
-}
+minecraft {}
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-    modCompile "net.fabricmc:fabric-loader:${project.loader_version}"
+
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
     compileOnly files('generated/api.jar')
     compileOnly files('generated/api_sources.jar')
-    runtime files('generated/impl.jar')
+    api("io.github.astrarre:astrarre-extra:0.0.1")
+
+    runtimeOnly files('generated/impl.jar')
 }
 
 
@@ -57,17 +69,46 @@ tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
 }
 
-// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-// if it is present.
-// If you remove this task, sources will not be generated.
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = "sources"
-    from sourceSets.main.allSource
-}
-
 jar {
     from "LICENSE"
     from "generated/manifest.properties"
+}
+
+import io.github.astrarre.stripper.Stripper
+task strippedJar(type: Jar, dependsOn: jar) {
+    classifier = "stripped"
+    // source
+    from sourceSets.main.allSource
+    // bytecode
+    with jar
+
+    doLast {
+        def file = outputs.files.first()
+
+        def filter = new ArrayList<String>()
+        Stripper.strip(filter, file, file)
+    }
+}
+
+
+// api jar, what people are supposed to compileOnly depend on
+task apiJar(type: Jar, dependsOn: strippedJar) {
+    classifier = "api"
+    from zipTree("generated/api_sources.jar")
+    from zipTree("generated/api.jar")
+    with strippedJar
+}
+
+import net.fabricmc.loom.task.RemapJarTask
+
+task implUnmapped(type: Jar, dependsOn: jar) {
+    classifier = "impl-dev"
+    with jar
+    from zipTree("generated/impl.jar")
+}
+
+task remapJar(type: RemapJarTask, overwrite: true, dependsOn: implUnmapped) {
+    input.set(implUnmapped.archivePath)
 }
 
 // configure the maven publication
@@ -77,11 +118,12 @@ publishing {
             // remap jar task is where you should look
             // add all the jars that should be included when publishing to maven
             artifact(remapJar) {
+                // somehow include sources in the remapJar process
                 builtBy remapJar
             }
-            // todo runtime jar
-            artifact(sourcesJar) {
-                builtBy remapSourcesJar
+
+            artifact(apiJar) {
+                builtBy apiJar
             }
         }
     }
@@ -90,5 +132,22 @@ publishing {
     repositories {
         // uncomment to publish to the local maven
         // mavenLocal()
+    }
+}
+
+bintray {
+    user = project.hasProperty('bintray_user') ? project.property('bintray_user') : ""
+    key = project.hasProperty('bintray_api_key') ? project.property('bintray_api_key') : ""
+    publications = ["mavenJava"]
+    publish = true //[Default: false] Whether version should be auto published after an upload
+    pkg {
+        repo = "maven"
+        name = "api"
+        userOrg = "astrarre"
+        licenses = ["LGPL-3.0"]
+        version {
+            name = version
+            released = new Date()
+        }
     }
 }
