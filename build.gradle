@@ -75,20 +75,19 @@ jar {
 }
 
 import io.github.astrarre.stripper.Stripper
-task strippedJar(type: Jar, dependsOn: jar) {
+task strippedJar(type: Jar, dependsOn: classes) {
     classifier = "stripped"
     // source
     from sourceSets.main.allSource
     // bytecode
     with jar
-
     doLast {
         def file = outputs.files.first()
-
         def filter = new ArrayList<String>()
         Stripper.strip(filter, file, file)
     }
 }
+
 
 
 // api jar, what people are supposed to compileOnly depend on
@@ -96,7 +95,7 @@ task apiJar(type: Jar, dependsOn: strippedJar) {
     classifier = "api"
     from zipTree("generated/api_sources.jar")
     from zipTree("generated/api.jar")
-    with strippedJar
+    from zipTree(strippedJar.archivePath)
 }
 
 import net.fabricmc.loom.task.RemapJarTask
@@ -118,7 +117,6 @@ publishing {
             // remap jar task is where you should look
             // add all the jars that should be included when publishing to maven
             artifact(remapJar) {
-                // somehow include sources in the remapJar process
                 builtBy remapJar
             }
 
