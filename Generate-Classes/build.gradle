@@ -19,7 +19,7 @@ dependencies {
     minecraft "com.mojang:minecraft:${parent.minecraft_version}"
     mappings "net.fabricmc:yarn:${parent.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${parent.loader_version}"
-    implementation 'io.github.astrarre:abstracter:0.0.10'
+    implementation 'io.github.astrarre:abstracter:0.0.11'
     implementation 'org.reflections:reflections:0.9.12'
 }
 

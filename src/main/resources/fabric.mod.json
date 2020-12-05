@@ -11,6 +11,9 @@
   "license": "LGPLv3",
   "icon": "assets/api/icon.png",
   "environment": "*",
+  "entrypoints": {
+    "main": ["io.github.astrarre.asm.AbstractionApplicator"]
+  },
   "depends": {
     "fabricloader": ">=0.10.8",
     "fabric": "*",

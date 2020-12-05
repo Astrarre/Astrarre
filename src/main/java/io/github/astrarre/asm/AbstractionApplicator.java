@@ -1,19 +1,9 @@
 package io.github.astrarre.asm;
 
-public class AbstractionApplicator implements Runnable {
-	private static final int TEST = 4;
-	public static final int NOT_TEST = internal();
+import net.fabricmc.api.ModInitializer;
 
-	private static int internal() {
-		return 0;
-	}
-
-	public static void publicApi() {
-		// e
-	}
-
+public class AbstractionApplicator implements ModInitializer {
 	@Override
-	public void run() {
-		// todo implement MM, should this be in the root project?
+	public void onInitialize() {
 	}
 }
