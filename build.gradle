@@ -5,7 +5,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'io.github.astrarre:astrarre-stripper:1.0.1'
+        classpath 'io.github.astrarre:astrarre-stripper:1.0.0'
     }
 }
 
@@ -71,7 +71,6 @@ tasks.withType(JavaCompile) {
 
 jar {
     from "LICENSE"
-    from "generated/manifest.properties"
 }
 
 import io.github.astrarre.stripper.Stripper
@@ -92,7 +91,6 @@ task strippedJar(type: Jar, dependsOn: classes) {
 
 // api jar, what people are supposed to compileOnly depend on
 task apiJar(type: Jar, dependsOn: strippedJar) {
-    classifier = "api"
     from zipTree("generated/api_sources.jar")
     from zipTree("generated/api.jar")
     from zipTree(strippedJar.archivePath)
@@ -101,9 +99,10 @@ task apiJar(type: Jar, dependsOn: strippedJar) {
 import net.fabricmc.loom.task.RemapJarTask
 
 task implUnmapped(type: Jar, dependsOn: jar) {
-    classifier = "impl-dev"
+    archiveBaseName = "impl-fabric"
     with jar
     from zipTree("generated/impl.jar")
+    from "generated/manifest.properties"
 }
 
 task remapJar(type: RemapJarTask, overwrite: true, dependsOn: implUnmapped) {
@@ -113,13 +112,15 @@ task remapJar(type: RemapJarTask, overwrite: true, dependsOn: implUnmapped) {
 // configure the maven publication
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-            // remap jar task is where you should look
-            // add all the jars that should be included when publishing to maven
+        mavenApiImpl(MavenPublication) {
+            artifactId = "impl-fabric"
             artifact(remapJar) {
                 builtBy remapJar
             }
+        }
 
+        mavenApi(MavenPublication) {
+            artifactId = "astrarre-api"
             artifact(apiJar) {
                 builtBy apiJar
             }
@@ -129,14 +130,14 @@ publishing {
     // select the repositories you want to publish to
     repositories {
         // uncomment to publish to the local maven
-        // mavenLocal()
+        mavenLocal()
     }
 }
 
 bintray {
     user = project.hasProperty('bintray_user') ? project.property('bintray_user') : ""
     key = project.hasProperty('bintray_api_key') ? project.property('bintray_api_key') : ""
-    publications = ["mavenJava"]
+    publications = ["mavenApiImpl", "mavenApi"]
     publish = true //[Default: false] Whether version should be auto published after an upload
     pkg {
         repo = "maven"
