@@ -1,11 +1,16 @@
 pluginManagement {
     repositories {
         jcenter()
+        gradlePluginPortal()
         maven {
             name = 'Fabric'
             url = 'https://maven.fabricmc.net/'
         }
-        gradlePluginPortal()
+        mavenLocal()
     }
 }
-include 'Generate-Classes'
+
+rootProject.name = "astrarre-api"
+include 'astrarre-internal-v0'
+
+

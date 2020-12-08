@@ -5,117 +5,193 @@ buildscript {
     }
 
     dependencies {
-        classpath 'io.github.astrarre:astrarre-stripper:1.0.0'
+        classpath 'io.github.astrarre:astrarre-stripper:1.0.1'
     }
 }
+
+
+import io.github.astrarre.stripper.Stripper
+
+import java.util.stream.Collectors
 
 plugins {
-    id 'fabric-loom' version '0.5.42'
+    id 'java'
+    id 'idea'
+    id 'eclipse'
+    id 'java-library'
     id 'maven-publish'
     id "com.jfrog.bintray" version "1.8.4"
-    id 'java-library'
+    id "fabric-loom" version "0.5.42"
 }
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
-
-archivesBaseName = project.archives_base_name
 version = project.mod_version
-group = project.maven_group
 
-
-repositories {
-    mavenCentral()
-    maven { url = "https://dl.bintray.com/astrarre/maven" }
+subprojects {
+    apply plugin: "java"
+    apply plugin: 'java-library'
+    apply plugin: "java-library"
+    apply plugin: "fabric-loom"
 }
 
-minecraft {}
+import net.fabricmc.loom.task.RunClientTask
+import net.fabricmc.loom.task.RunServerTask
 
-dependencies {
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+// gross gradle hacks
+task implMod(type: Jar) {
+    classifier = "impl-mod"
+    libsDirName = "misc"
 
-    compileOnly files('generated/api.jar')
-    compileOnly files('generated/api_sources.jar')
-
-    api("io.github.astrarre:astrarre-extra:0.0.1")
-    runtimeOnly files('generated/impl.jar')
+    from zipTree("$rootProject.projectDir/generated/impl.jar")
+    from "$rootProject.projectDir/generated/fabric.mod.json"
 }
 
-
-processResources {
-    inputs.property "version", project.version
-    from(sourceSets.main.output.classesDirs.singleFile) {
-        include "nanoevents/**"
+allprojects {
+    tasks.withType(JavaCompile).configureEach {
+        def targetVersion = 8
+        if (JavaVersion.current().isJava9Compatible()) {
+            it.options.release = targetVersion
+        } else {
+            sourceCompatibility = JavaVersion.toVersion(targetVersion)
+            targetCompatibility = JavaVersion.toVersion(targetVersion)
+        }
     }
 
-    from(sourceSets.main.resources.srcDirs) {
-        include "fabric.mod.json"
-        expand "version": project.version
+    group "io.github.astrarre"
+
+    sourceSets {
+        testmod {
+            compileClasspath += main.compileClasspath
+            runtimeClasspath += main.runtimeClasspath
+        }
     }
 
-    from(sourceSets.main.resources.srcDirs) {
-        exclude "fabric.mod.json"
+    loom {
+        shareCaches = true
+    }
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven{url 'https://maven.fabricmc.net/'}
+        maven{url 'http://maven.modmuss50.me/'}
+        maven{url 'https://dl.bintray.com/astrarre/maven'}
+        maven{url 'https://jitpack.io'}
+        flatDir {
+            dir rootProject.tasks.implMod.destinationDir
+        }
+    }
+
+    dependencies {
+        minecraft "com.mojang:minecraft:${project.minecraft_version}"
+        mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+        modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+        // to add compatibility
+        modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+        compileOnly files("$rootProject.projectDir/generated/api.jar")
+        compileOnly files("$rootProject.projectDir/generated/api_sources.jar")
+
+        modImplementation "io.github.astrarre:astrarre-extra:0.0.1"
+
+        fileTree(dir: rootProject.tasks.implMod.destinationDir, include: '*.jar').each {
+            String baseName = it.name.replace(".jar", "")
+            String version = "0.1.0"
+            int split = baseName.lastIndexOf('-')
+            if (split != -1) {
+                version = baseName.substring(split + 1)
+                baseName = baseName.substring(0, split)
+            }
+            String name = "testmod:${baseName}:${version}"
+            System.out.println("Found test mod: " + it.name.replace(".jar", "") + " -> " + name)
+            modRuntime name
+        }
+    }
+
+    tasks.classes.dependsOn rootProject.tasks.implMod
+
+    task runTestmodClient(type: RunClientTask) {
+        classpath sourceSets.testmod.runtimeClasspath
+    }
+
+    task runTestmodServer(type: RunServerTask) {
+        classpath sourceSets.testmod.runtimeClasspath
+    }
+
+    processResources {
+        inputs.property "version", project.version
+
+        from(sourceSets.main.resources.srcDirs) {
+            include "fabric.mod.json"
+            expand "version": project.version
+        }
+
+        from(sourceSets.main.resources.srcDirs) {
+            exclude "fabric.mod.json"
+        }
+    }
+
+
+    task collectedJar(type: Jar, dependsOn: jar) {
+        version "_temp_"
+        // source
+        from sourceSets.main.allSource
+        if (project.rootProject == project)
+            from classes
+        else
+            from jar
+
+        doLast {
+            def file = outputs.files.first()
+            def filter = new ArrayList<String>()
+            filter.add("io/github/astrarre/internal/(.*)")
+            Stripper.strip(filter, file, file)
+        }
     }
 }
 
-// ensure that the encoding is set to UTF-8, no matter what the system default is
-// this fixes some edge cases with special characters not displaying correctly
-// see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
-tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
+task sourcesJar(type: Jar, dependsOn: classes) {
+    archiveClassifier = "sources"
+    allprojects.each {
+        from it.sourceSets.main.allSource
+    }
 }
 
 jar {
     from "LICENSE"
-}
-
-import io.github.astrarre.stripper.Stripper
-task strippedJar(type: Jar, dependsOn: classes) {
-    classifier = "stripped"
-    // source
-    from sourceSets.main.allSource
-    // bytecode
-    with jar
-    doLast {
-        def file = outputs.files.first()
-        def filter = new ArrayList<String>()
-        Stripper.strip(filter, file, file)
-    }
-}
-
-
-
-// api jar, what people are supposed to compileOnly depend on
-task apiJar(type: Jar, dependsOn: strippedJar) {
-    from zipTree("generated/api_sources.jar")
-    from zipTree("generated/api.jar")
-    from zipTree(strippedJar.archivePath)
-}
-
-import net.fabricmc.loom.task.RemapJarTask
-
-task implUnmapped(type: Jar, dependsOn: jar) {
-    archiveBaseName = "impl-fabric"
-    with jar
     from zipTree("generated/impl.jar")
     from "generated/manifest.properties"
 }
 
-task remapJar(type: RemapJarTask, overwrite: true, dependsOn: implUnmapped) {
-    input.set(implUnmapped.archivePath)
+dependencies {
+    afterEvaluate {
+        include subprojects
+    }
+}
+
+// api jar, what people are supposed to compileOnly depend on
+task apiJar(type: Jar, dependsOn: allprojects.tasks.collectedJar) {
+    classifier = "api"
+    from zipTree("generated/api_sources.jar")
+    from zipTree("generated/api.jar")
+    allprojects.each {
+        from zipTree(it.tasks.collectedJar.archivePath)
+    }
 }
 
 // configure the maven publication
 publishing {
     publications {
-        mavenApiImpl(MavenPublication) {
+        mavenJava(MavenPublication) {
             artifactId = "impl-fabric"
             artifact(remapJar) {
                 builtBy remapJar
+            }
+
+            // sources for ye normal folk
+            artifact(sourcesJar) {
+                builtBy remapSourcesJar
             }
         }
 
@@ -137,16 +213,32 @@ publishing {
 bintray {
     user = project.hasProperty('bintray_user') ? project.property('bintray_user') : ""
     key = project.hasProperty('bintray_api_key') ? project.property('bintray_api_key') : ""
-    publications = ["mavenApiImpl", "mavenApi"]
-    publish = true //[Default: false] Whether version should be auto published after an upload
+    publications = ["mavenJava"]
+    publish = true
+    //[Default: false] Whether version should be auto published after an upload
     pkg {
         repo = "maven"
-        name = "api"
+        name = "astrarre-api"
         userOrg = "astrarre"
         licenses = ["LGPL-3.0"]
         version {
             name = version
             released = new Date()
         }
+    }
+}
+
+tasks.classes.doLast {
+    def file = new File(this.project.sourceSets.test.resources.srcDirs.first(), "gradle_info.properties")
+    if (!file.exists()) {
+        def properties = new Properties()
+        properties.setProperty("mappings", project.loom.getMappingsProvider().tinyMappings.absolutePath)
+        properties.setProperty("minecraft", configurations.minecraftNamed.resolve().last().absolutePath)
+        properties.setProperty("libraries", configurations.minecraftLibraries.resolve().stream().map() { it.absolutePath }.collect(Collectors.joining(";")))
+        properties.setProperty("projectDir", project.projectDir.absolutePath)
+
+        def out = new FileWriter(file)
+        properties.store(out, "Minecraft Libraries, Emitted by classes task")
+        out.close()
     }
 }

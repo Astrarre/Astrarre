@@ -1,14 +1,18 @@
 {
   "schemaVersion": 1,
-  "id": "astrarre-fabric",
-  "name": "Astrarre Impl Fabric",
-  "description": "The Official Astrarre API Implementation for the Fabric Modloader",
+  "id": "astrarre-internal-v0-testmod",
+  "name": "Astrarre Internals Test Mod",
   "version": "${version}",
   "environment": "*",
-  "license": "Apache-2.0",
+  "license": "LGPLv3",
   "icon": "icon.png",
   "contact": {
     "sources": "https://github.com/Astrarre/Astrarre"
+  },
+  "entrypoints": {
+    "main": [
+      "test.Cast"
+    ]
   },
   "authors": [
     "HalfOf2",
