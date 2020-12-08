@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "astrarre-internal-v0",
+  "name": "Astrarre Internals",
+  "description": "Some internal apis and functions for the astrarre modding api",
+  "version": "${version}",
+  "environment": "*",
+  "license": "LGPLv3",
+  "icon": "icon.png",
+  "contact": {
+    "sources": "https://github.com/Astrarre/Astrarre"
+  },
+  "entrypoints": {
+    "mm:early_risers": [
+      "io.github.astrarre.internal.AbstractionApplicator"
+    ]
+  },
+  "authors": [
+    "HalfOf2",
+    "Astrarre"
+  ],
+  "depends": {
+    "fabricloader": ">=0.8.9"
+  }
+}
