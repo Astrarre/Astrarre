@@ -11,6 +11,4 @@ pluginManagement {
 }
 
 rootProject.name = "astrarre-api"
-include 'astrarre-internal-v0'
-
-
+include 'Abstract'

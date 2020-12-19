@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
-  "id": "astrarre-internal-v0-testmod",
-  "name": "Astrarre Internals Test Mod",
-  "version": "${version}",
+  "id": "astrarre-fabric-test-mod",
+  "name": "Astrarre Impl Fabric Test Mod",
+  "version": "0.0.0",
   "environment": "*",
-  "license": "LGPLv3",
+  "license": "LGPL-3.0",
   "icon": "icon.png",
   "contact": {
     "sources": "https://github.com/Astrarre/Astrarre"
   },
   "entrypoints": {
     "main": [
-      "test.Cast"
+      "io.github.astrarre.testmod.TestMod"
     ]
   },
   "authors": [

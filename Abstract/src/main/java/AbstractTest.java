@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -62,25 +63,24 @@ public class AbstractTest {
 
 	public static void main(String[] args) throws IOException {
 		// todo wait for player's TR patch to go on maven
-		List<File> classpath = new ArrayList<>();
 		for (String library : PROPERTIES.getProperty("libraries").split(";")) {
 			File file = new File(library);
 			AbstracterLoader.CLASSPATH.addURL(file.toURI().toURL());
-			classpath.add(file);
 		}
 
 		AbstracterLoader.INSTANCE.addURL(new File(PROPERTIES.getProperty("minecraft")).toURI().toURL());
 
 		// settings
-		AbstracterConfig.registerInterface(AbstractBlock.Settings.class,
-				c -> new InterfaceAbstracter(c, "v0/io/github/astrarre/block/IBlock$Settings"));
+		AbstracterConfig.registerInterface(new InterfaceAbstracter(AbstractBlock.Settings.class,
+				"v0/io/github/astrarre/block/Block$Settings"));
 
 		AbstracterConfig.registerInnerOverride(Block.class, AbstractBlock.Settings.class);
 
 		// attachment interfaces > extension methods, cus no javadoc
 		AbstracterUtil.registerDefaultConstants(Blocks.class, Items.class);
-		AbstracterConfig.registerConstants(Material.class,
-				c -> new ConstantsAbstracter(c, "v0/io/github/astrarre/block/Materials"));
+
+		AbstracterConfig.registerConstants(new ConstantsAbstracter(Material.class,
+				"v0/io/github/astrarre/block/MinecraftMaterials"));
 		AbstracterUtil.registerConstantlessInterface(Material.class);
 		registerSubclassBaseInterface(Block.class);
 		registerSubclassBaseInterface(Item.class);
@@ -110,20 +110,15 @@ public class AbstractTest {
 		AbstracterUtil.registerDefaultBase(Material.class);
 
 		File folder = new File(PROPERTIES.getProperty("projectDir"), "generated");
-		folder.mkdirs();
-		AbstracterUtil.apply(classpath,
+		File include = new File(folder, "include");
+		include.mkdirs();
+
+		AbstracterUtil.apply(
 				new File(folder, "api.jar").getAbsolutePath(),
 				new File(folder, "api_sources.jar").getAbsolutePath(),
 				new File(folder, "impl.jar").getAbsolutePath(),
-				new File(folder, "manifest.properties").getAbsolutePath(),
+				new File(include, "manifest.properties").getAbsolutePath(),
 				PROPERTIES.getProperty("mappings"));
-	}
-
-	private static void registerSubclassInterface(Class<?> cls) {
-		AbstracterUtil.registerDefaultInterface(cls);
-		for (Class<?> sub : REFLECTIONS.getSubTypesOf(cls)) {
-			AbstracterUtil.registerDefaultInterface(sub);
-		}
 	}
 
 	private static void registerSubclassBaseInterface(Class<?> sup) {
@@ -132,6 +127,13 @@ public class AbstractTest {
 		for (Class<?> cls : REFLECTIONS.getSubTypesOf(sup)) {
 			AbstracterUtil.registerDefaultInterface(cls);
 			AbstracterUtil.registerDefaultBase(cls);
+		}
+	}
+
+	private static void registerSubclassInterface(Class<?> cls) {
+		AbstracterUtil.registerDefaultInterface(cls);
+		for (Class<?> sub : REFLECTIONS.getSubTypesOf(cls)) {
+			AbstracterUtil.registerDefaultInterface(sub);
 		}
 	}
 }

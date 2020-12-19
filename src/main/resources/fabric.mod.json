@@ -5,10 +5,15 @@
   "description": "The Official Astrarre API Implementation for the Fabric Modloader",
   "version": "${version}",
   "environment": "*",
-  "license": "Apache-2.0",
+  "license": "LGPL-3.0",
   "icon": "icon.png",
   "contact": {
     "sources": "https://github.com/Astrarre/Astrarre"
+  },
+  "entrypoints": {
+    "mm:early_risers": [
+      "io.github.astrarre.internal.AbstractionApplicator"
+    ]
   },
   "authors": [
     "HalfOf2",
