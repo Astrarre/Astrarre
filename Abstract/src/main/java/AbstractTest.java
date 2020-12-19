@@ -1,9 +1,6 @@
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 import io.github.astrarre.abstracter.AbstracterConfig;
@@ -40,11 +37,7 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 
-@SuppressWarnings ({
-		"ConstantConditions",
-		"UnstableApiUsage",
-		"ResultOfMethodCallIgnored"
-})
+@SuppressWarnings ("ResultOfMethodCallIgnored")
 public class AbstractTest {
 	private static final Reflections REFLECTIONS = new Reflections();
 	private static final Properties PROPERTIES = new Properties();
@@ -113,8 +106,7 @@ public class AbstractTest {
 		File include = new File(folder, "include");
 		include.mkdirs();
 
-		AbstracterUtil.apply(
-				new File(folder, "api.jar").getAbsolutePath(),
+		Abstra  cterUtil.applyParallel(new File(folder, "api.jar").getAbsolutePath(),
 				new File(folder, "api_sources.jar").getAbsolutePath(),
 				new File(folder, "impl.jar").getAbsolutePath(),
 				new File(include, "manifest.properties").getAbsolutePath(),

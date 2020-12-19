@@ -40,11 +40,11 @@ public class AbstractionApplicator implements Runnable {
 		boolean isNamed = FabricLoader.getInstance().getMappingResolver().getCurrentRuntimeNamespace().equals("named");
 		PROPERTIES.forEach((k, v) -> {
 			String className = (String) k;
-			// sometimes default methods will conflict and crash the game, this is a hack patch to allow the game to launch in the developer environment
+			// sometimes default methods will conflict and crash the game, this is a hack patch to allow the game to
+			// launch in the developer environment
 			// when amalgamation is finished we'll probably be able to remove this
 			if (isNamed) {
 				ClassTinkerers.addTransformation((String) v, c -> {
-					outer:
 					for (MethodNode method : c.methods) {
 						if (!Modifier.isStatic(method.access)) {
 							// todo just add some marker or something
@@ -55,21 +55,16 @@ public class AbstractionApplicator implements Runnable {
 							expectedInstructions += 2; // aload this, checkcast this -> mc
 							expectedInstructions += parameters.length; // aload 1->X
 							expectedInstructions += 2; // invokeVirtual, return
-							if (list.size() != expectedInstructions) {
-								continue;
-							}
-
-							if (
-								// aload 0
-								ifInstanceOf(list.get(0), VarInsnNode.class, i -> i.var == 0) &&
+							if (list.size() == expectedInstructions &&
+							    // aload 0
+							    ifInstanceOf(list.get(0), VarInsnNode.class, i -> i.var == 0) &&
 							    // checkcast nms
 							    ifInstanceOf(list.get(1),
 									    TypeInsnNode.class,
 									    i -> i.getOpcode() == Opcodes.CHECKCAST) &&
-
-							    validateParameters(parameters, list)
-							    && ifInstanceOf(list.get(2 + parameters.length),
-									MethodInsnNode.class,
+							    // validate parameters (aload 1 -> x)
+							    validateParameters(parameters, list) &&
+							    ifInstanceOf(list.get(2 + parameters.length), MethodInsnNode.class,
 									i -> (i.getOpcode() == Opcodes.INVOKEVIRTUAL || i.getOpcode() == Opcodes.INVOKEINTERFACE) && i.name.equals(
 											method.name) && i.desc.equals(method.desc))) {
 								method.instructions.clear();
