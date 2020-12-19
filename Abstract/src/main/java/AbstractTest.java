@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -106,11 +107,13 @@ public class AbstractTest {
 		File include = new File(folder, "include");
 		include.mkdirs();
 
-		Abstra  cterUtil.applyParallel(new File(folder, "api.jar").getAbsolutePath(),
+
+		AbstracterUtil.applyParallel(new File(folder, "api.jar").getAbsolutePath(),
 				new File(folder, "api_sources.jar").getAbsolutePath(),
 				new File(folder, "impl.jar").getAbsolutePath(),
 				new File(include, "manifest.properties").getAbsolutePath(),
 				PROPERTIES.getProperty("mappings"));
+		AbstracterConfig.writeBaseManifest(new FileOutputStream(new File(include, "base_manifest.properties")));
 	}
 
 	private static void registerSubclassBaseInterface(Class<?> sup) {

@@ -30,6 +30,6 @@ tasks.classes.doFirst {
 }
 
 dependencies {
-    implementation 'io.github.astrarre:abstracter:1.1.4'
+    implementation 'io.github.astrarre:abstracter:1.1.8'
     implementation 'org.reflections:reflections:0.9.12'
 }

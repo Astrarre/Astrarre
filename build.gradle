@@ -60,10 +60,7 @@ dependencies {
     // to add compatibility
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    compileOnly files("$projectDir/generated/api.jar")
     compileOnly files("$projectDir/generated/api_sources.jar")
-
-    modRuntime tasks.fakeImpl.outputs.files
 
     modImplementation "io.github.astrarre:astrarre-extra:0.0.1"
 
@@ -74,6 +71,8 @@ dependencies {
 
 sourceSets {
     main {
+        runtimeClasspath += tasks.fakeImpl.outputs.files
+        compileClasspath += files("$projectDir/generated/api.jar")
         resources {
             srcDir 'generated/include'
         }
@@ -98,13 +97,6 @@ task runTestmodClient(type: RunClientTask) {
 
 task runTestmodServer(type: RunServerTask) {
     classpath sourceSets.testmod.runtimeClasspath
-}
-
-sourceSets {
-    testmod {
-        runtimeClasspath += main.runtimeClasspath
-        compileClasspath += main.compileClasspath
-    }
 }
 
 processResources {
