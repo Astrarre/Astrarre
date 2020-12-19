@@ -1,0 +1,35 @@
+import java.util.stream.Collectors
+
+plugins {
+    id 'java'
+}
+
+group 'io.github.astrarre'
+version '0.0.1'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    maven { url 'https://dl.bintray.com/astrarre/maven' }
+    maven { url 'https://maven.fabricmc.net/' }
+}
+
+tasks.classes.doFirst {
+    def file = new File(sourceSets.main.resources.srcDirs.first(), "gradle_info.properties")
+    if (!file.exists()) {
+        def properties = new Properties()
+        properties.setProperty("mappings", parent.loom.getMappingsProvider().tinyMappings.absolutePath)
+        properties.setProperty("minecraft", parent.configurations.minecraftNamed.resolve().last().absolutePath)
+        properties.setProperty("libraries", parent.configurations.minecraftLibraries.resolve().stream().map() { it.absolutePath }.collect(Collectors.joining(";")))
+        properties.setProperty("projectDir", parent.projectDir.absolutePath)
+        def out = new FileWriter(file)
+        properties.store(out, "Minecraft Libraries, Emitted by classes task")
+        out.close()
+    }
+}
+
+dependencies {
+    implementation 'io.github.astrarre:abstracter:1.1.0'
+    implementation 'org.reflections:reflections:0.9.12'
+}
