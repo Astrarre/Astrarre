@@ -1,5 +1,35 @@
-/gradle_info.properties
-/build/
-/.gradle/
+# Gradle
+.gradle
+
+# Eclipse
+.checkstyle
+.classpath
+.metadata
+.settings
+.project
+*.launch
+
+# Intellij/Idea
+.factorypath
 .idea
-/*.iml
+*.iml
+*.ipr
+*.iws
+
+# Build artifacts
+bin/
+build/
+jars/
+out/
+classes/
+
+# Debug artifacts
+run
+*.log
+
+# Windows
+*.db
+$RECYCLE.BIN/
+
+# Mac
+.DS_Store

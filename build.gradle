@@ -1,17 +1,20 @@
 buildscript {
     repositories {
         mavenCentral()
+        mavenLocal()
         maven { url 'https://dl.bintray.com/astrarre/maven' }
     }
 
     dependencies {
-        classpath 'io.github.astrarre:astrarre-stripper:1.0.1'
+        classpath 'io.github.astrarre:astrarre-stripper:1.1.1'
     }
 }
 
 import io.github.astrarre.stripper.Stripper
 import net.fabricmc.loom.task.RunClientTask
 import net.fabricmc.loom.task.RunServerTask
+
+import java.util.stream.Collectors
 
 plugins {
     id 'java'
@@ -23,15 +26,27 @@ plugins {
     id "fabric-loom" version "0.5.42"
 }
 
-group "io.github.astrarre"
-
 version = project.mod_version
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
 
 loom.runDir = "run"
+loom {
+    shareCaches = true
+}
 
+def root = project
 allprojects {
+    plugins.apply('java')
+    plugins.apply('idea')
+    plugins.apply('eclipse')
+    plugins.apply('java-library')
+    plugins.apply('maven-publish')
+    plugins.apply("com.jfrog.bintray")
+    plugins.apply("fabric-loom")
+
+    group "io.github.astrarre"
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+
     repositories {
         mavenLocal()
         mavenCentral()
@@ -40,165 +55,140 @@ allprojects {
         maven { url 'https://dl.bintray.com/astrarre/maven' }
         maven { url 'https://jitpack.io' }
     }
-}
 
-
-//tasks.dependencies.dependsOn project(":Abstract").runMain todo
-task fakeImpl(type: Jar) {
-    archiveName 'fake_impl.jar'
-    from zipTree("generated/impl.jar")
-    from "generated/fabric.mod.json"
-}
-
-tasks.classes.dependsOn tasks.fakeImpl
-
-dependencies {
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-
-    // to add compatibility
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-
-    compileOnly files("$projectDir/generated/api_sources.jar")
-
-    modImplementation "io.github.astrarre:astrarre-extra:0.0.1"
-
-    // abstraction applicator fabric
-    implementation 'com.github.Chocohead:fabric-asm:v2.1'
-    include 'com.github.Chocohead:fabric-asm:v2.1'
-}
-
-sourceSets {
-    main {
-        runtimeClasspath += tasks.fakeImpl.outputs.files
-        compileClasspath += files("$projectDir/generated/api.jar")
-        resources {
-            srcDir 'generated/include'
-        }
-    }
-    testmod {
-        compileClasspath += main.compileClasspath
-        runtimeClasspath += main.runtimeClasspath
-    }
-}
-
-runClient {
-    classpath 'generated/impl.jar'
-}
-
-runServer {
-    classpath 'generated/impl.jar'
-}
-
-task runTestmodClient(type: RunClientTask) {
-    classpath sourceSets.testmod.runtimeClasspath
-}
-
-task runTestmodServer(type: RunServerTask) {
-    classpath sourceSets.testmod.runtimeClasspath
-}
-
-processResources {
-    inputs.property "version", project.version
-
-    from(sourceSets.main.resources.srcDirs) {
-        include "fabric.mod.json"
-        expand "version": project.version
-    }
-
-    from(sourceSets.main.resources.srcDirs) {
-        exclude "fabric.mod.json"
-    }
-}
-
-jar {
-    from zipTree("generated/impl.jar")
-    from "generated/include/manifest.properties"
-    from "LICENSE"
-}
-
-task strippedJar(type: Zip, dependsOn: jar) {
-    version "_temp_"
-    // source
-    from sourceSets.main.allSource
-    from classes
-
-    doLast {
-        def file = outputs.files.first()
-        def filter = new ArrayList<String>()
-        filter.add("io/github/astrarre/internal/(.*)")
-        Stripper.strip(filter, file, file)
-    }
-}
-
-// api jar, what people are supposed to compileOnly depend on
-task apiJar(type: Jar, dependsOn: strippedJar) {
-    classifier = "api"
-    from zipTree("generated/api_sources.jar")
-    from zipTree("generated/api.jar")
-    with strippedJar
-}
-
-task sourcesJar(type: Jar, dependsOn: classes) {
-    archiveClassifier = "sources"
-    from sourceSets.main.allSource
-}
-
-// configure the maven publication
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifactId = "impl-fabric"
-            // regular old implementation jar
-            artifact(remapJar) {
-                builtBy remapJar
-            }
-
-            // sources for ye normal folk
-            artifact(sourcesJar) {
-                builtBy remapSourcesJar
-            }
-        }
-
-        mavenApi(MavenPublication) {
-            artifactId = "astrarre-api"
-            artifact(apiJar) {
-                builtBy apiJar
-            }
-        }
-    }
-
-    // select the repositories you want to publish to
-    repositories {
-        // uncomment to publish to the local maven
-        mavenLocal()
-    }
-}
-
-bintray {
-    user = project.hasProperty('bintray_user') ? project.property('bintray_user') : ""
-    key = project.hasProperty('bintray_api_key') ? project.property('bintray_api_key') : ""
-    publications = ["mavenJava"]
-    publish = true
-    //[Default: false] Whether version should be auto published after an upload
-    pkg {
-        repo = "maven"
-        name = "astrarre-api"
-        userOrg = "astrarre"
-        licenses = ["LGPL-3.0"]
-        version {
-            name = version
-            released = new Date()
-        }
+    dependencies {
+        minecraft "com.mojang:minecraft:${root.minecraft_version}"
+        mappings "net.fabricmc:yarn:${root.yarn_mappings}:v2"
+        modImplementation "net.fabricmc:fabric-loader:${root.loader_version}"
+        modImplementation "net.fabricmc.fabric-api:fabric-api:${root.fabric_version}"
     }
 }
 
 subprojects {
-    afterEvaluate {
+    def parentProject = parent
+    sourceSets {
+        abstracter {
+            runtimeClasspath += parentProject.configurations.minecraftNamed
+            compileClasspath += parentProject.configurations.minecraftNamed
+        }
+
+        testmod {
+            compileClasspath += main.compileClasspath
+            runtimeClasspath += main.runtimeClasspath
+        }
+    }
+
+    dependencies {
+        modImplementation "io.github.astrarre:astrarre-stripper:1.1.1"
+        testmodCompile sourceSets.main.output
+    }
+
+    def hasAbstractions = {
         dependencies {
-            parent.configurations.minecraftNamed.each {
-                implementation files(it)
+            implementation project(":astrarre-base")
+            include project(":astrarre-base")
+            // todo find out how to include impl jar
+            compileOnly files("$buildDir/abstracted/api.jar")
+            compileOnly files("$buildDir/abstracted/api_sources.jar")
+            runtime zipTree("$buildDir/abstracted/impl.jar")
+        }
+
+        tasks.classes.dependsOn tasks.generateAbstractions
+    }
+
+    task generateAbstractions(type: JavaExec) {
+        group = "abstract"
+        description = "Runs the abstracter config class"
+        classpath = sourceSets.abstracter.runtimeClasspath
+        main = "abstract.Main"
+
+        def file = new File(buildDir, "abstracter_gradle_info.properties")
+        args file.absolutePath
+
+        doFirst {
+            if (!file.exists()) {
+                def properties = new Properties()
+                properties.setProperty("mappings", loom.getMappingsProvider().tinyMappings.absolutePath)
+                properties.setProperty("minecraft", configurations.minecraftNamed.resolve().last().absolutePath)
+                properties.setProperty("libraries", configurations.minecraftLibraries.resolve().stream().map() { it.absolutePath }.collect(Collectors.joining(";")))
+                properties.setProperty("projectDir", projectDir.absolutePath)
+                properties.setProperty("api_jar", "$buildDir/abstracted/api.jar")
+                properties.setProperty("api_sources_jar", "$buildDir/abstracted/api_sources.jar")
+                properties.setProperty("impl_jar", "$buildDir/abstracted/impl.jar")
+                def out = new FileWriter(file)
+                properties.store(out, "Minecraft Libraries, Emitted by classes task")
+                out.close()
+            }
+        }
+    }
+
+    processResources {
+        inputs.property "version", project.version
+
+        from(sourceSets.main.resources.srcDirs) {
+            include "fabric.mod.json"
+            expand "version": project.version
+        }
+
+        from(sourceSets.main.resources.srcDirs) {
+            exclude "fabric.mod.json"
+        }
+    }
+
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        archiveClassifier = "sources"
+        from sourceSets.main.allSource
+    }
+
+    jar {
+        from "$parent.projectDir/LICENSE"
+    }
+
+    // configure the maven publication
+    publishing {
+        publications {
+            /*mavenJava(MavenPublication) {
+                artifactId = "impl-fabric"
+                // regular old implementation jar
+                artifact(remapJar) {
+                    builtBy remapJar
+                }
+
+                // sources for ye normal folk
+                artifact(sourcesJar) {
+                    builtBy remapSourcesJar
+                }
+            }
+
+            mavenApi(MavenPublication) {
+                artifactId = "astrarre-api"
+                artifact(apiJar) {
+                    builtBy apiJar
+                }
+            }*/
+        }
+
+        // select the repositories you want to publish to
+        repositories {
+            // uncomment to publish to the local maven
+            mavenLocal()
+        }
+    }
+
+    bintray {
+        user = project.hasProperty('bintray_user') ? project.property('bintray_user') : ""
+        key = project.hasProperty('bintray_api_key') ? project.property('bintray_api_key') : ""
+        publications = ["mavenJava"]
+        publish = true
+        //[Default: false] Whether version should be auto published after an upload
+        pkg {
+            repo = "maven"
+            name = "astrarre-api"
+            userOrg = "astrarre"
+            licenses = ["LGPL-3.0"]
+            version {
+                name = version
+                released = new Date()
             }
         }
     }

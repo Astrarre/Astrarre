@@ -15,6 +15,9 @@
       "io.github.astrarre.internal.AbstractionApplicator"
     ]
   },
+  "mixins": [
+    "astrarre.mixins.json"
+  ],
   "authors": [
     "HalfOf2",
     "Astrarre"

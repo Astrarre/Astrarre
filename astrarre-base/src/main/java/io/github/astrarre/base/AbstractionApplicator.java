@@ -1,4 +1,4 @@
-package io.github.astrarre.internal;
+package io.github.astrarre.base;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,7 +8,6 @@ import java.util.Properties;
 import java.util.function.Predicate;
 
 import com.chocohead.mm.api.ClassTinkerers;
-import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
@@ -59,9 +58,7 @@ public class AbstractionApplicator implements Runnable {
 		boolean isNamed = FabricLoader.getInstance().getMappingResolver().getCurrentRuntimeNamespace().equals("named");
 		INTERFACE_PROPERTIES.forEach((k, v) -> {
 			String className = (String) k;
-			// sometimes default methods will conflict and crash the game, this is a hack patch to allow the game to
-			// launch in the developer environment
-			// when amalgamation is finished we'll probably be able to remove this
+			// todo improve this logic so it works in other people's dev envs that have different mappings
 			if (isNamed) {
 				ClassTinkerers.addTransformation((String) v, AbstractionApplicator::stripConflicts);
 			}
@@ -74,6 +71,7 @@ public class AbstractionApplicator implements Runnable {
 		}
 	}
 
+	// strip failing override methods
 	private static void stripConflicts(ClassNode node) {
 		Iterator<MethodNode> iterator = node.methods.iterator();
 		while (iterator.hasNext()) {

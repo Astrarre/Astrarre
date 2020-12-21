@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "io.github.astrarre.internal.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "render.Matrix4fMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

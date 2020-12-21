@@ -12,3 +12,6 @@ pluginManagement {
 
 rootProject.name = "astrarre-api"
 include 'Abstract'
+include 'astrarre-rendering-v0'
+include 'astrarre-base'
+
