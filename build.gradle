@@ -6,13 +6,16 @@ buildscript {
     }
 
     dependencies {
-        classpath 'io.github.astrarre:astrarre-stripper:1.1.1'
+        classpath 'io.github.astrarre:astrarre-stripper:1.1.3'
     }
 }
 
-import io.github.astrarre.stripper.Stripper
-import net.fabricmc.loom.task.RunClientTask
-import net.fabricmc.loom.task.RunServerTask
+
+import io.github.astrarre.stripper.gradle.StrippedJar
+import net.fabricmc.loom.task.RemapJarTask
+import org.gradle.api.internal.file.collections.FileTreeAdapter
+import org.gradle.api.internal.file.collections.GeneratedSingletonFileTree
+import org.gradle.api.internal.file.copy.CopySpecInternal
 
 import java.util.stream.Collectors
 
@@ -29,9 +32,7 @@ plugins {
 version = project.mod_version
 
 loom.runDir = "run"
-loom {
-    shareCaches = true
-}
+
 
 def root = project
 allprojects {
@@ -47,6 +48,17 @@ allprojects {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 
+    sourceSets {
+        testmod {
+            compileClasspath += main.compileClasspath
+            runtimeClasspath += main.runtimeClasspath
+        }
+        abstracter {
+            runtimeClasspath += root.configurations.minecraftNamed
+            compileClasspath += root.configurations.minecraftNamed
+        }
+    }
+
     repositories {
         mavenLocal()
         mavenCentral()
@@ -61,94 +73,171 @@ allprojects {
         mappings "net.fabricmc:yarn:${root.yarn_mappings}:v2"
         modImplementation "net.fabricmc:fabric-loader:${root.loader_version}"
         modImplementation "net.fabricmc.fabric-api:fabric-api:${root.fabric_version}"
-    }
-}
-
-subprojects {
-    def parentProject = parent
-    sourceSets {
-        abstracter {
-            runtimeClasspath += parentProject.configurations.minecraftNamed
-            compileClasspath += parentProject.configurations.minecraftNamed
-        }
-
-        testmod {
-            compileClasspath += main.compileClasspath
-            runtimeClasspath += main.runtimeClasspath
-        }
-    }
-
-    dependencies {
         modImplementation "io.github.astrarre:astrarre-stripper:1.1.1"
-        testmodCompile sourceSets.main.output
+        abstracterCompile "io.github.astrarre:abstracter:1.2.5"
     }
 
-    def hasAbstractions = {
-        dependencies {
-            implementation project(":astrarre-base")
-            include project(":astrarre-base")
-            // todo find out how to include impl jar
-            compileOnly files("$buildDir/abstracted/api.jar")
-            compileOnly files("$buildDir/abstracted/api_sources.jar")
-            runtime zipTree("$buildDir/abstracted/impl.jar")
-        }
-
-        tasks.classes.dependsOn tasks.generateAbstractions
+    jar {
+        from "$root.projectDir/LICENSE"
     }
 
-    task generateAbstractions(type: JavaExec) {
-        group = "abstract"
-        description = "Runs the abstracter config class"
-        classpath = sourceSets.abstracter.runtimeClasspath
-        main = "abstract.Main"
-
-        def file = new File(buildDir, "abstracter_gradle_info.properties")
-        args file.absolutePath
-
-        doFirst {
-            if (!file.exists()) {
-                def properties = new Properties()
-                properties.setProperty("mappings", loom.getMappingsProvider().tinyMappings.absolutePath)
-                properties.setProperty("minecraft", configurations.minecraftNamed.resolve().last().absolutePath)
-                properties.setProperty("libraries", configurations.minecraftLibraries.resolve().stream().map() { it.absolutePath }.collect(Collectors.joining(";")))
-                properties.setProperty("projectDir", projectDir.absolutePath)
-                properties.setProperty("api_jar", "$buildDir/abstracted/api.jar")
-                properties.setProperty("api_sources_jar", "$buildDir/abstracted/api_sources.jar")
-                properties.setProperty("impl_jar", "$buildDir/abstracted/impl.jar")
-                def out = new FileWriter(file)
-                properties.store(out, "Minecraft Libraries, Emitted by classes task")
-                out.close()
-            }
-        }
+    loom {
+        shareCaches = true
     }
 
-    processResources {
-        inputs.property "version", project.version
-
-        from(sourceSets.main.resources.srcDirs) {
-            include "fabric.mod.json"
-            expand "version": project.version
-        }
-
-        from(sourceSets.main.resources.srcDirs) {
-            exclude "fabric.mod.json"
-        }
-    }
-
-    task sourcesJar(type: Jar, dependsOn: classes) {
+    task sourcesJar(type: Jar) {
+        group = "astrarre"
         archiveClassifier = "sources"
         from sourceSets.main.allSource
     }
 
-    jar {
-        from "$parent.projectDir/LICENSE"
+    afterEvaluate {
+        processResources {
+            inputs.property "version", project.version
+
+            from(sourceSets.main.resources.srcDirs) {
+                include "fabric.mod.json"
+                expand "version": project.version
+            }
+
+            from(sourceSets.main.resources.srcDirs) {
+                exclude "fabric.mod.json"
+            }
+        }
+    }
+}
+
+def hasAbstractions(Project proj) {
+    println("$proj has abstractions!")
+    proj.configure(proj) {
+        task fakeImplJar(type: Jar) {
+            archiveName 'fake_impl.jar'
+            from zipTree("$proj.buildDir/abstracted/impl.jar")
+            def jar = (CopySpecInternal) getRootSpec().addFirst().into("")
+            jar.addChild().from {
+                GeneratedSingletonFileTree artificalFabricModJson = new GeneratedSingletonFileTree(getTemporaryDirFactory(), "fabric.mod.json", {
+                    it.write("{\"schemaVersion\": 1,\"id\":\"$proj.name-fake-impl\",\"version\": \"version\"}".bytes)
+                })
+                return new FileTreeAdapter(artificalFabricModJson)
+            }
+        }
+
+        dependencies {
+            runtimeOnly tasks.fakeImplJar.outputs.files
+            compile files("$buildDir/abstracted/api.jar")
+            testmodRuntimeOnly tasks.fakeImplJar.outputs.files
+            testmodCompile files("$buildDir/abstracted/api.jar")
+        }
+
+        tasks.compileJava.dependsOn tasks.fakeImplJar
+
+        task generateAbstractions(type: JavaExec) {
+            group = "astrarre"
+            description = "Runs the abstracter config class"
+            classpath = sourceSets.abstracter.runtimeClasspath
+            inputs.files classpath
+
+            outputs.file "$buildDir/abstracted/api.jar"
+            outputs.file "$buildDir/abstracted/api_sources.jar"
+            outputs.file "$buildDir/abstracted/impl.jar"
+            outputs.cacheIf { true }
+            main = "Main"
+
+            def file = new File(buildDir, "abstracter_gradle_info.properties")
+            args file.absolutePath
+
+            doFirst {
+                new File(buildDir, "abstracted").mkdirs()
+                if (!file.exists()) {
+                    def properties = new Properties()
+                    properties.setProperty("mappings", loom.getMappingsProvider().tinyMappings.absolutePath)
+                    properties.setProperty("minecraft", configurations.minecraftNamed.resolve().last().absolutePath)
+                    properties.setProperty("libraries", configurations.minecraftLibraries.resolve().stream().map() { it.absolutePath }.collect(Collectors.joining(";")))
+                    properties.setProperty("api_jar", "$buildDir/abstracted/api.jar")
+                    properties.setProperty("api_sources_jar", "$buildDir/abstracted/api_sources.jar")
+                    properties.setProperty("impl_jar", "$buildDir/abstracted/impl.jar")
+                    def out = new FileWriter(file)
+                    properties.store(out, "Minecraft Libraries, Emitted by classes task")
+                    out.close()
+                }
+            }
+        }
+
+        tasks.compileJava.dependsOn tasks.generateAbstractions
+        tasks.fakeImplJar.dependsOn tasks.generateAbstractions
+        // todo delete if unessary
+        task implJar(type: Jar, dependsOn: jar) {
+            group = "astrarre"
+            classifier = "impl-dev"
+            with jar
+            from zipTree("$buildDir/abstracted/impl.jar")
+        }
+
+        afterEvaluate {
+            RemapJarTask task = proj.tasks.remapJar
+            task.input = implJar.outputs.files.first()
+            task.dependsOn implJar
+        }
+    }
+}
+
+dependencies {
+    afterEvaluate {
+        subprojects.each {
+            compile project(":${it.name}")
+            include project("${it.name}:")
+            testmodCompile project("${it.name}:").sourceSets.testmod.output
+        }
+    }
+}
+
+subprojects {
+    dependencies {
+        testmodCompile sourceSets.main.output
     }
 
+    task stripJar(type: StrippedJar) {
+        group = "astrarre"
+        archiveClassifier = "stripped"
+        from sourceSets.main.allSource
+        with jar
+    }
+
+    task apiJar(type: Jar) {
+        group = "astrarre"
+        archiveClassifier = "api"
+        with stripJar
+        afterEvaluate {
+            if (project.tasks.findByName("generateAbstractions") != null) {
+                from zipTree("$buildDir/abstracted/api.jar")
+                from zipTree("$buildDir/abstracted/api_sources.jar")
+            }
+        }
+    }
+}
+
+task apiJar(type: Jar) {
+    group = "astrarre"
+    classifier = "api"
+    subprojects.each {
+        with it.tasks.apiJar {
+            exclude "LICENSE"
+        }
+    }
+    exclude("fabric.mod.json")
+    from "LICENSE"
+}
+
+subprojects.each {
+    apiJar.dependsOn it.tasks.apiJar
+}
+
+allprojects {
     // configure the maven publication
     publishing {
         publications {
-            /*mavenJava(MavenPublication) {
-                artifactId = "impl-fabric"
+            mavenJava(MavenPublication) {
+                artifactId = "$project.name-fabric"
                 // regular old implementation jar
                 artifact(remapJar) {
                     builtBy remapJar
@@ -158,14 +247,25 @@ subprojects {
                 artifact(sourcesJar) {
                     builtBy remapSourcesJar
                 }
+
+                pom.withXml {
+                    def depsNode = asNode().appendNode("dependencies")
+                    subprojects.each {
+                        def depNode = depsNode.appendNode("dependency")
+                        depNode.appendNode("groupId", it.group)
+                        depNode.appendNode("artifactId", "$it.name-fabric")
+                        depNode.appendNode("version", it.version)
+                        depNode.appendNode("scope", "runtime")
+                    }
+                }
             }
 
             mavenApi(MavenPublication) {
-                artifactId = "astrarre-api"
+                artifactId = "$project.name-api"
                 artifact(apiJar) {
                     builtBy apiJar
                 }
-            }*/
+            }
         }
 
         // select the repositories you want to publish to
@@ -178,7 +278,7 @@ subprojects {
     bintray {
         user = project.hasProperty('bintray_user') ? project.property('bintray_user') : ""
         key = project.hasProperty('bintray_api_key') ? project.property('bintray_api_key') : ""
-        publications = ["mavenJava"]
+        publications = ["mavenJava", "mavenApi"]
         publish = true
         //[Default: false] Whether version should be auto published after an upload
         pkg {

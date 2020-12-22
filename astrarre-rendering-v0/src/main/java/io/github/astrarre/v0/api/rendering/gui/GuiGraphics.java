@@ -1,8 +1,8 @@
 package io.github.astrarre.v0.api.rendering.gui;
 
-import io.github.astrarre.Hide;
 import io.github.astrarre.internal.access.render.Matrix4fAccess;
 import io.github.astrarre.internal.gui.GuiScreen;
+import io.github.astrarre.stripper.Hide;
 import io.github.astrarre.v0.api.rendering.util.ColorUtil;
 
 import net.minecraft.client.gui.DrawableHelper;

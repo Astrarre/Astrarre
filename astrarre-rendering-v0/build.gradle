@@ -1,4 +1,6 @@
 version '0.0.1'
+hasAbstractions(project)
 dependencies {
     implementation project(":astrarre-base")
+    implementation project(":astrarre-common-v0")
 }

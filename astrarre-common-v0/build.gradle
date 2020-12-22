@@ -1,0 +1,5 @@
+version '0.0.1'
+hasAbstractions(project)
+dependencies {
+    implementation project(':astrarre-base')
+}

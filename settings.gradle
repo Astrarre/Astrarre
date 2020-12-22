@@ -10,7 +10,8 @@ pluginManagement {
     }
 }
 
-rootProject.name = "astrarre-api"
+rootProject.name = "astrarre"
 include 'astrarre-rendering-v0'
 include 'astrarre-base'
+include 'astrarre-common-v0'
 
