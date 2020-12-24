@@ -9,11 +9,6 @@
   "contact": {
     "sources": "https://github.com/Astrarre/Astrarre"
   },
-  "entrypoints": {
-    "main": [
-      "io.github.astrarre.testmod.TestMod"
-    ]
-  },
   "authors": [
     "HalfOf2",
     "Astrarre"

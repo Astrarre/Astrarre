@@ -1,0 +1,24 @@
+task apiJar(type: Jar) {
+    group = "astrarre"
+    classifier = "api"
+    subprojects.each {
+        with it.tasks.apiJar {
+            exclude "LICENSE"
+        }
+    }
+    exclude("fabric.mod.json")
+    from "LICENSE"
+}
+
+def apiJarTask = tasks.apiJar
+subprojects.each {
+    apiJarTask.dependsOn it.tasks.apiJar
+}
+
+dependencies {
+    afterEvaluate {
+        subprojects.each {
+            include project("${it.name}:")
+        }
+    }
+}

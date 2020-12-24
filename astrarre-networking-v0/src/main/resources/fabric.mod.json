@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "id": "astrarre-fabric",
-  "name": "Astrarre Impl Fabric",
-  "description": "The Official Astrarre API Implementation for the Fabric Modloader",
+  "id": "astrarre-networking-v0",
+  "name": "Astrarre Networking v0",
+  "description": "A Networking API for Astrarre",
   "version": "${version}",
   "environment": "*",
   "license": "LGPL-3.0",
@@ -14,7 +14,10 @@
     "HalfOf2",
     "Astrarre"
   ],
-  "depends": {
-    "fabricloader": ">=0.8.9"
-  }
+  "custom": {
+    "nano:uses_AP": true
+  },
+  "mixins": [
+    "astrarre-network.mixins.json"
+  ]
 }

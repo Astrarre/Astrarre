@@ -1,0 +1,37 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        maven { url 'https://dl.bintray.com/astrarre/maven' }
+    }
+
+    dependencies {
+        classpath 'io.github.astrarre:astrarre-stripper:1.1.3'
+    }
+}
+
+import io.github.astrarre.stripper.gradle.StrippedJar
+subprojects {
+    dependencies {
+        testmodCompile sourceSets.main.output
+    }
+
+    task stripJar(type: StrippedJar) {
+        group = "astrarre"
+        archiveClassifier = "stripped"
+        from sourceSets.main.allSource
+        with jar
+    }
+
+    task apiJar(type: Jar) {
+        group = "astrarre"
+        archiveClassifier = "api"
+        with stripJar
+        afterEvaluate {
+            if (project.tasks.findByName("generateAbstractions") != null) {
+                from zipTree("$buildDir/abstracted/api.jar")
+                from zipTree("$buildDir/abstracted/api_sources.jar")
+            }
+        }
+    }
+}

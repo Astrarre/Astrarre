@@ -1,0 +1,2 @@
+version '0.0.0'
+moduleDependencies(project, ['astrarre-rendering-v0', 'astrarre-networking-v0'])

@@ -51,7 +51,7 @@ public class AbstractionApplicator implements Runnable, Opcodes {
 		try {
 			for (ModContainer mod : loader.getAllMods()) {
 				Path path = mod.getPath("/intr_manifest.properties");
-				if(Files.exists(path)) {
+				if (Files.exists(path)) {
 					Properties interfaceProperties = read(Files.newInputStream(path));
 					interfaceProperties.forEach((k, v) -> {
 						String className = resolver.mapClassName("intermediary", ((String) k).replace('/', '.'));
@@ -63,15 +63,16 @@ public class AbstractionApplicator implements Runnable, Opcodes {
 						ClassTinkerers.addTransformation(className, c -> c.interfaces.add((String) v));
 					});
 				}
+				Path base = mod.getPath("/base_manifest.txt");
+				if (Files.exists(base)) {
+					Files.newBufferedReader(base).lines().forEach(v -> ClassTinkerers.addTransformation(v, c -> stripConflicts(c, false)));
+				}
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 
 
-		//if (isNamed) {
-		//	BASE_PROPERTIES.forEach((k, v) -> ClassTinkerers.addTransformation((String) v, c -> stripConflicts(c, false)));
-		//}
 	}
 
 	private static Properties read(InputStream reader) {

@@ -11,7 +11,8 @@ pluginManagement {
 }
 
 rootProject.name = "astrarre"
-include 'astrarre-rendering-v0'
 include 'astrarre-base'
 include 'astrarre-common-v0'
-
+include 'astrarre-rendering-v0'
+include 'astrarre-networking-v0'
+include 'astrarre-gui-v0'

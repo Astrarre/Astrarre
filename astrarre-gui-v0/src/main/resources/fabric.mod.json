@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "id": "astrarre-fabric",
-  "name": "Astrarre Impl Fabric",
-  "description": "The Official Astrarre API Implementation for the Fabric Modloader",
+  "id": "astrarre-gui-v0",
+  "name": "Astrarre Gui v0",
+  "description": "A GUI API for Astrarre",
   "version": "${version}",
   "environment": "*",
   "license": "LGPL-3.0",
