@@ -37,23 +37,30 @@ static def nanoevents(Project project) {
 }
 
 static def moduleDependencies(project, List<String> depNames) {
-    def deps = depNames.iterator().collect { project.rootProject.project(":$it") }
-    project.dependencies {
-        deps.each {
-            compile it
+    project.configure(project) {
+        def deps = depNames.iterator().collect { rootProject.project(":$it") }
+        dependencies {
+            deps.each {
+                if(it != project) {
+                    compile it
+                }
+            }
         }
-    }
-    project.publishing {
-        publications {
-            mavenJava(MavenPublication) {
-                pom.withXml {
-                    def depsNode = asNode().appendNode("dependencies")
-                    deps.each {
-                        def depNode = depsNode.appendNode("dependency")
-                        depNode.appendNode("groupId", it.group)
-                        depNode.appendNode("artifactId", it.name)
-                        depNode.appendNode("version", it.version)
-                        depNode.appendNode("scope", "compile")
+
+        publishing {
+            publications {
+                mavenJava(MavenPublication) {
+                    pom.withXml {
+                        def depsNode = asNode().appendNode("dependencies")
+                        deps.each {
+                            if(it != project) {
+                                def depNode = depsNode.appendNode("dependency")
+                                depNode.appendNode("groupId", it.group)
+                                depNode.appendNode("artifactId", it.name)
+                                depNode.appendNode("version", it.version)
+                                depNode.appendNode("scope", "compile")
+                            }
+                        }
                     }
                 }
             }
@@ -69,7 +76,7 @@ import java.util.stream.Collectors
 
 static def hasAbstraction(Project proj) {
     println("$proj generates abstractions")
-    moduleDependencies(proj, ['astrarre-base'])
+    moduleDependencies(proj, ['astrarre-common-v0'])
     proj.configure(proj) {
         task fakeImplJar(type: Jar) {
             archiveName 'fake_impl.jar'

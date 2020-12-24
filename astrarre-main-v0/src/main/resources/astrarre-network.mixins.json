@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "io.github.astrarre.networking.internal.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "CustomPayloadC2SPacketAccess",
+    "ServerPlayNetworkHandlerMixin"
+  ],
+  "client": [
+    "ClientPlayNetworkHandlerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

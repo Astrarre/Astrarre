@@ -18,7 +18,9 @@ subprojects.each {
 dependencies {
     afterEvaluate {
         subprojects.each {
-            include project("${it.name}:")
+            Project project = project("$it.name:")
+            include project
+            testmodCompile project.sourceSets.testmod.output
         }
     }
 }

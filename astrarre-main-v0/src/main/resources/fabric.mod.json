@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "id": "astrarre-base",
-  "name": "Astrarre Base",
-  "description": "A small set of Astrarre's internal classes",
+  "id": "astrarre-main-v0",
+  "name": "Astrarre Main",
+  "description": "The primary api for astrarre, it contains all intertwined APIs",
   "version": "${version}",
   "environment": "*",
   "license": "LGPL-3.0",
@@ -10,13 +10,14 @@
   "contact": {
     "sources": "https://github.com/Astrarre/Astrarre"
   },
-  "entrypoints": {
-    "mm:early_risers": [
-      "io.github.astrarre.internal.common.AbstractionApplicator"
-    ]
-  },
   "authors": [
     "HalfOf2",
     "Astrarre"
+  ],
+  "custom": {
+    "nano:uses_AP": true
+  },
+  "mixins": [
+    "astrarre-network.mixins.json"
   ]
 }
