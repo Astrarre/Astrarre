@@ -1,6 +1,7 @@
 package io.github.astrarre.gui.internal;
 
 import io.github.astrarre.gui.internal.access.Matrix4fAccess;
+import io.github.astrarre.gui.v0.api.textures.Texture;
 import io.github.astrarre.stripper.Hide;
 import io.github.astrarre.gui.v0.api.util.Closeable;
 import io.github.astrarre.gui.v0.api.Graphics2d;
@@ -15,21 +16,24 @@ import net.fabricmc.api.Environment;
 
 @Environment (EnvType.CLIENT)
 public class GuiGraphics implements Graphics2d {
-	@Hide public final GuiScreen screen;
 	@Hide public MatrixStack matrices;
 	/**
 	 * offset bounds
 	 */
-	private int x, y;
+	private float x, y, z;
 
 	@Hide
-	public GuiGraphics(MatrixStack matrices, GuiScreen screen) {
+	public GuiGraphics(MatrixStack matrices) {
 		this.matrices = matrices;
-		this.screen = screen;
 	}
 
 	@Override
-	public void drawHorizontalLineByLength(int x, int y, int length, int color) {
+	public void drawTexture(Texture texture, int x1, int y1, int x2, int y2, float x, float y) {
+
+	}
+
+	@Override
+	public void drawHorizontalLineByLength(float x, float y, int length, int color) {
 		this.drawHorizontalLine(x, y, x + length, color);
 	}
 
@@ -37,9 +41,9 @@ public class GuiGraphics implements Graphics2d {
 	 * @implNote {@link DrawableHelper#drawHorizontalLine(MatrixStack, int, int, int, int)}
 	 */
 	@Override
-	public void drawHorizontalLine(int startX, int y, int endX, int color) {
+	public void drawHorizontalLine(float startX, float y, float endX, int color) {
 		if (endX < startX) {
-			int i = startX;
+			float i = startX;
 			startX = endX;
 			endX = i;
 		}
@@ -48,12 +52,13 @@ public class GuiGraphics implements Graphics2d {
 		endX += this.x;
 		y += this.y;
 
-		DrawableHelper.fill(this.matrices, startX, y, endX + 1, y + 1, color);
+		this.fill(startX, y, endX + 1, y + 1, color);
 	}
 
 
+
 	@Override
-	public void drawVerticalLineByLength(int x, int y, int length, int color) {
+	public void drawVerticalLineByLength(float x, float y, int length, int color) {
 		this.drawVerticalLine(x, y, y + length, color);
 	}
 
@@ -61,9 +66,9 @@ public class GuiGraphics implements Graphics2d {
 	 * @implNote {@link DrawableHelper#drawVerticalLine(MatrixStack, int, int, int, int)}
 	 */
 	@Override
-	public void drawVerticalLine(int x, int startY, int endY, int color) {
+	public void drawVerticalLine(float x, float startY, float endY, int color) {
 		if (endY < startY) {
-			int i = startY;
+			float i = startY;
 			startY = endY;
 			endY = i;
 		}
@@ -72,36 +77,36 @@ public class GuiGraphics implements Graphics2d {
 		startY += this.y;
 		endY += this.y;
 
-		DrawableHelper.fill(this.matrices, x, startY + 1, x + 1, endY, color);
+		this.fill(x, startY + 1, x + 1, endY, color);
 	}
 
 
 	@Override
-	public void fill(int x1, int y1, int x2, int y2, int color) {
+	public void fill(float x1, float y1, float x2, float y2, int color) {
 		x1 += this.x;
 		y1 += this.y;
 		x2 += this.x;
 		y2 += this.y;
-		DrawableHelper.fill(this.matrices, x1, y1, x2, y2, color);
+		DrawableHelper2.fill(this.matrices.peek().getModel(), x1, y1, x2, y2, color);
 	}
 
 
 	@Override
-	public void fillGradient(int x1, int y1, int x2, int y2, int startColor, int endColor) {
+	public void fillGradient(float x1, float y1, float x2, float y2, int startColor, int endColor) {
 		x1 += this.x;
 		y1 += this.y;
 		x2 += this.x;
 		y2 += this.y;
-		this.screen.fillGradient(this.matrices, x1, y1, x2, y2, startColor, endColor);
+		DrawableHelper2.fillGradient(this.matrices, x1, y1, x2, y2, this.getZ(), startColor, endColor);
 	}
 
 	@Override
-	public Closeable rotate(int x, int y, float degrees) {
+	public Closeable rotate(float x, float y, float degrees) {
 		return this.rotateAndTranslate(x, y, degrees, 0, 0);
 	}
 
 	@Override
-	public Closeable translate(int deltaX, int deltaY) {
+	public Closeable translate(float deltaX, float deltaY) {
 		this.matrices.push();
 		Matrix4f matrix4f = this.matrices.peek().getModel();
 		Matrix4fAccess.cast(matrix4f).astrarre_addToLastColumn(deltaX, deltaY, 0);
@@ -110,7 +115,7 @@ public class GuiGraphics implements Graphics2d {
 	}
 
 	@Override
-	public Closeable rotateAndTranslate(int originX, int originY, float degrees, int translateX, int translateY) {
+	public Closeable rotateAndTranslate(float originX, float originY, float degrees, float translateX, float translateY) {
 		originX += this.x;
 		originY += this.y;
 		translateX += this.x;
@@ -126,26 +131,26 @@ public class GuiGraphics implements Graphics2d {
 	}
 
 	@Override
-	public Closeable setOffsetCloseable(int x, int y) {
-		int ox1 = this.x, oy1 = this.y;
+	public Closeable setOffsetCloseable(float x, float y) {
+		float ox1 = this.x, oy1 = this.y;
 		this.setOffset(x, y);
 		return () -> this.setOffset(ox1, oy1);
 	}
 
 	@Override
-	public void setOffset(int x, int y) {
+	public void setOffset(float x, float y) {
 		this.x = x;
 		this.y = y;
 	}
 
 	@Override
-	public void setZ(int z) {
-		this.screen.setZOffset(z);
+	public void setZ(float z) {
+		this.z = z;
 	}
 
 	@Override
-	public int getZ() {
-		return this.screen.getZOffset();
+	public float getZ() {
+		return this.z;
 	}
 
 	@Hide

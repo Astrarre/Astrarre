@@ -1,9 +1,6 @@
 package io.github.astrarre.gui.v0.api.components;
 
-import io.github.astrarre.stripper.Hide;
-import io.github.astrarre.gui.v0.api.annotations.ClientOnlyProperty;
 import io.github.astrarre.gui.v0.api.Graphics2d;
-import io.github.astrarre.gui.v0.api.util.Closeable;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -13,36 +10,19 @@ import net.fabricmc.api.Environment;
  */
 public abstract class Component {
 	/**
-	 * the offset of the current component
+	 * The scale is always 'just right' for any given height and width, but not for position.
+	 * These bounds are not enforced in the render method, they are only used for collision in the HUD and passing events in Widget
 	 */
-	@ClientOnlyProperty
-	public int x, y;
-
-	private int id;
+	public float height, width;
+	public DynamicLocation location;
 
 	/**
 	 * @param tickDelta the 'fraction' of the tick that this is being rendered in.
 	 */
-	@Environment(EnvType.CLIENT)
-	public final void render(Graphics2d g2d, float tickDelta) {
-		int zLevel = g2d.getZ();
-		g2d.setZ(zLevel + 1);
-		try(Closeable ignored = g2d.setOffsetCloseable(this.x, this.y)) {
-			this.render0(g2d, tickDelta);
-		} finally {
-			g2d.setZ(zLevel);
-		}
-	}
+	@Environment (EnvType.CLIENT)
+	public abstract void render(Graphics2d g2d, float tickDelta);
 
-	@Environment(EnvType.CLIENT)
-	protected abstract void render0(Graphics2d g2d, float tickDelta);
-
-	public int getId() {
-		return this.id;
-	}
-
-	@Hide
-	public void setId(int id) {
-		this.id = id;
+	public Point2f getLocation(float screenWidth, float screenHeight) {
+		return this.location.getLocation(screenWidth, screenHeight);
 	}
 }

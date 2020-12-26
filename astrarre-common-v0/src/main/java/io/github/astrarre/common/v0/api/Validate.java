@@ -35,4 +35,9 @@ public class Validate {
 		}
 		throw new IllegalArgumentException(String.format("%s (%d) < %d!", name, val, comp));
 	}
+
+	public static <T> T notNull(T object, String message) {
+		if(object == null) throw new IllegalArgumentException(message);
+		return object;
+	}
 }

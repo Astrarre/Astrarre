@@ -1,4 +1,4 @@
-package io.github.astrarre.gui.v0.api.util;
+package io.github.astrarre.gui.v0.api.textures;
 
 import io.github.astrarre.common.v0.api.Validate;
 import io.github.astrarre.v0.util.Id;

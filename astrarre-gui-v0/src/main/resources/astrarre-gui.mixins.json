@@ -3,7 +3,8 @@
   "package": "io.github.astrarre.gui.internal.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "Matrix4fMixin"
+    "Matrix4fMixin",
+    "SpriteAtlasHolderMixin"
   ],
   "client": [
   ],
