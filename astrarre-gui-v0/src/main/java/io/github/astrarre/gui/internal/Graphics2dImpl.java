@@ -1,21 +1,22 @@
 package io.github.astrarre.gui.internal;
 
 import io.github.astrarre.gui.internal.access.Matrix4fAccess;
-import io.github.astrarre.gui.v0.api.textures.Texture;
-import io.github.astrarre.stripper.Hide;
-import io.github.astrarre.gui.v0.api.util.Closeable;
 import io.github.astrarre.gui.v0.api.Graphics2d;
+import io.github.astrarre.gui.v0.api.textures.Texture;
+import io.github.astrarre.gui.v0.api.util.Closeable;
+import io.github.astrarre.stripper.Hide;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Vector3f;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Matrix4f;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 @Environment (EnvType.CLIENT)
-public class GuiGraphics implements Graphics2d {
+public class Graphics2dImpl implements Graphics2d {
 	@Hide public MatrixStack matrices;
 	/**
 	 * offset bounds
@@ -23,13 +24,14 @@ public class GuiGraphics implements Graphics2d {
 	private float x, y, z;
 
 	@Hide
-	public GuiGraphics(MatrixStack matrices) {
+	public Graphics2dImpl(MatrixStack matrices) {
 		this.matrices = matrices;
 	}
 
 	@Override
 	public void drawTexture(Texture texture, int x1, int y1, int x2, int y2, float x, float y) {
-
+		MinecraftClient.getInstance().getTextureManager().bindTexture((Identifier) texture.getIdentifier());
+		DrawableHelper2.drawTexture(this.matrices, x, y, this.z, x1, y1, x2 - x1, y2 - y1, texture.getHeight(), texture.getWidth());
 	}
 
 	@Override
@@ -54,7 +56,6 @@ public class GuiGraphics implements Graphics2d {
 
 		this.fill(startX, y, endX + 1, y + 1, color);
 	}
-
 
 
 	@Override
@@ -110,7 +111,6 @@ public class GuiGraphics implements Graphics2d {
 		this.matrices.push();
 		Matrix4f matrix4f = this.matrices.peek().getModel();
 		Matrix4fAccess.cast(matrix4f).astrarre_addToLastColumn(deltaX, deltaY, 0);
-		matrix4f.addToLastColumn(new Vector3f(deltaX, deltaY, 0));
 		return () -> this.matrices.pop();
 	}
 
@@ -143,7 +143,10 @@ public class GuiGraphics implements Graphics2d {
 		this.y = y;
 	}
 
-	@Override
+	@Hide
+	public MatrixStack getMatrices() {
+		return this.matrices;
+	}	@Override
 	public void setZ(float z) {
 		this.z = z;
 	}
@@ -153,8 +156,5 @@ public class GuiGraphics implements Graphics2d {
 		return this.z;
 	}
 
-	@Hide
-	public MatrixStack getMatrices() {
-		return this.matrices;
-	}
+
 }

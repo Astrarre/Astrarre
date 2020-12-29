@@ -1,8 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "astrarre-gui-v0",
-  "name": "Astrarre Gui v0",
-  "description": "A GUI API for Astrarre",
+  "id": "astrarre-main-testmod-v0",
   "version": "${version}",
   "environment": "*",
   "license": "LGPL-3.0",
@@ -10,12 +8,11 @@
   "contact": {
     "sources": "https://github.com/Astrarre/Astrarre"
   },
-  "mixins": ["astrarre-gui.mixins.json"],
+  "entrypoints": {
+    "main": ["testmod.Init"]
+  },
   "authors": [
     "HalfOf2",
     "Astrarre"
-  ],
-  "depends": {
-    "fabricloader": ">=0.8.9"
-  }
+  ]
 }

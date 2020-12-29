@@ -2,10 +2,20 @@ package io.github.astrarre.gui.v0.api.components.button;
 
 import io.github.astrarre.gui.v0.api.textures.Texture;
 
+import net.minecraft.util.Identifier;
+
 /**
  * @see Builder
  */
 public class ButtonTextures {
+	private static final Identifier TEXTURE = new Identifier("textures/gui/container/beacon.png");
+	private static final Texture BEACON_TEXTURE = new Texture(TEXTURE, 256, 256);
+	public static final ButtonTextures BEACON_BUTTON = new Builder()
+			.setNormal(BEACON_TEXTURE, 0, 219, 21, 240)
+			.setHover(BEACON_TEXTURE, 66, 219,87, 240)
+			.setPressed(BEACON_TEXTURE, 22, 219, 43, 240)
+			.build();
+
 	public final Texture hover, press, normal;
 	public final int hoverX1, hoverY1, hoverX2, hoverY2, pressX1, pressY1, pressX2, pressY2, normalX1, normalY1, normalX2, normalY2;
 

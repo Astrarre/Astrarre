@@ -40,4 +40,11 @@ public class Validate {
 		if(object == null) throw new IllegalArgumentException(message);
 		return object;
 	}
+
+	public static <A, B> B instanceOf(A object, Class<B> cls, String message) {
+		if(cls.isInstance(object)) {
+			return (B) object;
+		}
+		throw new IllegalArgumentException(message);
+	}
 }

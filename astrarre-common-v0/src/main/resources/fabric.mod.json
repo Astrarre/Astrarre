@@ -12,7 +12,7 @@
   },
   "entrypoints": {
     "mm:early_risers": [
-      "io.github.astrarre.internal.common.AbstractionApplicator"
+      "io.github.astrarre.common.internal.AbstractionApplicator"
     ]
   },
   "authors": [

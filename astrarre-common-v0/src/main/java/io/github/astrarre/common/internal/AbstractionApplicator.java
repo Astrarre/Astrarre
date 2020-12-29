@@ -55,7 +55,6 @@ public class AbstractionApplicator implements Runnable, Opcodes {
 					Properties interfaceProperties = read(Files.newInputStream(path));
 					interfaceProperties.forEach((k, v) -> {
 						String className = resolver.mapClassName("intermediary", ((String) k).replace('/', '.'));
-						System.out.println("transforming " + className);
 						if (isNamed) {
 							ClassTinkerers.addTransformation((String) v, c -> stripConflicts(c, true));
 						}

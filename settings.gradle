@@ -14,3 +14,4 @@ rootProject.name = "astrarre"
 include 'astrarre-common-v0'
 include 'astrarre-gui-v0'
 include 'astrarre-main-v0'
+include 'astrarre-items-v0'

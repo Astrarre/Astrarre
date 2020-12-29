@@ -13,22 +13,35 @@ import io.github.astrarre.v0.client.texture.Sprite;
 import io.github.astrarre.v0.util.Id;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.resource.ReloadableResourceManager;
 import net.minecraft.util.Identifier;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-@Environment(EnvType.CLIENT)
+@Environment (EnvType.CLIENT)
 public interface SpriteManager {
-	SpriteManager POTION_EFFECTS = (SpriteManager) Validate.notNull(MinecraftClient.getInstance().getStatusEffectSpriteManager(), "SpriteManager was loaded too early!");
-	SpriteManager PAINTINGS = (SpriteManager) Validate.notNull(MinecraftClient.getInstance().getPaintingManager(), "SpriteManager was loaded too early!");
+	SpriteManager POTION_EFFECTS = Validate.instanceOf(MinecraftClient.getInstance().getStatusEffectSpriteManager(),
+			SpriteManager.class,
+			"SpriteManager was loaded too early!");
+	SpriteManager PAINTINGS = Validate.instanceOf(MinecraftClient.getInstance().getPaintingManager(),
+			SpriteManager.class,
+			"SpriteManager was loaded too early!");
+
 	static SpriteManager.Builder create(String modid, String path) {
 		return new Builder(modid, path);
 	}
 
+	/**
+	 * this must be created in a client initializer
+	 */
 	static SpriteManager create(String modid, String path, Supplier<Stream<Id>> valid) {
-		return (SpriteManager) new AstrarreSpriteManager(MinecraftClient.getInstance().getTextureManager(), new Identifier(modid, "textures/atlas/" + path + "s.png"), path,
-				(Supplier)valid);
+		AstrarreSpriteManager manager = new AstrarreSpriteManager(MinecraftClient.getInstance().getTextureManager(),
+				new Identifier(modid, "textures/atlas/" + path + "s.png"),
+				path,
+				(Supplier) valid);
+		((ReloadableResourceManager) MinecraftClient.getInstance().getResourceManager()).registerListener(manager);
+		return (SpriteManager) manager;
 	}
 
 	void forEach(Consumer<Sprite> consumer);

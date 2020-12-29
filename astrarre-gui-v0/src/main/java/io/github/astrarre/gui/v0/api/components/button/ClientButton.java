@@ -9,10 +9,8 @@ public class ClientButton extends Widget {
 	protected boolean isHovering, isPressed;
 	protected Runnable action;
 
-	public ClientButton(ButtonTextures textures, float height, float width) {
+	public ClientButton(ButtonTextures textures) {
 		this.textures = textures;
-		this.height = height;
-		this.width = width;
 	}
 
 	@Override
@@ -33,7 +31,7 @@ public class ClientButton extends Widget {
 	}
 
 	@Override
-	public void onMouseLeave() {
+	public void onMouseOutside() {
 		this.isHovering = false;
 		this.isPressed = false;
 	}

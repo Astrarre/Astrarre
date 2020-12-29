@@ -11,22 +11,22 @@ public abstract class Widget extends Component {
 	// todo Cursor class for cursor Items/Files/Whatever (custom Component for custom cursor stacks)
 
 	/**
-	 * @param g2d automatically offset by {@link #getLocation(float, float)}
+	 * @param g2d automatically offset by {@link #getBounds(float, float)}
 	 */
 	@Override
 	public abstract void render(Graphics2d g2d, float tickDelta);
 
 	/**
-	 * like all other methods, the coordinates are relative to {@link #getLocation(float, float)}
+	 * like all other methods, the coordinates are relative to {@link #getBounds(float, float)}
 	 * this is fired every time the mouse moves and is found to be inside the widget
 	 * @return true if the mouse over event was handled, and should not be passed to other components
 	 */
 	public boolean onMouseOver(float x, float y) {return false;}
 
 	/**
-	 * fired when the mouse leaves the bounds of the widget
+	 * fired when the mouse moves outside the bounds of the widget
 	 */
-	public void onMouseLeave() {}
+	public void onMouseOutside() {}
 
 	/**
 	 * called when the component is clicked. This method does not differentiate between the user holding the button down and clicking it briefly.

@@ -5,7 +5,7 @@ import io.github.astrarre.gui.v0.api.util.ColorUtil;
 import io.github.astrarre.gui.v0.api.textures.Texture;
 
 public interface Graphics2d {
-	// todo drawTexture and friends
+	// todo drawTextures, drawSprite
 
 	/**
 	 * Crops the texture from (x1, y1) -> (x2, y2) and draws it at (x, y)

@@ -1,7 +1,10 @@
 package io.github.astrarre.gui.v0.api.textures;
 
 import io.github.astrarre.common.v0.api.Validate;
+import io.github.astrarre.stripper.Hide;
 import io.github.astrarre.v0.util.Id;
+
+import net.minecraft.util.Identifier;
 
 /**
  * a path to an image, and it's size
@@ -24,6 +27,11 @@ public class Texture {
 		this.identifier = identifier;
 		this.width = Validate.positive(width, "width");
 		this.height = Validate.positive(height, "height");
+	}
+
+	@Hide
+	public Texture(Identifier texture, int width, int height) {
+		this((Id) texture, width, height);
 	}
 
 	public Id getIdentifier() {

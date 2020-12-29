@@ -14,9 +14,6 @@
     "HalfOf2",
     "Astrarre"
   ],
-  "custom": {
-    "nano:uses_AP": true
-  },
   "mixins": [
     "astrarre-network.mixins.json"
   ]
