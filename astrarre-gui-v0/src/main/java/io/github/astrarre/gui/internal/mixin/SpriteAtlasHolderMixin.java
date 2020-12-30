@@ -23,10 +23,10 @@ public abstract class SpriteAtlasHolderMixin implements SpriteManager {
 	protected abstract Stream<Identifier> getSprites();
 
 	@Shadow
-	protected abstract net.minecraft.client.texture.Sprite getSprite(Identifier objectId);
+	protected abstract net.minecraft.client.texture.Sprite shadow$getSprite(Identifier objectId);
 
 	@Override
-	public Sprite getSprite(Id identifier) {
-		return (Sprite) this.getSprite((Identifier) identifier);
+	public Sprite getSprite(Identifier sprite) {
+		return (Sprite) this.shadow$getSprite(sprite);
 	}
 }

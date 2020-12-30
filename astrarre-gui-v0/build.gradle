@@ -1,3 +1,4 @@
 version '0.0.0'
-moduleDependencies(project, ['astrarre-common-v0'])
+// todo compileOnly, Identifier is fairly stable
+moduleDependencies(project, ['astrarre-common-v0'], true)
 hasAbstraction(project)

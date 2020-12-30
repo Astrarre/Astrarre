@@ -1,5 +1,3 @@
-
-
 plugins {
     id 'java'
     id 'idea'
@@ -37,28 +35,38 @@ static def nanoevents(Project project) {
 }
 
 static def moduleDependencies(project, List<String> depNames) {
+    moduleDependencies(project, depNames, false)
+}
+
+static def moduleDependencies(project, List<String> depNames, boolean compileOnly) {
     project.configure(project) {
         def deps = depNames.iterator().collect { rootProject.project(":$it") }
         dependencies {
             deps.each {
-                if(it != project) {
-                    compile it
+                if (it != project) {
+                    if (compileOnly) {
+                        compileOnly it
+                    } else {
+                        compile it
+                    }
                 }
             }
         }
 
-        publishing {
-            publications {
-                mavenJava(MavenPublication) {
-                    pom.withXml {
-                        def depsNode = asNode().appendNode("dependencies")
-                        deps.each {
-                            if(it != project) {
-                                def depNode = depsNode.appendNode("dependency")
-                                depNode.appendNode("groupId", it.group)
-                                depNode.appendNode("artifactId", it.name)
-                                depNode.appendNode("version", it.version)
-                                depNode.appendNode("scope", "compile")
+        if (!compileOnly) {
+            publishing {
+                publications {
+                    mavenJava(MavenPublication) {
+                        pom.withXml {
+                            def depsNode = asNode().appendNode("dependencies")
+                            deps.each {
+                                if (it != project) {
+                                    def depNode = depsNode.appendNode("dependency")
+                                    depNode.appendNode("groupId", it.group)
+                                    depNode.appendNode("artifactId", it.name)
+                                    depNode.appendNode("version", it.version)
+                                    depNode.appendNode("scope", "compile")
+                                }
                             }
                         }
                     }
@@ -150,6 +158,7 @@ static def hasAbstraction(Project proj) {
         }
     }
 }
+
 apply from: 'scripts/modules.gradle'
 apply from: 'scripts/main.gradle'
 apply from: 'scripts/maven.gradle'

@@ -10,7 +10,7 @@ import net.minecraft.util.Identifier;
  * a path to an image, and it's size
  */
 public class Texture {
-	private final Id identifier;
+	private final Identifier identifier;
 	private final int width, height;
 
 
@@ -19,22 +19,26 @@ public class Texture {
 	}
 
 	/**
-	 * @param identifier the path to the image
+	 * @param texture the path to the image
 	 * @param width the width of the image
 	 * @param height the height of the image
 	 */
-	public Texture(Id identifier, int width, int height) {
-		this.identifier = identifier;
-		this.width = Validate.positive(width, "width");
-		this.height = Validate.positive(height, "height");
+	public Texture(Id texture, int width, int height) {
+		this((Identifier) texture, width, height);
 	}
 
 	@Hide
 	public Texture(Identifier texture, int width, int height) {
-		this((Id) texture, width, height);
+		this.identifier = texture;
+		this.width = Validate.positive(width, "width");
+		this.height = Validate.positive(height, "height");
 	}
 
-	public Id getIdentifier() {
+	public Id getId() {
+		return (Id) this.identifier;
+	}
+
+	public Identifier getIdentifier() {
 		return this.identifier;
 	}
 

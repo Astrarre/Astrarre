@@ -46,7 +46,12 @@ public interface SpriteManager {
 
 	void forEach(Consumer<Sprite> consumer);
 
-	Sprite getSprite(Id identifier);
+	@Hide
+	Sprite getSprite(Identifier sprite);
+
+	default Sprite getSprite(Id sprite) {
+		return this.getSprite((Identifier) sprite);
+	}
 
 	class Builder {
 		private final String modid;

@@ -8,6 +8,8 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.MethodNode;
 
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 
@@ -20,6 +22,11 @@ public class Main implements Opcodes {
 				newInstance.visitMethodInsn(INVOKESTATIC, node.name, "newInstance", String.format("(Lio/netty/buffer/ByteBuf;)L%s;", node.name));
 				newInstance.visitInsn(ARETURN);
 				node.methods.add(newInstance);
+			}));
+			AbstracterUtil.registerDefaultInterface(Item.class);
+			AbstracterUtil.registerDefaultInterface(ItemStack.class);
+			AbstracterConfig.registerInterface(new InterfaceAbstracter(ItemStack.class).post((aClass, node, b) -> {
+				node.interfaces.add("io/github/astrarre/itemview/v0/api/item/ItemStackView");
 			}));
 			AbstracterUtil.registerDefaultInterface(MinecraftServer.class);
 		});
