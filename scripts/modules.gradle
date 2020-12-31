@@ -6,7 +6,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'io.github.astrarre:astrarre-stripper:1.1.3'
+        classpath 'io.github.astrarre:astrarre-stripper:1.1.4'
     }
 }
 
@@ -19,7 +19,7 @@ subprojects {
     task stripJar(type: StrippedJar) {
         group = "astrarre"
         archiveClassifier = "stripped"
-        from sourceSets.main.allSource
+        from sourceSets.main.allJava
         with jar
     }
 

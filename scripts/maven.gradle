@@ -14,14 +14,16 @@ allprojects {
                     builtBy remapSourcesJar
                 }
 
-                pom.withXml {
-                    def depsNode = asNode().appendNode("dependencies")
-                    subprojects.each {
-                        def depNode = depsNode.appendNode("dependency")
-                        depNode.appendNode("groupId", it.group)
-                        depNode.appendNode("artifactId", "$it.name-fabric")
-                        depNode.appendNode("version", it.version)
-                        depNode.appendNode("scope", "runtime")
+                if(project == rootProject) {
+                    pom.withXml {
+                        def depsNode = asNode().appendNode("dependencies")
+                        subprojects.each {
+                            def depNode = depsNode.appendNode("dependency")
+                            depNode.appendNode("groupId", it.group)
+                            depNode.appendNode("artifactId", "$it.name-fabric")
+                            depNode.appendNode("version", it.version)
+                            depNode.appendNode("scope", "runtime")
+                        }
                     }
                 }
             }

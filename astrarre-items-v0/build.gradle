@@ -1,5 +1,2 @@
-version '0.0.0'
-
-dependencies {
-    compileOnly project(":astrarre-main-v0")
-}
+version '0.0.3'
+moduleDependencies(project, [':astrarre-main-v0'], true)

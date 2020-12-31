@@ -1,4 +1,4 @@
-def root = project
+def root = rootProject
 allprojects {
     plugins.apply('java')
     plugins.apply('idea')
@@ -12,14 +12,13 @@ allprojects {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 
+    minecraft {
+    }
+
     sourceSets {
         testmod {
             compileClasspath += main.compileClasspath
             runtimeClasspath += main.runtimeClasspath
-        }
-        abstracter {
-            runtimeClasspath += root.configurations.minecraftNamed
-            compileClasspath += root.configurations.minecraftNamed
         }
     }
 
@@ -39,17 +38,14 @@ allprojects {
         modImplementation "net.fabricmc:fabric-loader:${root.loader_version}"
         // keep track of incompatibilities
         modRuntime "net.fabricmc.fabric-api:fabric-api:${root.fabric_version}"
-        modImplementation "io.github.astrarre:astrarre-stripper:1.1.1"
-        abstracterCompile "io.github.astrarre:abstracter:1.2.5"
+        compileOnly "io.github.astrarre:astrarre-stripper:1.1.4"
     }
 
     jar {
         from "$root.projectDir/LICENSE"
     }
 
-    loom {
-        shareCaches = true
-    }
+
 
     task sourcesJar(type: Jar) {
         group = "astrarre"

@@ -5,10 +5,16 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id "com.jfrog.bintray" version "1.8.4"
-    id "fabric-loom" version "0.5.42"
+    id "fabric-loom" version "0.5.43"
 }
 
-version = project.mod_version
+group 'io.github.astrarre'
+version '0.0.0'
+
+loom {
+    shareCaches = true
+}
+
 loom.runDir = "run"
 apply from: 'scripts/allprojects.gradle'
 
@@ -38,13 +44,13 @@ static def moduleDependencies(project, List<String> depNames) {
     moduleDependencies(project, depNames, false)
 }
 
-static def moduleDependencies(project, List<String> depNames, boolean compileOnly) {
+static def moduleDependencies(project, List<String> depNames, boolean co) {
     project.configure(project) {
         def deps = depNames.iterator().collect { rootProject.project(":$it") }
         dependencies {
             deps.each {
                 if (it != project) {
-                    if (compileOnly) {
+                    if (co) {
                         compileOnly it
                     } else {
                         compile it
@@ -53,7 +59,7 @@ static def moduleDependencies(project, List<String> depNames, boolean compileOnl
             }
         }
 
-        if (!compileOnly) {
+        if (!co) {
             publishing {
                 publications {
                     mavenJava(MavenPublication) {
@@ -86,6 +92,17 @@ static def hasAbstraction(Project proj) {
     println("$proj generates abstractions")
     moduleDependencies(proj, ['astrarre-common-v0'])
     proj.configure(proj) {
+        sourceSets {
+            abstracter {
+                runtimeClasspath += proj.rootProject.configurations.minecraftNamed
+                compileClasspath += proj.rootProject.configurations.minecraftNamed
+            }
+        }
+
+        dependencies {
+            abstracterCompile "io.github.astrarre:abstracter:1.2.5"
+        }
+
         task fakeImplJar(type: Jar) {
             archiveName 'fake_impl.jar'
             from zipTree("$proj.buildDir/abstracted/impl.jar")
