@@ -99,10 +99,6 @@ static def hasAbstraction(Project proj) {
             }
         }
 
-        dependencies {
-            abstracterCompile "io.github.astrarre:abstracter:1.2.5"
-        }
-
         task fakeImplJar(type: Jar) {
             archiveName 'fake_impl.jar'
             from zipTree("$proj.buildDir/abstracted/impl.jar")
@@ -120,6 +116,7 @@ static def hasAbstraction(Project proj) {
             compile files("$buildDir/abstracted/api.jar")
             testmodRuntimeOnly tasks.fakeImplJar.outputs.files
             testmodCompile files("$buildDir/abstracted/api.jar")
+            abstracterCompile "io.github.astrarre:abstracter:1.1.11"
         }
 
         tasks.compileJava.dependsOn tasks.fakeImplJar

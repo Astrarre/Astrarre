@@ -4,14 +4,17 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import io.github.astrarre.itemview.internal.FabricItemViews;
+import io.github.astrarre.itemview.internal.FabricViews;
 import org.jetbrains.annotations.Nullable;
+
+import net.minecraft.nbt.CompoundTag;
 
 /**
  * an unmodifiable view of an nbt tag, the underlying object is not guaranteed to be immutable and may change.
- * @see FabricItemViews
+ * @see FabricViews
  */
 public interface NBTagView extends Iterable<String> {
+	NBTagView EMPTY = FabricViews.view(new CompoundTag());
 	// todo view all keys
 
 	/**

@@ -2,7 +2,7 @@ package io.github.astrarre.itemview.internal.nbt.list;
 
 import java.util.Arrays;
 
-import io.github.astrarre.itemview.internal.FabricItemViews;
+import io.github.astrarre.itemview.internal.FabricViews;
 import it.unimi.dsi.fastutil.ints.AbstractIntList;
 
 import net.minecraft.nbt.IntArrayTag;
@@ -40,7 +40,7 @@ public final class IntArrayView extends AbstractIntList {
 
 	/**
 	 * @deprecated internal
-	 * @see FabricItemViews#view(IntArrayTag)
+	 * @see FabricViews#view(IntArrayTag)
 	 */
 	@Deprecated
 	public static IntArrayView create(IntArrayTag tag) {

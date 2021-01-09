@@ -1,6 +1,6 @@
 package io.github.astrarre.itemview.v0.api.item;
 
-import io.github.astrarre.itemview.internal.FabricItemViews;
+import io.github.astrarre.itemview.internal.FabricViews;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.stripper.Hide;
 import io.github.astrarre.v0.item.ItemStack;
@@ -14,18 +14,18 @@ public interface ItemKey {
 	// todo abstract IItem
 	boolean isEmpty();
 
-	@Hide
 	default io.github.astrarre.v0.item.Item getKey() {
 		return (io.github.astrarre.v0.item.Item) this.getItem();
 	}
 
+	@Hide
 	Item getItem();
 
 	/**
 	 * @return serializes the ItemView
-	 * @see FabricItemViews#fromTag(NBTagView)
+	 * @see FabricViews#fromTag(NBTagView)
 	 */
-	NBTagView toTag();
+	NBTagView toTag(int count);
 
 	/**
 	 * @return the maximum the ItemStack (that this ItemView represents) can stack to
@@ -61,14 +61,17 @@ public interface ItemKey {
 	}
 
 	/**
+	 * {@code hasTag == EMPTY}
 	 * @return true if the ItemStack has nbt data
 	 */
-	boolean hasTag();
+	default boolean hasTag() {
+		return this.getTag() == NBTagView.EMPTY;
+	}
 
 	/**
 	 * @return the nbt data of the ItemStack
 	 */
-	@Nullable
+	@NotNull
 	NBTagView getTag();
 
 	/**
@@ -76,13 +79,4 @@ public interface ItemKey {
 	 */
 	@Nullable
 	NBTagView getSubTag(String key);
-
-	@NotNull
-	default NBTagView getOrNewTag() {
-		if(this.hasTag()) {
-			return this.getTag();
-		} else {
-			return FabricItemViews.view(new CompoundTag());
-		}
-	}
 }

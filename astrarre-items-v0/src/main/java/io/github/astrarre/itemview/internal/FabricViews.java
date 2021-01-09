@@ -9,6 +9,8 @@ import io.github.astrarre.itemview.v0.api.nbt.NBTType;
 import it.unimi.dsi.fastutil.bytes.ByteList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.longs.LongList;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
@@ -25,7 +27,7 @@ import net.minecraft.nbt.Tag;
  * A utility class for fabric mods
  */
 @SuppressWarnings ("ConstantConditions")
-public class FabricItemViews {
+public class FabricViews {
 	// todo change to immutable when possible
 
 	/**
@@ -100,11 +102,13 @@ public class FabricItemViews {
 		return (ItemStack) (Object) view;
 	}
 
+
 	/**
 	 * @return an immutable compound tag view
 	 */
-	public static NBTagView immutableView(CompoundTag tag) {
-		return (NBTagView) tag.copy();
+	@NotNull
+	public static NBTagView immutableView(@Nullable CompoundTag tag) {
+		return tag == null ? NBTagView.EMPTY : (NBTagView) tag.copy();
 	}
 
 	public static NBTagView immutable(NBTagView view) {
@@ -114,8 +118,9 @@ public class FabricItemViews {
 	/**
 	 * @return an unmodifiable compound tag view
 	 */
-	public static NBTagView view(CompoundTag tag) {
-		return (NBTagView) tag;
+	@NotNull
+	public static NBTagView view(@NotNull CompoundTag tag) {
+		return tag == null ? NBTagView.EMPTY : (NBTagView) tag;
 	}
 
 	/**

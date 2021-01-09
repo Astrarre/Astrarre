@@ -1,6 +1,6 @@
 package io.github.astrarre.itemview.v0.api.item;
 
-import io.github.astrarre.itemview.internal.FabricItemViews;
+import io.github.astrarre.itemview.internal.FabricViews;
 import io.github.astrarre.stripper.Hide;
 import io.github.astrarre.v0.item.ItemStack;
 
@@ -11,7 +11,7 @@ import io.github.astrarre.v0.item.ItemStack;
  * an unmodifiable view of an ItemStack
  */
 public interface ItemStackView extends ItemKey {
-	ItemStackView EMPTY = FabricItemViews.create(null);
+	ItemStackView EMPTY = FabricViews.create(null);
 
 	int getCount();
 

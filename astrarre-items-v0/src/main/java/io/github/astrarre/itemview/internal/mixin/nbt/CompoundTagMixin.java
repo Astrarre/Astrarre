@@ -3,7 +3,7 @@ package io.github.astrarre.itemview.internal.mixin.nbt;
 import java.util.Iterator;
 import java.util.Set;
 
-import io.github.astrarre.itemview.internal.FabricItemViews;
+import io.github.astrarre.itemview.internal.FabricViews;
 import io.github.astrarre.itemview.internal.util.ImmutableIterable;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.itemview.v0.api.nbt.NBTType;
@@ -122,13 +122,13 @@ public abstract class CompoundTagMixin implements NBTagView {
 
 	@Override
 	public Object get(String key) {
-		return FabricItemViews.view(this.shadow$get(key), NBTType.ANY);
+		return FabricViews.view(this.shadow$get(key), NBTType.ANY);
 	}
 
 	@Override
 	public NBTagView getTag(String path, NBTagView def) {
 		CompoundTag tag = this.getCompound(path);
-		return tag == null ? null : FabricItemViews.view(tag);
+		return tag == null ? null : FabricViews.view(tag);
 	}
 
 	@Override
@@ -138,7 +138,7 @@ public abstract class CompoundTagMixin implements NBTagView {
 			return def;
 		}
 		try {
-			return FabricItemViews.view(tag, type);
+			return FabricViews.view(tag, type);
 		} catch (ClassCastException e) {
 			return def;
 		}

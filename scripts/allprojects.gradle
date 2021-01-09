@@ -38,7 +38,11 @@ allprojects {
         modImplementation "net.fabricmc:fabric-loader:${root.loader_version}"
         // keep track of incompatibilities
         modRuntime "net.fabricmc.fabric-api:fabric-api:${root.fabric_version}"
-        compileOnly "io.github.astrarre:astrarre-stripper:1.1.4"
+        compileOnly("io.github.astrarre:astrarre-stripper:1.1.4") {
+            transitive = false
+        }
+
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     }
 
     jar {

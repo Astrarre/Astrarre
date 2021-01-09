@@ -2,7 +2,8 @@ package io.github.astrarre.itemview.internal;
 
 import io.github.astrarre.itemview.v0.api.item.ItemKey;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
-import io.github.astrarre.v0.item.ItemStack;
+import io.github.astrarre.stripper.Hide;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.item.Item;
@@ -13,26 +14,23 @@ import net.minecraft.util.registry.Registry;
 
 public class ItemKeyImpl implements ItemKey {
 	private final Item item;
-	private final int count;
-	@Nullable
+	@NotNull
 	private final NBTagView tag;
 
 	/**
-	 * @see #toTag()
+	 * @see #toTag(int)
 	 */
 	private NBTagView lazyTag;
 
-	public ItemKeyImpl(@Nullable Item item, int count, @Nullable NBTagView tag) {
-		if (count < 0) {
-			throw new IllegalArgumentException("Count cannot be negative (" + count + ")");
-		}
-		if (item == null || count == 0) {
-			item = Items.AIR;
-		}
-
-		this.tag = FabricItemViews.immutable(tag);
+	@Hide
+	public ItemKeyImpl(@Nullable Item item, @Nullable CompoundTag tag) {
+		this.tag = FabricViews.immutableView(tag);
 		this.item = item;
-		this.count = count;
+	}
+
+	public ItemKeyImpl(@Nullable Item item, @NotNull NBTagView tag) {
+		this.tag = FabricViews.immutable(tag);
+		this.item = item;
 	}
 
 	@Override
@@ -46,17 +44,15 @@ public class ItemKeyImpl implements ItemKey {
 	}
 
 	@Override
-	public NBTagView toTag() {
+	public NBTagView toTag(int count) {
 		NBTagView toTag = this.lazyTag;
 		if (toTag == null) {
 			CompoundTag tag = new CompoundTag();
 			Identifier identifier = Registry.ITEM.getId(this.getItem());
 			tag.putString("id", identifier.toString());
-			tag.putByte("Count", (byte) this.count);
-			if (this.tag != null) {
-				tag.put("tag", FabricItemViews.from(this.tag));
-			}
-			this.lazyTag = toTag = FabricItemViews.view(tag);
+			tag.putByte("Count", (byte) count);
+			tag.put("tag", FabricViews.from(this.tag));
+			this.lazyTag = toTag = FabricViews.view(tag);
 		}
 		return toTag;
 	}
@@ -69,11 +65,7 @@ public class ItemKeyImpl implements ItemKey {
 
 	@Override
 	public boolean areTagsEqual(ItemKey view) {
-		if (this.tag == null) {
-			return view == null;
-		} else {
-			return this.tag.equals(view.getTag());
-		}
+		return this.tag.equals(view.getTag());
 	}
 
 	@Override
@@ -83,16 +75,16 @@ public class ItemKeyImpl implements ItemKey {
 
 	@Override
 	public boolean hasTag() {
-		return this.tag != null;
+		return this.tag == NBTagView.EMPTY;
 	}
 
 	@Override
-	public @Nullable NBTagView getTag() {
+	public @NotNull NBTagView getTag() {
 		return this.tag;
 	}
 
 	@Override
 	public @Nullable NBTagView getSubTag(String key) {
-		return this.tag == null ? null : this.tag.getTag(key);
+		return this.tag.getTag(key);
 	}
 }

@@ -2,7 +2,7 @@ package io.github.astrarre.itemview.internal.nbt.list;
 
 import java.util.Arrays;
 
-import io.github.astrarre.itemview.internal.FabricItemViews;
+import io.github.astrarre.itemview.internal.FabricViews;
 import it.unimi.dsi.fastutil.bytes.AbstractByteList;
 
 import net.minecraft.nbt.ByteArrayTag;
@@ -38,7 +38,7 @@ public final class ByteArrayView extends AbstractByteList {
 	// internal
 	/**
 	 * @deprecated internal
-	 * @see FabricItemViews#view(ByteArrayTag)
+	 * @see FabricViews#view(ByteArrayTag)
 	 */
 	@Deprecated
 	public static ByteArrayView create(ByteArrayTag tag) {

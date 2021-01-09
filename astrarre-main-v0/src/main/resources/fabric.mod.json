@@ -15,6 +15,7 @@
     "Astrarre"
   ],
   "mixins": [
-    "astrarre-network.mixins.json"
+    "astrarre-network.mixins.json",
+    "astrarre-common.mixins.json"
   ]
 }
