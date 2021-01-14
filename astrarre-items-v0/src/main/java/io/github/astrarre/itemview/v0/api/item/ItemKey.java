@@ -3,23 +3,22 @@ package io.github.astrarre.itemview.v0.api.item;
 import io.github.astrarre.itemview.internal.FabricViews;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.stripper.Hide;
+import io.github.astrarre.v0.item.Item;
 import io.github.astrarre.v0.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.item.Item;
-import net.minecraft.nbt.CompoundTag;
 
 public interface ItemKey {
 	// todo abstract IItem
 	boolean isEmpty();
 
-	default io.github.astrarre.v0.item.Item getKey() {
+	default Item getKey() {
 		return (io.github.astrarre.v0.item.Item) this.getItem();
 	}
 
 	@Hide
-	Item getItem();
+	net.minecraft.item.Item getItem();
 
 	/**
 	 * @return serializes the ItemView

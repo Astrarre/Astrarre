@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "astrarre-transfer-v0",
+  "name": "Astrarre Transfer API Fabric",
+  "description": "Astrarre's resource transfer api",
+  "version": "${version}",
+  "environment": "*",
+  "license": "LGPL-3.0",
+  "icon": "icon.png",
+  "contact": {
+    "sources": "https://github.com/Astrarre/Astrarre"
+  },
+  "authors": [
+    "HalfOf2",
+    "Astrarre"
+  ],
+  "depends": {
+    "fabricloader": ">=0.8.9"
+  }
+}

@@ -31,7 +31,7 @@ public class HopperBlockEntityMixin {
 			BlockState state,
 			Block block) {
 		if(!block.hasBlockEntity()) {
-
+			//Providers.INVENTORY_REGISTRY.get().get()
 		}
 	}
 }

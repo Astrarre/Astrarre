@@ -86,7 +86,9 @@ import org.gradle.api.internal.file.collections.FileTreeAdapter
 import org.gradle.api.internal.file.collections.GeneratedSingletonFileTree
 import org.gradle.api.internal.file.copy.CopySpecInternal
 
+import java.nio.file.Files
 import java.util.stream.Collectors
+
 
 static def hasAbstraction(Project proj) {
     println("$proj generates abstractions")
@@ -116,7 +118,8 @@ static def hasAbstraction(Project proj) {
             compile files("$buildDir/abstracted/api.jar")
             testmodRuntimeOnly tasks.fakeImplJar.outputs.files
             testmodCompile files("$buildDir/abstracted/api.jar")
-            abstracterCompile "io.github.astrarre:abstracter:1.1.11"
+            abstracterCompile "io.github.astrarre:abstracter:1.1.12"
+            abstracterCompile 'org.reflections:reflections:0.9.12'
         }
 
         tasks.compileJava.dependsOn tasks.fakeImplJar

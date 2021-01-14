@@ -43,6 +43,7 @@ public class AbstractionApplicator implements Runnable, Opcodes {
 		return false;
 	}
 
+
 	@Override
 	public void run() {
 		FabricLoader loader = FabricLoader.getInstance();
@@ -59,7 +60,23 @@ public class AbstractionApplicator implements Runnable, Opcodes {
 							ClassTinkerers.addTransformation((String) v, c -> stripConflicts(c, true));
 						}
 
-						ClassTinkerers.addTransformation(className, c -> c.interfaces.add((String) v));
+						ClassTinkerers.addTransformation(className, c -> {
+							c.interfaces.add((String) v);
+							MethodNode target = null;
+							for (MethodNode method : c.methods) {
+								if (method.name.equals("<clinit>")) {
+									target = method;
+									break;
+								}
+							}
+							if (target == null) {
+								target = new MethodNode(ACC_STATIC, "<clinit>", "()V", null, null);
+								target.visitInsn(RETURN);
+							}
+
+							InsnList list = target.instructions;
+							list.insertBefore(list.getLast(), new MethodInsnNode(INVOKESTATIC, (String) v, "astrarre_artificial_clinit", "()V"));
+						});
 					});
 				}
 				Path base = mod.getPath("/base_manifest.txt");
@@ -70,8 +87,6 @@ public class AbstractionApplicator implements Runnable, Opcodes {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-
-
 	}
 
 	private static Properties read(InputStream reader) {
