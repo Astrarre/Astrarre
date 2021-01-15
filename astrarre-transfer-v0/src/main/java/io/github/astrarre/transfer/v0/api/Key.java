@@ -1,6 +1,7 @@
 package io.github.astrarre.transfer.v0.api;
 
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class Key {
 	/**
@@ -10,7 +11,7 @@ public abstract class Key {
 	 * @see Transaction#getParent()
 	 */
 	@ApiStatus.OverrideOnly
-	protected abstract void onApply(Transaction transaction);
+	protected abstract void onApply(@Nullable Transaction transaction);
 
 	/**
 	 * called when a transaction in which this key was enlisted was aborted
@@ -18,77 +19,74 @@ public abstract class Key {
 	 * @param transaction the transaction being aborted
 	 */
 	@ApiStatus.OverrideOnly
-	protected abstract void onAbort(Transaction transaction);
+	protected abstract void onAbort(@Nullable Transaction transaction);
+
+	public static abstract class Boolean extends Key {
+		/** @see Int#set(Transaction, int) */
+		public abstract void set(@Nullable Transaction transaction, boolean val);
+		/** @see Int#get(Transaction) */
+		public abstract boolean get(@Nullable Transaction transaction);
+	}
+
+	public static abstract class Byte extends Key {
+		/** @see Int#set(Transaction, int) */
+		public abstract void set(@Nullable Transaction transaction, byte val);
+		/** @see Int#get(Transaction) */
+		public abstract byte get(@Nullable Transaction transaction);
+	}
+
+	public static abstract class Char extends Key {
+		/** @see Int#set(Transaction, int) */
+		public abstract void set(@Nullable Transaction transaction, char val);
+		/** @see Int#get(Transaction) */
+		public abstract char get(@Nullable Transaction transaction);
+	}
+
+	public static abstract class Short extends Key {
+		/** @see Int#set(Transaction, int) */
+		public abstract void set(@Nullable Transaction transaction, short val);
+		/** @see Int#get(Transaction) */
+		public abstract short get(@Nullable Transaction transaction);
+	}
 
 	public static abstract class Int extends Key {
 		/**
-		 * technically you should only ever set data from the active transaction, the passed instance is for validation.
-		 * @return true if the transaction has not been seen before (if a container 'set' twice)
+		 * set the value for the given transaction in the key.
+		 * @implNote {@link @Nullable Transaction#enlistKey(Key)}
 		 */
-		@ApiStatus.OverrideOnly
-		protected abstract boolean store(Transaction transaction, int val);
+		public abstract void set(@Nullable Transaction transaction, int val);
 
 		/**
-		 * technically you should only ever retrieve data from the active transaction, the passed instance is for validation
+		 * get the value for the given transaction in the key.
 		 */
-		@ApiStatus.OverrideOnly
-		protected abstract int get(Transaction transaction);
-
-		/**
-		 * @return the true value of the field, do not call this when in a transaction
-		 */
-		public abstract int get();
+		public abstract int get(@Nullable Transaction transaction);
 	}
 
 	public static abstract class Float extends Key {
-		/** @see Int#store(Transaction, int) */
-		@ApiStatus.OverrideOnly
-		protected abstract boolean store(Transaction transaction, float val);
-
-		/** @see Int#store(Transaction, int) */
-		@ApiStatus.OverrideOnly
-		protected abstract float get(Transaction transaction);
-
-		/** @see Int#get()*/
-		public abstract float get();
+		/** @see Int#set(Transaction, int) */
+		public abstract void set(@Nullable Transaction transaction, float val);
+		/** @see Int#get(Transaction) */
+		public abstract float get(@Nullable Transaction transaction);
 	}
 
 	public static abstract class Double extends Key {
-		/** @see Int#store(Transaction, int) */
-		@ApiStatus.OverrideOnly
-		protected abstract boolean store(Transaction transaction, double val);
-
-		/** @see Int#store(Transaction, int) */
-		@ApiStatus.OverrideOnly
-		protected abstract double get(Transaction transaction);
-
-		/** @see Int#get()*/
-		public abstract double get();
+		/** @see Int#set(Transaction, int) */
+		public abstract void set(@Nullable Transaction transaction, double val);
+		/** @see Int#get(Transaction) */
+		public abstract double get(@Nullable Transaction transaction);
 	}
 
 	public static abstract class Long extends Key {
-		/** @see Int#store(Transaction, int) */
-		@ApiStatus.OverrideOnly
-		protected abstract boolean store(Transaction transaction, long val);
-
-		/** @see Int#store(Transaction, int) */
-		@ApiStatus.OverrideOnly
-		protected abstract long get(Transaction transaction);
-
-		/** @see Int#get()*/
-		public abstract long get();
+		/** @see Int#set(Transaction, int) */
+		public abstract void set(@Nullable Transaction transaction, long val);
+		/** @see Int#get(Transaction) */
+		public abstract long get(@Nullable Transaction transaction);
 	}
 
 	public static abstract class Object<T> extends Key {
-		/** @see Int#store(Transaction, int) */
-		@ApiStatus.OverrideOnly
-		protected abstract boolean store(Transaction transaction, T val);
-
-		/** @see Int#store(Transaction, int) */
-		@ApiStatus.OverrideOnly
-		protected abstract T get(Transaction transaction);
-
-		/** @see Int#get()*/
-		public abstract T get();
+		/** @see Int#set(Transaction, int) */
+		public abstract void set(@Nullable Transaction transaction, T val);
+		/** @see Int#get(Transaction) */
+		public abstract T get(@Nullable Transaction transaction);
 	}
 }

@@ -19,6 +19,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.InventoryProvider;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.ItemSteerable;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.Item;
@@ -50,6 +51,7 @@ public class Main implements Opcodes {
 			config.registerInterface(Box.class);
 			config.registerInterface(Direction.class);
 			config.registerInterface(MinecraftServer.class);
+			config.registerInterface(ItemSteerable.class);
 
 			config.registerInterface(new InterfaceAbstracter(ItemStack.class).post((c, aClass, node, b) -> {
 				node.interfaces.add("io/github/astrarre/itemview/v0/api/item/ItemStackView");

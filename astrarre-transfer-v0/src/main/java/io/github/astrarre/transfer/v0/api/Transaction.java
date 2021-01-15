@@ -1,13 +1,28 @@
 package io.github.astrarre.transfer.v0.api;
 
-public final class Transaction {
+public final class Transaction implements AutoCloseable {
 	private static final ThreadLocal<Transaction> ACTIVE = new ThreadLocal<>();
 	private final Transaction parent;
 	private final int nest;
+	private final boolean intent;
 	// this is composited with andThen
 	private Key compositeKey;
 
+	/**
+	 * <code>
+	 * new Transaction(true)
+	 * </code>
+	 */
 	public Transaction() {
+		this(true);
+	}
+
+	/**
+	 * @param intent {@link AutoCloseable#close()} will commit/abort the transaction if it has not been invalidated already. (true = commit, false =
+	 * 		abort)
+	 */
+	public Transaction(boolean intent) {
+		this.intent = intent;
 		this.parent = ACTIVE.get();
 		if (this.parent == null) {
 			this.nest = 0;
@@ -17,36 +32,8 @@ public final class Transaction {
 		ACTIVE.set(this);
 	}
 
-	public <T> T get(Key.Object<T> key) {
-		return key.get(this);
-	}
-
-	public int get(Key.Int key) {
-		return key.get(this);
-	}
-
-	public long get(Key.Long key) {
-		return key.get(this);
-	}
-
-	public float get(Key.Float key) {
-		return key.get(this);
-	}
-
-	public double get(Key.Double key) {
-		return key.get(this);
-	}
-
-	public <T> void set(Key.Object<T> key, T value) {
-		if (key.store(this, value)) {
-			if (key.store(this, value)) {
-				this.enlistKey(key);
-			}
-		}
-	}
-
 	/**
-	 * @deprecated playing with fire! If you want to make a Key for short or other primitives, you can use this
+	 * @deprecated playing with fire! This should only be called from Key
 	 */
 	@Deprecated
 	@SuppressWarnings ("DeprecatedIsStillUsed")
@@ -58,13 +45,13 @@ public final class Transaction {
 				private final Key old = Transaction.this.compositeKey;
 
 				@Override
-				protected void onApply(Transaction transaction) {
+				public void onApply(Transaction transaction) {
 					this.old.onApply(transaction);
 					key.onApply(transaction);
 				}
 
 				@Override
-				protected void onAbort(Transaction transaction) {
+				public void onAbort(Transaction transaction) {
 					this.old.onAbort(transaction);
 					key.onAbort(transaction);
 				}
@@ -72,28 +59,33 @@ public final class Transaction {
 		}
 	}
 
-	public void set(Key.Int key, int value) {
-		if (key.store(this, value)) {
-			this.enlistKey(key);
+	public Transaction getParent() {
+		return this.parent;
+	}
+
+	public int getNestLevel() {
+		return this.nest;
+	}
+
+	@Override
+	public void close() {
+		if (ACTIVE.get() == this) {
+			if (this.intent) {
+				this.commit();
+			} else {
+				this.abort();
+			}
 		}
 	}
 
-	public void set(Key.Long key, long value) {
-		if (key.store(this, value)) {
-			this.enlistKey(key);
+	public void commit() {
+		this.validateThread(
+				"Transaction must be invalidated on the same thread it was created on, and you cannot commit a transaction without invalidating " +
+				"it's" + " children!");
+		if (this.compositeKey != null) {
+			this.compositeKey.onApply(this);
 		}
-	}
-
-	public void set(Key.Float key, float value) {
-		if (key.store(this, value)) {
-			this.enlistKey(key);
-		}
-	}
-
-	public void set(Key.Double key, double value) {
-		if (key.store(this, value)) {
-			this.enlistKey(key);
-		}
+		ACTIVE.set(this.parent);
 	}
 
 	public void abort() {
@@ -116,23 +108,5 @@ public final class Transaction {
 		if (ACTIVE.get() != this) {
 			throw new IllegalStateException(err);
 		}
-	}
-
-	public void commit() {
-		this.validateThread(
-				"Transaction must be invalidated on the same thread it was created on, and you cannot commit a transaction without invalidating " +
-				"it's" + " children!");
-		if (this.compositeKey != null) {
-			this.compositeKey.onApply(this);
-		}
-		ACTIVE.set(this.parent);
-	}
-
-	public Transaction getParent() {
-		return this.parent;
-	}
-
-	public int getNestLevel() {
-		return this.nest;
 	}
 }
