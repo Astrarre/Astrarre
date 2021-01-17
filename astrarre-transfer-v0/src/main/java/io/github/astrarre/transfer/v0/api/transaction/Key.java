@@ -1,4 +1,4 @@
-package io.github.astrarre.transfer.v0.api;
+package io.github.astrarre.transfer.v0.api.transaction;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;

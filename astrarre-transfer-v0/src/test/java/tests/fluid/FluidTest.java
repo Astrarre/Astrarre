@@ -2,8 +2,8 @@ package tests.fluid;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import io.github.astrarre.transfer.v0.api.Transaction;
-import io.github.astrarre.transfer.v0.api.fluid.FluidVolume;
+import io.github.astrarre.transfer.v0.api.transaction.Transaction;
+import io.github.astrarre.transfer.v0.api.participants.fluid.FluidVolume;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

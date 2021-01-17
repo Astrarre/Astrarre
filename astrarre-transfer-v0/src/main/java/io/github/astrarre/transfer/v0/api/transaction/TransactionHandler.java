@@ -1,6 +1,8 @@
-package io.github.astrarre.transfer.v0.api;
+package io.github.astrarre.transfer.v0.api.transaction;
 
+import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -18,15 +20,7 @@ public class TransactionHandler {
 	/**
 	 * @return true if the transaction has never been seen before
 	 */
-	public boolean store(@Nullable Transaction transaction) {
-		if (transaction == null) {
-			if (this.transactions.isEmpty()) {
-				return true;
-			} else {
-				throw new IllegalStateException("");
-			}
-		}
-
+	public boolean store(@NotNull Transaction transaction) {
 		int nest = transaction.getNestLevel();
 		if (!this.transactions.isEmpty() && this.transactions.topInt() == nest) {
 			return true;

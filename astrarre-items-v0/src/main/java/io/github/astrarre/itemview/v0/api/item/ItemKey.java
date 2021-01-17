@@ -1,81 +1,58 @@
 package io.github.astrarre.itemview.v0.api.item;
 
-import io.github.astrarre.itemview.internal.FabricViews;
+import io.github.astrarre.itemview.internal.ItemKeyImpl;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.stripper.Hide;
 import io.github.astrarre.v0.item.Item;
 import io.github.astrarre.v0.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+import net.minecraft.nbt.CompoundTag;
 
+/**
+ * an Item and it's NBT data
+ */
 public interface ItemKey {
-	// todo abstract IItem
-	boolean isEmpty();
-
-	default Item getKey() {
-		return (io.github.astrarre.v0.item.Item) this.getItem();
+	@Hide
+	static ItemKey of(net.minecraft.item.Item item) {
+		return (ItemKey) item;
 	}
+
+	// todo cache ItemKey with versioning for mutable array tags
 
 	@Hide
-	net.minecraft.item.Item getItem();
-
-	/**
-	 * @return serializes the ItemView
-	 * @see FabricViews#fromTag(NBTagView)
-	 */
-	NBTagView toTag(int count);
-
-	/**
-	 * @return the maximum the ItemStack (that this ItemView represents) can stack to
-	 */
-	int getMaxCount();
-
-	/**
-	 * @return true if the nbt tags are equal to each other
-	 */
-	boolean areTagsEqual(ItemKey view);
-
-	default boolean areTagsEqual(ItemStack stack) {
-		return this.areTagsEqual((ItemKey) stack);
+	static ItemKey of(net.minecraft.item.ItemStack stack) {
+		if(stack.hasTag()) {
+			return new ItemKeyImpl(stack.getItem(), stack.getTag());
+		} else {
+			return of(stack.getItem());
+		}
 	}
 
-	@Hide
-	default boolean areTagsEqual(net.minecraft.item.ItemStack stack) {
-		return this.areTagsEqual((ItemStack) (Object) stack);
+	default Item getItem() {
+		return (Item) this.asItem();
 	}
 
 	/**
-	 * @return true if the nbt tags and items are equal, it does not check max stack size!
+	 * @return an immutable view of the ItemKey
 	 */
-	boolean canStackWith(ItemKey view);
-
-	default boolean canStackWith(io.github.astrarre.v0.item.ItemStack stack) {
-		return this.canStackWith((ItemKey) stack);
-	}
-
-	@Hide
-	default boolean canStackWith(net.minecraft.item.ItemStack stack) {
-		return this.canStackWith((ItemKey) (Object) stack);
-	}
-
-	/**
-	 * {@code hasTag == EMPTY}
-	 * @return true if the ItemStack has nbt data
-	 */
-	default boolean hasTag() {
-		return this.getTag() == NBTagView.EMPTY;
-	}
-
-	/**
-	 * @return the nbt data of the ItemStack
-	 */
-	@NotNull
 	NBTagView getTag();
 
-	/**
-	 * @return the nbt tag at a given key
-	 */
-	@Nullable
-	NBTagView getSubTag(String key);
+	@Hide
+	net.minecraft.item.Item asItem();
+
+	@Hide
+	default net.minecraft.item.ItemStack createItemStack(int count) {
+		net.minecraft.item.ItemStack stack = new net.minecraft.item.ItemStack(this.asItem(), count);
+		stack.setTag(this.getTag().copyTag());
+		return stack;
+	}
+
+	default ItemStack newItemStack(int count) {
+		return (ItemStack) (Object) this.createItemStack(count);
+	}
+
+	@Hide
+	default CompoundTag getCompoundTag() {
+		return this.getTag().copyTag();
+	}
 }

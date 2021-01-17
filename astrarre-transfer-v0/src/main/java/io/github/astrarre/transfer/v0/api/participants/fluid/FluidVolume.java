@@ -1,19 +1,18 @@
-package io.github.astrarre.transfer.v0.api.fluid;
+package io.github.astrarre.transfer.v0.api.participants.fluid;
 
-import io.github.astrarre.transfer.v0.api.Extractable;
 import io.github.astrarre.transfer.v0.api.Insertable;
-import io.github.astrarre.transfer.v0.api.Key;
-import io.github.astrarre.transfer.v0.api.Transaction;
-import io.github.astrarre.transfer.v0.api.keys.ObjectKeyImpl;
-import io.github.astrarre.transfer.v0.api.keys.generated.IntKeyImpl;
+import io.github.astrarre.transfer.v0.api.transaction.Key;
+import io.github.astrarre.transfer.v0.api.Participant;
+import io.github.astrarre.transfer.v0.api.transaction.Transaction;
+import io.github.astrarre.transfer.v0.api.transaction.keys.ObjectKeyImpl;
+import io.github.astrarre.transfer.v0.api.transaction.keys.generated.IntKeyImpl;
 
-import net.minecraft.Bootstrap;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.util.registry.Registry;
 
 // todo document terminology, FluidVolume, FluidContainer, etc.
-public class FluidVolume implements Extractable<Fluid>, Insertable<Fluid> {
+public class FluidVolume implements Participant<Fluid> {
 	protected final Key.Object<Fluid> fluid;
 	protected final Key.Int quantity;
 
@@ -34,6 +33,10 @@ public class FluidVolume implements Extractable<Fluid>, Insertable<Fluid> {
 
 	@Override
 	public int insert(Transaction transaction, Fluid type, int amount) {
+		if (amount == 0) {
+			return 0;
+		}
+
 		Fluid fluid = this.fluid.get(transaction);
 		if (fluid == Fluids.EMPTY || fluid == type) {
 			if (fluid != type) {
@@ -48,6 +51,10 @@ public class FluidVolume implements Extractable<Fluid>, Insertable<Fluid> {
 
 	@Override
 	public void extract(Transaction transaction, Insertable<Fluid> insertable) {
+		if(insertable.isFull(transaction)) {
+			return;
+		}
+
 		int oldLevel = this.quantity.get(transaction);
 		int amount = insertable.insert(transaction, this.fluid.get(transaction), oldLevel);
 		int newLevel = oldLevel - amount;
@@ -59,6 +66,10 @@ public class FluidVolume implements Extractable<Fluid>, Insertable<Fluid> {
 
 	@Override
 	public int extract(Transaction transaction, Fluid type, int amount) {
+		if (amount == 0) {
+			return 0;
+		}
+
 		if (this.fluid.get(transaction) == type) {
 			int oldLevel = this.quantity.get(transaction);
 			int toExtract = Math.min(oldLevel, amount);
@@ -68,6 +79,7 @@ public class FluidVolume implements Extractable<Fluid>, Insertable<Fluid> {
 			}
 			return toExtract;
 		}
+
 		return 0;
 	}
 

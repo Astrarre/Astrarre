@@ -6,9 +6,11 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
+import net.minecraft.inventory.Inventory;
+
 public class InventoryAbs extends InterfaceAbstracter {
-	public InventoryAbs(Class<?> cls) {
-		super(cls);
+	public InventoryAbs() {
+		super(Inventory.class);
 		this.post(InventoryAbs::process);
 	}
 

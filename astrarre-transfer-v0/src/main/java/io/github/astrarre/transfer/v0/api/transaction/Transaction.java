@@ -1,4 +1,4 @@
-package io.github.astrarre.transfer.v0.api;
+package io.github.astrarre.transfer.v0.api.transaction;
 
 public final class Transaction implements AutoCloseable {
 	private static final ThreadLocal<Transaction> ACTIVE = new ThreadLocal<>();

@@ -2,6 +2,7 @@ package io.github.astrarre.access.v0.api;
 
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import io.github.astrarre.access.v0.api.func.Access;
 import org.jetbrains.annotations.NotNull;

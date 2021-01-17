@@ -1,14 +1,21 @@
 package io.github.astrarre.itemview.internal.mixin.nbt;
 
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import io.github.astrarre.itemview.internal.FabricViews;
+import io.github.astrarre.itemview.internal.access.ImmutableAccess;
 import io.github.astrarre.itemview.internal.util.ImmutableIterable;
+import io.github.astrarre.itemview.internal.util.NBTagUnmodifiableMap;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.itemview.v0.api.nbt.NBTType;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Intrinsic;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 
 import net.minecraft.nbt.AbstractNumberTag;
@@ -16,10 +23,21 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 
 @Mixin(CompoundTag.class)
-public abstract class CompoundTagMixin implements NBTagView {
+public abstract class CompoundTagMixin implements NBTagView, ImmutableAccess {
+	private boolean immutable;
 	@Shadow public abstract @Nullable Tag shadow$get(String key);
 	@Shadow public abstract Set<String> getKeys();
 	@Shadow public abstract CompoundTag getCompound(String key);
+	@Shadow public abstract CompoundTag shadow$copy();
+	@Shadow public abstract boolean shadow$isEmpty();
+
+	@Mutable @Shadow @Final private Map<String, Tag> tags;
+
+	@Override
+	@Intrinsic
+	public boolean isEmpty() {
+		return this.shadow$isEmpty();
+	}
 
 	@Override
 	public byte getByte(String path, byte def) {
@@ -31,28 +49,10 @@ public abstract class CompoundTagMixin implements NBTagView {
 	}
 
 	@Override
-	public boolean getBool(String path, boolean def) {
-		AbstractNumberTag tag = this.itemview_getTag(path, NBTType.BOOL);
-		if(tag != null) {
-			return tag.getByte() != 0;
-		}
-		return def;
-	}
-
-	@Override
 	public short getShort(String path, short def) {
 		AbstractNumberTag tag = this.itemview_getTag(path, NBTType.SHORT);
 		if(tag != null) {
 			return tag.getShort();
-		}
-		return def;
-	}
-
-	@Override
-	public char getChar(String path, char def) {
-		AbstractNumberTag tag = this.itemview_getTag(path, NBTType.CHAR);
-		if(tag != null) {
-			return (char) tag.getShort();
 		}
 		return def;
 	}
@@ -147,5 +147,26 @@ public abstract class CompoundTagMixin implements NBTagView {
 	@Override
 	public Iterator<String> iterator() {
 		return new ImmutableIterable<>(this.getKeys().iterator());
+	}
+
+	@Override
+	public NBTagView copy() {
+		if(this.immutable) {
+			return this;
+		}
+		return FabricViews.view(this.shadow$copy());
+	}
+
+	@Override
+	public void astrarre_setImmutable() {
+		if(this.immutable = false) {
+			this.immutable = true;
+			this.tags = new NBTagUnmodifiableMap(this.tags);
+		}
+	}
+
+	@Override
+	public boolean astrarre_isImmutable() {
+		return this.immutable;
 	}
 }

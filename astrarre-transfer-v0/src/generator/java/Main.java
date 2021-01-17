@@ -31,8 +31,8 @@ public class Main {
 	}
 
 	private static void generate(String upperCase, String lower) throws IOException {
-		FileWriter writer = new FileWriter("astrarre-transfer-v0/src/main/java/io/github/astrarre/transfer/v0/api/keys/generated/"+upperCase+"KeyImpl.java");
-		writer.write(TEMPLATE.replace("%Upper%", upperCase).replace("%lower%", lower));
+		FileWriter writer = new FileWriter("astrarre-transfer-v0/src/main/java/io/github/astrarre/transfer/v0/api/transaction/keys/generated/"+upperCase+"KeyImpl.java");
+		writer.write(TEMPLATE.replace("%Upper%", upperCase).replace("%lower%", lower).replace("//%antiformatter%", ""));
 		writer.close();
 	}
 }

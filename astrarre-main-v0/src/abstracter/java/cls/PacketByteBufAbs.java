@@ -7,9 +7,11 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
+import net.minecraft.network.PacketByteBuf;
+
 public class PacketByteBufAbs extends InterfaceAbstracter {
-	public PacketByteBufAbs(Class<?> cl) {
-		super(cl);
+	public PacketByteBufAbs() {
+		super(PacketByteBuf.class);
 		this.post(PacketByteBufAbs::process);
 	}
 
