@@ -8,28 +8,20 @@ import it.unimi.dsi.fastutil.floats.FloatArrayList;
 
 // @formatter:off
 public class FloatKeyImpl extends Key.Float {
-	private final TransactionHandler handler;
+	private final TransactionHandler handler = new TransactionHandler();
 	private final FloatArrayList values = new FloatArrayList();
 
-	public FloatKeyImpl(TransactionHandler handler, float originalValue) {
-		this.handler = handler;
+	public FloatKeyImpl(float originalValue) {
 		this.values.add(0, originalValue);
 	}
 
-	public FloatKeyImpl(float originalValue) {this(new TransactionHandler(), originalValue);}
-
-	protected FloatKeyImpl(TransactionHandler handler) {
-		this.handler = handler;
-	}
-
 	protected FloatKeyImpl() {
-		this(new TransactionHandler());
 	}
 
 	@Override
 	public float get(Transaction transaction) {
-		if(transaction == null) {
-			return this.getTrue();
+		if(transaction == null || values.isEmpty()) {
+			return this.getRootValue();
 		}
 		return this.values.topFloat();
 	}
@@ -50,7 +42,7 @@ public class FloatKeyImpl extends Key.Float {
 	@Override
 	public void set(Transaction transaction, float val) {
 		if(transaction == null) {
-			this.setTrue(val);
+			this.setRootValue(val);
 			return;
 		}
 
@@ -65,14 +57,14 @@ public class FloatKeyImpl extends Key.Float {
 	/**
     * @return the 'true' value of the key
     */
-	protected float getTrue() {
+	protected float getRootValue() {
 		return this.values.getFloat(0);
 	}
 
 	/**
 	 * @param val the 'true' value of the key
 	 */
-	protected void setTrue(float val) {
+	protected void setRootValue(float val) {
 		this.values.set(0, val);
 	}
 }

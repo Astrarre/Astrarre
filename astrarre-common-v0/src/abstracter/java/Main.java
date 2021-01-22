@@ -8,9 +8,9 @@ import net.minecraft.util.Identifier;
 
 public class Main {
 	public static void main(String[] args) throws IOException, InterruptedException {
-		AbstracterConfig config = new AbstracterConfig();
-		AbstracterUtil.applyParallel(config, args[0], () -> {
-			config.registerInterface(new InterfaceAbstracter(Identifier.class)).name("io/github/astrarre/v0/util/Id");
-		});
+		AbstracterUtil util = AbstracterUtil.fromFile(args[0]);
+		AbstracterConfig config = util.createConfig("astrarre_manifest");
+		config.registerInterface(new InterfaceAbstracter(Identifier.class)).name("io/github/astrarre/v0/util/Id");
+		util.write(config);
 	}
 }

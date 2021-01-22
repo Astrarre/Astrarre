@@ -18,5 +18,8 @@
   "authors": [
     "HalfOf2",
     "Astrarre"
-  ]
+  ],
+  "custom": {
+    "astrarre:manifest": ["astrarre-common-v0"]
+  }
 }

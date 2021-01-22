@@ -8,28 +8,20 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 
 // @formatter:off
 public class IntKeyImpl extends Key.Int {
-	private final TransactionHandler handler;
+	private final TransactionHandler handler = new TransactionHandler();
 	private final IntArrayList values = new IntArrayList();
 
-	public IntKeyImpl(TransactionHandler handler, int originalValue) {
-		this.handler = handler;
+	public IntKeyImpl(int originalValue) {
 		this.values.add(0, originalValue);
 	}
 
-	public IntKeyImpl(int originalValue) {this(new TransactionHandler(), originalValue);}
-
-	protected IntKeyImpl(TransactionHandler handler) {
-		this.handler = handler;
-	}
-
 	protected IntKeyImpl() {
-		this(new TransactionHandler());
 	}
 
 	@Override
 	public int get(Transaction transaction) {
-		if(transaction == null) {
-			return this.getTrue();
+		if(transaction == null || values.isEmpty()) {
+			return this.getRootValue();
 		}
 		return this.values.topInt();
 	}
@@ -50,7 +42,7 @@ public class IntKeyImpl extends Key.Int {
 	@Override
 	public void set(Transaction transaction, int val) {
 		if(transaction == null) {
-			this.setTrue(val);
+			this.setRootValue(val);
 			return;
 		}
 
@@ -65,14 +57,14 @@ public class IntKeyImpl extends Key.Int {
 	/**
     * @return the 'true' value of the key
     */
-	protected int getTrue() {
+	protected int getRootValue() {
 		return this.values.getInt(0);
 	}
 
 	/**
 	 * @param val the 'true' value of the key
 	 */
-	protected void setTrue(int val) {
+	protected void setRootValue(int val) {
 		this.values.set(0, val);
 	}
 }

@@ -8,28 +8,20 @@ import it.unimi.dsi.fastutil.shorts.ShortArrayList;
 
 // @formatter:off
 public class ShortKeyImpl extends Key.Short {
-	private final TransactionHandler handler;
+	private final TransactionHandler handler = new TransactionHandler();
 	private final ShortArrayList values = new ShortArrayList();
 
-	public ShortKeyImpl(TransactionHandler handler, short originalValue) {
-		this.handler = handler;
+	public ShortKeyImpl(short originalValue) {
 		this.values.add(0, originalValue);
 	}
 
-	public ShortKeyImpl(short originalValue) {this(new TransactionHandler(), originalValue);}
-
-	protected ShortKeyImpl(TransactionHandler handler) {
-		this.handler = handler;
-	}
-
 	protected ShortKeyImpl() {
-		this(new TransactionHandler());
 	}
 
 	@Override
 	public short get(Transaction transaction) {
-		if(transaction == null) {
-			return this.getTrue();
+		if(transaction == null || values.isEmpty()) {
+			return this.getRootValue();
 		}
 		return this.values.topShort();
 	}
@@ -50,7 +42,7 @@ public class ShortKeyImpl extends Key.Short {
 	@Override
 	public void set(Transaction transaction, short val) {
 		if(transaction == null) {
-			this.setTrue(val);
+			this.setRootValue(val);
 			return;
 		}
 
@@ -65,14 +57,14 @@ public class ShortKeyImpl extends Key.Short {
 	/**
     * @return the 'true' value of the key
     */
-	protected short getTrue() {
+	protected short getRootValue() {
 		return this.values.getShort(0);
 	}
 
 	/**
 	 * @param val the 'true' value of the key
 	 */
-	protected void setTrue(short val) {
+	protected void setRootValue(short val) {
 		this.values.set(0, val);
 	}
 }

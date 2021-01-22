@@ -7,7 +7,9 @@ import net.minecraft.client.texture.Sprite;
 
 public class Main {
 	public static void main(String[] args) throws IOException, InterruptedException {
-		AbstracterConfig config = new AbstracterConfig();
-		AbstracterUtil.applyParallel(config, args[0], () -> config.registerInterface(Sprite.class));
+		AbstracterUtil util = AbstracterUtil.fromFile(args[0]);
+		AbstracterConfig config = util.createConfig("astrarre_manifest");
+		config.registerInterface(Sprite.class);
+		util.write(config);
 	}
 }

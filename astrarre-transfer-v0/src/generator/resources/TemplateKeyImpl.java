@@ -8,28 +8,20 @@ package io.github.astrarre.transfer.v0.api.transaction.keys.generated;
 
 // @formatter:off
 public class %Upper%KeyImpl extends Key.%Upper% {
-	private final TransactionHandler handler;
+	private final TransactionHandler handler = new TransactionHandler();
 	private final %Upper%ArrayList values = new %Upper%ArrayList();
 
-	public %Upper%KeyImpl(TransactionHandler handler, %lower% originalValue) {
-		this.handler = handler;
+	public %Upper%KeyImpl(%lower% originalValue) {
 		this.values.add(0, originalValue);
 	}
 
-	public %Upper%KeyImpl(%lower% originalValue) {this(new TransactionHandler(), originalValue);}
-
-	protected %Upper%KeyImpl(TransactionHandler handler) {
-		this.handler = handler;
-	}
-
 	protected %Upper%KeyImpl() {
-		this(new TransactionHandler());
 	}
 
 	@Override
 	public %lower% get(Transaction transaction) {
-		if(transaction == null) {
-			return this.getTrue();
+		if(transaction == null || values.isEmpty()) {
+			return this.getRootValue();
 		}
 		return this.values.top%Upper%();
 	}
@@ -50,7 +42,7 @@ public class %Upper%KeyImpl extends Key.%Upper% {
 	@Override
 	public void set(Transaction transaction, %lower% val) {
 		if(transaction == null) {
-			this.setTrue(val);
+			this.setRootValue(val);
 			return;
 		}
 
@@ -65,14 +57,14 @@ public class %Upper%KeyImpl extends Key.%Upper% {
 	/**
     * @return the 'true' value of the key
     */
-	protected %lower% getTrue() {
+	protected %lower% getRootValue() {
 		return this.values.get%Upper%(0);
 	}
 
 	/**
 	 * @param val the 'true' value of the key
 	 */
-	protected void setTrue(%lower% val) {
+	protected void setRootValue(%lower% val) {
 		this.values.set(0, val);
 	}
 }

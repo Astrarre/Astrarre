@@ -8,28 +8,20 @@ import it.unimi.dsi.fastutil.booleans.BooleanArrayList;
 
 // @formatter:off
 public class BooleanKeyImpl extends Key.Boolean {
-	private final TransactionHandler handler;
+	private final TransactionHandler handler = new TransactionHandler();
 	private final BooleanArrayList values = new BooleanArrayList();
 
-	public BooleanKeyImpl(TransactionHandler handler, boolean originalValue) {
-		this.handler = handler;
+	public BooleanKeyImpl(boolean originalValue) {
 		this.values.add(0, originalValue);
 	}
 
-	public BooleanKeyImpl(boolean originalValue) {this(new TransactionHandler(), originalValue);}
-
-	protected BooleanKeyImpl(TransactionHandler handler) {
-		this.handler = handler;
-	}
-
 	protected BooleanKeyImpl() {
-		this(new TransactionHandler());
 	}
 
 	@Override
 	public boolean get(Transaction transaction) {
-		if(transaction == null) {
-			return this.getTrue();
+		if(transaction == null || values.isEmpty()) {
+			return this.getRootValue();
 		}
 		return this.values.topBoolean();
 	}
@@ -50,7 +42,7 @@ public class BooleanKeyImpl extends Key.Boolean {
 	@Override
 	public void set(Transaction transaction, boolean val) {
 		if(transaction == null) {
-			this.setTrue(val);
+			this.setRootValue(val);
 			return;
 		}
 
@@ -65,14 +57,14 @@ public class BooleanKeyImpl extends Key.Boolean {
 	/**
     * @return the 'true' value of the key
     */
-	protected boolean getTrue() {
+	protected boolean getRootValue() {
 		return this.values.getBoolean(0);
 	}
 
 	/**
 	 * @param val the 'true' value of the key
 	 */
-	protected void setTrue(boolean val) {
+	protected void setRootValue(boolean val) {
 		this.values.set(0, val);
 	}
 }

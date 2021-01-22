@@ -6,31 +6,20 @@ import io.github.astrarre.transfer.v0.api.transaction.TransactionHandler;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 public class ObjectKeyImpl<T> extends Key.Object<T> {
-	private final TransactionHandler handler;
+	private final TransactionHandler handler = new TransactionHandler();
 	private final ObjectArrayList<T> values = new ObjectArrayList<>();
 
-	public ObjectKeyImpl(T originalValue) {this(new TransactionHandler(), originalValue);}
-
-	public ObjectKeyImpl(TransactionHandler handler, T originalValue) {
-		this.handler = handler;
+	public ObjectKeyImpl(T originalValue) {
 		this.values.add(0, originalValue);
 	}
 
 	/**
 	 * by default the value stack is used to hold the backing value of the key, but custom keys (like Inventory slots) have custom backing and thus do not
 	 * need an extra entry in the stack
-	 * @see #getTrue()
-	 * @see #setTrue(java.lang.Object)
+	 * @see #getRootValue()
+	 * @see #setRootValue(java.lang.Object)
 	 */
 	protected ObjectKeyImpl() {
-		this(new TransactionHandler());
-	}
-
-	/**
-	 * @see #ObjectKeyImpl()
-	 */
-	protected ObjectKeyImpl(TransactionHandler handler) {
-		this.handler = handler;
 	}
 
 	@Override
@@ -49,7 +38,7 @@ public class ObjectKeyImpl<T> extends Key.Object<T> {
 	@Override
 	public void set(Transaction transaction, T val) {
 		if (transaction == null) {
-			this.setTrue(val);
+			this.setRootValue(val);
 			return;
 		}
 
@@ -63,8 +52,8 @@ public class ObjectKeyImpl<T> extends Key.Object<T> {
 
 	@Override
 	public T get(Transaction transaction) {
-		if (transaction == null) {
-			return this.getTrue();
+		if (transaction == null || this.values.isEmpty()) {
+			return this.getRootValue();
 		}
 
 		return this.values.top();
@@ -73,14 +62,14 @@ public class ObjectKeyImpl<T> extends Key.Object<T> {
 	/**
 	 * This method gets the backing object of this key
 	 */
-	protected T getTrue() {
+	protected T getRootValue() {
 		return this.values.get(0);
 	}
 
 	/**
 	 * This method sets the backing object of this key
 	 */
-	protected void setTrue(T val) {
+	protected void setRootValue(T val) {
 		this.values.set(0, val);
 	}
 }

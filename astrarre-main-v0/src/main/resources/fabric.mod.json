@@ -17,5 +17,8 @@
   "mixins": [
     "astrarre-network.mixins.json",
     "astrarre-common.mixins.json"
-  ]
+  ],
+  "custom": {
+    "astrarre:manifest": ["astrarre-main-v0"]
+  }
 }

@@ -60,6 +60,14 @@ public abstract class Key {
 		 * get the value for the given transaction in the key.
 		 */
 		public abstract int get(@Nullable Transaction transaction);
+
+		public void decrement(Transaction transaction, int take) {
+			this.set(transaction, this.get(transaction) - take);
+		}
+
+		public void increment(Transaction transaction, int inc) {
+			this.set(transaction, this.get(transaction) + inc);
+		}
 	}
 
 	public static abstract class Float extends Key {

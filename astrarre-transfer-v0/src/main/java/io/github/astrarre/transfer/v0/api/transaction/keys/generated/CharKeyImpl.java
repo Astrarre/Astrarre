@@ -8,28 +8,20 @@ import it.unimi.dsi.fastutil.chars.CharArrayList;
 
 // @formatter:off
 public class CharKeyImpl extends Key.Char {
-	private final TransactionHandler handler;
+	private final TransactionHandler handler = new TransactionHandler();
 	private final CharArrayList values = new CharArrayList();
 
-	public CharKeyImpl(TransactionHandler handler, char originalValue) {
-		this.handler = handler;
+	public CharKeyImpl(char originalValue) {
 		this.values.add(0, originalValue);
 	}
 
-	public CharKeyImpl(char originalValue) {this(new TransactionHandler(), originalValue);}
-
-	protected CharKeyImpl(TransactionHandler handler) {
-		this.handler = handler;
-	}
-
 	protected CharKeyImpl() {
-		this(new TransactionHandler());
 	}
 
 	@Override
 	public char get(Transaction transaction) {
-		if(transaction == null) {
-			return this.getTrue();
+		if(transaction == null || values.isEmpty()) {
+			return this.getRootValue();
 		}
 		return this.values.topChar();
 	}
@@ -50,7 +42,7 @@ public class CharKeyImpl extends Key.Char {
 	@Override
 	public void set(Transaction transaction, char val) {
 		if(transaction == null) {
-			this.setTrue(val);
+			this.setRootValue(val);
 			return;
 		}
 
@@ -65,14 +57,14 @@ public class CharKeyImpl extends Key.Char {
 	/**
     * @return the 'true' value of the key
     */
-	protected char getTrue() {
+	protected char getRootValue() {
 		return this.values.getChar(0);
 	}
 
 	/**
 	 * @param val the 'true' value of the key
 	 */
-	protected void setTrue(char val) {
+	protected void setRootValue(char val) {
 		this.values.set(0, val);
 	}
 }

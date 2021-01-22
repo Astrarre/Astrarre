@@ -21,6 +21,7 @@ public class ItemStackAbs extends InterfaceAbstracter {
 			visitor.visitVarInsn(ALOAD, 0);
 			visitor.visitTypeInsn(CHECKCAST, this.cls);
 			visitor.visitMethodInsn(INVOKESTATIC, ITEM_KEY, "of", "(L" + this.cls + ";)L" + ITEM_KEY + ";", false);
+			visitor.visitInsn(ARETURN);
 		}
 	}
 }

@@ -8,28 +8,20 @@ import it.unimi.dsi.fastutil.bytes.ByteArrayList;
 
 // @formatter:off
 public class ByteKeyImpl extends Key.Byte {
-	private final TransactionHandler handler;
+	private final TransactionHandler handler = new TransactionHandler();
 	private final ByteArrayList values = new ByteArrayList();
 
-	public ByteKeyImpl(TransactionHandler handler, byte originalValue) {
-		this.handler = handler;
+	public ByteKeyImpl(byte originalValue) {
 		this.values.add(0, originalValue);
 	}
 
-	public ByteKeyImpl(byte originalValue) {this(new TransactionHandler(), originalValue);}
-
-	protected ByteKeyImpl(TransactionHandler handler) {
-		this.handler = handler;
-	}
-
 	protected ByteKeyImpl() {
-		this(new TransactionHandler());
 	}
 
 	@Override
 	public byte get(Transaction transaction) {
-		if(transaction == null) {
-			return this.getTrue();
+		if(transaction == null || values.isEmpty()) {
+			return this.getRootValue();
 		}
 		return this.values.topByte();
 	}
@@ -50,7 +42,7 @@ public class ByteKeyImpl extends Key.Byte {
 	@Override
 	public void set(Transaction transaction, byte val) {
 		if(transaction == null) {
-			this.setTrue(val);
+			this.setRootValue(val);
 			return;
 		}
 
@@ -65,14 +57,14 @@ public class ByteKeyImpl extends Key.Byte {
 	/**
     * @return the 'true' value of the key
     */
-	protected byte getTrue() {
+	protected byte getRootValue() {
 		return this.values.getByte(0);
 	}
 
 	/**
 	 * @param val the 'true' value of the key
 	 */
-	protected void setTrue(byte val) {
+	protected void setRootValue(byte val) {
 		this.values.set(0, val);
 	}
 }

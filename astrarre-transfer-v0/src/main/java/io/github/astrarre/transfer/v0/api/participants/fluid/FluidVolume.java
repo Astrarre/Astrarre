@@ -51,10 +51,6 @@ public class FluidVolume implements Participant<Fluid> {
 
 	@Override
 	public void extract(Transaction transaction, Insertable<Fluid> insertable) {
-		if(insertable.isFull(transaction)) {
-			return;
-		}
-
 		int oldLevel = this.quantity.get(transaction);
 		int amount = insertable.insert(transaction, this.fluid.get(transaction), oldLevel);
 		int newLevel = oldLevel - amount;

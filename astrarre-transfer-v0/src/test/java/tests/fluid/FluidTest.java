@@ -1,18 +1,21 @@
 package tests.fluid;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.*;
 
+import clsgolf.ClasspathTestRunner;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import io.github.astrarre.transfer.v0.api.participants.fluid.FluidVolume;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import net.minecraft.Bootstrap;
 import net.minecraft.fluid.Fluids;
 
+@RunWith(ClasspathTestRunner.class)
 public class FluidTest {
-	@BeforeAll
-	static void bootstrap() {
+	@Before
+	public void bootstrap() {
 		Bootstrap.initialize();
 	}
 

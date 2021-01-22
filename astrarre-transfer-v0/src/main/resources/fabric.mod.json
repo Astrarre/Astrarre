@@ -16,5 +16,8 @@
   ],
   "depends": {
     "fabricloader": ">=0.8.9"
+  },
+  "custom": {
+    "astrarre:manifest": ["astrarre-transfer-v0"]
   }
 }

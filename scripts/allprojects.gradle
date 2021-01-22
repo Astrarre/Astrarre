@@ -42,7 +42,7 @@ allprojects {
             transitive = false
         }
 
-        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+        testImplementation 'junit:junit:4.13.1'
     }
 
     jar {

@@ -8,28 +8,20 @@ import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 
 // @formatter:off
 public class DoubleKeyImpl extends Key.Double {
-	private final TransactionHandler handler;
+	private final TransactionHandler handler = new TransactionHandler();
 	private final DoubleArrayList values = new DoubleArrayList();
 
-	public DoubleKeyImpl(TransactionHandler handler, double originalValue) {
-		this.handler = handler;
+	public DoubleKeyImpl(double originalValue) {
 		this.values.add(0, originalValue);
 	}
 
-	public DoubleKeyImpl(double originalValue) {this(new TransactionHandler(), originalValue);}
-
-	protected DoubleKeyImpl(TransactionHandler handler) {
-		this.handler = handler;
-	}
-
 	protected DoubleKeyImpl() {
-		this(new TransactionHandler());
 	}
 
 	@Override
 	public double get(Transaction transaction) {
-		if(transaction == null) {
-			return this.getTrue();
+		if(transaction == null || values.isEmpty()) {
+			return this.getRootValue();
 		}
 		return this.values.topDouble();
 	}
@@ -50,7 +42,7 @@ public class DoubleKeyImpl extends Key.Double {
 	@Override
 	public void set(Transaction transaction, double val) {
 		if(transaction == null) {
-			this.setTrue(val);
+			this.setRootValue(val);
 			return;
 		}
 
@@ -65,14 +57,14 @@ public class DoubleKeyImpl extends Key.Double {
 	/**
     * @return the 'true' value of the key
     */
-	protected double getTrue() {
+	protected double getRootValue() {
 		return this.values.getDouble(0);
 	}
 
 	/**
 	 * @param val the 'true' value of the key
 	 */
-	protected void setTrue(double val) {
+	protected void setRootValue(double val) {
 		this.values.set(0, val);
 	}
 }

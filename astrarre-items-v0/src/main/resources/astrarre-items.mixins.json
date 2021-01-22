@@ -4,7 +4,6 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "item.ItemMixin",
-    "item.ItemStackMixin",
     "nbt.CompoundTagMixin",
     "nbt.list.ByteArrayTagMixin",
     "nbt.list.IntArrayTagMixin",

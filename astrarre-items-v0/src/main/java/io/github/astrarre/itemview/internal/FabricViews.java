@@ -47,7 +47,7 @@ public class FabricViews {
 	 */
 	@NotNull
 	public static NBTagView view(@NotNull CompoundTag tag) {
-		return tag == null ? NBTagView.EMPTY : (NBTagView) tag;
+		return (tag == null || tag.isEmpty()) ? NBTagView.EMPTY : (NBTagView) tag;
 	}
 
 	public static <T> T immutableView(Tag tag, NBTType<T> type) {

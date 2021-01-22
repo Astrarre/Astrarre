@@ -14,7 +14,7 @@ public class FixedFluidVolume extends FluidVolume {
 
 	@Override
 	public int insert(Transaction transaction, Fluid type, int amount) {
-		return super.insert(transaction, type, Math.min(this.max - this.quantity.get(transaction), amount));
+		return super.insert(transaction, type, Math.min(this.getMax() - this.quantity.get(transaction), amount));
 	}
 
 	/**

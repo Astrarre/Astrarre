@@ -44,22 +44,23 @@ static def moduleDependencies(project, List<String> depNames) {
     moduleDependencies(project, depNames, false)
 }
 
-static def moduleDependencies(project, List<String> depNames, boolean co) {
+static def moduleDependencies(project, List<String> depNames, boolean compOnly) {
     project.configure(project) {
         def deps = depNames.iterator().collect { rootProject.project(":$it") }
         dependencies {
             deps.each {
                 if (it != project) {
-                    if (co) {
+                    if (compOnly) {
                         compileOnly it
                     } else {
                         compile it
                     }
+                    testmodImplementation it
                 }
             }
         }
 
-        if (!co) {
+        if (!compOnly) {
             publishing {
                 publications {
                     mavenJava(MavenPublication) {
@@ -114,11 +115,10 @@ static def hasAbstraction(Project proj) {
         }
 
         dependencies {
-            runtimeOnly tasks.fakeImplJar.outputs.files
+            modRuntime tasks.fakeImplJar.outputs.files
             compile files("$buildDir/abstracted/api.jar")
-            testmodRuntimeOnly tasks.fakeImplJar.outputs.files
-            testmodCompile files("$buildDir/abstracted/api.jar")
-            abstracterCompile "io.github.astrarre:abstracter:1.1.12"
+
+            abstracterCompile "io.github.astrarre:abstracter:1.1.13"
             abstracterCompile 'org.reflections:reflections:0.9.12'
         }
 
@@ -129,7 +129,6 @@ static def hasAbstraction(Project proj) {
             description = "Runs the abstracter config class"
             classpath = sourceSets.abstracter.runtimeClasspath
             inputs.files classpath
-
             outputs.file "$buildDir/abstracted/api.jar"
             outputs.file "$buildDir/abstracted/api_sources.jar"
             outputs.file "$buildDir/abstracted/impl.jar"

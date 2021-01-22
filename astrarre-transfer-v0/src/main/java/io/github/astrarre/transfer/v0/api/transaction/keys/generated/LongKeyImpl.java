@@ -8,28 +8,20 @@ import it.unimi.dsi.fastutil.longs.LongArrayList;
 
 // @formatter:off
 public class LongKeyImpl extends Key.Long {
-	private final TransactionHandler handler;
+	private final TransactionHandler handler = new TransactionHandler();
 	private final LongArrayList values = new LongArrayList();
 
-	public LongKeyImpl(TransactionHandler handler, long originalValue) {
-		this.handler = handler;
+	public LongKeyImpl(long originalValue) {
 		this.values.add(0, originalValue);
 	}
 
-	public LongKeyImpl(long originalValue) {this(new TransactionHandler(), originalValue);}
-
-	protected LongKeyImpl(TransactionHandler handler) {
-		this.handler = handler;
-	}
-
 	protected LongKeyImpl() {
-		this(new TransactionHandler());
 	}
 
 	@Override
 	public long get(Transaction transaction) {
-		if(transaction == null) {
-			return this.getTrue();
+		if(transaction == null || values.isEmpty()) {
+			return this.getRootValue();
 		}
 		return this.values.topLong();
 	}
@@ -50,7 +42,7 @@ public class LongKeyImpl extends Key.Long {
 	@Override
 	public void set(Transaction transaction, long val) {
 		if(transaction == null) {
-			this.setTrue(val);
+			this.setRootValue(val);
 			return;
 		}
 
@@ -65,14 +57,14 @@ public class LongKeyImpl extends Key.Long {
 	/**
     * @return the 'true' value of the key
     */
-	protected long getTrue() {
+	protected long getRootValue() {
 		return this.values.getLong(0);
 	}
 
 	/**
 	 * @param val the 'true' value of the key
 	 */
-	protected void setTrue(long val) {
+	protected void setRootValue(long val) {
 		this.values.set(0, val);
 	}
 }

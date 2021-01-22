@@ -1,5 +1,8 @@
 version '0.0.0'
 hasAbstraction(project)
+
+moduleDependencies(project, ['astrarre-items-v0'], false)
+
 dependencies {
-    testmodCompile project(":astrarre-gui-v0")
+    //testmodCompile project(":astrarre-items-v0")
 }

@@ -6,6 +6,7 @@ import java.util.List;
 
 import io.github.astrarre.itemview.internal.FabricViews;
 import io.github.astrarre.stripper.Hide;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.nbt.CompoundTag;
@@ -15,8 +16,16 @@ import net.minecraft.nbt.CompoundTag;
  *
  * @see FabricViews
  */
+@NotNull
 public interface NBTagView extends Iterable<String> {
 	NBTagView EMPTY = FabricViews.view(new CompoundTag());
+
+	/**
+	 * @return an immutable copy of the tag
+	 */
+	static NBTagView of(io.github.astrarre.v0.nbt.CompoundTag tag) {
+		return tag == null ? EMPTY : (NBTagView) tag.copy();
+	}
 
 	/**
 	 * equivalent to

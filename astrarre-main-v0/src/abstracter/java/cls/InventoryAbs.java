@@ -21,7 +21,7 @@ public class InventoryAbs extends InterfaceAbstracter {
 				if (method.name.equals("astrarre_artificial_clinit")) {
 					method.visitTypeInsn(NEW, "io/github/astrarre/itemview/internal/EmptyInventory");
 					method.visitInsn(DUP);
-					method.visitMethodInsn(INVOKEVIRTUAL, "io/github/astrarre/itemview/internal/EmptyInventory", "<init>", "()V");
+					method.visitMethodInsn(INVOKESPECIAL, "io/github/astrarre/itemview/internal/EmptyInventory", "<init>", "()V");
 					method.visitFieldInsn(PUTSTATIC,
 							"io/github/astrarre/v0/inventory/Inventory",
 							"EMPTY",

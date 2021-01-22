@@ -11,6 +11,8 @@ import java.util.Properties;
 import java.util.function.Predicate;
 
 import com.chocohead.mm.api.ClassTinkerers;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
@@ -26,6 +28,8 @@ import net.fabricmc.loader.api.MappingResolver;
 import net.fabricmc.loader.api.ModContainer;
 
 public class AbstractionApplicator implements Runnable, Opcodes {
+	private static final Logger LOGGER = LogManager.getLogger("Abstraction Applicator");
+
 	private static boolean validateParameters(Type[] parameters, InsnList list) {
 		for (int i = 0; i < parameters.length; i++) {
 			int fi = i;
@@ -43,7 +47,6 @@ public class AbstractionApplicator implements Runnable, Opcodes {
 		return false;
 	}
 
-
 	@Override
 	public void run() {
 		FabricLoader loader = FabricLoader.getInstance();
@@ -51,37 +54,11 @@ public class AbstractionApplicator implements Runnable, Opcodes {
 		boolean isNamed = resolver.getCurrentRuntimeNamespace().equals("named");
 		try {
 			for (ModContainer mod : loader.getAllMods()) {
-				Path path = mod.getPath("/intr_manifest.properties");
-				if (Files.exists(path)) {
-					Properties interfaceProperties = read(Files.newInputStream(path));
-					interfaceProperties.forEach((k, v) -> {
-						String className = resolver.mapClassName("intermediary", ((String) k).replace('/', '.'));
-						if (isNamed) {
-							ClassTinkerers.addTransformation((String) v, c -> stripConflicts(c, true));
-						}
-
-						ClassTinkerers.addTransformation(className, c -> {
-							c.interfaces.add((String) v);
-							MethodNode target = null;
-							for (MethodNode method : c.methods) {
-								if (method.name.equals("<clinit>")) {
-									target = method;
-									break;
-								}
-							}
-							if (target == null) {
-								target = new MethodNode(ACC_STATIC, "<clinit>", "()V", null, null);
-								target.visitInsn(RETURN);
-							}
-
-							InsnList list = target.instructions;
-							list.insertBefore(list.getLast(), new MethodInsnNode(INVOKESTATIC, (String) v, "astrarre_artificial_clinit", "()V"));
-						});
-					});
-				}
-				Path base = mod.getPath("/base_manifest.txt");
-				if (Files.exists(base)) {
-					Files.newBufferedReader(base).lines().forEach(v -> ClassTinkerers.addTransformation(v, c -> stripConflicts(c, false)));
+				Path dir = mod.getPath("astrarre_manifest");
+				if (Files.isDirectory(dir) && Files.exists(dir)) {
+					LOGGER.info("Applying abstraction for " + mod.getMetadata().getId());
+					read(Files.newInputStream(dir.resolve("interface.properties"))).forEach((a, b) -> InterfaceAbstractionApplicator.apply(resolver.mapClassName("intermediary", ((String) a).replace('/', '.')).replace('.', '/'), (String) b, isNamed));
+					read(Files.newInputStream(dir.resolve("base_impl.properties"))).forEach((a, b) -> BaseAbstractionApplicator.apply((String) a, resolver.mapClassName("intermediary", ((String) b).replace('/', '.')).replace('.', '/'), isNamed));
 				}
 			}
 		} catch (Exception e) {
@@ -97,52 +74,5 @@ public class AbstractionApplicator implements Runnable, Opcodes {
 			throw new RuntimeException(e);
 		}
 		return properties;
-	}
-
-	// strip failing override methods
-	private static void stripConflicts(ClassNode node, boolean iface) {
-		Iterator<MethodNode> iterator = node.methods.iterator();
-		while (iterator.hasNext()) {
-			MethodNode method = iterator.next();
-			if (!Modifier.isStatic(method.access)) {
-				// if final method, or interface
-				if (Modifier.isFinal(method.access) || iface) {
-					InsnList list = method.instructions;
-					if (list != null && list.size() > 0) {
-						ListIterator<AbstractInsnNode> iter = list.iterator();
-						int current = 0;
-						while (iter.hasNext()) {
-							AbstractInsnNode n = iter.next();
-							if (n instanceof VarInsnNode) {
-								if (((VarInsnNode) n).var == current) {
-									current++;
-								} else {
-									break;
-								}
-							}
-						}
-
-						if (iter.hasNext()) {
-							AbstractInsnNode next = iter.next();
-							if (next instanceof MethodInsnNode) {
-								// if interface (invokevirtual/interface) if base (invokespecial)
-								MethodInsnNode methodInvoke = (MethodInsnNode) next;
-								int opcode = methodInvoke.getOpcode();
-								if ((iface && (opcode == INVOKEVIRTUAL || opcode == INVOKEINTERFACE)) || (!iface && (opcode == INVOKESPECIAL))) {
-									if (methodInvoke.name.equals(method.name) && methodInvoke.desc.equals(method.desc)) {
-										if (iter.hasNext()) {
-											AbstractInsnNode returnInsn = iter.next();
-											if (returnInsn instanceof InsnNode && !iter.hasNext()) {
-												iterator.remove();
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
 	}
 }
