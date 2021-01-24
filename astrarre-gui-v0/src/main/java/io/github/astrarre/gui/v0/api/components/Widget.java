@@ -1,6 +1,6 @@
 package io.github.astrarre.gui.v0.api.components;
 
-import io.github.astrarre.gui.v0.api.Graphics2d;
+import io.github.astrarre.gui.v0.api.Graphics3d;
 import io.github.astrarre.gui.v0.api.cursor.Cursor;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,7 +14,7 @@ public abstract class Widget extends Component {
 	 * @param g2d automatically offset by {@link #getBounds(float, float)}
 	 */
 	@Override
-	public abstract void render(Graphics2d g2d, float tickDelta);
+	public abstract void render(Graphics3d g2d, float tickDelta);
 
 	/**
 	 * like all other methods, the coordinates are relative to {@link #getBounds(float, float)}

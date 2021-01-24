@@ -118,7 +118,7 @@ static def hasAbstraction(Project proj) {
             modRuntime tasks.fakeImplJar.outputs.files
             compile files("$buildDir/abstracted/api.jar")
 
-            abstracterCompile "io.github.astrarre:abstracter:1.1.13"
+            abstracterCompile "io.github.astrarre:abstracter:1.1.14"
             abstracterCompile 'org.reflections:reflections:0.9.12'
         }
 

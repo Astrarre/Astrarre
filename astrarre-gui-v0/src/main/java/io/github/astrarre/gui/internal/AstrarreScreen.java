@@ -1,10 +1,9 @@
 package io.github.astrarre.gui.internal;
 
-import io.github.astrarre.gui.v0.api.Graphics2d;
+import io.github.astrarre.gui.v0.api.Graphics3d;
 import io.github.astrarre.gui.v0.api.components.DynamicBound;
 import io.github.astrarre.gui.v0.api.util.Rect4f;
 import io.github.astrarre.gui.v0.api.components.button.ButtonTextures;
-import io.github.astrarre.gui.v0.api.components.button.ClientButton;
 import io.github.astrarre.gui.v0.api.util.Closeable;
 
 import net.minecraft.client.gui.Element;
@@ -38,10 +37,10 @@ public class AstrarreScreen extends Screen implements Element {
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		this.renderBackground(matrices);
-		Graphics2d graphics2d = new Graphics2dImpl(matrices);
+		Graphics3d graphics3D = new Graphics3DImpl(matrices);
 		Rect4f rect4F = this.button.bounds.getLocation(this.width, this.height);
-		try(Closeable c = graphics2d.translate(rect4F.x, rect4F.y)) {
-			this.button.render(graphics2d, delta);
+		try(Closeable c = graphics3D.translate(rect4F.x, rect4F.y, getZOffset())) {
+			this.button.render(graphics3D, delta);
 		}
 		super.render(matrices, mouseX, mouseY, delta);
 	}

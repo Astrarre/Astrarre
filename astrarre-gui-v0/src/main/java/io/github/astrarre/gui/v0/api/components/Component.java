@@ -1,6 +1,6 @@
 package io.github.astrarre.gui.v0.api.components;
 
-import io.github.astrarre.gui.v0.api.Graphics2d;
+import io.github.astrarre.gui.v0.api.Graphics3d;
 import io.github.astrarre.gui.v0.api.util.Rect4f;
 
 import net.fabricmc.api.EnvType;
@@ -16,7 +16,7 @@ public abstract class Component {
 	 * @param tickDelta the 'fraction' of the tick that this is being rendered in.
 	 */
 	@Environment (EnvType.CLIENT)
-	public abstract void render(Graphics2d g2d, float tickDelta);
+	public abstract void render(Graphics3d g2d, float tickDelta);
 
 	public final Rect4f getBounds(float screenWidth, float screenHeight) {
 		return this.bounds.getLocation(screenWidth, screenHeight);
