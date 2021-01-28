@@ -1,11 +1,2 @@
 version '0.0.0'
-//moduleDependencies(project, [':astrarre-main-v0'], true)
-def main = rootProject.project(":astrarre-main-v0")
-def curr = project
-main.afterEvaluate {
-    curr.tasks.compileJava.dependsOn main.tasks.generateAbstractions
-}
-
-dependencies {
-    compileOnly files("$main.buildDir/abstracted/impl.jar")
-}
+moduleDependencies(project, [':astrarre-abstractions-v0'], false)

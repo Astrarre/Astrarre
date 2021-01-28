@@ -12,4 +12,12 @@ public interface Participant<T> extends Extractable<T>, Insertable<T> {
 	default long getVersion(Transaction transaction) {
 		return TransferInternal.version++;
 	}
+
+	default boolean supportsExtraction() {
+		return true;
+	}
+
+	default boolean supportsInsertion() {
+		return true;
+	}
 }

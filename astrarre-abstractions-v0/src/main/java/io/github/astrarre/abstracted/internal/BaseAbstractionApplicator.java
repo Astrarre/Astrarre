@@ -1,4 +1,4 @@
-package io.github.astrarre.common.internal;
+package io.github.astrarre.abstracted.internal;
 
 import java.lang.reflect.Modifier;
 import java.util.Iterator;

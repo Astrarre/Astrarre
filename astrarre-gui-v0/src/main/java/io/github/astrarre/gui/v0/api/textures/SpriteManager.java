@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import io.github.astrarre.common.v0.api.Validate;
+import io.github.astrarre.abstracted.v0.api.Validate;
 import io.github.astrarre.gui.internal.textures.AstrarreSpriteManager;
 import io.github.astrarre.stripper.Hide;
 import io.github.astrarre.v0.client.texture.Sprite;

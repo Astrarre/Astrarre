@@ -1,6 +1,6 @@
 package io.github.astrarre.gui.v0.api.textures;
 
-import io.github.astrarre.common.v0.api.Validate;
+import io.github.astrarre.abstracted.v0.api.Validate;
 import io.github.astrarre.stripper.Hide;
 import io.github.astrarre.v0.util.Id;
 

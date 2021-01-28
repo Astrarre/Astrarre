@@ -1,7 +1,5 @@
 package io.github.astrarre.access.internal.mixin;
 
-import io.github.astrarre.access.v0.api.Provider;
-import io.github.astrarre.access.v0.api.Providers;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

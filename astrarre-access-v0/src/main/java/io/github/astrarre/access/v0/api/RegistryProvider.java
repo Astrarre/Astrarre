@@ -18,5 +18,4 @@ public class RegistryProvider<A extends Access<T>, T> extends Provider<A, T> {
 	public @NotNull A get() {
 		return super.get();
 	}
-
 }

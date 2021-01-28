@@ -1,8 +1,7 @@
 package io.github.astrarre.transfer.v0.api.participants.fluid;
 
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
-
-import net.minecraft.fluid.Fluid;
+import io.github.astrarre.v0.fluid.Fluid;
 
 public class FixedFluidVolume extends FluidVolume {
 	protected final int max;

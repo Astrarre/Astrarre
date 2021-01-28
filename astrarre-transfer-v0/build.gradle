@@ -1,6 +1,5 @@
 version '0.0.0'
-//moduleDependencies(project, [':astrarre-main-v0'], true)
-moduleDependencies(project, [':astrarre-items-v0', ':astrarre-access-v0'], false)
+moduleDependencies(project, [':astrarre-items-v0', ':astrarre-access-v0', ':astrarre-abstractions-v0'], false)
 
 sourceSets {
     generator {

@@ -1,4 +1,4 @@
-package io.github.astrarre.common.internal;
+package io.github.astrarre.abstracted.internal;
 
 import com.chocohead.mm.api.ClassTinkerers;
 import org.objectweb.asm.Opcodes;

@@ -1,8 +1,3 @@
 version '0.0.0'
-hasAbstraction(project)
 
-moduleDependencies(project, ['astrarre-items-v0'], false)
-
-dependencies {
-    //testmodCompile project(":astrarre-items-v0")
-}
+moduleDependencies(project, ['astrarre-items-v0', 'astrarre-abstractions-v0'], false)

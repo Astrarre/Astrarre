@@ -1,7 +1,0 @@
-version '0.0.1'
-hasAbstraction(project)
-
-dependencies {
-    implementation 'com.github.Chocohead:fabric-asm:v2.1'
-    include 'com.github.Chocohead:fabric-asm:v2.1'
-}

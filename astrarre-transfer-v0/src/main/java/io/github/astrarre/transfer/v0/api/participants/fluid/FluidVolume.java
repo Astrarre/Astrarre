@@ -1,15 +1,14 @@
 package io.github.astrarre.transfer.v0.api.participants.fluid;
 
 import io.github.astrarre.transfer.v0.api.Insertable;
-import io.github.astrarre.transfer.v0.api.transaction.Key;
 import io.github.astrarre.transfer.v0.api.Participant;
+import io.github.astrarre.transfer.v0.api.transaction.Key;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import io.github.astrarre.transfer.v0.api.transaction.keys.ObjectKeyImpl;
 import io.github.astrarre.transfer.v0.api.transaction.keys.generated.IntKeyImpl;
-
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.util.registry.Registry;
+import io.github.astrarre.v0.fluid.Fluid;
+import io.github.astrarre.v0.fluid.Fluids;
+import io.github.astrarre.v0.util.registry.Registry;
 
 // todo document terminology, FluidVolume, FluidContainer, etc.
 public class FluidVolume implements Participant<Fluid> {
@@ -83,4 +82,6 @@ public class FluidVolume implements Participant<Fluid> {
 	public boolean isEmpty(Transaction transaction) {
 		return this.fluid.get(transaction) == Fluids.EMPTY;
 	}
+
+	
 }
