@@ -8,10 +8,12 @@ import org.objectweb.asm.tree.MethodNode;
 
 public class InterfaceAbstractionApplicator implements Opcodes {
 	public static void apply(String minecraft, String abstractionClass, boolean isNamed) {
+		System.out.println(minecraft);
 		ClassTinkerers.addTransformation(minecraft, node -> {
 			node.interfaces.add(abstractionClass);
 			MethodNode method = node.methods.stream().filter(n -> n.name.equals("<clinit>")).findFirst().orElseGet(() -> {
 				MethodNode n = new MethodNode(ACC_STATIC, "<clinit>", "()V", null, null);
+				node.methods.add(n);
 				n.visitInsn(RETURN);
 				return n;
 			});

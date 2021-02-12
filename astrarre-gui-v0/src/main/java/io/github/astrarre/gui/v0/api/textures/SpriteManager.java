@@ -13,6 +13,7 @@ import io.github.astrarre.v0.client.texture.Sprite;
 import io.github.astrarre.v0.util.Id;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.resource.ReloadableResourceManager;
 import net.minecraft.util.Identifier;
 
@@ -25,6 +26,12 @@ public interface SpriteManager {
 			SpriteManager.class,
 			"SpriteManager was loaded too early!");
 	SpriteManager PAINTINGS = Validate.instanceOf(MinecraftClient.getInstance().getPaintingManager(),
+			SpriteManager.class,
+			"SpriteManager was loaded too early!");
+	SpriteManager BLOCKS = Validate.instanceOf(MinecraftClient.getInstance().getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE),
+			SpriteManager.class,
+			"SpriteManager was loaded too early!");
+	SpriteManager PARTICLES = Validate.instanceOf(MinecraftClient.getInstance().getSpriteAtlas(SpriteAtlasTexture.PARTICLE_ATLAS_TEXTURE),
 			SpriteManager.class,
 			"SpriteManager was loaded too early!");
 
@@ -46,12 +53,7 @@ public interface SpriteManager {
 
 	void forEach(Consumer<Sprite> consumer);
 
-	@Hide
-	Sprite getSprite(Identifier sprite);
-
-	default Sprite getSprite(Id sprite) {
-		return this.getSprite((Identifier) sprite);
-	}
+	Sprite getSprite(Id sprite);
 
 	class Builder {
 		private final String modid;
@@ -61,12 +63,6 @@ public interface SpriteManager {
 		public Builder(String modid, String path) {
 			this.modid = modid;
 			this.path = path;
-		}
-
-		@Hide
-		public Builder add(Identifier identifier) {
-			this.validIdentifiers.add((Id) identifier);
-			return this;
 		}
 
 		public Builder add(Id id) {

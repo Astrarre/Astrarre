@@ -44,7 +44,9 @@ static def moduleDependencies(project, List<String> depNames) {
     moduleDependencies(project, depNames, false)
 }
 
-static def moduleDependencies(project, List<String> depNames, boolean compOnly) {
+static Project abstractions(Project project) { project.project(":astrarre-abstractions-v0") }
+
+static def moduleDependencies(Project project, List<String> depNames, boolean compOnly) {
     project.configure(project) {
         def deps = depNames.iterator().collect { rootProject.project(":$it") }
         dependencies {
@@ -82,8 +84,6 @@ static def moduleDependencies(project, List<String> depNames, boolean compOnly) 
         }
     }
 }
-
-
 
 apply from: 'scripts/modules.gradle'
 apply from: 'scripts/main.gradle'

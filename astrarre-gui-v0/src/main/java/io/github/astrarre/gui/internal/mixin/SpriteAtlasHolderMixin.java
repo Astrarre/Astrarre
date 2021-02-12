@@ -14,19 +14,18 @@ import net.minecraft.util.Identifier;
 
 @Mixin (SpriteAtlasHolder.class)
 public abstract class SpriteAtlasHolderMixin implements SpriteManager {
-	@Override
-	public void forEach(Consumer<Sprite> consumer) {
-		this.getSprites().map(this::getSprite).map(Sprite.class::cast).forEach(consumer);
-	}
-
+	@Shadow
+	protected abstract net.minecraft.client.texture.Sprite shadow$getSprite(Identifier objectId);
 	@Shadow
 	protected abstract Stream<Identifier> getSprites();
 
-	@Shadow
-	protected abstract net.minecraft.client.texture.Sprite shadow$getSprite(Identifier objectId);
+	@Override
+	public void forEach(Consumer<Sprite> consumer) {
+		this.getSprites().map(Id.class::cast).map(this::getSprite).map(Sprite.class::cast).forEach(consumer);
+	}
 
 	@Override
-	public Sprite getSprite(Identifier sprite) {
-		return (Sprite) this.shadow$getSprite(sprite);
+	public Sprite getSprite(Id sprite) {
+		return (Sprite) this.shadow$getSprite((Identifier) sprite);
 	}
 }

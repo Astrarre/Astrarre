@@ -37,7 +37,7 @@ allprojects {
         mappings "net.fabricmc:yarn:${root.yarn_mappings}:v2"
         modImplementation "net.fabricmc:fabric-loader:${root.loader_version}"
         // keep track of incompatibilities
-        modRuntime "net.fabricmc.fabric-api:fabric-api:${root.fabric_version}"
+        modImplementation "net.fabricmc.fabric-api:fabric-api:${root.fabric_version}"
         compileOnly("io.github.astrarre:astrarre-stripper:1.1.4") {
             transitive = false
         }

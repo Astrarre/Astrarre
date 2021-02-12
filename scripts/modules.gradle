@@ -14,6 +14,7 @@ import io.github.astrarre.stripper.gradle.StrippedJar
 subprojects {
     dependencies {
         testmodCompile sourceSets.main.output
+        modApi parent
     }
 
     task stripJar(type: StrippedJar) {

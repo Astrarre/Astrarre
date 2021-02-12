@@ -4,7 +4,8 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "Matrix4fMixin",
-    "SpriteAtlasHolderMixin"
+    "SpriteAtlasHolderMixin",
+    "SpriteAtlasTextureMixin"
   ],
   "client": [
   ],

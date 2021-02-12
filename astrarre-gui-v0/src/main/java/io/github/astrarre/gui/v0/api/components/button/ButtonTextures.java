@@ -1,6 +1,7 @@
 package io.github.astrarre.gui.v0.api.components.button;
 
 import io.github.astrarre.gui.v0.api.textures.Texture;
+import io.github.astrarre.v0.util.Id;
 
 import net.minecraft.util.Identifier;
 
@@ -8,7 +9,7 @@ import net.minecraft.util.Identifier;
  * @see Builder
  */
 public class ButtonTextures {
-	private static final Identifier TEXTURE = new Identifier("textures/gui/container/beacon.png");
+	private static final Id TEXTURE = Id.newInstance("textures/gui/container/beacon.png");
 	private static final Texture BEACON_TEXTURE = new Texture(TEXTURE, 256, 256);
 	public static final ButtonTextures BEACON_BUTTON = new Builder()
 			.setNormal(BEACON_TEXTURE, 0, 219, 21, 240)

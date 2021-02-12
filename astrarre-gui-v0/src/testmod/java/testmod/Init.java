@@ -1,7 +1,5 @@
 package testmod;
 
-import io.github.astrarre.gui.internal.AstrarreScreen;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemUsageContext;
@@ -17,7 +15,6 @@ import net.fabricmc.api.ModInitializer;
 public class Init implements ModInitializer {
 	@Override
 	public void onInitialize() {
-		System.out.println("TESTMOD INIT");
 		Registry.register(Registry.ITEM, new Identifier("testmod", "test"), new ItemA(new Item.Settings()));
 	}
 

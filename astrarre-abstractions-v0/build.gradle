@@ -1,22 +1,10 @@
 version '0.0.0'
-dependencies {
-    implementation 'com.github.Chocohead:fabric-asm:v2.1'
-    include 'com.github.Chocohead:fabric-asm:v2.1'
-}
-
 
 import org.gradle.api.internal.file.collections.FileTreeAdapter
 import org.gradle.api.internal.file.collections.GeneratedSingletonFileTree
 import org.gradle.api.internal.file.copy.CopySpecInternal
 
 import java.util.stream.Collectors
-
-sourceSets {
-    abstracter {
-        runtimeClasspath += project.rootProject.configurations.minecraftNamed
-        compileClasspath += project.rootProject.configurations.minecraftNamed
-    }
-}
 
 task fakeImplJar(type: Jar) {
     archiveName 'fake_impl.jar'
@@ -30,12 +18,51 @@ task fakeImplJar(type: Jar) {
     }
 }
 
-dependencies {
-    modRuntime tasks.fakeImplJar.outputs.files
-    compile files("$buildDir/abstracted/api.jar")
+def dir = tasks.fakeImplJar.outputs.files.first().parent
 
-    abstracterCompile "io.github.astrarre:abstracter:1.1.13"
+repositories {
+    flatDir {
+        dirs dir
+    }
+}
+
+sourceSets {
+    abstracter {
+        runtimeClasspath += project.rootProject.configurations.minecraftNamed
+        compileClasspath += project.rootProject.configurations.minecraftNamed
+    }
+}
+
+dependencies {
+    implementation 'com.github.Chocohead:fabric-asm:v2.1'
+    include 'com.github.Chocohead:fabric-asm:v2.1'
+    abstracterCompile "io.github.astrarre:abstracter:1.1.15"
     abstracterCompile 'org.reflections:reflections:0.9.12'
+
+    rootProject.subprojects {
+        if(it != project) {
+            modRuntime it
+        }
+    }
+
+    compileOnly files("$buildDir/abstracted/api.jar")
+    fileTree(dir: dir, include: 'fake_impl.jar').each {
+        String baseName = it.name.replace(".jar", "")
+        String version = "0.1.0"
+        int split = baseName.lastIndexOf('-')
+
+        if (split != -1) {
+            version = baseName.substring(split + 1)
+            baseName = baseName.substring(0, split)
+        }
+
+        String name = "testmod:${baseName}:${version}"
+
+        System.out.println("Found test mod: " + it.name.replace(".jar", "") + " -> " + name)
+
+        modApi name
+        testmodCompile name
+    }
 }
 
 tasks.compileJava.dependsOn tasks.fakeImplJar

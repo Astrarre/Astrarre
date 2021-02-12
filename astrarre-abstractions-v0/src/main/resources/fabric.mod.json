@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "astrarre-abstracted-v0",
+  "id": "astrarre-abstractions-v0",
   "name": "Astrarre Abstractions",
   "description": "Astrarre's Automated Abstractions",
   "version": "${version}",
@@ -9,6 +9,11 @@
   "icon": "icon.png",
   "contact": {
     "sources": "https://github.com/Astrarre/Astrarre"
+  },
+  "entrypoints": {
+    "mm:early_risers": [
+      "io.github.astrarre.abstracted.internal.AbstractionApplicator"
+    ]
   },
   "authors": [
     "HalfOf2",

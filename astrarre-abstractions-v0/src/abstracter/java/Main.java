@@ -26,6 +26,7 @@ import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.texture.Sprite;
+import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemSteerable;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
@@ -43,6 +44,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.DefaultedRegistry;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
@@ -79,7 +81,13 @@ public class Main {
 
 		config.registerInterface(BlockState.class);
 		config.registerInterface(World.class);
+
+
 		config.registerInterface(BlockPos.class);
+		AbstractAbstracter v3d = config.registerInterface(Vec3d.class);
+		config.registerInterface(Vector3f.class).name(v3d.name.replace("Vec3d", "Vec3f"));
+
+
 		config.registerInterface(WorldAccess.class);
 		config.registerInterface(Box.class);
 		config.registerInterface(MinecraftServer.class);
