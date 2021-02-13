@@ -12,6 +12,9 @@
   "entrypoints": {
     "main": [
       "io.github.astrarre.testmod.TestMod"
+    ],
+    "preLaunch": [
+      "io.github.astrarre.testmod.TestModPreLaunchTesting"
     ]
   },
   "authors": [

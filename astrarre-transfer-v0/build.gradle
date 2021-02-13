@@ -1,9 +1,0 @@
-version '0.0.0'
-moduleDependencies(project, [':astrarre-items-v0', ':astrarre-access-v0', ':astrarre-abstractions-v0'], false)
-
-sourceSets {
-    generator {
-        compileClasspath += sourceSets.main.compileClasspath
-        runtimeClasspath += sourceSets.main.runtimeClasspath
-    }
-}

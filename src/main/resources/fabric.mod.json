@@ -16,5 +16,17 @@
   ],
   "depends": {
     "fabricloader": ">=0.8.9"
+  },
+  "mixins": [
+    "astrarre-access.mixins.json",
+    "astrarre-common.mixins.json",
+    "astrarre-gui.mixins.json",
+    "astrarre-items.mixins.json",
+    "astrarre-network.mixins.json"
+  ],
+  "entrypoints": {
+    "mm:early_risers": [
+      "io.github.astrarre.abstraction.internal.AbstractionApplicator"
+    ]
   }
 }

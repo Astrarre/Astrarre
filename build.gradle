@@ -1,3 +1,14 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        maven { url 'https://dl.bintray.com/astrarre/maven' }
+    }
+
+    dependencies {
+        classpath 'io.github.astrarre:astrarre-stripper:1.1.4'
+    }
+}
 plugins {
     id 'java'
     id 'idea'
@@ -11,80 +22,122 @@ plugins {
 group 'io.github.astrarre'
 version '0.0.0'
 
+
+minecraft {}
 loom {
-    shareCaches = true
+    runDir = "run"
 }
 
-loom.runDir = "run"
-apply from: 'scripts/allprojects.gradle'
+sourceSets {
+    generator {
+        compileClasspath += sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.runtimeClasspath
+    }
+    testmod {
+        compileClasspath += sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.runtimeClasspath
+    }
+    abstracter {
+        runtimeClasspath += configurations.minecraftNamed
+        compileClasspath += configurations.minecraftNamed
+    }
+}
 
-static def nanoevents(Project project) {
-    def nano_events_ver = "3.0.6"
-    def nano_events_ap = "1.0.4"
-    project.configure(project) {
-        processResources {
-            from(sourceSets.main.output.classesDirs.singleFile) {
-                include "nanoevents/**"
-            }
-        }
+apply from: 'scripts/dependencies.gradle'
 
-        dependencies {
-            modImplementation "net.devtech:NanoEvents:$nano_events_ver"
+processResources {
+    from(sourceSets.main.output.classesDirs.singleFile) {
+        include "nanoevents/**"
+    }
 
-            testmodCompileOnly "net.devtech:nanoevents-ap:$nano_events_ap"
-            compileOnly "net.devtech:nanoevents-ap:$nano_events_ap"
+    inputs.property "version", project.version
+    from(sourceSets.main.resources.srcDirs) {
+        include "fabric.mod.json"
+        expand "version": project.version
+    }
 
-            annotationProcessor "net.devtech:nanoevents-ap:$nano_events_ap"
-            testmodAnnotationProcessor "net.devtech:nanoevents-ap:$nano_events_ap"
+    from(sourceSets.main.resources.srcDirs) {
+        exclude "fabric.mod.json"
+    }
+}
+
+task sourcesJar(type: Jar) {
+    group = "astrarre"
+    archiveClassifier = "sources"
+    from sourceSets.main.allSource
+}
+
+import io.github.astrarre.stripper.gradle.StrippedJar
+task stripJar(type: StrippedJar) {
+    group = "astrarre"
+    archiveClassifier = "stripped"
+    from sourceSets.main.allJava
+    with jar
+}
+
+task apiJar(type: Jar) {
+    group = "astrarre"
+    archiveClassifier = "api"
+    with stripJar
+    afterEvaluate {
+        if (project.tasks.findByName("generateAbstractions") != null) {
+            from zipTree("$buildDir/abstracted/api.jar")
+            from zipTree("$buildDir/abstracted/api_sources.jar")
         }
     }
 }
 
-static def moduleDependencies(project, List<String> depNames) {
-    moduleDependencies(project, depNames, false)
+apply from: 'scripts/abstraction.gradle'
+
+jar {
+    from "LICENSE"
 }
 
-static Project abstractions(Project project) { project.project(":astrarre-abstractions-v0") }
+// configure the maven publication
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = "$project.name-fabric"
+            // regular old implementation jar
+            artifact(remapJar) {
+                builtBy remapJar
+            }
 
-static def moduleDependencies(Project project, List<String> depNames, boolean compOnly) {
-    project.configure(project) {
-        def deps = depNames.iterator().collect { rootProject.project(":$it") }
-        dependencies {
-            deps.each {
-                if (it != project) {
-                    if (compOnly) {
-                        compileOnly it
-                    } else {
-                        compile it
-                    }
-                    testmodImplementation it
-                }
+            // sources for ye normal folk
+            artifact(sourcesJar) {
+                builtBy remapSourcesJar
             }
         }
 
-        if (!compOnly) {
-            publishing {
-                publications {
-                    mavenJava(MavenPublication) {
-                        pom.withXml {
-                            def depsNode = asNode().appendNode("dependencies")
-                            deps.each {
-                                if (it != project) {
-                                    def depNode = depsNode.appendNode("dependency")
-                                    depNode.appendNode("groupId", it.group)
-                                    depNode.appendNode("artifactId", it.name)
-                                    depNode.appendNode("version", it.version)
-                                    depNode.appendNode("scope", "compile")
-                                }
-                            }
-                        }
-                    }
-                }
+        mavenApi(MavenPublication) {
+            artifactId = "$project.name-api"
+            artifact(apiJar) {
+                builtBy apiJar
             }
         }
     }
+
+    // select the repositories you want to publish to
+    repositories {
+        // uncomment to publish to the local maven
+        mavenLocal()
+    }
 }
 
-apply from: 'scripts/modules.gradle'
-apply from: 'scripts/main.gradle'
-apply from: 'scripts/maven.gradle'
+bintray {
+    user = project.hasProperty('bintray_user') ? project.property('bintray_user') : ""
+    key = project.hasProperty('bintray_api_key') ? project.property('bintray_api_key') : ""
+    publications = ["mavenJava", "mavenApi"]
+    publish = true
+    //[Default: false] Whether version should be auto published after an upload
+    pkg {
+        repo = "maven"
+        name = "astrarre-api"
+        userOrg = "astrarre"
+        licenses = ["LGPL-3.0"]
+        version {
+            name = version
+            released = new Date()
+        }
+    }
+}

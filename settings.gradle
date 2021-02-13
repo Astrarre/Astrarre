@@ -11,10 +11,4 @@ pluginManagement {
 }
 
 rootProject.name = "astrarre"
-include 'astrarre-abstractions-v0'
-include 'astrarre-gui-v0'
-include 'astrarre-main-v0'
-include 'astrarre-items-v0'
-include 'astrarre-access-v0'
-include 'astrarre-transfer-v0'
 

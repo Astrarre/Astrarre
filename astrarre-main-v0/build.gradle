@@ -1,3 +1,0 @@
-version '0.0.0'
-
-moduleDependencies(project, ['astrarre-items-v0', 'astrarre-abstractions-v0'], false)

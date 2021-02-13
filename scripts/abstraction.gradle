@@ -1,0 +1,108 @@
+import org.gradle.api.internal.file.collections.FileTreeAdapter
+import org.gradle.api.internal.file.collections.GeneratedSingletonFileTree
+import org.gradle.api.internal.file.copy.CopySpecInternal
+
+import java.util.stream.Collectors
+
+task fakeImplJar(type: Jar) {
+    archiveName 'fake_impl.jar'
+    from zipTree("$project.buildDir/abstracted/impl.jar")
+    def jar = (CopySpecInternal) getRootSpec().addFirst().into("")
+    jar.addChild().from {
+        GeneratedSingletonFileTree artificalFabricModJson = new GeneratedSingletonFileTree(getTemporaryDirFactory(), "fabric.mod.json", {
+            it.write("{\"schemaVersion\": 1,\"id\":\"$project.name-fake-impl\",\"version\": \"version\"}".bytes)
+        })
+        return new FileTreeAdapter(artificalFabricModJson)
+    }
+}
+
+def dir = tasks.fakeImplJar.outputs.files.first().parent
+
+repositories {
+    flatDir {
+        dirs dir
+    }
+}
+
+dependencies {
+    implementation 'com.github.Chocohead:fabric-asm:v2.1'
+    include 'com.github.Chocohead:fabric-asm:v2.1'
+    abstracterCompile "io.github.astrarre:abstracter:1.1.15"
+    abstracterCompile 'org.reflections:reflections:0.9.12'
+
+    rootProject.subprojects {
+        if(it != project) {
+            modRuntime it
+        }
+    }
+
+    compileOnly files("$buildDir/abstracted/api.jar")
+    fileTree(dir: dir, include: 'fake_impl.jar').each {
+        String baseName = it.name.replace(".jar", "")
+        String version = "0.1.0"
+        int split = baseName.lastIndexOf('-')
+
+        if (split != -1) {
+            version = baseName.substring(split + 1)
+            baseName = baseName.substring(0, split)
+        }
+
+        String name = "testmod:${baseName}:${version}"
+
+        System.out.println("Found test mod: " + it.name.replace(".jar", "") + " -> " + name)
+
+        modApi name
+        testmodCompile name
+    }
+}
+
+tasks.compileJava.dependsOn tasks.fakeImplJar
+
+task generateAbstractions(type: JavaExec) {
+    group = "astrarre"
+    description = "Runs the abstracter config class"
+    classpath = sourceSets.abstracter.runtimeClasspath
+    inputs.files classpath
+    outputs.file "$buildDir/abstracted/api.jar"
+    outputs.file "$buildDir/abstracted/api_sources.jar"
+    outputs.file "$buildDir/abstracted/impl.jar"
+    outputs.cacheIf { true }
+    main = "Main"
+
+    def file = new File(buildDir, "abstracter_gradle_info.properties")
+    args file.absolutePath
+
+    doFirst {
+        new File(buildDir, "abstracted").mkdirs()
+        if (!file.exists()) {
+            def properties = new Properties()
+            properties.setProperty("mappings", loom.getMappingsProvider().tinyMappings.absolutePath)
+            properties.setProperty("minecraft", configurations.minecraftNamed.resolve().last().absolutePath)
+            properties.setProperty("libraries", configurations.minecraftLibraries.resolve().stream().map() { it.absolutePath }.collect(Collectors.joining(";")))
+            properties.setProperty("api_jar", "$buildDir/abstracted/api.jar")
+            properties.setProperty("api_sources_jar", "$buildDir/abstracted/api_sources.jar")
+            properties.setProperty("impl_jar", "$buildDir/abstracted/impl.jar")
+            def out = new FileWriter(file)
+            properties.store(out, "Minecraft Libraries, Emitted by classes task")
+            out.close()
+        }
+    }
+}
+
+tasks.compileJava.dependsOn tasks.generateAbstractions
+tasks.fakeImplJar.dependsOn tasks.generateAbstractions
+
+task implJar(type: Jar, dependsOn: jar) {
+    group = "astrarre"
+    classifier = "impl-dev"
+    with jar
+    from zipTree("$buildDir/abstracted/impl.jar")
+}
+
+afterEvaluate {
+    remapJar {
+        classifier = "impl"
+        input = implJar.outputs.files.first()
+    }
+    tasks.remapJar.dependsOn implJar
+}

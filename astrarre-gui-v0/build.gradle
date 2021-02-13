@@ -1,2 +1,0 @@
-version '0.0.0'
-moduleDependencies(project, ['astrarre-abstractions-v0'], false)
