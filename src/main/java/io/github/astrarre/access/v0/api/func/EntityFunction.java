@@ -2,18 +2,27 @@ package io.github.astrarre.access.v0.api.func;
 
 import java.util.function.BinaryOperator;
 
-import io.github.astrarre.access.v0.api.Provider;
+import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.v0.entity.Entity;
 import io.github.astrarre.v0.util.math.Box;
 import io.github.astrarre.v0.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 
-public interface EntityFunction<T> extends Access<T> {
+public interface EntityFunction<T> extends Returns<T> {
 	// todo caching
 	T get(@Nullable Direction direction, Entity entity);
 
-	static <T> EntityFunction<T> of(Provider<EntityFunction<T>, T> provider) {
-		return (direction, entity) -> provider.get().get(direction, entity);
+	static <T> EntityFunction<@Nullable T> empty() {
+		return (direction, entity) -> null;
+	}
+
+	/**
+	 * don't forget to declare the provider as a dependency if you use this to register a provider into another provider!
+	 * @see Access#andThen(Returns, Access[])
+	 * @see Access#addDependency(Access)
+	 */
+	static <T> EntityFunction<T> of(Access<EntityFunction<T>, T> access) {
+		return (direction, entity) -> access.get().get(direction, entity);
 	}
 
 	/**

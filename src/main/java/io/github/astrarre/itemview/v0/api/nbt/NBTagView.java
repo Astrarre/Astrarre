@@ -18,7 +18,7 @@ import net.minecraft.nbt.CompoundTag;
  */
 @NotNull
 public interface NBTagView extends Iterable<String> {
-	NBTagView EMPTY = FabricViews.view(new CompoundTag());
+	NBTagView EMPTY = (NBTagView) new CompoundTag();
 
 	/**
 	 * @return an immutable copy of the tag

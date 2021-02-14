@@ -29,7 +29,7 @@ public class ItemKeyImpl implements ItemKey {
 	@Hide
 	public ItemKeyImpl(net.minecraft.item.Item item, NBTagView tag) {
 		this.item = item;
-		this.nbtTag = tag == null ? null : tag.copy();
+		this.nbtTag = tag == null ? NBTagView.EMPTY : tag.copy();
 
 		int result = Objects.hashCode(tag);
 		result = 31 * result + Objects.hashCode(item);

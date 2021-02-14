@@ -1,15 +1,15 @@
+import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-
-import org.apache.commons.io.IOUtils;
+import java.io.InputStreamReader;
+import java.util.stream.Collectors;
 
 public class Main {
 	private static final String TEMPLATE;
 
 	static {
-		try {
-			TEMPLATE = IOUtils.toString(Main.class.getResourceAsStream("/TemplateKeyImpl.java"), StandardCharsets.UTF_8);
+		try(BufferedReader reader = new BufferedReader(new InputStreamReader(Main.class.getResourceAsStream("/TemplateKeyImpl.java")))) {
+			TEMPLATE = reader.lines().collect(Collectors.joining("\n"));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -31,7 +31,7 @@ public class Main {
 	}
 
 	private static void generate(String upperCase, String lower) throws IOException {
-		FileWriter writer = new FileWriter("astrarre-transfer-v0/src/main/java/io/github/astrarre/transfer/v0/api/transaction/keys/generated/"+upperCase+"KeyImpl.java");
+		FileWriter writer = new FileWriter("src/main/java/io/github/astrarre/transfer/v0/api/transaction/keys/generated/"+upperCase+"KeyImpl.java");
 		writer.write(TEMPLATE.replace("%Upper%", upperCase).replace("%lower%", lower).replace("//%antiformatter%", ""));
 		writer.close();
 	}

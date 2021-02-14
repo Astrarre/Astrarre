@@ -5,6 +5,7 @@ import java.util.function.Predicate;
 import org.jetbrains.annotations.Nullable;
 
 public class Validate {
+
 	public static void void_(Object object) {}
 
 	/**

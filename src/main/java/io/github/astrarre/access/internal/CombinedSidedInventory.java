@@ -33,7 +33,7 @@ public class CombinedSidedInventory extends CombinedInventory implements SidedIn
 	public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
 		return this.apply(slot, (i, s) -> {
 			if(dir == null || i == this.inventories[dir.ordinal()]) {
-				return true; // todo canInsert
+				return i.isValid(slot, stack) && i instanceof FilteringInventory && ((FilteringInventory) i).canInsert(slot, stack);
 			}
 			return false;
 		});
@@ -43,7 +43,7 @@ public class CombinedSidedInventory extends CombinedInventory implements SidedIn
 	public boolean canExtract(int slot, ItemStack stack, Direction dir) {
 		return this.apply(slot, (i, s) -> {
 			if(dir == null || i == this.inventories[dir.ordinal()]) {
-				return true; // todo canInsert
+				return i instanceof FilteringInventory && ((FilteringInventory) i).canInsert(slot, stack);
 			}
 			return false;
 		});

@@ -30,8 +30,6 @@ loom {
 
 sourceSets {
     generator {
-        compileClasspath += sourceSets.main.compileClasspath
-        runtimeClasspath += sourceSets.main.runtimeClasspath
     }
     testmod {
         compileClasspath += sourceSets.main.compileClasspath

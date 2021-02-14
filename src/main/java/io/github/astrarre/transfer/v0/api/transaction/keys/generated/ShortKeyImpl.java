@@ -28,6 +28,7 @@ public class ShortKeyImpl extends Key.Short {
 
 	@Override
 	protected void onApply(Transaction transaction) {
+		super.onApply(transaction);
 		this.handler.pop(transaction);
 		Transaction parent = transaction.getParent();
 		this.set(parent, this.values.popShort());

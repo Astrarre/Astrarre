@@ -32,7 +32,7 @@ public class AstrarreScreen extends Screen {
 		super.render(matrices, mouseX, mouseY, delta);
 		try {
 			Graphics3DImpl impl = new Graphics3DImpl(matrices);
-			Closeable closeable = impl.applyTransformation(new Transformation(0, 0, 45, ));
+			Closeable closeable = impl.applyTransformation(new Transformation(0, 0, 45, 10, 10, 0, 1, 1, 1));
 
 			impl.fillRect(10, 10, 0xffaaffaa);
 

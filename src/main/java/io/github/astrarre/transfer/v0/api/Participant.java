@@ -9,7 +9,7 @@ public interface Participant<T> extends Extractable<T>, Insertable<T> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	default long getVersion(Transaction transaction) {
+	default long getVersion() {
 		return TransferInternal.version++;
 	}
 

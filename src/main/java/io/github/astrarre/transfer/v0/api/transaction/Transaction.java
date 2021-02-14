@@ -1,5 +1,6 @@
 package io.github.astrarre.transfer.v0.api.transaction;
 
+// todo some way of de-duplicating containers
 public final class Transaction implements AutoCloseable {
 	private static final ThreadLocal<Transaction> ACTIVE = new ThreadLocal<>();
 	private final Transaction parent;

@@ -26,10 +26,10 @@ public class SlotParticipant implements Participant<ItemKey> {
 	}
 
 	@Override
-	public int extract(Transaction transaction, ItemKey type, int amount) {
-		if (type != ItemKey.EMPTY && amount != 0 && this.item.get(transaction).equals(type)) {
+	public int extract(Transaction transaction, ItemKey type, int quantity) {
+		if (type != ItemKey.EMPTY && quantity != 0 && this.item.get(transaction).equals(type)) {
 			int count = this.count.get(transaction);
-			int toTake = Math.min(count, amount);
+			int toTake = Math.min(count, quantity);
 			if (toTake == count) {
 				this.item.set(transaction, ItemKey.EMPTY);
 			}
@@ -41,8 +41,8 @@ public class SlotParticipant implements Participant<ItemKey> {
 	}
 
 	@Override
-	public int insert(Transaction transaction, ItemKey type, int amount) {
-		if(type == ItemKey.EMPTY || amount == 0) return 0;
+	public int insert(Transaction transaction, ItemKey type, int quantity) {
+		if(type == ItemKey.EMPTY || quantity == 0) return 0;
 
 		ItemKey itemType = this.item.get(transaction);
 		int currentCount = this.count.get(transaction);
@@ -53,7 +53,7 @@ public class SlotParticipant implements Participant<ItemKey> {
 				this.item.set(transaction, type);
 			}
 
-			int toInsert = Math.min(itemType.getMaxStackSize() - currentCount, amount);
+			int toInsert = Math.min(itemType.getMaxStackSize() - currentCount, quantity);
 			this.count.increment(transaction, toInsert);
 			return toInsert;
 		}
@@ -69,7 +69,7 @@ public class SlotParticipant implements Participant<ItemKey> {
 
 		@Override
 		protected void setRootValue(ItemKey val) {
-			SlotParticipant.this.inventory.setStack(SlotParticipant.this.index, val.createItemStack(1));
+			SlotParticipant.this.inventory.setStack(SlotParticipant.this.index, val.createItemStack(0));
 		}
 	}
 

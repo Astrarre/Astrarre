@@ -28,6 +28,7 @@ public class FloatKeyImpl extends Key.Float {
 
 	@Override
 	protected void onApply(Transaction transaction) {
+		super.onApply(transaction);
 		this.handler.pop(transaction);
 		Transaction parent = transaction.getParent();
 		this.set(parent, this.values.popFloat());

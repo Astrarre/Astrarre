@@ -25,11 +25,15 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ItemSteerable;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.boss.dragon.EnderDragonPart;
 import net.minecraft.entity.player.PlayerEntity;
@@ -70,6 +74,10 @@ public class Main {
 		config.registerInterface(Block.class);
 		config.registerInterface(BlockEntity.class);
 		config.registerInterface(Entity.class);
+		config.registerInterface(EntityType.class);
+		config.registerInterface(EquipmentSlot.class);
+		config.registerInterface(LivingEntity.class);
+		config.registerInterface(BlockEntityType.class);
 
 		// todo NBT aware stack sizes and durability
 		config.getInterfaceAbstraction(Type.getInternalName(Item.class)).post((config1, cls, node, impl) -> {

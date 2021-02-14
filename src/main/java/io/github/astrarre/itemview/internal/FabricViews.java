@@ -37,6 +37,11 @@ public class FabricViews {
 		if (tag == null || tag.isEmpty()) {
 			return NBTagView.EMPTY;
 		}
+
+		if(((ImmutableAccess)tag).astrarre_isImmutable()) {
+			return (NBTagView) tag;
+		}
+
 		NBTagView view = (NBTagView) tag.copy();
 		((ImmutableAccess)view).astrarre_setImmutable();
 		return view;

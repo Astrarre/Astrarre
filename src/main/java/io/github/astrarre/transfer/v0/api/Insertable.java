@@ -7,9 +7,9 @@ import org.jetbrains.annotations.Nullable;
 public interface Insertable<T> {
 	/**
 	 * @param transaction the current transaction
-	 * @return the amount actually inserted
+	 * @return the quantity actually inserted
 	 */
-	int insert(Transaction transaction, T type, int amount);
+	int insert(@Nullable Transaction transaction, T type, int quantity);
 
 	/**
 	 * @return if true, insert should return 0 else undefined
@@ -19,9 +19,10 @@ public interface Insertable<T> {
 	}
 
 	/**
-	 * if the returned value is the same as the last time this was called, then it is safe to assume the participant has not changed
+	 * if the returned value is the same as the last time this was called, then it is safe to assume the participant has not changed.
+	 * This is invalid within a transaction
 	 */
-	default long getVersion(Transaction transaction) {
+	default long getVersion() {
 		return TransferInternal.version++;
 	}
 }

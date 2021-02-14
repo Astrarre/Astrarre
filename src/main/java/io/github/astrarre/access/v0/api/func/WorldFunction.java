@@ -2,7 +2,7 @@ package io.github.astrarre.access.v0.api.func;
 
 import java.util.function.BinaryOperator;
 
-import io.github.astrarre.access.v0.api.Provider;
+import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.v0.block.BlockState;
 import io.github.astrarre.v0.block.entity.BlockEntity;
 import io.github.astrarre.v0.util.math.BlockPos;
@@ -10,7 +10,7 @@ import io.github.astrarre.v0.util.math.Direction;
 import io.github.astrarre.v0.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public interface WorldFunction<T> extends Access<T> {
+public interface WorldFunction<T> extends Returns<T> {
 	static <T> WorldFunction<T> empty() {
 		return (WorldFunction<T>) EMPTY;
 	}
@@ -35,24 +35,24 @@ public interface WorldFunction<T> extends Access<T> {
 		}
 	};
 
-	static <T> WorldFunction<T> of(Provider<WorldFunction<T>, T> provider) {
+	static <T> WorldFunction<T> of(Access<WorldFunction<T>, T> access) {
 		return new WorldFunction<T>() {
 			@Nullable
 			@Override
 			public T get(@Nullable Direction direction, BlockState state, World view, BlockPos pos, @Nullable BlockEntity entity) {
-				return provider.get().get(direction, state, view, pos, entity);
+				return access.get().get(direction, state, view, pos, entity);
 			}
 
 			@Nullable
 			@Override
 			public T get(@Nullable Direction direction, World view, BlockPos pos) {
-				return provider.get().get(direction, view, pos);
+				return access.get().get(direction, view, pos);
 			}
 
 			@Nullable
 			@Override
 			public T get(@Nullable Direction direction, BlockState state, World view, BlockPos pos) {
-				return provider.get().get(direction, state, view, pos);
+				return access.get().get(direction, state, view, pos);
 			}
 		};
 	}
