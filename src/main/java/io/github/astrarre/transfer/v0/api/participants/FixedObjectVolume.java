@@ -28,7 +28,8 @@ public class FixedObjectVolume<T> extends ObjectVolume<T> {
 
 	@Override
 	public int insert(Transaction transaction, T type, int quantity) {
-		return super.insert(transaction, type, Math.min(this.getMax(transaction) - this.quantity.get(transaction), quantity));
+		int currentCount = this.quantity.get(transaction);
+		return super.insert(transaction, type, Math.min(this.getMax(transaction) - currentCount, Math.min(this.getMaxStackSize(type) - currentCount, quantity)));
 	}
 
 	/**
@@ -36,5 +37,9 @@ public class FixedObjectVolume<T> extends ObjectVolume<T> {
 	 */
 	public int getMax(Transaction transaction) {
 		return this.max;
+	}
+
+	public int getMaxStackSize(T type) {
+		return Integer.MAX_VALUE;
 	}
 }

@@ -1,0 +1,156 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        maven { url 'https://dl.bintray.com/astrarre/maven' }
+    }
+
+    dependencies {
+        classpath 'io.github.astrarre:astrarre-stripper:1.1.4'
+    }
+}
+import io.github.astrarre.stripper.gradle.StrippedJar
+
+allprojects {
+    group 'io.github.astrarre'
+    if (project != rootProject) {
+        buildscript {
+            repositories {
+                mavenCentral()
+                mavenLocal()
+                maven { url 'https://dl.bintray.com/astrarre/maven' }
+            }
+
+            dependencies {
+                classpath 'io.github.astrarre:astrarre-stripper:1.1.4'
+            }
+        }
+
+
+        plugins.apply 'java'
+        plugins.apply 'idea'
+        plugins.apply 'eclipse'
+        plugins.apply 'java-library'
+        plugins.apply 'maven-publish'
+        plugins.apply "com.jfrog.bintray"
+        plugins.apply "fabric-loom"
+    }
+
+    minecraft {}
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url 'https://raw.githubusercontent.com/Devan-Kerman/Devan-Repo/master/' }
+        maven { url 'https://maven.fabricmc.net/' }
+        maven { url 'http://maven.modmuss50.me/' }
+        maven { url 'https://dl.bintray.com/astrarre/maven' }
+        maven { url 'https://jitpack.io' }
+    }
+
+    sourceSets {
+        testmod {
+            compileClasspath += sourceSets.main.compileClasspath
+            runtimeClasspath += sourceSets.main.runtimeClasspath
+        }
+    }
+
+    jar {
+        from "$rootProject.projectDir/LICENSE"
+    }
+    dependencies {
+        minecraft "com.mojang:minecraft:${minecraft_version}"
+        mappings "net.fabricmc:yarn:${yarn_mappings}:v2"
+        modImplementation "net.fabricmc:fabric-loader:${loader_version}"
+
+        compileOnly("io.github.astrarre:astrarre-stripper:1.1.4") {
+            transitive = false
+        }
+
+        testImplementation 'junit:junit:4.13.1'
+        testmodCompile sourceSets.main.output
+    }
+
+    processResources {
+        inputs.property "version", project.version
+        from(sourceSets.main.resources.srcDirs) {
+            include "fabric.mod.json"
+            expand "version": project.version
+        }
+
+        from(sourceSets.main.resources.srcDirs) {
+            exclude "fabric.mod.json"
+        }
+    }
+
+    task sourcesJar(type: Jar) {
+        group = "astrarre"
+        archiveClassifier = "sources"
+        from sourceSets.main.allSource
+    }
+
+
+    task stripJar(type: StrippedJar) {
+        group = "astrarre"
+        archiveClassifier = "stripped"
+        from sourceSets.main.allJava
+        with jar
+    }
+
+    task apiJar(type: Jar) {
+        group = "astrarre"
+        archiveClassifier = "api"
+        with stripJar
+        afterEvaluate {
+            if (project.tasks.findByName("generateAbstractions") != null) {
+                from zipTree("$buildDir/abstracted/api.jar")
+                from zipTree("$buildDir/abstracted/api_sources.jar")
+            }
+        }
+    }
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                artifactId = "$project.name-fabric"
+                // regular old implementation jar
+                artifact(remapJar) {
+                    builtBy remapJar
+                }
+
+                // sources for ye normal folk
+                artifact(sourcesJar) {
+                    builtBy remapSourcesJar
+                }
+            }
+
+            mavenApi(MavenPublication) {
+                artifactId = "$project.name-api"
+                mavenApi(MavenPublication) {
+                    artifactId = "$project.name-api"
+                    artifact(apiJar) {
+                        builtBy apiJar
+                    }
+                }
+            }
+        }
+    }
+
+    bintray {
+        user = project.hasProperty('bintray_user') ? project.property('bintray_user') : ""
+        key = project.hasProperty('bintray_api_key') ? project.property('bintray_api_key') : ""
+        publications = ["mavenJava", "mavenApi"]
+        publish = true
+        //[Default: false] Whether version should be auto published after an upload
+        pkg {
+            repo = "maven"
+            name = project.name
+            userOrg = "astrarre"
+            licenses = ["LGPL-3.0"]
+            version {
+                name = version
+                released = new Date()
+            }
+        }
+    }
+}

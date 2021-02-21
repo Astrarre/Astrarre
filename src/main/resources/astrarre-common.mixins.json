@@ -3,7 +3,6 @@
   "package": "io.github.astrarre.common.internal.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "Matrix4fAccessor",
     "MinecraftServerMixin"
   ],
   "client": [

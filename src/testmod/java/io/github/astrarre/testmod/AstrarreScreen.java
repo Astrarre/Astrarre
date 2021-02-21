@@ -1,21 +1,13 @@
 package io.github.astrarre.testmod;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import io.github.astrarre.common.v0.api.util.math.Transformation;
-import io.github.astrarre.gui.internal.DrawableHelper2;
-import io.github.astrarre.gui.internal.Graphics3DImpl;
-import io.github.astrarre.gui.v0.api.util.Closeable;
+import io.github.astrarre.rendering.v0.fabric.MatrixGraphics;
+import io.github.astrarre.rendering.v0.api.Transformation;
+import io.github.astrarre.rendering.v0.api.util.Close;
 
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Matrix4f;
 
 public class AstrarreScreen extends Screen {
 	private static final float SIZE = 40;
@@ -31,36 +23,10 @@ public class AstrarreScreen extends Screen {
 		this.renderBackground(matrices);
 		super.render(matrices, mouseX, mouseY, delta);
 		try {
-			Graphics3DImpl impl = new Graphics3DImpl(matrices);
-			Closeable closeable = impl.applyTransformation(new Transformation(0, 0, 45, 10, 10, 0, 1, 1, 1));
-
+			MatrixGraphics impl = new MatrixGraphics(matrices);
+			Close closeable = impl.applyTransformation(new Transformation(0, 0, 45, 10, 10, 0, 1, 1, 1));
 			impl.fillRect(10, 10, 0xffaaffaa);
-
 			closeable.close();
-
-			Matrix4f matrix = matrices.peek().getModel();
-			Tessellator tessellator = Tessellator.getInstance();
-			for (Vector3f[] quad : DrawableHelper2.iterateAsQuads(new Vector3f[] {
-					new Vector3f(50, 0, 2),
-					new Vector3f(25, 10, 2),
-					new Vector3f(30, 40, 2),
-					new Vector3f(70, 40, 2),
-					new Vector3f(75, 10, 2)
-			})) {
-				BufferBuilder bufferBuilder = tessellator.getBuffer();
-				RenderSystem.disableTexture();
-				RenderSystem.enableBlend();
-				RenderSystem.defaultBlendFunc();
-				bufferBuilder.begin(7, VertexFormats.POSITION_COLOR);
-				bufferBuilder.vertex(matrix, quad[0].getX(), quad[0].getY(), quad[0].getZ()).color(1.0f, 1.0f, 1.0f, 1.0f).next();
-				bufferBuilder.vertex(matrix, quad[1].getX(), quad[1].getY(), quad[1].getZ()).color(1.0f, 1.0f, 1.0f, 1.0f).next();
-				bufferBuilder.vertex(matrix, quad[2].getX(), quad[2].getY(), quad[2].getZ()).color(1.0f, 1.0f, 1.0f, 1.0f).next();
-				bufferBuilder.vertex(matrix, quad[3].getX(), quad[3].getY(), quad[3].getZ()).color(1.0f, 1.0f, 1.0f, 1.0f).next();
-				bufferBuilder.end();
-				BufferRenderer.draw(bufferBuilder);
-				RenderSystem.disableBlend();
-				RenderSystem.enableTexture();
-			}
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}

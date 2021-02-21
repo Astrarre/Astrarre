@@ -27,7 +27,7 @@ repositories {
 dependencies {
     implementation 'com.github.Chocohead:fabric-asm:v2.1'
     include 'com.github.Chocohead:fabric-asm:v2.1'
-    abstracterCompile "io.github.astrarre:abstracter:1.1.15"
+    abstracterCompile "io.github.astrarre:abstracter:1.1.17"
     abstracterCompile 'org.reflections:reflections:0.9.12'
 
     rootProject.subprojects {

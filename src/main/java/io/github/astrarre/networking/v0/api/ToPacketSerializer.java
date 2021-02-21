@@ -3,8 +3,8 @@ package io.github.astrarre.networking.v0.api;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+import io.github.astrarre.util.v0.api.Id;
 import io.github.astrarre.v0.network.PacketByteBuf;
-import io.github.astrarre.v0.util.Id;
 
 /**
  * an interface used for serializing and deserializing objects

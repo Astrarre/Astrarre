@@ -1,10 +1,15 @@
 package io.github.astrarre.transfer.v0.api;
 
+import io.github.astrarre.transfer.internal.InsertableParticipant;
 import io.github.astrarre.transfer.internal.TransferInternal;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import org.jetbrains.annotations.Nullable;
 
 public interface Insertable<T> {
+	static <T> Participant<T> asParticipant(Insertable<T> insertable) {
+		return new InsertableParticipant<>(insertable);
+	}
+
 	/**
 	 * @param transaction the current transaction
 	 * @return the quantity actually inserted

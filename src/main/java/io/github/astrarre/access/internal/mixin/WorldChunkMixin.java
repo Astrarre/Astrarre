@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
@@ -26,7 +27,7 @@ public class WorldChunkMixin implements WorldChunkAccess {
 			at = @At (value = "INVOKE",
 					target = "Lnet/minecraft/block/BlockState;onStateReplaced(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;" + "Lnet" +
 					         "/minecraft/block/BlockState;Z)V"))
-	private void setBlockState(BlockPos pos, BlockState state, boolean removed) {
+	private void setBlockState(BlockPos pos, BlockState state, boolean moved, CallbackInfoReturnable<BlockState> cir) {
 		CachedWorldQuery access = this.onChanged.get(pos);
 		if (access != null) {
 			access.invalidateBlockState();

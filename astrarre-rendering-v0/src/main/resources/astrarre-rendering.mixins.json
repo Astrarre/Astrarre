@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "io.github.astrarre.rendering.internal.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "Matrix4fAccessor",
+    "Matrix4fMixin",
+    "io.github.astrarre.rendering.mixin.SpriteAtlasHolderMixin",
+    "SpriteAtlasTextureMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

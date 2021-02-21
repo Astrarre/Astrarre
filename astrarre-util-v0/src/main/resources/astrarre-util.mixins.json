@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "io.github.astrarre.util.internal.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "IdentifierMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

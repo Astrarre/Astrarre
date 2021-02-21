@@ -9,6 +9,7 @@ buildscript {
         classpath 'io.github.astrarre:astrarre-stripper:1.1.4'
     }
 }
+
 plugins {
     id 'java'
     id 'idea'
@@ -19,21 +20,22 @@ plugins {
     id "fabric-loom" version "0.5.43"
 }
 
-group 'io.github.astrarre'
+
 version '0.0.0'
 
-
-minecraft {}
 loom {
+    shareCaches = true
     runDir = "run"
+}
+
+apply from: 'scripts/allprojects.gradle'
+
+dependencies {
+    dependsOn(project, subprojects)
 }
 
 sourceSets {
     generator {
-    }
-    testmod {
-        compileClasspath += sourceSets.main.compileClasspath
-        runtimeClasspath += sourceSets.main.runtimeClasspath
     }
     abstracter {
         runtimeClasspath += configurations.minecraftNamed
@@ -41,101 +43,77 @@ sourceSets {
     }
 }
 
-apply from: 'scripts/dependencies.gradle'
-
-processResources {
-    from(sourceSets.main.output.classesDirs.singleFile) {
-        include "nanoevents/**"
-    }
-
-    inputs.property "version", project.version
-    from(sourceSets.main.resources.srcDirs) {
-        include "fabric.mod.json"
-        expand "version": project.version
-    }
-
-    from(sourceSets.main.resources.srcDirs) {
-        exclude "fabric.mod.json"
-    }
-}
-
-task sourcesJar(type: Jar) {
-    group = "astrarre"
-    archiveClassifier = "sources"
-    from sourceSets.main.allSource
-}
-
-import io.github.astrarre.stripper.gradle.StrippedJar
-task stripJar(type: StrippedJar) {
-    group = "astrarre"
-    archiveClassifier = "stripped"
-    from sourceSets.main.allJava
-    with jar
-}
-
-task apiJar(type: Jar) {
-    group = "astrarre"
-    archiveClassifier = "api"
-    with stripJar
-    afterEvaluate {
-        if (project.tasks.findByName("generateAbstractions") != null) {
-            from zipTree("$buildDir/abstracted/api.jar")
-            from zipTree("$buildDir/abstracted/api_sources.jar")
+static def fapi(Project proj) {
+    proj.configure(proj) {
+        dependencies {
+            modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
         }
     }
 }
+
+static def nanoevents(Project proj) {
+    proj.configure(proj) {
+        def nano_events_ver = "3.0.6"
+        def nano_events_ap = "1.0.4"
+        modImplementation("net.devtech:NanoEvents:$nano_events_ver") {
+            transitive = false
+        }
+
+        testmodCompileOnly "net.devtech:nanoevents-ap:$nano_events_ap"
+        compileOnly "net.devtech:nanoevents-ap:$nano_events_ap"
+        annotationProcessor "net.devtech:nanoevents-ap:$nano_events_ap"
+        testmodAnnotationProcessor "net.devtech:nanoevents-ap:$nano_events_ap"
+
+        processResources {
+            from(sourceSets.main.output.classesDirs.singleFile) {
+                include "nanoevents/**"
+            }
+        }
+    }
+}
+
+static def dependsOn(Project proj, Iterable<Project> projs) {
+    proj.dependencies {
+        projs.each {
+            compile it
+            testmodCompile it.sourceSets.main.output
+        }
+    }
+    proj.publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                pom.withXml {
+                    def depsNode = asNode().appendNode("dependencies")
+                    projs.each {
+                        def depNode = depsNode.appendNode("dependency")
+                        depNode.appendNode("groupId", it.group)
+                        depNode.appendNode("artifactId", "$it.name-fabric")
+                        depNode.appendNode("version", it.version)
+                        depNode.appendNode("scope", "compile")
+                    }
+                }
+            }
+            mavenApi(MavenPublication) {
+                pom.withXml {
+                    def depsNode = asNode().appendNode("dependencies")
+                    projs.each {
+                        def depNode = depsNode.appendNode("dependency")
+                        depNode.appendNode("groupId", it.group)
+                        depNode.appendNode("artifactId", "$it.name-api")
+                        depNode.appendNode("version", it.version)
+                        depNode.appendNode("scope", "compile")
+                    }
+                }
+            }
+        }
+    }
+}
+
+static def dependsOn(Project proj, String... projects) {
+    List<Project> projs = projects.collect { proj.rootProject.project(it) }
+    dependsOn(proj, projs)
+}
+
+fapi(project)
 
 apply from: 'scripts/abstraction.gradle'
-
-jar {
-    from "LICENSE"
-}
-
-// configure the maven publication
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifactId = "$project.name-fabric"
-            // regular old implementation jar
-            artifact(remapJar) {
-                builtBy remapJar
-            }
-
-            // sources for ye normal folk
-            artifact(sourcesJar) {
-                builtBy remapSourcesJar
-            }
-        }
-
-        mavenApi(MavenPublication) {
-            artifactId = "$project.name-api"
-            artifact(apiJar) {
-                builtBy apiJar
-            }
-        }
-    }
-
-    // select the repositories you want to publish to
-    repositories {
-        // uncomment to publish to the local maven
-        mavenLocal()
-    }
-}
-
-bintray {
-    user = project.hasProperty('bintray_user') ? project.property('bintray_user') : ""
-    key = project.hasProperty('bintray_api_key') ? project.property('bintray_api_key') : ""
-    publications = ["mavenJava", "mavenApi"]
-    publish = true
-    //[Default: false] Whether version should be auto published after an upload
-    pkg {
-        repo = "maven"
-        name = "astrarre-api"
-        userOrg = "astrarre"
-        licenses = ["LGPL-3.0"]
-        version {
-            name = version
-            released = new Date()
-        }
-    }
-}

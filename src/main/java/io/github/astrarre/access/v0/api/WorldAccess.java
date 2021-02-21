@@ -1,8 +1,8 @@
 package io.github.astrarre.access.v0.api;
 
-import java.util.function.BinaryOperator;
-
+import com.google.common.collect.Iterators;
 import io.github.astrarre.access.internal.util.MapFilter;
+import io.github.astrarre.access.v0.api.func.IterFunc;
 import io.github.astrarre.access.v0.api.func.WorldFunction;
 import io.github.astrarre.access.v0.api.provider.BlockEntityProvider;
 import io.github.astrarre.access.v0.api.provider.BlockProvider;
@@ -21,67 +21,48 @@ public class WorldAccess<T> extends Access<WorldFunction<T>, T> {
 	 * @see FunctionAccess
 	 */
 	public WorldAccess() {
-		this((WorldFunction.NoBlock<T>) (direction, world, pos) -> null);
-	}
-
-	public WorldAccess(WorldFunction<T> defaultAccess) {
-		this((function, function2) -> (direction, state, world, pos, entity) -> {
-			T val = function.get(direction, state, world, pos, entity);
-			if (val != null) {
-				return val;
+		this((functions) -> (direction, state, world, pos, entity) -> {
+			for (WorldFunction<T> function : functions) {
+				T val = function.get(direction, state, world, pos, entity);
+				if (val != null) {
+					return val;
+				}
 			}
-			return function2.get(direction, state, world, pos, entity);
-		}, defaultAccess);
+			return null;
+		});
 	}
 
-	public WorldAccess(BinaryOperator<WorldFunction<T>> andThen, WorldFunction<T> defaultAccess) {
-		super(andThen, defaultAccess);
-		this.blockEntityTypes = new MapFilter<>(andThen, WorldFunction.empty());
-		this.blockStateTypes = new MapFilter<>(andThen, WorldFunction.empty());
-		this.blockTypes = new MapFilter<>(andThen, WorldFunction.empty());
+	public WorldAccess(IterFunc<WorldFunction<T>> iterFunc) {
+		super(iterFunc);
+		this.blockEntityTypes = new MapFilter<>(iterFunc);
+		this.blockStateTypes = new MapFilter<>(iterFunc);
+		this.blockTypes = new MapFilter<>(iterFunc);
 	}
 
-	public WorldAccess(T defaultValue) {
-		this((WorldFunction.NoBlock<T>) (d, w, p) -> defaultValue);
+	public static <T> WorldAccess<T> newInstance(IterFunc<T> combiner) {
+		return new WorldAccess<>((functions) -> (direction, state, world, pos, entity) -> combiner.combine(() -> Iterators.transform(functions.iterator(),
+				input -> input.get(direction, state, world, pos, entity))));
 	}
 
-	public WorldAccess(BinaryOperator<WorldFunction<T>> andThen) {
-		this(andThen, (WorldFunction.NoBlock<T>) (d, w, p) -> null);
-	}
 
-	public WorldAccess(BinaryOperator<WorldFunction<T>> andThen, T defaultValue) {
-		this(andThen, (WorldFunction.NoBlock<T>) (d, w, p) -> defaultValue);
-	}
-
-	public static <T> WorldAccess<T> newInstance(BinaryOperator<T> combiner) {
-		return new WorldAccess<>((function, function2) -> (direction, state, world, pos, entity) -> combiner.apply(function.get(direction,
-				state,
-				world,
-				pos,
-				entity), function2.get(direction, state, world, pos, entity)));
-	}
-
-	public static <T> WorldAccess<T> newInstance(BinaryOperator<T> combiner, T defaultValue) {
-		return new WorldAccess<>((function, function2) -> (direction, state, world, pos, entity) -> combiner.apply(function.get(direction,
-				state,
-				world,
-				pos,
-				entity), function2.get(direction, state, world, pos, entity)), defaultValue);
-	}
-
+	private boolean addedProviderFunction;
 	/**
 	 * adds functions for {@link BlockProvider} and {@link BlockEntityProvider}
+	 *
+	 * (calling this multiple times will only register it once)
 	 */
 	public WorldAccess<T> addWorldProviderFunctions() {
+		if(this.addedProviderFunction) return this;
+		this.addedProviderFunction = true;
 		this.andThen((WorldFunction.NoBlockEntity<T>) (direction, state, view, pos) -> {
 			Block block = state.getBlock();
-			if(block instanceof BlockProvider) {
+			if (block instanceof BlockProvider) {
 				return ((BlockProvider) block).get(this, direction, state, view, pos);
 			}
 			return null;
 		});
 		this.andThen((direction, state, view, pos, entity) -> {
-			if(entity instanceof BlockEntityProvider) {
+			if (entity instanceof BlockEntityProvider) {
 				return ((BlockEntityProvider) entity).get(this, direction);
 			}
 			return null;
@@ -91,24 +72,24 @@ public class WorldAccess<T> extends Access<WorldFunction<T>, T> {
 
 	public WorldAccess<T> forBlock(Block block, WorldFunction<T> function) {
 		if (this.blockTypes.add(block, function)) {
-			this.add((WorldFunction.NoBlockEntity<T>) (direction, state, view, pos) -> this.blockTypes.get(state.getBlock())
-			                                                                                          .get(direction, state, view, pos));
+			this.andThen((WorldFunction.NoBlockEntity<T>) (direction, state, view, pos) -> this.blockTypes.get(state.getBlock())
+			                                                                                             .get(direction, state, view, pos));
 		}
 		return this;
 	}
 
 	public WorldAccess<T> forBlockState(BlockState block, WorldFunction<T> function) {
 		if (this.blockStateTypes.add(block, function)) {
-			this.add((WorldFunction.NoBlockEntity<T>) (direction, state, view, pos) -> this.blockStateTypes.get(state)
-			                                                                                               .get(direction, state, view, pos));
+			this.andThen((WorldFunction.NoBlockEntity<T>) (direction, state, view, pos) -> this.blockStateTypes.get(state)
+			                                                                                                  .get(direction, state, view, pos));
 		}
 		return this;
 	}
 
 	public WorldAccess<T> forBlockEntity(BlockEntityType<?> block, WorldFunction<T> function) {
 		if (this.blockEntityTypes.add(block, function)) {
-			this.add((direction, state, view, pos, entity) -> entity != null ? this.blockEntityTypes.get(entity.getType())
-			                                                                                        .get(direction, state, view, pos) : null);
+			this.andThen((direction, state, view, pos, entity) -> entity != null ? this.blockEntityTypes.get(entity.getType())
+			                                                                                           .get(direction, state, view, pos) : null);
 		}
 		return this;
 	}

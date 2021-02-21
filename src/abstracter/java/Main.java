@@ -59,7 +59,7 @@ public class Main {
 	public static void main(String[] args) throws IOException, InterruptedException {
 		AbstracterUtil util = AbstracterUtil.fromFile(args[0]);
 		AbstracterConfig config = util.createConfig("astrarre_manifest");
-		config.registerInterface(new InterfaceAbstracter(Identifier.class)).name("io/github/astrarre/v0/util/Id");
+		config.manualInterface(Identifier.class, "io/github/astrarre/util/v0/api/Id");
 		config.registerInterface(Sprite.class);
 		config.registerInterface(new PacketByteBufAbs());
 		config.registerInterface(new InventoryAbs());

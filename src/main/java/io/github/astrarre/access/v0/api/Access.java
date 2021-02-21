@@ -1,153 +1,204 @@
 package io.github.astrarre.access.v0.api;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.function.BinaryOperator;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
+import io.github.astrarre.access.v0.api.func.IterFunc;
 import io.github.astrarre.access.v0.api.func.Returns;
 import org.jetbrains.annotations.NotNull;
 
 public class Access<A extends Returns<T>, T> {
-	protected final BinaryOperator<A> andThen;
+	protected final IterFunc<A> combiner;
 	protected List<Object> delegates = new ArrayList<>();
-	protected Listener<A, T> listener;
+	protected Consumer<Access<A, T>> listener;
+	protected A compiledFunction;
 
-	protected A defaultAccess, defaultCompiledDelegate;
+	/**
+	 * @param combiner andThen
+	 */
+	public Access(IterFunc<A> combiner) {
+		this.combiner = combiner;
+		this.recompile();
+	}
 
-	public interface Listener<A extends Returns<T>, T> {
-		void onRegister(A func, Collection<Access<?, ?>> dependencies);
-
-		default Listener<A, T> andThen(Listener<A, T> access) {
-			return (func, dependencies) -> {
-				this.onRegister(func, dependencies);
-				access.onRegister(func, dependencies);
-			};
+	protected void recompile() {
+		this.compiledFunction = this.combiner.combine(() -> Iterators.transform(this.delegates.iterator(), this::get));
+		if (this.listener != null) {
+			this.listener.accept(this);
 		}
 	}
 
-	/**
-	 * @param andThen andThen
-	 * @param defaultAccess a version of the function that returns the default value of this provider
-	 */
-	public Access(BinaryOperator<A> andThen, A defaultAccess) {
-		this.andThen = andThen;
-		this.defaultAccess = defaultAccess;
+	protected A get(Object o) {
+		if (o instanceof Entry) {
+			return (A) ((Entry<?, ?, ?, ?>) o).delegate.delegate;
+		}
+		return (A) o;
 	}
 
-	public <B extends Returns<T>> Access<A, T> andThenMap(B accessor, Function<B, A> query) {
-		return this.andThen(query.apply(accessor));
+	public <E extends Returns<U>, U> Access<A, T> dependsOn(Access<E, U> access, Function<E, A> function) {
+		return this.dependsOn(access, function, true);
 	}
 
-	public <B extends Returns<T>> Access<A, T> andThenMapWithDependencies(B accessor, Function<B, A> query, Collection<Access<?, ?>> dependencies) {
-		return this.andThenWithDependencies(query.apply(accessor), dependencies);
-	}
+	private <E extends Returns<U>, U> Access<A, T> dependsOn(Access<E, U> access, Function<E, A> function, boolean end) {
+		// current entry in delegates, we store the reference so we can update it
+		Entry[] entryRef = {null};
 
-	public <U, B extends Returns<U>> Access<A, T> andThenMapFunc(B accessor, Function<B, A> query) {
-		return this.andThen(query.apply(accessor));
-	}
-
-	public <U, B extends Returns<U>> Access<A, T> andThenMapFuncWithDependencies(B accessor, Function<B, A> query, Collection<Access<?, ?>> dependencies) {
-		return this.andThenWithDependencies(query.apply(accessor), dependencies);
-	}
-
-	/**
-	 * this provider will inherit all listeners from the target provider (circular dependencies should work)
-	 */
-	public void addDependency(Access<A, T> access) {
-		if(access == this) throw new IllegalArgumentException("cannot depend on self!");
-		access.registerListener((func, dependencies) -> {
-			if(!dependencies.contains(this)) {
-				Set<Access<?, ?>> deps = new HashSet<>(dependencies);
-				deps.add(access);
-				this.andThenWithDependencies(func, deps);
-			}
-		});
-	}
-
-	public <B extends Returns<T>> void addDependency(Access<B, T> access, Function<B, A> query) {
-		if(access == this) throw new IllegalArgumentException("cannot depend on self!");
-		access.registerListener((func, dependencies) -> {
-			if(!dependencies.contains(this)) {
-				Set<Access<?, ?>> deps = new HashSet<>(dependencies);
-				deps.add(access);
-				this.andThenWithDependencies(query.apply(func), deps);
-			}
-		});
-	}
-
-	public <U, B extends Returns<U>> void addDependencyType(Access<B, U> access, Function<B, A> query) {
-		if(access == this) throw new IllegalArgumentException("cannot depend on self!");
-		access.registerListener((func, dependencies) -> {
-			if(!dependencies.contains(this)) {
-				Set<Access<?, ?>> deps = new HashSet<>(dependencies);
-				deps.add(access);
-				this.andThenWithDependencies(query.apply(func), deps);
-			}
-		});
-	}
-
-	public void registerListener(Listener<A, T> listener) {
-		for (Object delegate : this.delegates) {
-			if(delegate instanceof Entry) {
-				listener.onRegister((A) ((Entry<?, ?>) delegate).delegate, ((Entry<?, ?>) delegate).dependencies);
+		{
+			// compute initial entry and add it to the list
+			Iterable<Object> initialInputs = access.getExcluding(this); // List#add always returns true
+			entryRef[0] = new Entry<>(new CombinedFunction<>(function.apply(access.combiner.combine(Iterables.transform(initialInputs, o -> {
+				if (o instanceof CombinedFunction) {
+					return (E) ((CombinedFunction<?, ?>) o).delegate;
+				}
+				return (E) o;
+			}))), initialInputs), function, access);
+			if (end) {
+				this.delegates.add(entryRef[0]);
 			} else {
-				listener.onRegister((A) delegate, Collections.emptyList());
+				this.delegates.add(0, entryRef[0]);
 			}
+			this.recompile();
 		}
 
-		if(this.listener == null) {
+		access.addListener(a -> {
+			// we take the now outdated (theoretically) entry
+			Entry<A, T, E, U> entry = entryRef[0];
+			// and compare the inputs of the entry against the new set of inputs, if the opposing access added a dependency on us, it shouldn't have
+			// changed
+			Iterable<Object> newInputs = a.getExcluding(this);
+			if (!Iterables.elementsEqual(entry.delegate.inputs, newInputs)) {
+				entry.delegate = new CombinedFunction<>(entry.mapping.apply(entry.dependency.combiner.combine(Iterables.transform(newInputs, o -> {
+					if (o instanceof CombinedFunction) {
+						return (E) ((CombinedFunction<?, ?>) o).delegate;
+					}
+					return (E) o;
+				}))), newInputs);
+				this.recompile();
+			}
+		});
+
+
+		return this;
+	}
+
+	private Iterable<Object> getExcluding(Access<?, ?> access) {
+		return () -> new Iterator<Object>() {
+			private final Iterator<Object> iterator = Access.this.delegates.iterator();
+			A cached;
+
+			@Override
+			public boolean hasNext() {
+				return this.get() != null;
+			}
+
+			protected Object get() {
+				if (this.cached != null) {
+					return this.cached;
+				}
+
+				while (this.iterator.hasNext()) {
+					Object next = this.iterator.next();
+					if (next instanceof Entry) {
+						if (((Entry<?, ?, ?, ?>) next).dependency == access) {
+							continue;
+						} else {
+							return this.cached = (A) ((Entry<?, ?, ?, ?>) next).get(access);
+						}
+					}
+					return this.cached = (A) next;
+				}
+				return null;
+			}
+
+			@Override
+			public Object next() {
+				Object a = this.get();
+				this.cached = null;
+				return a;
+			}
+		};
+	}
+
+	private Access<A, T> addListener(Consumer<Access<A, T>> listener) {
+		if (this.listener == null) {
 			this.listener = listener;
 		} else {
 			this.listener = this.listener.andThen(listener);
 		}
-	}
-
-	public Access<A, T> andThenWithDependencies(A func, Collection<Access<?, ?>> dependencies) {
-		this.add(func);
-		this.delegates.add(new Entry<>(func, dependencies));
-		if(this.listener != null) {
-			this.listener.onRegister(func, dependencies);
-		}
 		return this;
 	}
 
-	protected void add(A func) {
-		if (this.defaultCompiledDelegate == this.defaultAccess) {
-			this.defaultCompiledDelegate = func;
-		} else if (this.defaultCompiledDelegate == null) {
-			this.defaultCompiledDelegate = func;
-		} else {
-			this.defaultCompiledDelegate = this.andThen.apply(this.defaultCompiledDelegate, func);
-		}
+	public <E extends Returns<U>, U> Access<A, T> dependsOnBefore(Access<E, U> access, Function<E, A> function) {
+		return this.dependsOn(access, function, false);
 	}
 
-	public Access<A, T> andThen(A func) {
-		this.add(func);
-		this.delegates.add(func);
-		if(this.listener != null) {
-			this.listener.onRegister(func, Collections.emptyList());
-		}
+	public Access<A, T> before(A func) {
+		this.delegates.add(0, func);
+		this.recompile();
+		return this;
+	}
 
+	/**
+	 * adds a function to this access, the later you register, the higher your priority
+	 */
+	public Access<A, T> andThen(A func) {
+		this.delegates.add(func);
+		this.recompile();
 		return this;
 	}
 
 	@NotNull
 	public A get() {
-		return this.defaultCompiledDelegate == null ? this.defaultAccess : this.defaultCompiledDelegate;
+		return this.compiledFunction;
 	}
 
-	private static final class Entry<A extends Returns<T>, T> {
+	private static final class CombinedFunction<A extends Returns<T>, T> {
 		private final A delegate;
-		private final Collection<Access<?, ?>> dependencies;
+		private final Iterable<Object> inputs;
 
-		private Entry(A delegate, Collection<Access<?, ?>> dependencies) {
+		private CombinedFunction(A delegate, Iterable<Object> inputs) {
 			this.delegate = delegate;
-			this.dependencies = dependencies;
+			this.inputs = inputs;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) {
+				return true;
+			}
+			if (!(o instanceof CombinedFunction)) {
+				return false;
+			}
+			CombinedFunction<?, ?> function = (CombinedFunction<?, ?>) o;
+			return Iterables.elementsEqual(this.inputs, function.inputs);
+		}
+
+	}
+
+	private static final class Entry<A extends Returns<T>, T, E extends Returns<U>, U> {
+		private final Function<E, A> mapping;
+		private final Access<E, U> dependency;
+		private CombinedFunction<A, T> delegate;
+
+		private Entry(CombinedFunction<A, T> delegate, Function<E, A> mapping, Access<E, U> dependency) {
+			this.delegate = delegate;
+			this.mapping = mapping;
+			this.dependency = dependency;
+		}
+
+		public Object get(Access<?, ?> excluding) {
+			Iterable<Object> inputs = this.dependency.getExcluding(excluding);
+			return new CombinedFunction<>(this.mapping.apply(this.dependency.combiner.combine(Iterables.transform(inputs, o -> {
+				if (o instanceof CombinedFunction) {
+					return (E) ((CombinedFunction<?, ?>) o).delegate;
+				}
+				return (E) o;
+			}))), inputs);
 		}
 	}
 }

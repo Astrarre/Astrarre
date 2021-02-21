@@ -17,15 +17,6 @@ public interface EntityFunction<T> extends Returns<T> {
 	}
 
 	/**
-	 * don't forget to declare the provider as a dependency if you use this to register a provider into another provider!
-	 * @see Access#andThen(Returns, Access[])
-	 * @see Access#addDependency(Access)
-	 */
-	static <T> EntityFunction<T> of(Access<EntityFunction<T>, T> access) {
-		return (direction, entity) -> access.get().get(direction, entity);
-	}
-
-	/**
 	 * @return a world function that queries all of the entities that collide with the queried position, and returns the first non-value.
 	 */
 	default WorldFunction<T> toWorldFunction() {

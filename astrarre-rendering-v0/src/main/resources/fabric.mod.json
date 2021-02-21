@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "astrarre-rendering-v0",
+  "name": "Astrarre Rendering v0 Fabric",
+  "description": "Astrarre's Rendering API",
+  "version": "${version}",
+  "environment": "*",
+  "license": "LGPL-3.0",
+  "contact": {
+    "sources": "https://github.com/Astrarre/Astrarre"
+  },
+  "authors": [
+    "HalfOf2",
+    "Astrarre"
+  ],
+  "depends": {
+    "fabricloader": ">=0.8.9"
+  },
+  "mixins": [
+    "astrarre-rendering.mixins.json"
+  ]
+}

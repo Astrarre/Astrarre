@@ -35,28 +35,6 @@ public interface WorldFunction<T> extends Returns<T> {
 		}
 	};
 
-	static <T> WorldFunction<T> of(Access<WorldFunction<T>, T> access) {
-		return new WorldFunction<T>() {
-			@Nullable
-			@Override
-			public T get(@Nullable Direction direction, BlockState state, World view, BlockPos pos, @Nullable BlockEntity entity) {
-				return access.get().get(direction, state, view, pos, entity);
-			}
-
-			@Nullable
-			@Override
-			public T get(@Nullable Direction direction, World view, BlockPos pos) {
-				return access.get().get(direction, view, pos);
-			}
-
-			@Nullable
-			@Override
-			public T get(@Nullable Direction direction, BlockState state, World view, BlockPos pos) {
-				return access.get().get(direction, state, view, pos);
-			}
-		};
-	}
-
 	/**
 	 * @param state the BlockState at the given world and position
 	 * @param entity if {@code state.getBlock().hasBlockEntity()} then it is expected BlockEntity was already queried for

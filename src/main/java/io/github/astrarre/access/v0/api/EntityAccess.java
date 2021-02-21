@@ -1,9 +1,8 @@
 package io.github.astrarre.access.v0.api;
 
-import java.util.function.BinaryOperator;
-
 import io.github.astrarre.access.internal.util.MapFilter;
 import io.github.astrarre.access.v0.api.func.EntityFunction;
+import io.github.astrarre.access.v0.api.func.IterFunc;
 import io.github.astrarre.access.v0.api.provider.EntityProvider;
 import io.github.astrarre.v0.entity.EntityType;
 import io.github.astrarre.v0.entity.EquipmentSlot;
@@ -16,58 +15,54 @@ public class EntityAccess<T> extends Access<EntityFunction<T>, T> {
 	private final MapFilter<EntityType<?>, EntityFunction<T>, T> entityTypes;
 	private final MapFilter<Pair<EquipmentSlot, Item>, EntityFunction<T>, T> equipmentFilters;
 
+
 	/**
 	 * docs for each of the constructors are the same from FunctionAccess
 	 * @see FunctionAccess
 	 */
 	public EntityAccess() {
-		this((EntityFunction<T>) (d, e) -> null);
-	}
-
-	public EntityAccess(EntityFunction<T> defaultAccess) {
-		this((function, function2) -> (d, e) -> {
-			T val = function.get(d, e);
-			if (val != null) {
-				return val;
+		this((functions) -> (d, e) -> {
+			for (EntityFunction<T> function : functions) {
+				T val = function.get(d, e);
+				if (val != null) {
+					return val;
+				}
 			}
-			return function2.get(d, e);
-		}, defaultAccess);
+			return null;
+		});
 	}
 
-	public EntityAccess(BinaryOperator<EntityFunction<T>> andThen, EntityFunction<T> defaultAccess) {
-		super(andThen, defaultAccess);
-		this.entityTypes = new MapFilter<>(andThen, EntityFunction.empty());
-		this.equipmentFilters = new MapFilter<>(andThen, EntityFunction.empty());
-	}
-
-	public EntityAccess(T defaultValue) {
-		this((EntityFunction<T>) (d, e) -> defaultValue);
-	}
-
-	public EntityAccess(BinaryOperator<EntityFunction<T>> andThen) {
-		this(andThen, (d, e) -> null);
-	}
-
-	public EntityAccess(BinaryOperator<EntityFunction<T>> andThen, T defaultValue) {
-		this(andThen, (d, e) -> defaultValue);
+	public EntityAccess(IterFunc<EntityFunction<T>> iterFunc) {
+		super(iterFunc);
+		this.entityTypes = new MapFilter<>(iterFunc);
+		this.equipmentFilters = new MapFilter<>(iterFunc);
 	}
 
 	/**
 	 * @param combiner combines the return value of the function
 	 */
-	public static <T> EntityAccess<T> newInstance(BinaryOperator<T> combiner) {
-		return new EntityAccess<>((BinaryOperator<EntityFunction<T>>) (function, function2) -> (d, e) -> combiner.apply(function.get(d, e), function2.get(d, e)));
+	public static <T> EntityAccess<T> newInstance(IterFunc<T> combiner) {
+		return new EntityAccess<>((functions) -> (d, e) -> {
+			for (EntityFunction<T> function : functions) {
+				T val = function.get(d, e);
+				if (val != null) {
+					return val;
+				}
+			}
+			return null;
+		});
 	}
 
-	public static <T> EntityAccess<T> newInstance(BinaryOperator<T> combiner, T defaultValue) {
-		return new EntityAccess<>((function, function2) -> (d, e) -> combiner.apply(function.get(d, e), function2.get(d, e)), defaultValue);
-	}
+	private boolean addedProviderFunction;
 
 	/**
 	 * adds an entity function for {@link EntityProvider}
+	 * (calling this multiple times will only register it once)
 	 * @see EntityProvider
 	 */
 	public EntityAccess<T> addEntityProviderFunction() {
+		if(this.addedProviderFunction) return this;
+		this.addedProviderFunction = true;
 		this.andThen((direction, entity) -> {
 			if (entity instanceof EntityProvider) {
 				return ((EntityProvider) entity).get(this, direction);

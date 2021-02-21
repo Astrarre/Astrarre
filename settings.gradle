@@ -11,4 +11,7 @@ pluginManagement {
 }
 
 rootProject.name = "astrarre"
+include 'astrarre-rendering-v0'
+include 'astrarre-util-v0'
+include 'astrarre-itemview-v0'
 

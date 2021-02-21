@@ -3,12 +3,8 @@
   "package": "io.github.astrarre.itemview.internal.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "item.ItemMixin",
-    "nbt.CompoundTagMixin",
-    "nbt.list.ByteArrayTagMixin",
-    "nbt.list.IntArrayTagMixin",
-    "nbt.list.ListTagMixin",
-    "nbt.list.LongArrayTagMixin"
+    "ItemKeyImplMixin",
+    "ItemMixin"
   ],
   "injectors": {
     "defaultRequire": 1

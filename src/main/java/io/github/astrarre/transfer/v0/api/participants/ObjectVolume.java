@@ -1,6 +1,6 @@
 package io.github.astrarre.transfer.v0.api.participants;
 
-import io.github.astrarre.itemview.v0.api.item.ItemKey;
+import io.github.astrarre.itemview.v0.fabric.TaggedItem;
 import io.github.astrarre.transfer.v0.api.participants.item.ItemSlotParticipant;
 import io.github.astrarre.transfer.v0.api.transaction.Key;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
@@ -8,7 +8,6 @@ import io.github.astrarre.transfer.v0.api.transaction.keys.generated.IntKeyImpl;
 import io.github.astrarre.transfer.v0.api.Insertable;
 import io.github.astrarre.transfer.v0.api.Participant;
 import io.github.astrarre.transfer.v0.api.transaction.keys.ObjectKeyImpl;
-import io.github.astrarre.v0.util.registry.Registry;
 import org.jetbrains.annotations.Nullable;
 
 // todo document terminology, FluidVolume, FluidContainer, etc.
@@ -17,7 +16,7 @@ public class ObjectVolume<T> implements Participant<T> {
 	protected final Key.Object<T> type;
 	protected final Key.Int quantity;
 
-	public static ObjectVolume<ItemKey> createItemVolume() {
+	public static ObjectVolume<TaggedItem> createItemVolume() {
 		return new ItemSlotParticipant();
 	}
 

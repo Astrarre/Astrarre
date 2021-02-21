@@ -1,13 +1,11 @@
 package io.github.astrarre.transfer.v0.api.participants;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 
-import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Iterables;
-import io.github.astrarre.common.v0.api.util.DualIterator;
-import io.github.astrarre.itemview.v0.api.item.ItemKey;
+import io.github.astrarre.util.v0.api.DualIterator;
+import io.github.astrarre.transfer.internal.TransferInternal;
 import io.github.astrarre.transfer.v0.api.Insertable;
 import io.github.astrarre.transfer.v0.api.Participant;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
@@ -16,6 +14,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
+ * inventory conversion function is registered for this class exactly
+ * @see TransferInternal#FROM_INVENTORY
  * @implNote {@link #iterator()}
  */
 public class AggregateParticipant<T> implements Participant<T>, Iterable<Participant<T>> {

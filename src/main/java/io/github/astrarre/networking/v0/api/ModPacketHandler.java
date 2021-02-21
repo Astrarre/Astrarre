@@ -4,8 +4,8 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import io.github.astrarre.networking.internal.mixin.CustomPayloadC2SPacketAccess;
 import io.github.astrarre.stripper.Hide;
+import io.github.astrarre.util.v0.api.Id;
 import io.github.astrarre.v0.network.PacketByteBuf;
-import io.github.astrarre.v0.util.Id;
 
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;

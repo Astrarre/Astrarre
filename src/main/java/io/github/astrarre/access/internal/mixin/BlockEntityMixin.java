@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
@@ -39,23 +40,23 @@ public class BlockEntityMixin implements BlockEntityAccess {
 	}
 
 	@Inject (method = "setLocation", at = @At ("HEAD"))
-	public void onMove(World w, BlockPos p) {
-		if (this.astrarre_listener != null && !(w == this.world && Objects.equals(p, this.pos))) {
+	public void onMove(World world, BlockPos pos, CallbackInfo ci) {
+		if (this.astrarre_listener != null && !(world == this.world && Objects.equals(pos, this.pos))) {
 			this.astrarre_listener.accept((BlockEntity) (Object) this);
 			this.astrarre_listener = null;
 		}
 	}
 
 	@Inject (method = "setPos", at = @At ("HEAD"))
-	public void onMove(BlockPos p) {
-		if (this.astrarre_listener != null && !(Objects.equals(p, this.pos))) {
+	public void onMove(BlockPos pos, CallbackInfo ci) {
+		if (this.astrarre_listener != null && !(Objects.equals(pos, this.pos))) {
 			this.astrarre_listener.accept((BlockEntity) (Object) this);
 			this.astrarre_listener = null;
 		}
 	}
 
 	@Inject(method = "markRemoved", at = @At("HEAD"))
-	public void onRemoved() {
+	public void onRemoved(CallbackInfo ci) {
 		if (this.astrarre_listener != null) {
 			this.astrarre_listener.accept((BlockEntity) (Object) this);
 			this.astrarre_listener = null;

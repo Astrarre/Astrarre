@@ -1,15 +1,15 @@
 package io.github.astrarre.transfer.internal;
 
-import io.github.astrarre.itemview.v0.api.item.ItemKey;
-import io.github.astrarre.transfer.v0.api.transaction.keys.generated.IntKeyImpl;
+import io.github.astrarre.itemview.v0.fabric.TaggedItem;
 import io.github.astrarre.transfer.v0.api.Insertable;
+import io.github.astrarre.transfer.v0.api.transaction.keys.generated.IntKeyImpl;
 import io.github.astrarre.transfer.v0.api.Participant;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import io.github.astrarre.transfer.v0.api.transaction.keys.ObjectKeyImpl;
 
 import net.minecraft.inventory.Inventory;
 
-public class SlotParticipant implements Participant<ItemKey> {
+public class SlotParticipant implements Participant<TaggedItem> {
 	private final Inventory inventory;
 	private final int index;
 	private final SlotItemKey item = new SlotItemKey();
@@ -21,17 +21,17 @@ public class SlotParticipant implements Participant<ItemKey> {
 	}
 
 	@Override
-	public void extract(Transaction transaction, Insertable<ItemKey> insertable) {
+	public void extract(Transaction transaction, Insertable<TaggedItem> insertable) {
 		this.count.set(transaction, insertable.insert(transaction, this.item.get(transaction), this.count.get(transaction)));
 	}
 
 	@Override
-	public int extract(Transaction transaction, ItemKey type, int quantity) {
-		if (type != ItemKey.EMPTY && quantity != 0 && this.item.get(transaction).equals(type)) {
+	public int extract(Transaction transaction, TaggedItem type, int quantity) {
+		if (type != TaggedItem.EMPTY && quantity != 0 && this.item.get(transaction).equals(type)) {
 			int count = this.count.get(transaction);
 			int toTake = Math.min(count, quantity);
 			if (toTake == count) {
-				this.item.set(transaction, ItemKey.EMPTY);
+				this.item.set(transaction, TaggedItem.EMPTY);
 			}
 
 			this.count.decrement(transaction, toTake);
@@ -41,14 +41,14 @@ public class SlotParticipant implements Participant<ItemKey> {
 	}
 
 	@Override
-	public int insert(Transaction transaction, ItemKey type, int quantity) {
-		if(type == ItemKey.EMPTY || quantity == 0) return 0;
+	public int insert(Transaction transaction, TaggedItem type, int quantity) {
+		if(type == TaggedItem.EMPTY || quantity == 0) return 0;
 
-		ItemKey itemType = this.item.get(transaction);
+		TaggedItem itemType = this.item.get(transaction);
 		int currentCount = this.count.get(transaction);
 
-		if (itemType.getMaxStackSize() > currentCount && itemType == ItemKey.EMPTY || itemType.equals(type)) {
-			if (itemType == ItemKey.EMPTY) {
+		if (itemType.getMaxStackSize() > currentCount && itemType == TaggedItem.EMPTY || itemType.equals(type)) {
+			if (itemType == TaggedItem.EMPTY) {
 				// set new type
 				this.item.set(transaction, type);
 			}
@@ -61,14 +61,14 @@ public class SlotParticipant implements Participant<ItemKey> {
 	}
 
 	// item key must be called before count key!
-	public class SlotItemKey extends ObjectKeyImpl<ItemKey> {
+	public class SlotItemKey extends ObjectKeyImpl<TaggedItem> {
 		@Override
-		protected ItemKey getRootValue() {
-			return ItemKey.of(SlotParticipant.this.inventory.getStack(SlotParticipant.this.index));
+		protected TaggedItem getRootValue() {
+			return TaggedItem.of(SlotParticipant.this.inventory.getStack(SlotParticipant.this.index));
 		}
 
 		@Override
-		protected void setRootValue(ItemKey val) {
+		protected void setRootValue(TaggedItem val) {
 			SlotParticipant.this.inventory.setStack(SlotParticipant.this.index, val.createItemStack(0));
 		}
 	}

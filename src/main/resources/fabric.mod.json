@@ -20,9 +20,10 @@
   "mixins": [
     "astrarre-access.mixins.json",
     "astrarre-common.mixins.json",
-    "astrarre-gui.mixins.json",
+    "astrarre-rendering.mixins.json",
     "astrarre-items.mixins.json",
-    "astrarre-network.mixins.json"
+    "astrarre-network.mixins.json",
+    "astrarre-transfer.mixins.json"
   ],
   "entrypoints": {
     "mm:early_risers": [

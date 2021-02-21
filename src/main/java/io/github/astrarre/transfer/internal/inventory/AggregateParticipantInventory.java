@@ -1,22 +1,28 @@
 package io.github.astrarre.transfer.internal.inventory;
 
+import java.util.Collections;
 import java.util.Set;
 
-import io.github.astrarre.itemview.v0.api.item.ItemKey;
+import io.github.astrarre.access.v0.api.Access;
+import io.github.astrarre.access.v0.api.func.Returns;
+import io.github.astrarre.access.v0.api.provider.Provider;
+import io.github.astrarre.itemview.v0.fabric.TaggedItem;
+import io.github.astrarre.transfer.internal.TransferInternal;
 import io.github.astrarre.transfer.v0.api.Participant;
 import io.github.astrarre.transfer.v0.api.participants.AggregateParticipant;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
-public class AggregateParticipantInventory implements Inventory {
-	protected final AggregateParticipant<ItemKey> participant;
+public class AggregateParticipantInventory implements Inventory, Provider {
+	public final AggregateParticipant<TaggedItem> participant;
 	protected final InternalItemSlotParticipant access = new InternalItemSlotParticipant();
 
-	public AggregateParticipantInventory(AggregateParticipant<ItemKey> participant) {
+	public AggregateParticipantInventory(AggregateParticipant<TaggedItem> participant) {
 		this.participant = participant;
 	}
 
@@ -32,7 +38,7 @@ public class AggregateParticipantInventory implements Inventory {
 
 	@Override
 	public ItemStack getStack(int slot) {
-		Participant<ItemKey> participant = this.participant.getParticipant(slot);
+		Participant<TaggedItem> participant = this.participant.getParticipant(slot);
 		try (Transaction transaction = new Transaction(false)) {
 			participant.extract(transaction, this.access);
 			return this.access.getType(transaction).createItemStack(this.access.getQuantity(transaction));
@@ -41,7 +47,7 @@ public class AggregateParticipantInventory implements Inventory {
 
 	@Override
 	public ItemStack removeStack(int slot, int amount) {
-		Participant<ItemKey> participant = this.participant.getParticipant(slot);
+		Participant<TaggedItem> participant = this.participant.getParticipant(slot);
 		int oldMax = this.access.getMax(null);
 		// cap amount
 		this.access.setMax(amount);
@@ -62,9 +68,18 @@ public class AggregateParticipantInventory implements Inventory {
 	@Override
 	public void setStack(int slot, ItemStack stack) {
 		this.removeStack(slot);
-		Participant<ItemKey> participant = this.participant.getParticipant(slot);
-		// todo what to do with voided items?
-		participant.insert(null, ItemKey.of(stack), stack.getCount());
+		Participant<TaggedItem> participant = this.participant.getParticipant(slot);
+		TaggedItem key = TaggedItem.of(stack);
+		int overflow = participant.insert(null, key, stack.getCount());
+		if (overflow > 0) {
+			// todo what to do with voided items? If they can't be overflowed into the inventory, what next
+			this.participant.insert(null, key, overflow);
+		}
+	}
+
+	@Override
+	public int getMaxCountPerStack() {
+		return Integer.MAX_VALUE;
 	}
 
 	@Override
@@ -76,16 +91,6 @@ public class AggregateParticipantInventory implements Inventory {
 	}
 
 	@Override
-	public void clear() {
-		this.participant.clear(null);
-	}
-
-	@Override
-	public int getMaxCountPerStack() {
-		return Integer.MAX_VALUE;
-	}
-
-	@Override
 	public void onOpen(PlayerEntity player) {}
 
 	@Override
@@ -93,10 +98,10 @@ public class AggregateParticipantInventory implements Inventory {
 
 	@Override
 	public boolean isValid(int slot, ItemStack stack) {
-		Participant<ItemKey> participant = this.participant.getParticipant(slot);
-		if(participant.isFull(null) && participant.supportsInsertion()) {
-			try(Transaction transaction = new Transaction(false)) {
-				return participant.insert(transaction, ItemKey.of(stack), stack.getCount()) == stack.getCount();
+		Participant<TaggedItem> participant = this.participant.getParticipant(slot);
+		if (participant.isFull(null) && participant.supportsInsertion()) {
+			try (Transaction transaction = new Transaction(false)) {
+				return participant.insert(transaction, TaggedItem.of(stack), stack.getCount()) == stack.getCount();
 			}
 		}
 		return false;
@@ -104,11 +109,33 @@ public class AggregateParticipantInventory implements Inventory {
 
 	@Override
 	public int count(Item item) {
-		return this.participant.extract(null, ItemKey.of(item), Integer.MAX_VALUE);
+		try(Transaction transaction = new Transaction(false)) {
+			SetMatchingInsertable insertable = new SetMatchingInsertable(Collections.singleton(item), Integer.MAX_VALUE);
+			this.participant.extract(transaction, TaggedItem.of(item), Integer.MAX_VALUE);
+			return insertable.found.get(transaction);
+		}
 	}
 
 	@Override
 	public boolean containsAny(Set<Item> items) {
-		return false;
+		try(Transaction transaction = new Transaction(false)) {
+			SetMatchingInsertable insertable = new SetMatchingInsertable(items, 1);
+			this.participant.extract(transaction, insertable);
+			return insertable.isFull(transaction);
+		}
+	}
+
+	@Override
+	public void clear() {
+		this.participant.clear(null);
+	}
+
+	public AggregateParticipant<TaggedItem> getParticipant() {
+		return this.participant;
+	}
+
+	@Override
+	public <T> @Nullable T get(Access<? extends Returns<T>, T> access) {
+		return access == TransferInternal.FROM_INVENTORY ? (T) this.participant : null;
 	}
 }
