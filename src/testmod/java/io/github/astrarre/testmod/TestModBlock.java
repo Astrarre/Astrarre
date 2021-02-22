@@ -6,7 +6,6 @@ import java.util.Map;
 import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.access.v0.api.func.Returns;
 import io.github.astrarre.itemview.v0.api.item.ItemKey;
-import io.github.astrarre.itemview.v0.fabric.TaggedItem;
 import io.github.astrarre.itemview.v0.api.item.nbt.NBTagView;
 import io.github.astrarre.transfer.v0.api.Insertable;
 import io.github.astrarre.transfer.v0.api.Participant;
@@ -34,7 +33,7 @@ public class TestModBlock extends Block implements BlockEntityProvider {
 		return new Entity();
 	}
 
-	public static class Entity extends BlockEntity implements io.github.astrarre.access.v0.api.provider.BlockEntityProvider, Participant<ItemKey> {
+	public static class Entity extends BlockEntity implements io.github.astrarre.access.v0.fabric.provider.BlockEntityProvider, Participant<ItemKey> {
 		private final Map<Item, Object2IntMap<NBTagView>> storage = new HashMap<>();
 
 		public Entity() {

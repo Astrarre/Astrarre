@@ -10,7 +10,7 @@ import java.util.Set;
 
 import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.access.v0.api.FunctionAccess;
-import io.github.astrarre.access.v0.api.WorldAccess;
+import io.github.astrarre.access.v0.fabric.WorldAccess;
 import io.github.astrarre.access.v0.api.func.AccessFunction;
 import io.github.astrarre.itemview.v0.fabric.TaggedItem;
 import io.github.astrarre.transfer.internal.NUtil;

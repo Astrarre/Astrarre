@@ -5,7 +5,7 @@ import java.util.Set;
 
 import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.access.v0.api.func.Returns;
-import io.github.astrarre.access.v0.api.provider.Provider;
+import io.github.astrarre.access.v0.fabric.provider.Provider;
 import io.github.astrarre.itemview.v0.fabric.TaggedItem;
 import io.github.astrarre.transfer.internal.TransferInternal;
 import io.github.astrarre.transfer.v0.api.Participant;
