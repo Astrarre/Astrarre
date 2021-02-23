@@ -135,7 +135,7 @@ public class AggregateParticipantInventory implements Inventory, Provider {
 	}
 
 	@Override
-	public <T> @Nullable T get(Access<? extends Returns<T>, T> access) {
-		return access == FabricParticipants.FROM_INVENTORY ? (T) this.participant : null;
+	public @Nullable Object get(Access<?> access) {
+		return access == FabricParticipants.FROM_INVENTORY ? this.participant : null;
 	}
 }

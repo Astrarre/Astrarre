@@ -4,7 +4,7 @@ import com.google.common.collect.Iterators;
 import io.github.astrarre.access.v0.api.func.AccessBiFunction;
 import io.github.astrarre.access.v0.api.func.IterFunc;
 
-public class BiFunctionAccess<A, B, C> extends Access<AccessBiFunction<A, B, C>, C> {
+public class BiFunctionAccess<A, B, C> extends Access<AccessBiFunction<A, B, C>> {
 	/**
 	 * combines {@link BiFunctionAccess (AccessFunction)} and {@link BiFunctionAccess (BinaryOperator)}
 	 */

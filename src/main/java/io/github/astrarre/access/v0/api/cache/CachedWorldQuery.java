@@ -60,7 +60,7 @@ public final class CachedWorldQuery {
 		this.reference = null;
 	}
 
-	public <T> T get(Access<WorldFunction<T>, T> access, Direction direction) {
+	public <T> T get(Access<WorldFunction<T>> access, Direction direction) {
 		return access.get().get(direction, this.getBlockState(), this.world, this.pos, this.getBlockEntity());
 	}
 

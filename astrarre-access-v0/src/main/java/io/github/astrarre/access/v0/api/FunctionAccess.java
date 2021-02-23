@@ -10,7 +10,7 @@ import io.github.astrarre.access.v0.api.func.AccessFunction;
 import io.github.astrarre.access.v0.api.func.IterFunc;
 import io.github.astrarre.access.v0.api.provider.Provider;
 
-public class FunctionAccess<A, B> extends Access<AccessFunction<A, B>, B> {
+public class FunctionAccess<A, B> extends Access<AccessFunction<A, B>> {
 	private final MapFilter<A, AccessFunction<A, B>, B> instanceFunctions;
 	private final MapFilter<Class<? extends A>, AccessFunction<A, B>, B> classFunctions;
 	private boolean addedProviderFunction;
@@ -60,7 +60,7 @@ public class FunctionAccess<A, B> extends Access<AccessFunction<A, B>, B> {
 
 		this.andThen(a -> {
 			if (a instanceof Provider) {
-				return ((Provider) a).get(this);
+				return (B) ((Provider) a).get(this);
 			}
 			return null;
 		});

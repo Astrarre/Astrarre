@@ -23,6 +23,7 @@ import io.github.astrarre.transfer.v0.api.participants.FixedObjectVolume;
 import io.github.astrarre.transfer.v0.api.participants.ObjectVolume;
 import io.github.astrarre.transfer.v0.fabric.participants.item.ItemSlotParticipant;
 
+import net.minecraft.block.entity.HopperBlockEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.Inventory;
@@ -32,6 +33,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
+/**
+ * get your inventories from {@link HopperBlockEntity#getInventoryAt(World, BlockPos)}
+ */
 public final class FabricParticipants {
 	/**
 	 * if a participant is looking for a limited set of items, this can help narrow it down
@@ -52,10 +56,7 @@ public final class FabricParticipants {
 			BiFunctionAccess.newInstance(AggregateParticipant::merge);
 
 	public static final FunctionAccess<Participant<TaggedItem>, Inventory> TO_INVENTORY = new FunctionAccess<>();
-	/**
-	 * register conversion functions here
-	 */
-	public static final BiFunctionAccess<Direction, Inventory, Participant<TaggedItem>> FROM_INVENTORY_REGISTRY = new BiFunctionAccess<>();
+
 	/**
 	 * this is where you should access to convert, this contains astrarre's standard converters.
 	 */

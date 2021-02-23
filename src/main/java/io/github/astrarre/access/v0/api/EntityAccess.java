@@ -11,7 +11,7 @@ import io.github.astrarre.v0.item.Item;
 
 import net.minecraft.util.Pair;
 
-public class EntityAccess<T> extends Access<EntityFunction<T>, T> {
+public class EntityAccess<T> extends Access<EntityFunction<T>> {
 	private final MapFilter<EntityType<?>, EntityFunction<T>, T> entityTypes;
 	private final MapFilter<Pair<EquipmentSlot, Item>, EntityFunction<T>, T> equipmentFilters;
 
@@ -65,7 +65,7 @@ public class EntityAccess<T> extends Access<EntityFunction<T>, T> {
 		this.addedProviderFunction = true;
 		this.andThen((direction, entity) -> {
 			if (entity instanceof EntityProvider) {
-				return ((EntityProvider) entity).get(this, direction);
+				return (T) ((EntityProvider) entity).get(this, direction);
 			}
 			return null;
 		});

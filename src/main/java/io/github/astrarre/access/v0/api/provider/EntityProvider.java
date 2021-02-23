@@ -13,6 +13,6 @@ public interface EntityProvider {
 	 * @param access the provider accessing this block
 	 * @return the instance, or null
 	 */
-	@Nullable <T> T get(Access<? extends Returns<T>, T> access, Direction direction);
+	@Nullable Object get(Access<?> access, Direction direction);
 
 }

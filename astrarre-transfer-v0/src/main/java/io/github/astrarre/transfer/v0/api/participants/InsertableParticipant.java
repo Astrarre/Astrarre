@@ -54,7 +54,7 @@ public final class InsertableParticipant<T> implements Participant<T>, Provider 
 	}
 
 	@Override
-	public <T> @Nullable T get(Access<? extends Returns<T>, T> access) {
+	public @Nullable Object get(Access<?> access) {
 		return access == Participants.DIRECT_WRAPPERS_INSERTABLE ? (T) this.insertable : null;
 	}
 }

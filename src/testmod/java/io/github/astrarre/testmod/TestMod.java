@@ -4,6 +4,7 @@ import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.block.entity.HopperBlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -23,6 +24,7 @@ public class TestMod implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		System.out.println(HopperBlockEntity.ABOVE_SHAPE);
 		Registry.register(Registry.ITEM, new Identifier("testmod", "test"), new ItemA(new Item.Settings().group(ItemGroup.MISC)));
 	}
 

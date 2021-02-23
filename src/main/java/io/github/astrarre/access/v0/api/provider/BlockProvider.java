@@ -17,5 +17,5 @@ public interface BlockProvider {
 	 * @param access the provider accessing this block
 	 * @return the instance, or null
 	 */
-	@Nullable <T> T get(Access<? extends Returns<T>, T> access, Direction direction, BlockState state, World view, BlockPos pos);
+	@Nullable Object get(Access<?> access, Direction direction, BlockState state, World view, BlockPos pos);
 }

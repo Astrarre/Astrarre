@@ -1,0 +1,7 @@
+version '0.0.0'
+dependsOn(project, 'astrarre-itemview-v0', 'astrarre-util-v0', 'astrarre-access-v0')
+
+sourceSets {
+    generator {
+    }
+}

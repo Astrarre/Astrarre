@@ -63,7 +63,7 @@ public final class ExtractableParticipant<T> implements Participant<T>, Provider
 	}
 
 	@Override
-	public <T> @Nullable T get(Access<? extends Returns<T>, T> access) {
+	public @Nullable Object get(Access<?> access) {
 		return access == Participants.DIRECT_WRAPPERS_EXTRACTABLE ? (T) this.extractable : null;
 	}
 }

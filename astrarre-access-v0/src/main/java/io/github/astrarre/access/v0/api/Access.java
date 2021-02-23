@@ -5,8 +5,10 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
@@ -14,16 +16,16 @@ import io.github.astrarre.access.v0.api.func.IterFunc;
 import io.github.astrarre.access.v0.api.func.Returns;
 import org.jetbrains.annotations.NotNull;
 
-public class Access<A extends Returns<T>, T> {
-	protected final IterFunc<A> combiner;
+public class Access<F> {
+	protected final IterFunc<F> combiner;
 	protected List<Object> delegates = new ArrayList<>();
-	protected Consumer<Access<A, T>> listener;
-	protected A compiledFunction;
+	protected Consumer<Access<F>> listener;
+	protected F compiledFunction;
 
 	/**
 	 * @param combiner andThen
 	 */
-	public Access(IterFunc<A> combiner) {
+	public Access(IterFunc<F> combiner) {
 		this.combiner = combiner;
 		this.recompile();
 	}
@@ -36,23 +38,42 @@ public class Access<A extends Returns<T>, T> {
 		}
 	}
 
-	protected A get(Object o) {
+	protected F get(Object o) {
 		if (o instanceof Access.Func) {
-			return ((Func<?, A>) o).delegate;
+			return ((Func<?, F>) o).delegate;
 		}
-		return (A) o;
+		return (F) o;
 	}
 
 	@NotNull
-	public A get() {
+	public F get() {
 		return this.compiledFunction;
 	}
 
-	public <E extends Returns<U>, U> Access<A, T> dependsOn(Access<E, U> access, Function<E, A> function) {
+	/**
+	 * @return an invoker that contains all functions except those from the passed registry (the supplier should be called each time for it to be updated
+	 */
+	public Supplier<F> getExcluding(Collection<Access<?>> accesses) {
+		AtomicReference<F> reference = new AtomicReference<>();
+		this.addListener(a -> {
+			F val = compile(a.getWithout(accesses), a.combiner);
+			reference.set(val);
+		});
+		return reference::get;
+	}
+
+	public Access<F> dependsOn(Access<F> access) {
+		return this.dependsOn(access, Function.identity());
+	}
+
+	public <E> Access<F> dependsOn(Access<E> access, Function<E, F> function) {
 		return this.dependsOn(access, function, true);
 	}
 
-	private Access<A, T> addListener(Consumer<Access<A, T>> listener) {
+	/**
+	 * fired when a function is added to the access
+	 */
+	public Access<F> addListener(Consumer<Access<F>> listener) {
 		listener.accept(this);
 		if (this.listener == null) {
 			this.listener = listener;
@@ -62,11 +83,11 @@ public class Access<A extends Returns<T>, T> {
 		return this;
 	}
 
-	public <E extends Returns<U>, U> Access<A, T> dependsOnBefore(Access<E, U> access, Function<E, A> function) {
+	public <E> Access<F> dependsOnBefore(Access<E> access, Function<E, F> function) {
 		return this.dependsOn(access, function, false);
 	}
 
-	public Access<A, T> before(A func) {
+	public Access<F> before(F func) {
 		this.delegates.add(0, func);
 		this.recompile();
 		return this;
@@ -75,21 +96,20 @@ public class Access<A extends Returns<T>, T> {
 	/**
 	 * adds a function to this access, the later you register, the higher your priority
 	 */
-	public Access<A, T> andThen(A func) {
+	public Access<F> andThen(F func) {
 		this.delegates.add(func);
 		this.recompile();
 		return this;
 	}
 
-
-	private <SilenceGenerics extends Returns<?>> Iterable<Object> getWithout(Collection<Access<?, ?>> accesses) {
+	private <SilenceGenerics extends Returns<?>> Iterable<Object> getWithout(Collection<Access<?>> accesses) {
 		return Iterables.transform(Iterables.filter(this.delegates, o -> !(o instanceof Func && accesses.contains(((Func<?, ?>) o).dep))), delegate -> {
 			if(delegate instanceof Func) {
 				// our own delegate
-				Func<SilenceGenerics, A> current = (Func<SilenceGenerics, A>) delegate;
-				Func<SilenceGenerics, A> copied = new Func<>(current.dep, current.mapping);
+				Func<SilenceGenerics, F> current = (Func<SilenceGenerics, F>) delegate;
+				Func<SilenceGenerics, F> copied = new Func<>(current.dep, current.mapping);
 
-				HashSet<Access<?, ?>> newAccesses = new HashSet<>(accesses);
+				HashSet<Access<?>> newAccesses = new HashSet<>(accesses);
 				newAccesses.add(this);
 				Iterable<Object> val = current.dep.getWithout(newAccesses);
 				copied.inputs = val;
@@ -100,13 +120,12 @@ public class Access<A extends Returns<T>, T> {
 		});
 	}
 
-	private <E extends Returns<U>, U> Access<A, T> dependsOn(Access<E, U> access, Function<E, A> function, boolean end) {
-		Func<E, A> dependency = new Func<>(access, function);
+	private <E> Access<F> dependsOn(Access<E> access, Function<E, F> function, boolean end) {
+		Func<E, F> dependency = new Func<>(access, function);
 		if(end) this.delegates.add(dependency);
 		else this.delegates.add(0, dependency);
 		access.addListener(a -> {
-			// todo recompile somehow
-			HashSet<Access<?, ?>> accesses = new HashSet<>();
+			HashSet<Access<?>> accesses = new HashSet<>();
 			Iterable<Object> inputs = a.getWithout(accesses);
 			if(dependency.inputs == null || !Iterables.elementsEqual(inputs, dependency.inputs)) {
 				dependency.inputs = inputs;
@@ -117,13 +136,13 @@ public class Access<A extends Returns<T>, T> {
 		return this;
 	}
 
-	private static final class Func<Entries extends Returns<?>, Target extends Returns<?>> {
-		private final Access<Entries, ?> dep;
+	private static final class Func<Entries, Target> {
+		private final Access<Entries> dep;
 		private final Function<Entries, Target> mapping;
 		private Target delegate;
 		private Iterable<Object> inputs;
 
-		private Func(Access<Entries, ?> dep, Function<Entries, Target> mapping) {
+		private Func(Access<Entries> dep, Function<Entries, Target> mapping) {
 			this.dep = dep;
 			this.mapping = mapping;
 		}

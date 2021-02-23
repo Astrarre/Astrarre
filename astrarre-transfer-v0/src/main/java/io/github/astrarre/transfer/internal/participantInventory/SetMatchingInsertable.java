@@ -43,7 +43,7 @@ public class SetMatchingInsertable implements Insertable<TaggedItem>, Provider {
 	}
 
 	@Override
-	public <T> @Nullable T get(Access<? extends Returns<T>, T> access) {
-		return access == FabricParticipants.FILTERS ? (T) this.items : null;
+	public @Nullable Object get(Access<?> access) {
+		return access == FabricParticipants.FILTERS ? this.items : null;
 	}
 }

@@ -89,7 +89,7 @@ public enum Participants implements Participant<Object> {
 	 * unwraps a delegate recursively
 	 */
 	@NotNull
-	public static <T> Collection<T> unwrap(Access<AccessFunction<T, Collection<T>>, Collection<T>> access, T instance) {
+	public static <T> Collection<T> unwrap(Access<AccessFunction<T, Collection<T>>> access, T instance) {
 		Collection<T> collection = unwrapInternal(access.get(), instance);
 		if (collection == null) {
 			return Collections.singleton(instance);
