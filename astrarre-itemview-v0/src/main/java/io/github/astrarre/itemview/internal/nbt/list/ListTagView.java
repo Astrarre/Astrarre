@@ -3,7 +3,7 @@ package io.github.astrarre.itemview.internal.nbt.list;
 import java.util.AbstractList;
 
 import io.github.astrarre.itemview.v0.fabric.FabricViews;
-import io.github.astrarre.itemview.v0.api.item.nbt.NBTType;
+import io.github.astrarre.itemview.v0.api.nbt.NBTType;
 
 import net.minecraft.nbt.ListTag;
 

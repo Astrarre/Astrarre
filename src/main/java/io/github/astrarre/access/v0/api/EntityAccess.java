@@ -1,6 +1,6 @@
 package io.github.astrarre.access.v0.api;
 
-import io.github.astrarre.access.internal.util.MapFilter;
+import io.github.astrarre.access.internal.MapFilter;
 import io.github.astrarre.access.v0.api.func.EntityFunction;
 import io.github.astrarre.access.v0.api.func.IterFunc;
 import io.github.astrarre.access.v0.api.provider.EntityProvider;

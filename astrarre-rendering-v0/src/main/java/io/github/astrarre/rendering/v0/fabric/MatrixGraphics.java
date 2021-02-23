@@ -1,7 +1,7 @@
 package io.github.astrarre.rendering.v0.fabric;
 
 import io.github.astrarre.rendering.internal.util.SetupTeardown;
-import io.github.astrarre.rendering.internal.util.DrawableHelper2;
+import io.github.astrarre.rendering.internal.util.MatrixGraphicsUtil;
 import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.rendering.v0.api.textures.Texture;
 import io.github.astrarre.rendering.v0.api.util.Close;
@@ -71,12 +71,12 @@ public class MatrixGraphics implements FabricGraphics {
 
 	@Override
 	public void fillRect(float width, float height, int color) {
-		DrawableHelper2.fill(this.matrices.peek().getModel(), 0, 0, width, height, color);
+		MatrixGraphicsUtil.fill(this.matrices.peek().getModel(), 0, 0, width, height, color);
 	}
 
 	@Override
 	public void fillGradient(float width, float height, int startColor, int endColor) {
-		DrawableHelper2.fillGradient(this.matrices, 0, 0, width, height, 0, startColor, endColor);
+		MatrixGraphicsUtil.fillGradient(this.matrices, 0, 0, width, height, 0, startColor, endColor);
 	}
 
 	@Override

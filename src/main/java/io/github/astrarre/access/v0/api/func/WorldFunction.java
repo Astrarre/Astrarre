@@ -2,7 +2,6 @@ package io.github.astrarre.access.v0.api.func;
 
 import java.util.function.BinaryOperator;
 
-import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.v0.block.BlockState;
 import io.github.astrarre.v0.block.entity.BlockEntity;
 import io.github.astrarre.v0.util.math.BlockPos;
@@ -11,29 +10,10 @@ import io.github.astrarre.v0.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public interface WorldFunction<T> extends Returns<T> {
+	WorldFunction.NoBlock<?> EMPTY = (direction, view, pos) -> null;
 	static <T> WorldFunction<T> empty() {
 		return (WorldFunction<T>) EMPTY;
 	}
-
-	WorldFunction<?> EMPTY = new WorldFunction<Object>() {
-		@Nullable
-		@Override
-		public Object get(@Nullable Direction direction, BlockState state, World view, BlockPos pos, @Nullable BlockEntity entity) {
-			return null;
-		}
-
-		@Nullable
-		@Override
-		public Object get(@Nullable Direction direction, World view, BlockPos pos) {
-			return null;
-		}
-
-		@Nullable
-		@Override
-		public Object get(@Nullable Direction direction, BlockState state, World view, BlockPos pos) {
-			return null;
-		}
-	};
 
 	/**
 	 * @param state the BlockState at the given world and position
@@ -182,5 +162,4 @@ public interface WorldFunction<T> extends Returns<T> {
 			return this.get(direction, view, pos, null);
 		}
 	}
-
 }

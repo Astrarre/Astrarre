@@ -58,7 +58,11 @@ public class ModPacketHandler {
 		this.syncServerRegistry.put(id, receiver);
 	}
 
+	/**
+	 * @deprecated internal
+	 */
 	@Hide
+	@Deprecated
 	@Environment(EnvType.CLIENT)
 	public void onReceiveAsync(CustomPayloadS2CPacket packet) {
 		this.fire((Id) packet.getChannel(), (PacketByteBuf) packet.getData(), this.asyncClientRegistry);

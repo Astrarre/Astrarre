@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.Set;
 
 import io.github.astrarre.itemview.v0.fabric.FabricViews;
-import io.github.astrarre.itemview.v0.api.item.nbt.NBTType;
-import io.github.astrarre.itemview.v0.api.item.nbt.NBTagView;
+import io.github.astrarre.itemview.v0.api.nbt.NBTType;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.itemview.internal.access.ImmutableAccess;
 import io.github.astrarre.itemview.internal.util.ImmutableIterable;
 import io.github.astrarre.itemview.internal.util.NBTagUnmodifiableMap;

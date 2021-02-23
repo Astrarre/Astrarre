@@ -1,7 +1,7 @@
 package io.github.astrarre.access.v0.api;
 
 import com.google.common.collect.Iterators;
-import io.github.astrarre.access.internal.util.MapFilter;
+import io.github.astrarre.access.internal.MapFilter;
 import io.github.astrarre.access.v0.api.func.IterFunc;
 import io.github.astrarre.access.v0.api.func.WorldFunction;
 import io.github.astrarre.access.v0.api.provider.BlockEntityProvider;

@@ -3,7 +3,6 @@
   "package": "io.github.astrarre.access.internal.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "HopperBlockEntityMixin",
     "BlockEntityMixin",
     "WorldChunkMixin"
   ],

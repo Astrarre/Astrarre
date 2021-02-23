@@ -1,7 +1,7 @@
 package io.github.astrarre.itemview.v0.fabric;
 
-import io.github.astrarre.itemview.internal.ItemKeyImpl;
-import io.github.astrarre.itemview.v0.api.item.nbt.NBTagView;
+import io.github.astrarre.itemview.internal.TaggedItemImpl;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.stripper.Hide;
 
 import net.minecraft.item.Item;
@@ -13,7 +13,7 @@ import net.minecraft.nbt.CompoundTag;
  * an Item and it's NBT data (guaranteed immutable)
  */
 public interface TaggedItem {
-	TaggedItem EMPTY = new ItemKeyImpl(Items.AIR, NBTagView.EMPTY);
+	TaggedItem EMPTY = new TaggedItemImpl(Items.AIR, NBTagView.EMPTY);
 
 	// todo cache ItemKey with versioning for mutable array tags
 
@@ -56,7 +56,7 @@ public interface TaggedItem {
 			return (TaggedItem) Items.AIR;
 		}
 
-		return new ItemKeyImpl(this.getItem(), n);
+		return new TaggedItemImpl(this.getItem(), n);
 	}
 
 	@Hide
@@ -64,7 +64,7 @@ public interface TaggedItem {
 		if (stack.isEmpty()) {
 			return EMPTY;
 		} else if (stack.hasTag()) {
-			return new ItemKeyImpl(stack.getItem(), stack.getTag());
+			return new TaggedItemImpl(stack.getItem(), stack.getTag());
 		} else {
 			return of(stack.getItem());
 		}

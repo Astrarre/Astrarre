@@ -22,8 +22,7 @@
     "astrarre-common.mixins.json",
     "astrarre-rendering.mixins.json",
     "astrarre-items.mixins.json",
-    "astrarre-network.mixins.json",
-    "astrarre-transfer.mixins.json"
+    "astrarre-network.mixins.json"
   ],
   "entrypoints": {
     "mm:early_risers": [

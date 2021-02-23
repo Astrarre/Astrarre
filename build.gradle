@@ -35,8 +35,6 @@ dependencies {
 }
 
 sourceSets {
-    generator {
-    }
     abstracter {
         runtimeClasspath += configurations.minecraftNamed
         compileClasspath += configurations.minecraftNamed

@@ -1,6 +1,6 @@
 package io.github.astrarre.itemview.internal.mixin.item;
 
-import io.github.astrarre.itemview.v0.api.item.nbt.NBTagView;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.itemview.v0.fabric.TaggedItem;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;

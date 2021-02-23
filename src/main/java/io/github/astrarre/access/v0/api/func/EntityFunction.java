@@ -2,7 +2,6 @@ package io.github.astrarre.access.v0.api.func;
 
 import java.util.function.BinaryOperator;
 
-import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.v0.entity.Entity;
 import io.github.astrarre.v0.util.math.Box;
 import io.github.astrarre.v0.util.math.Direction;

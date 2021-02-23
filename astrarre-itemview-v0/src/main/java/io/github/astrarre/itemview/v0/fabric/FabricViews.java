@@ -4,8 +4,8 @@ import java.util.List;
 
 import io.github.astrarre.itemview.internal.access.AbstractListTagAccess;
 import io.github.astrarre.itemview.internal.access.ImmutableAccess;
-import io.github.astrarre.itemview.v0.api.item.nbt.NBTType;
-import io.github.astrarre.itemview.v0.api.item.nbt.NBTagView;
+import io.github.astrarre.itemview.v0.api.nbt.NBTType;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import it.unimi.dsi.fastutil.bytes.ByteList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.longs.LongList;

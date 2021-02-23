@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "io.github.astrarre.transfer.internal.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "HopperBlockEntityMixin_ParticipantCompat",
+    "InventoryMixin_AddProvider",
+    "ItemStackMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,13 +1,13 @@
 package io.github.astrarre.itemview.internal.mixin;
 
-import io.github.astrarre.itemview.internal.ItemKeyImpl;
+import io.github.astrarre.itemview.internal.TaggedItemImpl;
 import io.github.astrarre.itemview.v0.api.item.ItemKey;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 import net.minecraft.item.Item;
 
-@Mixin(ItemKeyImpl.class)
+@Mixin(TaggedItemImpl.class)
 public abstract class ItemKeyImplMixin implements ItemKey {
 	@Override
 	@Shadow public abstract Item getItem();
