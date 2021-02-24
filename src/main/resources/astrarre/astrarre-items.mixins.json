@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "io.github.astrarre.itemview.internal.astrarre.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "ItemKeyImplMixin",
+    "ItemMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

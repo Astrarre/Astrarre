@@ -6,7 +6,7 @@ import java.util.Iterator;
 import com.google.common.collect.Iterables;
 import io.github.astrarre.transfer.v0.api.Insertable;
 import io.github.astrarre.transfer.v0.fabric.participants.FabricParticipants;
-import io.github.astrarre.util.v0.api.DualIterator;
+import io.github.astrarre.util.v0.api.collection.DualIterator;
 import io.github.astrarre.transfer.v0.api.Participant;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import it.unimi.dsi.fastutil.HashCommon;

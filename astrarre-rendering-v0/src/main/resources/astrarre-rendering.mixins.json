@@ -5,8 +5,7 @@
   "mixins": [
     "Matrix4fAccessor",
     "Matrix4fMixin",
-    "io.github.astrarre.rendering.mixin.SpriteAtlasHolderMixin",
-    "SpriteAtlasTextureMixin"
+    "SpriteMixin"
   ],
   "client": [
   ],

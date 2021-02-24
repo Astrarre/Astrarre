@@ -1,6 +1,6 @@
 package io.github.astrarre.testmod;
 
-import io.github.astrarre.rendering.v0.fabric.MatrixGraphics;
+import io.github.astrarre.rendering.internal.MatrixGraphics;
 import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.rendering.v0.api.util.Close;
 

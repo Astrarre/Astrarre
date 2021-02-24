@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "io.github.astrarre.transfer.internal.astrarre.mixin",
+  "plugin": "io.github.astrarre.transfer.internal.astrarre.InventoryTransformer",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "HopperBlockEntityMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -16,4 +16,6 @@ include 'astrarre-util-v0'
 include 'astrarre-itemview-v0'
 include 'astrarre-transfer-v0'
 include 'astrarre-access-v0'
+include 'astrarre-gui-v0'
+include 'astrarre-networking-v0'
 

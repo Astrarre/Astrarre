@@ -1,7 +1,7 @@
 package io.github.astrarre.transfer.v0.api;
 
 import io.github.astrarre.transfer.v0.api.participants.InsertableParticipant;
-import io.github.astrarre.transfer.internal.TransferInternal;
+import io.github.astrarre.transfer.internal.fabric.TransferInternal;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import org.jetbrains.annotations.Nullable;
 

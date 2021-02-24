@@ -49,6 +49,8 @@ public class Main {
 		AbstracterUtil util = AbstracterUtil.fromFile(args[0]);
 		AbstracterConfig config = util.createConfig("astrarre_manifest");
 		config.manualInterface(Identifier.class, "io/github/astrarre/util/v0/api/Id");
+		config.manualInterface(Identifier.class, "io/github/astrarre/util/v0/api/Id");
+		config.manualInterface(Sprite.class, "io/github/astrarre/rendering/v0/api/textures/SpriteInfo");
 		config.registerInterface(Sprite.class);
 		config.registerInterface(new PacketByteBufAbs());
 		config.registerInterface(new ItemStackAbs());

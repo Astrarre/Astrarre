@@ -1,11 +1,21 @@
 package io.github.astrarre.util.v0.api;
 
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.jetbrains.annotations.Nullable;
 
 public class Validate {
 	public static void void_(Object object) {}
+
+	/**
+	 * @throws T rethrows {@code throwable}
+	 * @return nothing, because it throws
+	 */
+	@SuppressWarnings ("unchecked")
+	public static <T extends Throwable> RuntimeException rethrow(Throwable throwable) throws T {
+		throw (T) throwable;
+	}
 
 	/**
 	 * @param name the name of the parameter
@@ -74,6 +84,12 @@ public class Validate {
 	public static void isTrue(boolean va, String msg) {
 		if (!va) {
 			throw new IllegalArgumentException(msg);
+		}
+	}
+
+	public static void isNull(Object value, String error) {
+		if(value != null) {
+			throw new IllegalArgumentException(error);
 		}
 	}
 }

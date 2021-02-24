@@ -18,16 +18,15 @@
     "fabricloader": ">=0.8.9"
   },
   "mixins": [
-    "astrarre-access.mixins.json",
-    "astrarre-common.mixins.json",
-    "astrarre-rendering.mixins.json",
-    "astrarre-items.mixins.json",
-    "astrarre-network.mixins.json",
-    "astrarre-transfer.mixins.json"
+    "astrarre/astrarre-access.mixins.json",
+    "astrarre/astrarre-common.mixins.json",
+    "astrarre/astrarre-rendering.mixins.json",
+    "astrarre/astrarre-items.mixins.json",
+    "astrarre/astrarre-transfer.mixins.json"
   ],
   "entrypoints": {
     "mm:early_risers": [
-      "io.github.astrarre.abstraction.internal.AbstractionApplicator"
+      "io.github.astrarre.abstraction.internal.astrarre.AbstractionApplicator"
     ]
   }
 }

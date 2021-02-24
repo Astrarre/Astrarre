@@ -7,8 +7,8 @@ import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.access.v0.api.cache.CachedWorldQuery;
 import io.github.astrarre.itemview.v0.api.item.ItemKey;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
-import io.github.astrarre.transfer.internal.TransferInternalAstrarre;
-import io.github.astrarre.transfer.internal.inventory.EmptyInventory;
+import io.github.astrarre.transfer.internal.astrarre.TransferInternalAstrarre;
+import io.github.astrarre.transfer.internal.fabric.inventory.EmptyInventory;
 import io.github.astrarre.transfer.v0.api.AstrarreParticipants;
 import io.github.astrarre.transfer.v0.api.Insertable;
 import io.github.astrarre.transfer.v0.api.Participant;
@@ -46,7 +46,7 @@ public class TestModBlock extends Block implements BlockEntityProvider, Inventor
 	public SidedInventory getInventory(BlockState state, WorldAccess world, BlockPos pos) {
 		if (world instanceof World) {
 			return TransferInternalAstrarre
-					       .getSidedInventoryAt((io.github.astrarre.v0.world.World) world, (io.github.astrarre.v0.util.math.BlockPos) pos);
+					       .getSidedInventoryAt(AstrarreParticipants.ITEM_WORLD.get(), (io.github.astrarre.v0.world.World) world, (io.github.astrarre.v0.util.math.BlockPos) pos, null, null);
 		}
 		return EmptyInventory.INSTANCE;
 	}

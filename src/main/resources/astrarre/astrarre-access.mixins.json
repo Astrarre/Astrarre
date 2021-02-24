@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "io.github.astrarre.access.internal.astrarre.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "BlockEntityMixin",
+    "WorldChunkMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

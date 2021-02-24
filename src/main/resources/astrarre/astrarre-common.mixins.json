@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "io.github.astrarre.common.internal.astrarre.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "MinecraftServerMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

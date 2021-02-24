@@ -2,8 +2,8 @@ package io.github.astrarre.access.v0.api.cache;
 
 import java.lang.ref.WeakReference;
 
-import io.github.astrarre.access.internal.access.WorldChunkAccess;
-import io.github.astrarre.access.internal.access.BlockEntityAccess;
+import io.github.astrarre.access.internal.astrarre.access.WorldChunkAccess;
+import io.github.astrarre.access.internal.astrarre.access.BlockEntityAccess;
 import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.access.v0.api.func.WorldFunction;
 import io.github.astrarre.v0.block.BlockState;

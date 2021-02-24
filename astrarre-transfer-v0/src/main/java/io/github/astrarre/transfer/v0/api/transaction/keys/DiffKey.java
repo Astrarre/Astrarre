@@ -3,7 +3,7 @@ package io.github.astrarre.transfer.v0.api.transaction.keys;
 import java.util.HashMap;
 
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
-import io.github.astrarre.util.v0.api.MapDiff;
+import io.github.astrarre.util.v0.api.collection.MapDiff;
 
 /**
  * a key who's type is mutable, but can be 'diffed' and 'patched'.

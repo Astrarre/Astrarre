@@ -2,7 +2,7 @@ package io.github.astrarre.rendering.v0.api.util;
 
 import io.github.astrarre.rendering.internal.mixin.Matrix4fAccessor;
 import io.github.astrarre.rendering.internal.util.MathUtil;
-import io.github.astrarre.util.v0.api.UnsafeFloatArrayList;
+import io.github.astrarre.util.v0.api.collection.UnsafeFloatArrayList;
 import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.util.v0.api.Validate;
 
@@ -87,4 +87,5 @@ public final class Polygon {
 			return new Polygon(this.list.arr(), 0, this.list.size());
 		}
 	}
+
 }

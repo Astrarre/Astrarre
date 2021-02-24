@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "astrarre-networking-v0",
+  "name": "Astrarre Networking v0",
+  "description": "Custom Packet Networking for the Astrarre API",
+  "version": "${version}",
+  "environment": "*",
+  "license": "LGPL-3.0",
+  "contact": {
+    "sources": "https://github.com/Astrarre/Astrarre"
+  },
+  "authors": [
+    "HalfOf2",
+    "Astrarre"
+  ],
+  "depends": {
+    "fabricloader": ">=0.8.9"
+  },
+  "mixins": [
+    "astrarre-network.mixins.json"
+  ]
+}

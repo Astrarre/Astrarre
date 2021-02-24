@@ -26,6 +26,7 @@ public class TestMod implements ModInitializer {
 	public void onInitialize() {
 		System.out.println(HopperBlockEntity.ABOVE_SHAPE);
 		Registry.register(Registry.ITEM, new Identifier("testmod", "test"), new ItemA(new Item.Settings().group(ItemGroup.MISC)));
+		System.exit(0);
 	}
 
 	static class ItemA extends Item {

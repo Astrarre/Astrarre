@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 
 
 import io.github.astrarre.rendering.internal.textures.AstrarreSpriteManager;
+import io.github.astrarre.rendering.v0.api.textures.SpriteInfo;
 import io.github.astrarre.util.v0.api.Id;
 import io.github.astrarre.util.v0.api.Validate;
 import io.github.astrarre.v0.client.texture.Sprite;
@@ -51,9 +52,9 @@ public interface SpriteManager {
 		return (SpriteManager) manager;
 	}
 
-	void forEach(Consumer<Sprite> consumer);
+	void forEach(Consumer<SpriteInfo> consumer);
 
-	Sprite getSprite(Id sprite);
+	SpriteInfo getSprite(Id sprite);
 
 	class Builder {
 		private final String modid;
