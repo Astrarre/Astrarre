@@ -5,9 +5,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.UTFDataFormatException;
 
-import io.github.astrarre.networking.v0.api.Output;
+import io.github.astrarre.networking.v0.api.io.Output;
 import io.github.astrarre.util.v0.api.Validate;
-import io.netty.buffer.ByteBuf;
 import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.network.PacketByteBuf;

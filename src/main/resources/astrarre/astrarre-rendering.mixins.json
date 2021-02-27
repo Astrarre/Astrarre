@@ -3,7 +3,6 @@
   "package": "io.github.astrarre.rendering.internal.astrarre.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "AstrarreMatrixGraphicsMixin",
     "SpriteAtlasHolderMixin",
     "SpriteAtlasTextureMixin"
   ],

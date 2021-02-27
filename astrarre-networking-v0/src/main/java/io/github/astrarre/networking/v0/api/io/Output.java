@@ -1,7 +1,8 @@
-package io.github.astrarre.networking.v0.api;
+package io.github.astrarre.networking.v0.api.io;
 
 import java.io.DataOutput;
 
+import io.github.astrarre.util.v0.api.Id;
 import org.jetbrains.annotations.NotNull;
 
 public interface Output extends DataOutput {
@@ -17,6 +18,10 @@ public interface Output extends DataOutput {
 		}
 	}
 
+	default void writeId(Id id) {
+		this.writeUTF(id.id());
+		this.writeUTF(id.path());
+	}
 	
 	/**
 	 * {@inheritDoc}
@@ -101,4 +106,8 @@ public interface Output extends DataOutput {
 	 */
 	@Override
 	void writeUTF(@NotNull String s);
+
+	default void writeEnum(Enum<?> type) {
+		this.writeInt(type.ordinal());
+	}
 }

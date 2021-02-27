@@ -17,7 +17,7 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id "com.jfrog.bintray" version "1.8.4"
-    id "fabric-loom" version "0.5.43"
+    id "fabric-loom" version "0.6-SNAPSHOT"
 }
 
 
@@ -25,7 +25,7 @@ version '0.0.0'
 
 loom {
     shareCaches = true
-    runDir = "run"
+    //runDir = "run"
 }
 
 apply from: 'scripts/allprojects.gradle'

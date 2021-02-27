@@ -92,4 +92,10 @@ public class Validate {
 			throw new IllegalArgumentException(error);
 		}
 	}
+
+	public static void lessThan(int index, int length, String s) {
+		if (index >= length) {
+			throw new IllegalArgumentException(s);
+		}
+	}
 }

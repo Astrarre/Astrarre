@@ -12,6 +12,7 @@ import net.minecraft.util.math.Quaternion;
  * To take full advantage of optimization capabilities, store these in static fields
  */
 public final class Transformation {
+	public static final Transformation EMPTY = Transformation.translate(0, 0, 0);
 	public final float roll, pitch, yaw;
 	public final float offX, offY, offZ;
 	public final float scaleX, scaleY, scaleZ;

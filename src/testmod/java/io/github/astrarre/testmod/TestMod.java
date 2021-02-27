@@ -1,5 +1,9 @@
 package io.github.astrarre.testmod;
 
+import io.github.astrarre.recipies.v0.api.Recipe;
+import io.github.astrarre.recipies.v0.api.ingredient.IntIngredient;
+import io.github.astrarre.util.v0.api.Validate;
+
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -19,14 +23,20 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
 
 public class TestMod implements ModInitializer {
-	public static final Block TEST_BLOCK = Registry.register(Registry.BLOCK, "testmod:be_test", new TestModBlock(AbstractBlock.Settings.copy(Blocks.STONE)));
-	public static final BlockEntityType<?> BE_TYPE = Registry.register(Registry.BLOCK_ENTITY_TYPE, "testmod:be_test", BlockEntityType.Builder.create(TestModBlock.Entity::new, TEST_BLOCK).build(null));
+	public static final Block TEST_BLOCK = Registry.register(
+			Registry.BLOCK,
+			"testmod:be_test",
+			new TestModBlock(AbstractBlock.Settings.copy(Blocks.STONE)));
+	public static final BlockEntityType<?> BE_TYPE = Registry.register(
+			Registry.BLOCK_ENTITY_TYPE,
+			"testmod:be_test",
+			BlockEntityType.Builder.create(TestModBlock.Entity::new, TEST_BLOCK).build(null));
 
 	@Override
 	public void onInitialize() {
 		System.out.println(HopperBlockEntity.ABOVE_SHAPE);
 		Registry.register(Registry.ITEM, new Identifier("testmod", "test"), new ItemA(new Item.Settings().group(ItemGroup.MISC)));
-		System.exit(0);
+		Recipe.getInput(new IntIngredient(), "test");
 	}
 
 	static class ItemA extends Item {
@@ -37,7 +47,11 @@ public class TestMod implements ModInitializer {
 		@Override
 		@Environment (EnvType.CLIENT)
 		public ActionResult useOnBlock(ItemUsageContext context) {
-			MinecraftClient.getInstance().openScreen(new AstrarreScreen(new LiteralText("aaaaaaa")));
+			try {
+				MinecraftClient.getInstance().openScreen(new AstrarreScreen(new LiteralText("aaaaaaa")));
+			} catch (Throwable e) {
+				e.printStackTrace();
+			}
 			return ActionResult.CONSUME;
 		}
 	}

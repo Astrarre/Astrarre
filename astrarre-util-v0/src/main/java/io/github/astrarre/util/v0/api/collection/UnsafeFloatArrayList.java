@@ -7,6 +7,10 @@ public class UnsafeFloatArrayList extends FloatArrayList {
 		super(capacity);
 	}
 
+	public UnsafeFloatArrayList(float[] a, int offset, int length) {
+		super(a, offset, length);
+	}
+
 	public float[] arr() {
 		return this.a;
 	}

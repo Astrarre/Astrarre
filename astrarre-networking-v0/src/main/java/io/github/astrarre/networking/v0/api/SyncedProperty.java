@@ -1,20 +1,21 @@
 package io.github.astrarre.networking.v0.api;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import io.github.astrarre.networking.v0.api.serializer.ToPacketSerializer;
 import io.github.astrarre.stripper.Hide;
 
 /**
  * a wrapper for a property that can be synced to the client or server
  */
 public abstract class SyncedProperty<T> {
-	protected final Map<Behavior, Consumer<T>> listeners = new HashMap<>();
-	protected final ToPacketSerializer<T> serializer;
+	protected final Map<Behavior, Consumer<T>> listeners = new EnumMap<>(Behavior.class);
+	public final ToPacketSerializer<T> serializer;
 	protected T value;
 
-	protected SyncedProperty(ToPacketSerializer<T> serializer) {
+	public SyncedProperty(ToPacketSerializer<T> serializer) {
 		this.serializer = serializer;
 	}
 
@@ -26,10 +27,15 @@ public abstract class SyncedProperty<T> {
 
 	protected abstract void synchronize(T value);
 
+	/**
+	 * @deprecated internal
+	 * @param value
+	 */
 	@Hide
-	public void onSync(T value) {
-		this.value = value;
-		this.listeners.getOrDefault(Behavior.FIRE_DEST, b -> {}).accept(value);
+	@Deprecated
+	public void onSync(Object value) {
+		this.value = (T) value;
+		this.listeners.getOrDefault(Behavior.FIRE_DEST, b -> {}).accept((T) value);
 	}
 
 	public T get() {

@@ -1,14 +1,18 @@
 package io.github.astrarre.networking.v0.api;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import io.github.astrarre.networking.internal.ByteBufDataInput;
 import io.github.astrarre.networking.mixin.CustomPayloadC2SPacketAccess;
+import io.github.astrarre.networking.v0.api.io.Input;
+import io.github.astrarre.networking.v0.api.io.Output;
 import io.github.astrarre.networking.v0.fabric.FabricData;
 import io.github.astrarre.stripper.Hide;
 import io.github.astrarre.util.v0.api.Id;
+import io.netty.buffer.Unpooled;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
@@ -26,22 +30,24 @@ import net.fabricmc.api.Environment;
 public class ModPacketHandler {
 	public static final ModPacketHandler INSTANCE = new ModPacketHandler();
 
-	// todo readOnly abstraction of PacketByteBuf
-
 	private final Multimap<Id, Receiver> asyncClientRegistry = HashMultimap.create(),
 			asyncServerRegistry = HashMultimap.create(),
 			syncClientRegistry = HashMultimap.create(),
 			syncServerRegistry = HashMultimap.create();
 
 	@Environment(EnvType.CLIENT)
-	public void sendToServer(Id id, Output output) {
-		Objects.requireNonNull(MinecraftClient.getInstance().getNetworkHandler(), "No Active Server!").sendPacket(new CustomPayloadC2SPacket((Identifier) id, FabricData.from(output)));
+	public void sendToServer(Id id, Consumer<Output> output) {
+		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+		output.accept((Output) buf);
+		Objects.requireNonNull(MinecraftClient.getInstance().getNetworkHandler(), "No Active Server!").sendPacket(new CustomPayloadC2SPacket((Identifier) id, buf));
 	}
 
 	// todo make ServerPlayerEntity abstraction in Astrarre.main have extension method for sending packet
 	@Hide
-	public void sendToClient(ServerPlayerEntity entity, Id id, Output out) {
-		entity.networkHandler.sendPacket(new CustomPayloadS2CPacket((Identifier) id, FabricData.from(out)));
+	public void sendToClient(ServerPlayerEntity entity, Id id, Consumer<Output> out) {
+		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+		out.accept((Output) buf);
+		entity.networkHandler.sendPacket(new CustomPayloadS2CPacket((Identifier) id, buf));
 	}
 
 	/**

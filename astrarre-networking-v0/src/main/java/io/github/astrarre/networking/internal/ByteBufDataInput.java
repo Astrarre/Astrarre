@@ -3,7 +3,7 @@ package io.github.astrarre.networking.internal;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import io.github.astrarre.networking.v0.api.Input;
+import io.github.astrarre.networking.v0.api.io.Input;
 import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.network.PacketByteBuf;

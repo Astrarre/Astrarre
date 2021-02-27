@@ -1,13 +1,22 @@
-package io.github.astrarre.networking.v0.api;
+package io.github.astrarre.networking.v0.api.io;
 
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import io.github.astrarre.util.v0.api.Id;
 import org.jetbrains.annotations.NotNull;
 
 public interface Input extends DataInput {
+	default <T extends Enum<T>> T readEnum(Class<T> enumClass) {
+		return enumClass.getEnumConstants()[this.readInt()];
+	}
+
+	interface BufferOperator<T> {
+		void set(Input input, T array, int index);
+	}
+
 	default void writeTo(OutputStream stream, byte[] buffer) throws IOException {
 		int count;
 		while ((count = this.read(buffer)) != -1) {
@@ -36,6 +45,9 @@ public interface Input extends DataInput {
 		return this.read(ints, off, len, (input, array, index) -> array[off + index] = input.readInt(), 4);
 	}
 
+	default Id readId() {
+		return Id.newInstance(this.readUTF(), this.readUTF());
+	}
 
 	int read(byte[] buffer);
 

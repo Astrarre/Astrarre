@@ -33,12 +33,12 @@ public class InventoryTransformer implements IMixinConfigPlugin, Opcodes {
 	 * can't reference class directly or it'll get class loaded
 	 */
 	private static final String HOOKS = Type.getInternalName(InventoryTransformer.class) + "Hooks";
-	private static final String WORLD = RESOLVER.mapClassName("intermediary", "net/minecraft/class_1937");
-	private static final String INVENTORY = RESOLVER.mapClassName("intermediary", "net/minecraft/class_1263");
+	private static final String WORLD = RESOLVER.mapClassName("intermediary", "net.minecraft.class_1937");
+	private static final String INVENTORY = RESOLVER.mapClassName("intermediary", "net.minecraft.class_1263");
 
-	private static final String DESC = String.format("(L%s;DDD)L%s;", WORLD, INVENTORY);
+	private static final String DESC = String.format("(L%s;DDD)L%s;", WORLD.replace('.', '/'), INVENTORY.replace('.', '/'));
 	private static final String NAME = FabricLoader.getInstance().getMappingResolver()
-			                                   .mapMethodName("intermediary", "net/minecraft/class_2614", "method_11251", DESC);
+			                                   .mapMethodName("intermediary", "net.minecraft.class_2614", "method_11251", DESC);
 
 
 	// @formatter:off

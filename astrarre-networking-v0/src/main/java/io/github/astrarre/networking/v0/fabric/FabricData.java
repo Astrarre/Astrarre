@@ -6,8 +6,8 @@ import java.util.function.Function;
 
 import io.github.astrarre.networking.internal.ByteBufDataInput;
 import io.github.astrarre.networking.internal.ByteBufDataOutput;
-import io.github.astrarre.networking.v0.api.Input;
-import io.github.astrarre.networking.v0.api.Output;
+import io.github.astrarre.networking.v0.api.io.Input;
+import io.github.astrarre.networking.v0.api.io.Output;
 import io.github.astrarre.util.internal.mixin.PacketByteBufAccessor;
 import io.github.astrarre.util.v0.api.Validate;
 import io.netty.buffer.ByteBufOutputStream;

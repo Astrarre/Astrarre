@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "astrarre-recipes-v0",
+  "name": "Astrarre Recipies v0",
+  "description": "Astrarre APIs recipe format and api",
+  "version": "${version}",
+  "environment": "*",
+  "license": "LGPL-3.0",
+  "contact": {
+    "sources": "https://github.com/Astrarre/Astrarre"
+  },
+  "authors": [
+    "HalfOf2",
+    "Astrarre"
+  ],
+  "depends": {
+    "fabricloader": ">=0.8.9"
+  }
+}

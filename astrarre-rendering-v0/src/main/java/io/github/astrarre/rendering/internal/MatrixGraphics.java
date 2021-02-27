@@ -20,7 +20,7 @@ import net.fabricmc.api.Environment;
 
 @Environment (EnvType.CLIENT)
 public class MatrixGraphics implements Graphics3d {
-
+	private final Close close;
 	@Hide public MatrixStack matrices;
 
 	@Hide private SetupTeardown stage;
@@ -28,6 +28,7 @@ public class MatrixGraphics implements Graphics3d {
 	@Hide
 	public MatrixGraphics(MatrixStack matrices) {
 		this.matrices = matrices;
+		this.close = () -> this.matrices.pop();
 	}
 
 	@Hide
@@ -86,6 +87,6 @@ public class MatrixGraphics implements Graphics3d {
 	public Close applyTransformation(Transformation transformation) {
 		this.matrices.push();
 		transformation.apply(this.matrices);
-		return () -> this.matrices.pop();
+		return this.close;
 	}
 }

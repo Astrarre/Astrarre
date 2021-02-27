@@ -11,42 +11,26 @@ import net.minecraft.util.Identifier;
  */
 public class Texture {
 	private final Identifier identifier;
-	private final int offX, offY, width, height;
+	private final int width, height;
 
-	public Texture(String modid, String path, int offX, int offY, int width, int height) {
-		this(Id.newInstance(modid, path), width, height, offX, offY);
+	public Texture(String modid, String path, int width, int height) {
+		this(Id.newInstance(modid, path), width, height);
 	}
 
 	/**
 	 * @param texture the path to the image
 	 * @param width the width of the image
 	 * @param height the height of the image
-	 * @param offX the 'origin' of the texture (imagine this as like a cutout of an image)
 	 */
-	public Texture(Id texture, int offX, int offY, int width, int height) {
-		this((Identifier) texture, offX, offY, width, height);
-	}
-
-	@Hide
-	public Texture(Identifier texture, int offX, int offY, int width, int height) {
-		this.identifier = texture;
-		this.offX = offX;
-		this.offY = offY;
-		this.width = Validate.positive(width, "width");
-		this.height = Validate.positive(height, "height");
-	}
-
-	public Texture(String modid, String path, int width, int height) {
-		this(Id.newInstance(modid, path), width, height, 0, 0);
-	}
-
 	public Texture(Id texture, int width, int height) {
-		this((Identifier) texture, 0, 0, width, height);
+		this((Identifier) texture, width, height);
 	}
 
 	@Hide
 	public Texture(Identifier texture, int width, int height) {
-		this(texture, 0, 0, width, height);
+		this.identifier = texture;
+		this.width = Validate.positive(width, "width");
+		this.height = Validate.positive(height, "height");
 	}
 
 	public Id getId() {
