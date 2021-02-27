@@ -1,0 +1,3 @@
+version '0.0.0'
+dependsOn(project, 'astrarre-transfer-v0')
+fapi(project)
