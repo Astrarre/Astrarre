@@ -24,6 +24,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.util.math.Vector3f;
+import net.minecraft.client.util.math.Vector4f;
+import net.minecraft.util.math.Matrix4f;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -92,7 +94,7 @@ public class Panel extends Drawable implements Interactable, Container {
 	public void add(Drawable drawable) {
 		if (!this.rootContainer.isClient()) {
 			this.toDraw.add(drawable);
-			this.sendToClient(SYNC_CLIENT, output -> drawable.write(output));
+			this.sendToClient(SYNC_CLIENT, drawable::write);
 		}
 	}
 
@@ -107,10 +109,14 @@ public class Panel extends Drawable implements Interactable, Container {
 
 	@Override
 	public void mouseMoved(double mouseX, double mouseY) {
-		Vector3f v3f = new Vector3f(0, 0, 0);
-		for (Interactable interactable : this.in(mouseX, mouseY)) {
+		Vector4f v3f = new Vector4f(0, 0, 0, 0);
+		for (Interactable interactable : this.interactables()) {
+			Drawable drawable = (Drawable) interactable;
 			transformation(interactable, v3f, mouseX, mouseY);
-			interactable.mouseMoved(v3f.getX(), v3f.getY());
+			if (drawable.getBounds().isInsideProjection(v3f.getX(), v3f.getY())) {
+				interactable.mouseMoved(v3f.getX(), v3f.getY());
+				return;
+			}
 		}
 	}
 
@@ -118,25 +124,25 @@ public class Panel extends Drawable implements Interactable, Container {
 			"unchecked",
 			"rawtypes"
 	})
-	protected Iterable<Interactable> in(double mouseX, double mouseY) {
+	protected Iterable<Interactable> interactables() {
 		return (Iterable) Iterables.filter(
 				this.toDraw,
-				input -> input instanceof Interactable && input.getBounds().isInsideProjection((float) mouseX, (float) mouseY));
+				input -> input instanceof Interactable);
 	}
 
-	private static void transformation(Interactable interactable, Vector3f vec3f, double x, double y) {
-		Transformation transformation = ((Drawable) interactable).getTransformation();
-		vec3f.set((float) x, (float) y, 0);
-		TransformationUtil.transformInverse(vec3f, transformation);
+	private static void transformation(Interactable interactable, Vector4f vector4f, double x, double y) {
+		vector4f.set((float) x, (float) y, 1, 1);
+		vector4f.transform(((Drawable)interactable).getInvertedMatrix());
 	}
 
 	@Override
 	@Environment (EnvType.CLIENT)
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		Vector3f v3f = new Vector3f(0, 0, 0);
-		for (Interactable interactable : this.in(mouseX, mouseY)) {
+		Vector4f v3f = new Vector4f(0, 0, 0, 1);
+		for (Interactable interactable : this.interactables()) {
+			Drawable drawable = (Drawable) interactable;
 			transformation(interactable, v3f, mouseX, mouseY);
-			if (interactable.mouseClicked(v3f.getX(), v3f.getY(), button)) {
+			if (drawable.getBounds().isInsideProjection(v3f.getX(), v3f.getY()) && interactable.mouseClicked(v3f.getX(), v3f.getY(), button)) {
 				return true;
 			}
 		}
@@ -145,10 +151,11 @@ public class Panel extends Drawable implements Interactable, Container {
 
 	@Override
 	public boolean mouseReleased(double mouseX, double mouseY, int button) {
-		Vector3f v3f = new Vector3f(0, 0, 0);
-		for (Interactable interactable : this.in(mouseX, mouseY)) {
+		Vector4f v3f = new Vector4f(0, 0, 0, 0);
+		for (Interactable interactable : this.interactables()) {
+			Drawable drawable = (Drawable) interactable;
 			transformation(interactable, v3f, mouseX, mouseY);
-			if (interactable.mouseReleased(v3f.getX(), v3f.getY(), button)) {
+			if (drawable.getBounds().isInsideProjection(v3f.getX(), v3f.getY()) && interactable.mouseReleased(v3f.getX(), v3f.getY(), button)) {
 				return true;
 			}
 		}
@@ -157,12 +164,12 @@ public class Panel extends Drawable implements Interactable, Container {
 
 	@Override
 	public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-		Vector3f v3f = new Vector3f(0, 0, 0);
-		for (Interactable interactable : this.in(mouseX, mouseY)) {
+		Vector4f v3f = new Vector4f(0, 0, 0, 0);
+		for (Interactable interactable : this.interactables()) {
 			transformation(interactable, v3f, mouseX, mouseY);
 			float mX = v3f.getX(), mY = v3f.getY();
 			transformation(interactable, v3f, deltaX, deltaY);
-			if (interactable.mouseDragged(mX, mY, button, v3f.getX(), v3f.getY())) {
+			if (interactable.mouseReleased(mX, mY, button) && interactable.mouseDragged(mX, mY, button, v3f.getX(), v3f.getY())) {
 				return true;
 			}
 		}
@@ -171,10 +178,11 @@ public class Panel extends Drawable implements Interactable, Container {
 
 	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		Vector3f v3f = new Vector3f(0, 0, 0);
-		for (Interactable interactable : this.in(mouseX, mouseY)) {
+		Vector4f v3f = new Vector4f(0, 0, 0, 0);
+		for (Interactable interactable : this.interactables()) {
+			Drawable drawable = (Drawable) interactable;
 			transformation(interactable, v3f, mouseX, mouseY);
-			if (interactable.mouseScrolled(v3f.getX(), v3f.getY(), amount)) {
+			if (drawable.getBounds().isInsideProjection(v3f.getX(), v3f.getY()) && interactable.mouseScrolled(v3f.getX(), v3f.getY(), amount)) {
 				return true;
 			}
 		}
@@ -207,10 +215,11 @@ public class Panel extends Drawable implements Interactable, Container {
 
 	@Override
 	public boolean mouseHover(double mouseX, double mouseY) {
-		Vector3f v3f = new Vector3f(0, 0, 0);
-		for (Interactable interactable : this.in(mouseX, mouseY)) {
+		Vector4f v3f = new Vector4f(0, 0, 0, 0);
+		for (Interactable interactable : this.interactables()) {
+			Drawable drawable = (Drawable) interactable;
 			transformation(interactable, v3f, mouseX, mouseY);
-			if (interactable.mouseHover(v3f.getX(), v3f.getY())) {
+			if (drawable.getBounds().isInsideProjection(v3f.getX(), v3f.getY()) && interactable.mouseHover(v3f.getX(), v3f.getY())) {
 				return true;
 			}
 		}
@@ -277,17 +286,18 @@ public class Panel extends Drawable implements Interactable, Container {
 
 	@Override
 	public <T extends Drawable & Interactable> T drawableAt(double x, double y) {
-		Vector3f v3f = new Vector3f(0, 0, 0);
-		for (Drawable drawable : this.toDraw) {
-			if (drawable instanceof Interactable && drawable.getBounds().isInsideProjection((float) x, (float) y)) {
-				transformation((Interactable) drawable, v3f, x, y);
-				if (drawable instanceof Container) {
-					return ((Container) drawable).drawableAt(v3f.getX(), v3f.getY());
-				} else if (((Interactable) drawable).mouseHover(v3f.getX(), v3f.getY())) {
-					return (T) drawable;
+		Vector4f v3f = new Vector4f(0, 0, 0, 0);
+		for (Interactable interactable : this.interactables()) {
+			transformation(interactable, v3f, x, y);
+			if(((Drawable)interactable).getBounds().isInsideProjection(v3f.getX(), v3f.getY())) {
+				if (interactable instanceof Container) {
+					return ((Container) interactable).drawableAt(v3f.getX(), v3f.getY());
+				} else if (interactable.mouseHover(v3f.getX(), v3f.getY())) {
+					return (T) interactable;
 				}
 			}
 		}
+
 		return null;
 	}
 

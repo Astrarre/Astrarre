@@ -14,16 +14,19 @@ import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.rendering.v0.api.util.Close;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
+import io.github.astrarre.stripper.Hide;
 import io.github.astrarre.util.v0.api.Id;
 import org.jetbrains.annotations.ApiStatus;
+
+import net.minecraft.util.math.Matrix4f;
 
 public abstract class Drawable extends DrawableInternal {
 	/**
 	 * @see DrawableRegistry#register(Id, BiFunction)
 	 */
 	public final DrawableRegistry.Entry registryId;
-	private Polygon untransformedBounds = Polygon.EMPTY;
 	private Transformation transformation = Transformation.EMPTY;
+	private Matrix4f invertedMatrix;
 	private Polygon bounds = Polygon.EMPTY;
 
 	public Drawable(RootContainer rootContainer, DrawableRegistry.Entry id) {
@@ -112,27 +115,37 @@ public abstract class Drawable extends DrawableInternal {
 	}
 
 	public void setTransformation(Transformation transformation) {
-		if (transformation == Transformation.EMPTY) {
-			this.bounds = this.untransformedBounds;
-		} else {
-			this.bounds = this.untransformedBounds.toBuilder().transform(transformation).build();
-		}
 		this.transformation = transformation;
+		this.invertedMatrix = null;
 	}
 
 	/**
-	 * @return the post-transformed bounds of this drawable
+	 * @return the untransformed bounds of this drawable
 	 */
 	public Polygon getBounds() {
 		return this.bounds;
 	}
 
 	public void setBounds(Polygon polygon) {
-		this.untransformedBounds = polygon;
-		if (this.transformation == Transformation.EMPTY) {
-			this.bounds = polygon;
-		} else {
-			this.bounds = polygon.toBuilder().transform(this.transformation).build();
+		this.bounds = polygon;
+	}
+
+	/**
+	 * @return get the matrix used to invert points so they make sense from the Drawable's perspective
+	 */
+	@Hide
+	public Matrix4f getInvertedMatrix() {
+		Matrix4f invertedMatrix = this.invertedMatrix;
+		if(invertedMatrix == null) {
+			Transformation transformation = this.transformation;
+			Matrix4f m4f = transformation.modelMatrixTransform.copy();
+			if(m4f.invert()) {
+				this.invertedMatrix = m4f;
+			} else {
+				this.invertedMatrix = transformation.modelMatrixTransform;
+			}
+			invertedMatrix = m4f;
 		}
+		return invertedMatrix;
 	}
 }

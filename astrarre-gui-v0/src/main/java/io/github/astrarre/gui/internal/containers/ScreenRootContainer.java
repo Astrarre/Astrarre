@@ -17,8 +17,6 @@ public class ScreenRootContainer<T extends Screen> extends RootContainerInternal
 
 	public ScreenRootContainer(T screen) {
 		this.screen = screen;
-		List<Element> children = (List<Element>) this.screen.children();
-		children.add(new PanelElement(this.getContentPanel()));
 	}
 
 	@Override

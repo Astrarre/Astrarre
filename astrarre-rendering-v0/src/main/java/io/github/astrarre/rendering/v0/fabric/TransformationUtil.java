@@ -4,6 +4,7 @@ import io.github.astrarre.rendering.internal.mixin.Matrix4fAccessor;
 import io.github.astrarre.rendering.v0.api.Transformation;
 
 import net.minecraft.client.util.math.Vector3f;
+import net.minecraft.client.util.math.Vector4f;
 import net.minecraft.util.math.Matrix4f;
 
 public class TransformationUtil {

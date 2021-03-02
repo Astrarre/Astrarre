@@ -6,6 +6,7 @@ import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.access.Interactable;
 import io.github.astrarre.networking.v0.api.io.Input;
 import io.github.astrarre.networking.v0.api.io.Output;
+import io.github.astrarre.rendering.internal.util.MatrixGraphicsUtil;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.rendering.v0.api.textures.Texture;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
@@ -18,9 +19,9 @@ public class Button extends Drawable implements Interactable {
 	public static final Texture PRESSED = new Texture("minecraft", "textures/gui/container/beacon.png", 256, 256);
 	public static final Polygon SQUARE_18x18 = new Polygon.Builder(4)
 			.addVertex(0, 0, 0)
-			.addVertex(0, 18, 0)
-			.addVertex(18, 18, 0)
-			.addVertex(18, 0, 0)
+			.addVertex(0, 22, 0)
+			.addVertex(22, 22, 0)
+			.addVertex(22, 0, 0)
 			.build();
 
 	/**
