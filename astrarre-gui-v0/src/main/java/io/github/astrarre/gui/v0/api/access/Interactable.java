@@ -1,4 +1,4 @@
-package io.github.astrarre.gui.v0.api.bounds;
+package io.github.astrarre.gui.v0.api.access;
 
 import net.minecraft.client.gui.Element;
 
@@ -152,31 +152,24 @@ public interface Interactable {
 	}
 
 	/**
-	 * Changes the focusing element by cycling to the next/previous element.
-	 *
-	 * This action is done typically when the user has pressed the 'Tab' or 'Ctrl+Tab'
-	 * key.
-	 *
-	 * @return {@code true} to indicate that the event handling is successful/valid
-	 *
-	 * @param lookForwards {@code true} to cycle forwards, otherwise cycle backwards
+	 * This method is for handling tab / ctrl+tab calls, if the function returns false
+	 * @return true if the component handled the cycle forward call.
 	 */
-	@Environment(EnvType.CLIENT)
-	default boolean changeFocus(boolean lookForwards) {
+	default boolean handleFocusCycle(boolean forward) {
 		return false;
 	}
 
+	default boolean canFocus() {return false;}
+	default void onFocus() {}
+	default void onLostFocus() {}
+
 	/**
-	 * Checks if the mouse position is within the bound
-	 * of the element.
-	 *
-	 * @return {@code true} if the mouse is within the bound of the element, otherwise {@code false}
-	 *
+	 * @return {@code true} if the mouse is within the bound of the element
 	 * @param mouseX the X coordinate of the mouse
 	 * @param mouseY the Y coordinate of the mouse
 	 */
 	@Environment(EnvType.CLIENT)
-	default boolean isMouseOver(double mouseX, double mouseY) {
+	default boolean mouseHover(double mouseX, double mouseY) {
 		return false;
 	}
 }

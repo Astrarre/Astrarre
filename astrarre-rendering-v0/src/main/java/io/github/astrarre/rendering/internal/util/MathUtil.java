@@ -39,7 +39,7 @@ public class MathUtil {
 	}
 
 	public static boolean onSegment(float px, float py, float qx, float qy, float rx, float ry) {
-		return lessThanEqualTo(qx, Math.max(px, rx)) && qx >= Math.min(px, rx) && lessThanEqualTo(qy, Math.max(py, ry)) && qy >= Math.min(py, ry);
+		return lessThanEqualTo(qx, Math.max(px, rx)) && greaterThanEqualTo(qx, Math.min(px, rx)) && lessThanEqualTo(qy, Math.max(py, ry)) && greaterThanEqualTo(qy, Math.min(py, ry));
 	}
 
 	private static boolean lessThanEqualTo(float a, float b) {

@@ -1,14 +1,19 @@
 package io.github.astrarre.gui.v0.api;
 
-import io.github.astrarre.gui.v0.api.bounds.Interactable;
+import java.util.Iterator;
+
+import io.github.astrarre.gui.v0.api.access.Container;
+import io.github.astrarre.gui.v0.api.access.Interactable;
+import io.github.astrarre.gui.v0.api.panel.Panel;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
 import io.github.astrarre.stripper.Hide;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * root container, this is not meant to be implemented. Astrarre implements it for Screen and HUD
  * todo allow adding components from the client
  */
-public interface Container {
+public interface RootContainer {
 	enum Type {
 		HUD,
 		SCREEN
@@ -18,10 +23,7 @@ public interface Container {
 
 	boolean isClient();
 
-	/**
-	 * adds a component to draw to the container (also adds it to root)
-	 */
-	void add(Drawable drawable);
+	Panel getContentPanel();
 
 	/**
 	 * if {@link #getType()} == {@link Type#SCREEN} The iterable will be empty if on the clientside
@@ -30,7 +32,7 @@ public interface Container {
 	@Hide
 	Iterable<NetworkMember> getViewers();
 
-	boolean setFocus(Interactable drawable);
+	<T extends Drawable & Interactable> void setFocus(T drawable);
 
 	/**
 	 * @return true if the user is dragging their mouse (in hud this is always false)

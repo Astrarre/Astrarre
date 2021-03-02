@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import io.github.astrarre.networking.internal.ByteBufDataInput;
+import io.github.astrarre.networking.internal.ByteBufDataOutput;
 import io.github.astrarre.networking.mixin.CustomPayloadC2SPacketAccess;
 import io.github.astrarre.networking.v0.api.io.Input;
 import io.github.astrarre.networking.v0.api.io.Output;
@@ -38,7 +39,7 @@ public class ModPacketHandler {
 	@Environment(EnvType.CLIENT)
 	public void sendToServer(Id id, Consumer<Output> output) {
 		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-		output.accept((Output) buf);
+		output.accept(new ByteBufDataOutput(buf));
 		Objects.requireNonNull(MinecraftClient.getInstance().getNetworkHandler(), "No Active Server!").sendPacket(new CustomPayloadC2SPacket((Identifier) id, buf));
 	}
 
@@ -46,7 +47,7 @@ public class ModPacketHandler {
 	@Hide
 	public void sendToClient(ServerPlayerEntity entity, Id id, Consumer<Output> out) {
 		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-		out.accept((Output) buf);
+		out.accept(new ByteBufDataOutput(buf));
 		entity.networkHandler.sendPacket(new CustomPayloadS2CPacket((Identifier) id, buf));
 	}
 

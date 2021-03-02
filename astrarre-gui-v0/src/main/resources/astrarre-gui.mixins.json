@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "io.github.astrarre.gui.internal.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "HandledScreenAccessor",
+    "HandledScreenMixin",
+    "ScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

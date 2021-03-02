@@ -1,9 +1,9 @@
 package io.github.astrarre.gui.v0.api.drawable;
 
-import io.github.astrarre.gui.v0.api.Container;
+import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.Drawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
-import io.github.astrarre.gui.v0.api.bounds.Interactable;
+import io.github.astrarre.gui.v0.api.access.Interactable;
 import io.github.astrarre.networking.v0.api.io.Input;
 import io.github.astrarre.networking.v0.api.io.Output;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
@@ -23,33 +23,36 @@ public class Button extends Drawable implements Interactable {
 			.addVertex(18, 0, 0)
 			.build();
 
+	/**
+	 * the channel id for button toggling
+	 */
 	public static final int BUTTON_TOGGLE = 0;
 	protected boolean state;
 
 	@Environment(EnvType.CLIENT)
 	protected boolean highlighted;
 
-	public Button(Container container) {
-		super(container, DrawableRegistry.BUTTON);
+	public Button(RootContainer rootContainer) {
+		super(rootContainer, DrawableRegistry.BUTTON);
 		this.setBounds(SQUARE_18x18);
 	}
 
-	public Button(Container container, Input input) {
-		this(container);
+	public Button(RootContainer rootContainer, Input input) {
+		this(rootContainer);
 		this.state = input.readBoolean();
 	}
 
 	@Override
 	protected void render0(Graphics3d graphics, float tickDelta) {
 		if(this.state) {
-			graphics.drawTexture(PRESSED, 0, 219, 18, 237);
+			graphics.drawTexture(PRESSED, 0, 219, 22, 241);
 		} else {
-			graphics.drawTexture(UNPRESS, 18, 219, 36, 237);
+			graphics.drawTexture(UNPRESS, 22, 219, 44, 241);
 		}
 	}
 
 	@Override
-	public void write(Output output) {
+	public void write0(Output output) {
 		output.writeBoolean(this.state);
 	}
 
@@ -62,7 +65,8 @@ public class Button extends Drawable implements Interactable {
 	}
 
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+	@Environment(EnvType.CLIENT)
+	public boolean mouseReleased(double mouseX, double mouseY, int button) {
 		this.state ^= true;
 		this.sendToServer(BUTTON_TOGGLE, o -> o.writeBoolean(this.state));
 		return true;
@@ -70,7 +74,7 @@ public class Button extends Drawable implements Interactable {
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	public boolean isMouseOver(double mouseX, double mouseY) {
+	public boolean mouseHover(double mouseX, double mouseY) {
 		this.highlighted = true;
 		return true;
 	}

@@ -22,6 +22,28 @@ public class MatrixGraphicsUtil {
 	 */
 	public static final int MIN_WIDTH = 320, MIN_HEIGHT = 240;
 
+	public static void line(MatrixStack matrices, float x0, float x1, float y0, float y1, int color) {
+		Matrix4f matrix = matrices.peek().getModel();
+
+		float a = (float)(color >> 24 & 255) / 255.0F;
+		float r = (float)(color >> 16 & 255) / 255.0F;
+		float g = (float)(color >> 8 & 255) / 255.0F;
+		float b = (float)(color & 255) / 255.0F;
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		RenderSystem.enableBlend();
+		RenderSystem.disableTexture();
+		RenderSystem.defaultBlendFunc();
+
+		bufferBuilder.begin(1, VertexFormats.POSITION_COLOR);
+		bufferBuilder.vertex(matrix, x0, y0, 0F).color(r, g, b, a).next();
+		bufferBuilder.vertex(matrix, x1, y1, 0F).color(r, g, b, a).next();
+		bufferBuilder.end();
+
+		BufferRenderer.draw(bufferBuilder);
+		RenderSystem.enableTexture();
+		RenderSystem.disableBlend();
+	}
+
 	/**
 	 * @see DrawableHelper#fill(Matrix4f, int, int, int, int, int)
 	 */

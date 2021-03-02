@@ -3,6 +3,7 @@ package io.github.astrarre.gui.v0.api;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
+import io.github.astrarre.gui.internal.RootContainerInternal;
 import io.github.astrarre.gui.internal.DrawableInternal;
 import io.github.astrarre.gui.internal.GuiPacketHandler;
 import io.github.astrarre.networking.v0.api.ModPacketHandler;
@@ -25,10 +26,12 @@ public abstract class Drawable extends DrawableInternal {
 	private Transformation transformation = Transformation.EMPTY;
 	private Polygon bounds = Polygon.EMPTY;
 
-	public Drawable(Container container, DrawableRegistry.Entry id) {
-		super(container);
+	public Drawable(RootContainer rootContainer, DrawableRegistry.Entry id) {
+		super(rootContainer);
 		this.registryId = id;
 	}
+
+
 
 	public final void render(Graphics3d graphics, float tickDelta) {
 		try (Close close = graphics.applyTransformation(this.transformation)) {
@@ -46,7 +49,17 @@ public abstract class Drawable extends DrawableInternal {
 	/**
 	 * @throws UnsupportedOperationException if this is a clientside component only and cannot be sent from the server
 	 */
-	public void write(Output output) {}
+	public final void write(Output output) {
+		output.writeId(this.registryId.id);
+		output.writeInt(this.getSyncId());
+		this.write0(output);
+	}
+
+	public static Drawable read(RootContainer rootContainer, Input input) {
+		return RootContainerInternal.readDrawable(rootContainer, input);
+	}
+
+	protected abstract void write0(Output output);
 
 	/**
 	 * send a packet to the client side counterparts of this drawable
@@ -54,11 +67,11 @@ public abstract class Drawable extends DrawableInternal {
 	 * @param channel an internal channel id for this specific drawable
 	 */
 	public final void sendToClient(int channel, Consumer<Output> consumer) {
-		for (NetworkMember viewer : this.container.getViewers()) {
+		for (NetworkMember viewer : this.rootContainer.getViewers()) {
 			viewer.send(GuiPacketHandler.DRAWABLE_PACKET_CHANNEL, output -> {
 				output.writeInt(channel);
-				output.writeEnum(this.container.getType());
-				output.writeInt(this.getId());
+				output.writeEnum(this.rootContainer.getType());
+				output.writeInt(this.getSyncId());
 				consumer.accept(output);
 			});
 		}
@@ -73,8 +86,8 @@ public abstract class Drawable extends DrawableInternal {
 	public final void sendToServer(int channel, Consumer<Output> consumer) {
 		ModPacketHandler.INSTANCE.sendToServer(GuiPacketHandler.DRAWABLE_PACKET_CHANNEL, output -> {
 			output.writeInt(channel);
-			output.writeEnum(this.container.getType());
-			output.writeInt(this.getId());
+			output.writeEnum(this.rootContainer.getType());
+			output.writeInt(this.getSyncId());
 			consumer.accept(output);
 		});
 	}

@@ -5,6 +5,9 @@ import io.github.astrarre.rendering.internal.util.MathUtil;
 import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.util.v0.api.Validate;
 import io.github.astrarre.util.v0.api.collection.UnsafeFloatArrayList;
+import org.lwjgl.system.CallbackI;
+
+import net.minecraft.client.util.math.Vector4f;
 
 public final class Polygon {
 	public static final float EPSILON = .0001f;
@@ -77,7 +80,7 @@ public final class Polygon {
 				z);
 	}
 
-	private boolean isInsideProjection(float px, float py) {
+	public boolean isInsideProjection(float px, float py) {
 		int count = 0;
 		int vertices = this.vertices();
 		for (int i = 0; i < vertices; i++) {
@@ -92,6 +95,7 @@ public final class Polygon {
 		}
 		return (count % 2 == 1); // Same as (count%2 == 1)
 	}
+
 
 	public int vertices() {
 		return this.length / 3;
@@ -122,6 +126,17 @@ public final class Polygon {
 		return new Builder(new UnsafeFloatArrayList(this.vertices, this.offset, this.length));
 	}
 
+	public interface PointWalker {
+		void accept(float x1, float y1, float z1, float x2, float y2, float z2);
+	}
+
+	public void walk(PointWalker walker) {
+		int vertices = this.vertices();
+		for (int i = 0; i < vertices; i++) {
+			walker.accept(this.getX(i), this.getY(i), this.getZ(i), this.getX((i + 1) % vertices), this.getY((i + 1) % vertices), this.getZ((i + 1) % vertices));
+		}
+	}
+
 	/**
 	 * this builder can be re-used
 	 *
@@ -142,16 +157,20 @@ public final class Polygon {
 		}
 
 		public Builder transform(Transformation transformation) {
+			Vector4f v4f = new Vector4f(0, 0, 0, 1);
+			transformation.init();
+
 			for (int i = 0; i < this.list.size(); i += 3) {
-				transformation.init();
-				Matrix4fAccessor matrix = (Matrix4fAccessor) (Object) transformation.modelMatrixTransform;
 				float f = this.list.getFloat(i);
 				float g = this.list.getFloat(i + 1);
 				float h = this.list.getFloat(i + 2);
-				this.list.set(i, matrix.getA00() * f + matrix.getA01() * g + matrix.getA02() * h);
-				this.list.set(i, matrix.getA10() * f + matrix.getA11() * g + matrix.getA12() * h);
-				this.list.set(i, matrix.getA20() * f + matrix.getA21() * g + matrix.getA22() * h);
+				v4f.set(f, g, h, 1);
+				v4f.transform(transformation.modelMatrixTransform);
+				this.list.set(i, v4f.getX());
+				this.list.set(i+1, v4f.getY());
+				this.list.set(i+2, v4f.getZ());
 			}
+
 			return this;
 		}
 

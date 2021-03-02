@@ -1,8 +1,7 @@
 package io.github.astrarre.gui.internal.access;
 
-import io.github.astrarre.gui.internal.ContainerInternal;
-import io.github.astrarre.gui.v0.api.Container;
+import io.github.astrarre.gui.internal.RootContainerInternal;
 
 public interface ContainerAccess {
-	ContainerInternal getContainer();
+	RootContainerInternal getContainer();
 }

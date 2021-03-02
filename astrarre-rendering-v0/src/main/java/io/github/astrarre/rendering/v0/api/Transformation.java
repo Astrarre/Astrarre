@@ -115,6 +115,7 @@ public final class Transformation {
 		translateRotate.multiply(new Quaternion(this.roll, this.pitch, this.yaw, true));
 		Matrix4f matrix4f = Matrix4f.scale(this.scaleX, this.scaleY, this.scaleZ);
 		translateRotate.multiply(matrix4f);
+
 		this.modelMatrixTransform = translateRotate;
 	}
 }
