@@ -1,9 +1,15 @@
 package io.github.astrarre.rendering.v0.api;
 
+import io.github.astrarre.itemview.v0.fabric.TaggedItem;
 import io.github.astrarre.rendering.v0.api.textures.SpriteInfo;
 import io.github.astrarre.rendering.v0.api.textures.Texture;
 import io.github.astrarre.rendering.v0.api.util.Close;
 import io.github.astrarre.stripper.Hide;
+
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.item.ItemStack;
+import net.minecraft.text.OrderedText;
+import net.minecraft.text.Text;
 
 /**
  * Graphics3d, confusingly this is also used for GUIs because they can have layers and things can overlap
@@ -24,7 +30,29 @@ public interface Graphics3d {
 		return getARGB(0xff, red, green, blue);
 	}
 
+	static int getWidth(String text) {
+		return MinecraftClient.getInstance().textRenderer.getWidth(text);
+	}
+
+	@Hide
+	static int getWidth(Text text) {
+		return MinecraftClient.getInstance().textRenderer.getWidth(text);
+	}
+
+	@Hide
+	static int getWidth(OrderedText text) {
+		return MinecraftClient.getInstance().textRenderer.getWidth(text);
+	}
+
+	void drawText(String text, int color, boolean shadow);
+
 	// todo drawText, adventure text abstraction
+
+	@Hide
+	void drawText(Text text, int color, boolean shadow);
+
+	@Hide
+	void drawText(OrderedText text, int color, boolean shadow);
 
 	/**
 	 * draws a sprite along the xy plane
@@ -33,10 +61,17 @@ public interface Graphics3d {
 	void drawSprite(SpriteInfo sprite);
 
 	/**
-	 * Crops the texture from (x1, y1) -> (x2, y2) and draws it
+	 * Crops the texture from (x1, y1) -> (x1 + width, y1 + height) and draws it
 	 * @param texture the texture to draw
 	 */
-	void drawTexture(Texture texture, int x1, int y1, int x2, int y2);
+	void drawTexture(Texture texture, int x1, int y1, int width, int height);
+
+	void drawLine(float x1, float y1, float x2, float y2, int color);
+
+	void drawItem(TaggedItem stack);
+
+	@Hide
+	void drawItem(ItemStack stack);
 
 	/**
 	 * Draws a line from a starting position to a specified length. (Drawn along the X axis)

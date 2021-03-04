@@ -20,9 +20,9 @@ public class ServerPlayNetworkHandlerMixin {
 	@Inject (method = "onCustomPayload", at = @At ("HEAD"))
 	private void onCustomPayloadAsync(CustomPayloadC2SPacket packet, CallbackInfo ci) {
 		if (this.player.getServerWorld().getServer().isOnThread()) {
-			ModPacketHandler.INSTANCE.onReceive(packet);
+			ModPacketHandler.INSTANCE.onReceive(this.player, packet);
 		} else {
-			ModPacketHandler.INSTANCE.onReceiveAsync(packet);
+			ModPacketHandler.INSTANCE.onReceiveAsync(this.player, packet);
 			NetworkThreadUtils.forceMainThread(packet, (ServerPlayPacketListener)this, this.player.getServerWorld());
 		}
 	}

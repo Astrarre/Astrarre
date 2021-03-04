@@ -18,5 +18,10 @@
   },
   "mixins": [
     "astrarre-gui.mixins.json"
-  ]
+  ],
+  "entrypoints": {
+    "main": [
+      "io.github.astrarre.gui.internal.AstrarreInitializer"
+    ]
+  }
 }

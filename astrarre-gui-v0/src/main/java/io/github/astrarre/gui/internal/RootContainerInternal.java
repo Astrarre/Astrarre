@@ -1,18 +1,17 @@
 package io.github.astrarre.gui.internal;
 
 import java.util.Random;
-import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
-import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.Drawable;
-import io.github.astrarre.gui.v0.api.DrawableRegistry;
+import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.access.Interactable;
 import io.github.astrarre.gui.v0.api.panel.Panel;
 import io.github.astrarre.networking.v0.api.io.Input;
 import io.github.astrarre.networking.v0.api.io.Output;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
 import io.github.astrarre.stripper.Hide;
-import io.github.astrarre.util.v0.api.Id;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
@@ -23,20 +22,26 @@ public abstract class RootContainerInternal implements RootContainer {
 	private final Object2IntOpenHashMap<Drawable> componentRegistry = new Object2IntOpenHashMap<>();
 	private final Int2ObjectOpenHashMap<Drawable> reversedRegistry = new Int2ObjectOpenHashMap<>();
 	protected final Panel panel;
-
+	int tick;
 	private int nextId = RANDOM.nextInt(), nextClientId = this.nextId + Integer.MAX_VALUE;
 
 	protected RootContainerInternal() {
 		this.panel = new Panel(this);
 	}
 
-	protected RootContainerInternal(Input input) {
+	protected RootContainerInternal(Consumer<RootContainerInternal> toRun, Input input) {
+		toRun.accept(this);
 		int size = input.readInt();
 		for (int i = 0; i < size && input.bytes() > 0; i++) {
-			Drawable drawable = readDrawable(this, input);
+			Drawable drawable = Drawable.read(this, input);
 			this.addSynced(drawable);
 		}
-		this.panel = (Panel) Drawable.read(this, input);
+		int panelId = input.readInt();
+		this.panel = (Panel) this.forId(panelId);
+	}
+
+	protected RootContainerInternal(Input input) {
+		this(internal -> {}, input);
 	}
 
 	@Override
@@ -59,7 +64,12 @@ public abstract class RootContainerInternal implements RootContainer {
 		return id;
 	}
 
+	@Override
+	public <T extends Drawable & Interactable> void setFocus(T drawable) {
+		this.panel.setFocused(drawable, -1);
+	}
 
+	@Override
 	@Nullable
 	public Drawable forId(int id) {
 		return this.reversedRegistry.get(id);
@@ -80,35 +90,29 @@ public abstract class RootContainerInternal implements RootContainer {
 	 */
 	@Hide
 	@Deprecated
-	void write(Output output) {
+	public void write(Output output) {
 		output.writeInt(this.componentRegistry.size());
 		for (Drawable drawable : this.componentRegistry.keySet()) {
 			drawable.write(output);
 		}
-		this.panel.write(output);
-	}
-
-	/**
-	 * id     | Identifer
-	 * syncId | int
-	 * ------------------
-	 * rest of input
-	 */
-	public static Drawable readDrawable(RootContainer rootContainer, Input input) {
-		Id id = input.readId();
-		BiFunction<RootContainer, Input, Drawable> function = DrawableRegistry.forId(id);
-		if (function == null || input.bytes() < 4) {
-			throw new IllegalStateException("Broken (d/s)erializer!");
-		} else {
-			int syncId = input.readInt();
-			Drawable drawable = function.apply(rootContainer, input);
-			((DrawableInternal) drawable).id = syncId;
-			return drawable;
-		}
+		output.writeInt(this.panel.getSyncId());
 	}
 
 	void addSynced(Drawable drawable) {
 		this.componentRegistry.put(drawable, drawable.getSyncId());
+		ObjectIterator<Int2ObjectMap.Entry<Drawable>> iterator = this.reversedRegistry.int2ObjectEntrySet().iterator();
+		while (iterator.hasNext()) {
+			Int2ObjectMap.Entry<Drawable> entry = iterator.next();
+			if (entry.getValue() == drawable) {
+				iterator.remove();
+				break;
+			}
+		}
 		this.reversedRegistry.put(drawable.getSyncId(), drawable);
+	}
+
+	@Override
+	public int tick() {
+		return this.tick;
 	}
 }

@@ -1,8 +1,10 @@
 package io.github.astrarre.testmod;
 
-import io.github.astrarre.gui.internal.RootContainerInternal;
-import io.github.astrarre.gui.internal.access.ContainerAccess;
-import io.github.astrarre.gui.v0.api.drawable.Button;
+import io.github.astrarre.gui.v0.api.RootContainer;
+import io.github.astrarre.gui.v0.api.base.Button;
+import io.github.astrarre.gui.v0.api.base.TextField;
+import io.github.astrarre.gui.v0.fabric.adapter.Slot;
+import io.github.astrarre.networking.v0.api.network.NetworkMember;
 import io.github.astrarre.recipies.v0.api.Recipe;
 import io.github.astrarre.recipies.v0.api.ingredient.IntIngredient;
 import io.github.astrarre.rendering.v0.api.Transformation;
@@ -12,12 +14,10 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.HopperBlockEntity;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.text.LiteralText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -49,15 +49,28 @@ public class TestMod implements ModInitializer {
 		@Override
 		@Environment (EnvType.CLIENT)
 		public ActionResult useOnBlock(ItemUsageContext context) {
-			try {
-				Screen screen = new Screen(new LiteralText("yeet")) {};
-				RootContainerInternal internal = ((ContainerAccess) screen).getContainer();
-				Button button = new Button(internal);
-				button.setTransformation(Transformation.translate(10, 10, 0).combine(Transformation.rotate(0, 0, 30)));
-				internal.getContentPanel().addClient(button);
-				MinecraftClient.getInstance().openScreen(screen);
-			} catch (Throwable e) {
-				e.printStackTrace();
+			PlayerEntity entity = context.getPlayer();
+			if (!context.getWorld().isClient && entity != null) {
+				RootContainer.open((NetworkMember) entity, container -> {
+					Button button = new Button(container);
+					button.setTransformation(Transformation.translate(10, 10, 0).combine(Transformation.rotate(0, 0, 30)));
+					container.getContentPanel().add(button);
+
+					TextField field = new TextField(container, 100, 10) {
+						@Override
+						protected void syncedFromClient(String string) {
+							System.out.println("Hello from the server!");
+						}
+					};
+					field.setTransformation(Transformation.translate(30, 30, 0));
+					container.getContentPanel().add(field);
+
+					for (int i = 0; i < 9; i++) {
+						Slot slot = Slot.inventorySlot(container, entity.inventory, i);
+						slot.setTransformation(Transformation.translate(150+i*22, 150, 0));
+						container.getContentPanel().add(slot);
+					}
+				});
 			}
 			return ActionResult.CONSUME;
 		}

@@ -1,34 +1,49 @@
 package io.github.astrarre.rendering.internal;
 
-import io.github.astrarre.rendering.internal.util.SetupTeardown;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
+import io.github.astrarre.itemview.v0.fabric.TaggedItem;
 import io.github.astrarre.rendering.internal.util.MatrixGraphicsUtil;
+import io.github.astrarre.rendering.internal.util.SetupTeardown;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.rendering.v0.api.textures.SpriteInfo;
 import io.github.astrarre.rendering.v0.api.textures.Texture;
 import io.github.astrarre.rendering.v0.api.util.Close;
 import io.github.astrarre.stripper.Hide;
+import io.github.astrarre.util.v0.api.Validate;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.render.DiffuseLighting;
+import net.minecraft.client.render.OverlayTexture;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.item.ItemRenderer;
+import net.minecraft.client.render.model.BakedModel;
+import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.client.texture.Sprite;
+import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.item.ItemStack;
+import net.minecraft.text.OrderedText;
+import net.minecraft.text.Text;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 @Environment (EnvType.CLIENT)
 public class MatrixGraphics implements Graphics3d {
-	private final Close close;
 	@Hide public MatrixStack matrices;
+	private TextRenderer textRenderer;
+	private ItemRenderer itemRenderer;
 
 	@Hide private SetupTeardown stage;
 
 	@Hide
 	public MatrixGraphics(MatrixStack matrices) {
 		this.matrices = matrices;
-		this.close = () -> this.matrices.pop();
 	}
 
 	@Hide
@@ -37,11 +52,47 @@ public class MatrixGraphics implements Graphics3d {
 	}
 
 	@Override
+	public void drawText(String text, int color, boolean shadow) {
+		if (shadow) {
+			this.getTextRenderer().drawWithShadow(this.matrices, text, 0, 0, color);
+		} else {
+			this.getTextRenderer().draw(this.matrices, text, 0, 0, color);
+		}
+	}
+
+	public TextRenderer getTextRenderer() {
+		TextRenderer textRenderer = this.textRenderer;
+		if (textRenderer == null) {
+			textRenderer = this.textRenderer = MinecraftClient.getInstance().textRenderer;
+		}
+		return textRenderer;
+	}
+
+	@Override
+	public void drawText(Text text, int color, boolean shadow) {
+		if (shadow) {
+			this.getTextRenderer().drawWithShadow(this.matrices, text, 0, 0, color);
+		} else {
+			this.getTextRenderer().draw(this.matrices, text, 0, 0, color);
+		}
+	}
+
+	@Override
+	public void drawText(OrderedText text, int color, boolean shadow) {
+		if (shadow) {
+			this.getTextRenderer().drawWithShadow(this.matrices, text, 0, 0, color);
+		} else {
+			this.getTextRenderer().draw(this.matrices, text, 0, 0, color);
+		}
+	}
+
+	@Override
 	public void drawSprite(SpriteInfo info) {
 		this.pushStage(null);
 		Sprite sprite = (Sprite) info;
-		DrawableHelper.drawSprite(this.matrices, 0, 0, 0, (int) (sprite.getMaxU() - sprite.getMinU()),
-				(int) (sprite.getMaxV() - sprite.getMinV()), sprite);
+		DrawableHelper
+				.drawSprite(this.matrices, 0, 0, 0, (int) (sprite.getMaxU() - sprite.getMinU()), (int) (sprite.getMaxV() - sprite.getMinV()),
+						sprite);
 	}
 
 	/**
@@ -63,9 +114,41 @@ public class MatrixGraphics implements Graphics3d {
 	}
 
 	@Override
-	public void drawTexture(Texture texture, int x1, int y1, int x2, int y2) {
+	public void drawTexture(Texture texture, int x1, int y1, int width, int height) {
+		Validate.positive(width, "Width cannot be negative!");
+		Validate.positive(height, "Height cannot be negative!");
 		MinecraftClient.getInstance().getTextureManager().bindTexture(texture.getIdentifier());
-		DrawableHelper.drawTexture(this.matrices, 0, 0, x1, y1, x2 - x1, y2 - y1, texture.getWidth(), texture.getHeight());
+		DrawableHelper.drawTexture(this.matrices, 0, 0, x1, y1, width, height, texture.getWidth(), texture.getHeight());
+	}
+
+	@Override
+	public void drawLine(float x1, float y1, float x2, float y2, int color) {
+		MatrixGraphicsUtil.line(this.matrices, x1, x2, y1, y2, color);
+	}
+
+	@Override
+	public void drawItem(TaggedItem stack) {
+		RenderSystem.pushMatrix();
+		RenderSystem.multMatrix(this.matrices.peek().getModel());
+		this.getItemRenderer().renderInGui(stack.createItemStack(1), 1, 1);
+		RenderSystem.popMatrix();
+	}
+
+	@Override
+	public void drawItem(ItemStack stack) {
+		RenderSystem.pushMatrix();
+		RenderSystem.multMatrix(this.matrices.peek().getModel());
+		this.getItemRenderer().renderGuiItemOverlay(this.getTextRenderer(), stack, 0, 0);
+		this.getItemRenderer().renderInGui(stack, 1, 1);
+		RenderSystem.popMatrix();
+	}
+
+	public ItemRenderer getItemRenderer() {
+		ItemRenderer itemRenderer = this.itemRenderer;
+		if (itemRenderer == null) {
+			itemRenderer = this.itemRenderer = MinecraftClient.getInstance().getItemRenderer();
+		}
+		return itemRenderer;
 	}
 
 	@Override
@@ -87,6 +170,6 @@ public class MatrixGraphics implements Graphics3d {
 	public Close applyTransformation(Transformation transformation) {
 		this.matrices.push();
 		transformation.apply(this.matrices);
-		return this.close;
+		return () -> this.matrices.pop();
 	}
 }

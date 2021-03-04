@@ -42,6 +42,11 @@ public final class Transformation {
 		this.scaleZ = scaleZ;
 	}
 
+	/**
+	 * the rotation in degrees.
+	 *
+	 * (for guis, the Z axis is pointing out of the screen, so to rotate something in a gui, you should use yaw)
+	 */
 	public static Transformation rotate(float roll, float pitch, float yaw) {
 		return new Transformation(roll, pitch, yaw, 0, 0, 0, 1, 1, 1);
 	}

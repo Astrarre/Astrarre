@@ -1,20 +1,18 @@
 package io.github.astrarre.rendering.v0.api.util;
 
-import io.github.astrarre.rendering.internal.mixin.Matrix4fAccessor;
 import io.github.astrarre.rendering.internal.util.MathUtil;
 import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.util.v0.api.Validate;
 import io.github.astrarre.util.v0.api.collection.UnsafeFloatArrayList;
-import org.lwjgl.system.CallbackI;
 
 import net.minecraft.client.util.math.Vector4f;
 
 public final class Polygon {
 	public static final float EPSILON = .0001f;
 	public static final Polygon EMPTY = new Polygon.Builder(3)
-			                                    .addVertex(0, 0, 0)
-			                                    .addVertex(0, EPSILON, 0)
-			                                    .addVertex(EPSILON, 0, 0)
+			                                    .addVertex(0, 0)
+			                                    .addVertex(0, EPSILON)
+			                                    .addVertex(EPSILON, 0)
 			                                    .build();
 
 	private final float[] vertices;
@@ -25,14 +23,14 @@ public final class Polygon {
 	}
 
 	/**
-	 * @param vertices the vertices buffer [x1, y1, z1, x2, y2, z2, x3, y3, z3, etc.]
+	 * @param vertices the vertices buffer [x1, y1, x2, y2, x3, y3, etc.]
 	 */
 	public Polygon(float[] vertices, int offset, int length) {
-		if (length % 3 != 0) {
-			throw new IllegalArgumentException("verticies must be a multiple of three! [x1, y1, z1, x2, y2, z2, x3, y3, z3]");
+		if (length % 2 != 0) {
+			throw new IllegalArgumentException("verticies must be a multiple of three! [x1, y1, x2, y2, x3, y3]");
 		}
 
-		if (length < 9) {
+		if (length < 6) {
 			throw new IllegalArgumentException("< 3 points is not a polygon!");
 		}
 
@@ -45,47 +43,19 @@ public final class Polygon {
 		this.vertices = vertices;
 	}
 
-	public float getZ(int vertex) {
-		return this.get(vertex, 2);
-	}
-
 	private float get(int vertex, int offset) {
-		int index = (this.offset + vertex * 3) + offset;
+		int index = (this.offset + vertex * 2) + offset;
 		Validate.lessThan(index, this.length, index + " out of bounds!");
 		return this.vertices[index];
 	}
 
-	public boolean isInside(float x, float y, float z) {
-		if (this.isCoplanar(x, y, z)) {
-			// project onto X/Y plane
-			return this.isInsideProjection(x, y);
-		}
-		return false;
-	}
 
-	public boolean isCoplanar(float x, float y, float z) {
-		int i = this.offset;
-		return MathUtil.areCoplanar(
-				this.vertices[i++],
-				this.vertices[i++],
-				this.vertices[i++],
-				this.vertices[i++],
-				this.vertices[i++],
-				this.vertices[i++],
-				this.vertices[i++],
-				this.vertices[i++],
-				this.vertices[i++],
-				x,
-				y,
-				z);
-	}
-
-	public boolean isInsideProjection(float px, float py) {
+	public boolean isInside(float px, float py) {
 		int count = 0;
 		int vertices = this.vertices();
 		for (int i = 0; i < vertices; i++) {
 			int next = (i + 1) % vertices;
-			float x = this.getX(i), y = this.getX(i), nx = this.getX(next), ny = this.getY(next);
+			float x = this.getX(i), y = this.getY(i), nx = this.getX(next), ny = this.getY(next);
 			if (MathUtil.linesIntersect(x, y, nx, ny, px, py, 1_000_000, py)) {
 				if (Math.abs(MathUtil.rot(x, y, px, py, nx, ny)) < EPSILON) {
 					return MathUtil.onSegment(x, y, px, py, nx, ny);
@@ -98,7 +68,7 @@ public final class Polygon {
 
 
 	public int vertices() {
-		return this.length / 3;
+		return this.length / 2;
 	}
 
 	public float getX(int vertex) {
@@ -127,13 +97,13 @@ public final class Polygon {
 	}
 
 	public interface PointWalker {
-		void accept(float x1, float y1, float z1, float x2, float y2, float z2);
+		void accept(float x1, float y1, float x2, float y2);
 	}
 
 	public void walk(PointWalker walker) {
 		int vertices = this.vertices();
 		for (int i = 0; i < vertices; i++) {
-			walker.accept(this.getX(i), this.getY(i), this.getZ(i), this.getX((i + 1) % vertices), this.getY((i + 1) % vertices), this.getZ((i + 1) % vertices));
+			walker.accept(this.getX(i), this.getY(i), this.getX((i + 1) % vertices), this.getY((i + 1) % vertices));
 		}
 	}
 
@@ -160,40 +130,21 @@ public final class Polygon {
 			Vector4f v4f = new Vector4f(0, 0, 0, 1);
 			transformation.init();
 
-			for (int i = 0; i < this.list.size(); i += 3) {
+			for (int i = 0; i < this.list.size(); i += 2) {
 				float f = this.list.getFloat(i);
 				float g = this.list.getFloat(i + 1);
-				float h = this.list.getFloat(i + 2);
-				v4f.set(f, g, h, 1);
+				v4f.set(f, g, 1, 1);
 				v4f.transform(transformation.modelMatrixTransform);
 				this.list.set(i, v4f.getX());
 				this.list.set(i+1, v4f.getY());
-				this.list.set(i+2, v4f.getZ());
 			}
 
 			return this;
 		}
 
-		public Builder addVertex(float x, float y, float z) {
-			// 3 points define a plane
-			if (this.list.size() > 9) {
-				Validate.isTrue(MathUtil.areCoplanar(
-						this.list.getFloat(0),
-						this.list.getFloat(1),
-						this.list.getFloat(2),
-						this.list.getFloat(3),
-						this.list.getFloat(4),
-						this.list.getFloat(5),
-						this.list.getFloat(6),
-						this.list.getFloat(7),
-						this.list.getFloat(8),
-						x,
-						y,
-						z), "(" + x + ", " + y + ", " + z + ")");
-			}
+		public Builder addVertex(float x, float y) {
 			this.list.add(x);
 			this.list.add(y);
-			this.list.add(z);
 			return this;
 		}
 

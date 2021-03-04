@@ -1,6 +1,11 @@
 package io.github.astrarre.rendering.internal.util;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.DiffuseLighting;
+import net.minecraft.client.texture.SpriteAtlasTexture;
 
 public enum SetupTeardown {
 	FILL(null) {
@@ -26,6 +31,20 @@ public enum SetupTeardown {
 		@Override
 		public void teardown() {
 			RenderSystem.shadeModel(7424);
+		}
+	},
+	ITEM(null) {
+		@Override
+		public void setup() {
+
+		}
+
+		@Override
+		public void teardown() {
+			RenderSystem.enableDepthTest();
+			RenderSystem.disableAlphaTest();
+			RenderSystem.disableRescaleNormal();
+			RenderSystem.popMatrix();
 		}
 	};
 

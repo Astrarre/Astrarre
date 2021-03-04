@@ -1,27 +1,27 @@
-package io.github.astrarre.common.internal.astrarre.mixin;
+package io.github.astrarre.util.internal.mixin;
 
-import io.github.astrarre.common.v0.api.Astrarre;
-import io.github.astrarre.v0.server.MinecraftServer;
+import io.github.astrarre.util.v0.fabric.MinecraftServers;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.MinecraftDedicatedServer;
 import net.minecraft.server.integrated.IntegratedServer;
 
 @Mixin({IntegratedServer.class,
         MinecraftDedicatedServer.class
 })
-public abstract class MinecraftServerMixin implements MinecraftServer {
+public abstract class MinecraftServerMixin {
 	@Inject(method = "setupServer", at = @At("HEAD"))
 	private void onSetup(CallbackInfoReturnable<Boolean> cir) {
-		Astrarre.setCurrentServer(this);
+		MinecraftServers.activeServer = (MinecraftServer) (Object) this;
 	}
 
 	@Inject(method = "shutdown", at = @At("TAIL"))
 	private void onSetup(CallbackInfo ci) {
-		Astrarre.setCurrentServer(null);
+		MinecraftServers.activeServer = null;
 	}
 }

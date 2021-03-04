@@ -19,7 +19,6 @@
   },
   "mixins": [
     "astrarre/astrarre-access.mixins.json",
-    "astrarre/astrarre-common.mixins.json",
     "astrarre/astrarre-rendering.mixins.json",
     "astrarre/astrarre-items.mixins.json",
     "astrarre/astrarre-transfer.mixins.json"
