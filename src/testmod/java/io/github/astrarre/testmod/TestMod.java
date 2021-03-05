@@ -5,8 +5,6 @@ import io.github.astrarre.gui.v0.api.base.Button;
 import io.github.astrarre.gui.v0.api.base.TextField;
 import io.github.astrarre.gui.v0.fabric.adapter.Slot;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
-import io.github.astrarre.recipies.v0.api.Recipe;
-import io.github.astrarre.recipies.v0.api.ingredient.IntIngredient;
 import io.github.astrarre.rendering.v0.api.Transformation;
 
 import net.minecraft.block.AbstractBlock;
@@ -38,7 +36,7 @@ public class TestMod implements ModInitializer {
 	public void onInitialize() {
 		System.out.println(HopperBlockEntity.ABOVE_SHAPE);
 		Registry.register(Registry.ITEM, new Identifier("testmod", "test"), new ItemA(new Item.Settings().group(ItemGroup.MISC)));
-		Recipe.getInput(new IntIngredient(), "test");
+		//Recipe.getInput(new IntIngredient(), "test");
 	}
 
 	static class ItemA extends Item {
