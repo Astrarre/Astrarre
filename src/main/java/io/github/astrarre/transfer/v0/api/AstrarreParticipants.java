@@ -36,7 +36,6 @@ public class AstrarreParticipants {
 		ITEM_WORLD.addWorldProviderFunctions();
 		FLUID_WORLD.addWorldProviderFunctions();
 
-
 		FILTERS.dependsOn(FabricParticipants.FILTERS, function -> insertable -> (Set) function.apply((Insertable)insertable));
 		FabricParticipants.FILTERS.dependsOn(FILTERS, function -> insertable -> (Set) function.apply((Insertable)insertable));
 	}

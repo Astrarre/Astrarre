@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "astrarre-recipes-v0",
-  "name": "Astrarre Recipies v0",
+  "name": "Astrarre Recipes v0",
   "description": "Astrarre APIs recipe format and api",
   "version": "${version}",
   "environment": "*",
@@ -15,5 +15,8 @@
   ],
   "depends": {
     "fabricloader": ">=0.8.9"
-  }
+  },
+  "mixins": [
+    "astrarre-recipes.mixins.json"
+  ]
 }

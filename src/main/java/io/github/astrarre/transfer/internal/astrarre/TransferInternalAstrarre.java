@@ -20,10 +20,10 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
 
 public class TransferInternalAstrarre {
-	public static final WorldAccess<Participant<ItemKey>> ITEM_WORLD = new WorldAccess<>(Participants.EMPTY.cast());
+	public static final WorldAccess<Participant<ItemKey>> HOPPER_BLOCK_ENTITY_GET_INVENTORY = new WorldAccess<>(Participants.EMPTY.cast());
 
 	static {
-		ITEM_WORLD.andThen((direction, state, view, pos, entity) -> {
+		HOPPER_BLOCK_ENTITY_GET_INVENTORY.andThen((direction, state, view, pos, entity) -> {
 			if (entity instanceof Inventory) {
 				// noinspection rawtypes,unchecked,ConstantConditions
 				return (Participant) FabricParticipants.FROM_INVENTORY.get()
@@ -32,7 +32,7 @@ public class TransferInternalAstrarre {
 			return null;
 		});
 
-		ITEM_WORLD.andThen((WorldFunction.NoBlockEntity<Participant<ItemKey>>) (d, s, v, p) -> {
+		HOPPER_BLOCK_ENTITY_GET_INVENTORY.andThen((WorldFunction.NoBlockEntity<Participant<ItemKey>>) (d, s, v, p) -> {
 			if (s.getBlock() instanceof InventoryProvider) {
 				InventoryProvider block = (InventoryProvider) s.getBlock();
 				// noinspection rawtypes,unchecked,ConstantConditions
@@ -51,7 +51,7 @@ public class TransferInternalAstrarre {
 	public static SidedInventory getSidedInventoryAt(WorldFunction<Participant<ItemKey>> function,
 			World world,
 			BlockPos pos,
-			BlockState state,
+			@Nullable BlockState state,
 			@Nullable BlockEntity entity) {
 		if (state == null) {
 			state = world.getBlockState(pos);
@@ -60,6 +60,7 @@ public class TransferInternalAstrarre {
 		if (entity == null && state.getBlock().hasBlockEntity()) {
 			entity = world.getBlockEntity(pos);
 		}
+
 		return new CombinedSidedInventory(
 				FabricParticipants.TO_INVENTORY.get().apply((Participant) function.get(Direction.UP, state, world, pos, entity)),
 				FabricParticipants.TO_INVENTORY.get().apply((Participant) function.get(Direction.DOWN, state, world, pos, entity)),

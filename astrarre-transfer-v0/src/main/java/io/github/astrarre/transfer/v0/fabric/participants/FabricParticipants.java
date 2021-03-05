@@ -12,6 +12,7 @@ import io.github.astrarre.itemview.v0.fabric.TaggedItem;
 import io.github.astrarre.transfer.internal.fabric.NUtil;
 import io.github.astrarre.transfer.internal.fabric.SlotParticipant;
 import io.github.astrarre.transfer.internal.fabric.inventory.CombinedSidedInventory;
+import io.github.astrarre.transfer.internal.fabric.inventory.EmptyInventory;
 import io.github.astrarre.transfer.internal.fabric.inventory.SidedInventoryAccess;
 import io.github.astrarre.transfer.internal.fabric.participantInventory.AggregateParticipantInventory;
 import io.github.astrarre.transfer.internal.fabric.participantInventory.ParticipantInventory;
@@ -62,7 +63,6 @@ public final class FabricParticipants {
 	 */
 	public static final BiFunctionAccess<Direction, Inventory, Participant<TaggedItem>> FROM_INVENTORY = new BiFunctionAccess<>();
 
-
 	static {
 		TO_INVENTORY.addProviderFunction();
 		TO_INVENTORY.andThen(participant -> {
@@ -71,6 +71,9 @@ public final class FabricParticipants {
 			}
 			return null;
 		});
+
+		// todo voiding and creative sink
+		TO_INVENTORY.forInstance(Participants.EMPTY.cast(), participant -> EmptyInventory.INSTANCE);
 
 		TO_INVENTORY.andThen(ParticipantInventory::new);
 
