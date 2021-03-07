@@ -12,7 +12,7 @@ import net.minecraft.item.Items;
 import net.minecraft.util.registry.Registry;
 
 public class ItemStackValueParser implements ValueParser<ItemStack> {
-	private static final Id AIR = Id.newInstance("minecraft", "air");
+	private static final Id AIR = Id.create("minecraft", "air");
 
 	@Override
 	public Either<ItemStack, String> parse(PeekableReader reader) {

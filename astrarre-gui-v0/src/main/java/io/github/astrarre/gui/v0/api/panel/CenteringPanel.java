@@ -15,7 +15,7 @@ import net.fabricmc.api.Environment;
  * a panel who's [0, 0] lies at [centerX - width/2, centerY - height/2] of the root container
  */
 public class CenteringPanel extends Panel {
-	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.newInstance("astrarre-gui-v0", "centering_panel"), CenteringPanel::new);
+	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "centering_panel"), CenteringPanel::new);
 
 	@Environment(EnvType.CLIENT)
 	protected Transformation original;
@@ -25,7 +25,7 @@ public class CenteringPanel extends Panel {
 		super(rootContainer, ENTRY);
 		this.width = width;
 		this.height = height;
-		this.setBoundsProtected(Polygon.create(width, height));
+		this.setBoundsProtected(Polygon.rectangle(width, height));
 	}
 
 	@Environment(EnvType.CLIENT)
@@ -39,9 +39,10 @@ public class CenteringPanel extends Panel {
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	public void setTransformation(Transformation transformation) {
+	public CenteringPanel setTransformation(Transformation transformation) {
 		this.original = transformation;
 		super.setTransformationProtected(transformation);
+		return this;
 	}
 
 	@Override

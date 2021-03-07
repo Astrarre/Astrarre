@@ -13,7 +13,7 @@ import io.github.astrarre.util.v0.api.Id;
  * the standard inventory background
  */
 public class BeveledRectangle extends RectangularDrawable {
-	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.newInstance("astrarre-gui-v0", "beveled_rectangle"),
+	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "beveled_rectangle"),
 			BeveledRectangle::new);
 
 	public BeveledRectangle(RootContainer container, CenteringPanel panel) {

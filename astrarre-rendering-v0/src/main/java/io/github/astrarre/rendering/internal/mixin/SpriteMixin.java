@@ -2,6 +2,7 @@ package io.github.astrarre.rendering.internal.mixin;
 
 import io.github.astrarre.rendering.v0.api.textures.SpriteInfo;
 import io.github.astrarre.rendering.v0.api.textures.Texture;
+import io.github.astrarre.rendering.v0.api.textures.TexturePart;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -12,7 +13,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.util.Identifier;
 
 @Mixin(Sprite.class)
 public abstract class SpriteMixin implements SpriteInfo {

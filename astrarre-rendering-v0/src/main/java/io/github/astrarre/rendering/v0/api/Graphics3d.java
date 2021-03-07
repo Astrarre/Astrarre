@@ -5,6 +5,7 @@ import java.util.List;
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import io.github.astrarre.rendering.v0.api.textures.SpriteInfo;
 import io.github.astrarre.rendering.v0.api.textures.Texture;
+import io.github.astrarre.rendering.v0.api.textures.TexturePart;
 import io.github.astrarre.rendering.v0.api.util.Close;
 
 import net.minecraft.client.MinecraftClient;
@@ -66,6 +67,10 @@ public interface Graphics3d {
 	 */
 	void drawTexture(Texture texture, int x1, int y1, int width, int height);
 
+	default void drawTexture(TexturePart part) {
+		this.drawTexture(part.texture, part.offX, part.offY, part.width, part.height);
+	}
+
 	void drawLine(float x1, float y1, float x2, float y2, int color);
 
 	void drawItem(ItemKey stack);
@@ -86,7 +91,6 @@ public interface Graphics3d {
 	 * @param color {@link Graphics3d#getARGB(int, int, int)}
 	 */
 	void fillRect(float width, float height, int color);
-
 
 	/**
 	 * Fills in the specified region with a gradient which goes from the startColor (top) to the endColor (bottom)

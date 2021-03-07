@@ -141,10 +141,11 @@ public abstract class Drawable extends DrawableInternal {
 		return this.transformation;
 	}
 
-	public void setTransformation(Transformation transformation) {
+	public Drawable setTransformation(Transformation transformation) {
 		this.transformation = transformation;
 		this.invertedMatrix = null;
 		this.sendToClients(TRANSFORM_CHANGE, output -> GuiUtil.write(transformation, output));
+		return this;
 	}
 
 	/**

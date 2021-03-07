@@ -16,7 +16,7 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 
 public class TextField extends AbstractButtonAdapter<TextFieldWidget> {
 	public static final int UPDATE_TEXT = 1;
-	private static final DrawableRegistry.Entry TEXT_FIELD = DrawableRegistry.register(Id.newInstance("astrarre-gui-v0", "text_field"), TextField::new);
+	private static final DrawableRegistry.Entry TEXT_FIELD = DrawableRegistry.register(Id.create("astrarre-gui-v0", "text_field"), TextField::new);
 	// only exists on the server
 	private String text = "";
 

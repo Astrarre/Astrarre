@@ -13,9 +13,9 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 public class GuiPacketHandler {
-	public static final Id OPEN_GUI = Id.newInstance("astrarre-gui-v0", "open_gui");
-	public static final Id DRAWABLE_PACKET_CHANNEL = Id.newInstance("astrarre-gui-v0", "sync");
-	public static final Id ADD_DRAWABLE = Id.newInstance("astrarre-gui-v0", "add_drawable");
+	public static final Id OPEN_GUI = Id.create("astrarre-gui-v0", "open_gui");
+	public static final Id DRAWABLE_PACKET_CHANNEL = Id.create("astrarre-gui-v0", "sync");
+	public static final Id ADD_DRAWABLE = Id.create("astrarre-gui-v0", "add_drawable");
 
 	static {
 		ModPacketHandler.INSTANCE.registerClient(ADD_DRAWABLE, (id, buf) -> {

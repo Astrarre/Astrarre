@@ -26,9 +26,9 @@ public class IdentifierParser implements ValueParser<Id>  {
 				while (Identifier.isPathCharacterValid(c = (char) reader.peek(ni++))) {
 					builder.append(c);
 				}
-				id = Id.newInstance(name, builder.toString());
+				id = Id.create(name, builder.toString());
 			} else {
-				id = Id.newInstance("minecraft", name);
+				id = Id.create("minecraft", name);
 			}
 		} catch (InvalidIdentifierException e) {
 			return Either.ofRight(e.getMessage());

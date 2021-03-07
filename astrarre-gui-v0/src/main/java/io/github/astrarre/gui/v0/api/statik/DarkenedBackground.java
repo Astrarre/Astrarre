@@ -9,7 +9,7 @@ import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.util.v0.api.Id;
 
 public class DarkenedBackground extends Drawable {
-	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.newInstance("astrarre-gui-v0", "darkened_background"), DarkenedBackground::new);
+	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "darkened_background"), DarkenedBackground::new);
 	private int width, height;
 
 	public DarkenedBackground(RootContainer rootContainer) {

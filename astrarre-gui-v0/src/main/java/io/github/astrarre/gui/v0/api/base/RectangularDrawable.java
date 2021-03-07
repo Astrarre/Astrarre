@@ -15,7 +15,7 @@ public abstract class RectangularDrawable extends Drawable {
 		super(rootContainer, id);
 		this.width = width;
 		this.height = height;
-		this.setBoundsProtected(Polygon.create(width, height));
+		this.setBoundsProtected(Polygon.rectangle(width, height));
 	}
 
 	protected RectangularDrawable(RootContainer rootContainer, DrawableRegistry.Entry id, Input input) {

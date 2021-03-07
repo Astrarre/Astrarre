@@ -66,7 +66,7 @@ public final class Polygon {
 		return (count % 2 == 1); // Same as (count%2 == 1)
 	}
 
-	public static Polygon create(float width, float height) {
+	public static Polygon rectangle(float width, float height) {
 		float[] buf = {0, 0, 0, height, width, height, width, 0};
 		return new Polygon(buf);
 	}

@@ -1,4 +1,4 @@
-package io.github.astrarre.testmod;
+package io.github.astrarre.testmod.gui;
 
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.panel.CenteringPanel;
@@ -42,5 +42,7 @@ public class TestModGui {
 			slot.setTransformation(Transformation.translate(6 + hotbarIndex * 18, 140, 0));
 			center.add(slot);
 		}
+
+		center.add(new TestDrawable(container).setTransformation(Transformation.translate(10, 10, 0)));
 	}
 }

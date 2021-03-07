@@ -17,7 +17,7 @@ import io.github.astrarre.util.v0.api.Validate;
  * change the color of a drawable
  */
 public final class TaintedDrawable extends DelegateDrawable {
-	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.newInstance("astrarre-gui-v0", "tainted_drawable"), TaintedDrawable::new);
+	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "tainted_drawable"), TaintedDrawable::new);
 	protected final float red, green, blue, alpha;
 
 	public TaintedDrawable(RootContainer container, Drawable drawable, float red, float green, float blue, float alpha) {

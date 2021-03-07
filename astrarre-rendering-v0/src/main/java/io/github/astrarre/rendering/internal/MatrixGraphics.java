@@ -10,6 +10,7 @@ import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.rendering.v0.api.textures.SpriteInfo;
 import io.github.astrarre.rendering.v0.api.textures.Texture;
+import io.github.astrarre.rendering.v0.api.textures.TexturePart;
 import io.github.astrarre.rendering.v0.api.util.Close;
 import io.github.astrarre.util.v0.api.Validate;
 import org.jetbrains.annotations.Nullable;

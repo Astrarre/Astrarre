@@ -28,7 +28,7 @@ import net.fabricmc.api.Environment;
 
 public class Panel extends Drawable implements Interactable, Container {
 	private static final Logger LOGGER = LogManager.getLogger("Astrarre Panel");
-	private static final DrawableRegistry.Entry PANEL = DrawableRegistry.register(Id.newInstance("astrarre-gui-v0", "panel"), Panel::new);
+	private static final DrawableRegistry.Entry PANEL = DrawableRegistry.register(Id.create("astrarre-gui-v0", "panel"), Panel::new);
 	public static final int SYNC_CLIENT = 0;
 	private final List<Drawable> toDraw;
 	protected int index;

@@ -31,7 +31,7 @@ public abstract class Slot extends Drawable implements Interactable {
 	public static final Polygon SQUARE_16x16 = new Polygon.Builder(4).addVertex(0, 0).addVertex(0, 18).addVertex(18, 18).addVertex(18, 0).build();
 	private static final Texture INVENTORY_TEXTURE = new Texture("minecraft", "textures/gui/container/furnace.png", 256, 256);
 	private static final DrawableRegistry.Entry INVENTORY = DrawableRegistry
-			                                                        .register(Id.newInstance("astrarre-gui-v0", "inventory_slot"), ClientSlot::new);
+			                                                        .register(Id.create("astrarre-gui-v0", "inventory_slot"), ClientSlot::new);
 	private static final Transformation TRANSFORMATION = Transformation.translate(1, 1, 0);
 	private final SlotInventory inventory;
 	protected MinecraftSlot minecraftSlot;

@@ -11,19 +11,19 @@ public interface Id {
 		return (Id) identifier;
 	}
 
-	static Id newInstance(String id, String path) {
+	static Id create(String id, String path) {
 		return (Id) new Identifier(id, path);
 	}
 
 	/**
 	 * should actually be faster than mojang's version
 	 */
-	static Id newInstance(String str) {
+	static Id create(String str) {
 		int i = str.indexOf(':');
 		if(i == -1) {
-			return newInstance("minecraft", str);
+			return create("minecraft", str);
 		}
-		return newInstance(str.substring(0, i), str.substring(i+1));
+		return create(str.substring(0, i), str.substring(i + 1));
 	}
 
 	String id();

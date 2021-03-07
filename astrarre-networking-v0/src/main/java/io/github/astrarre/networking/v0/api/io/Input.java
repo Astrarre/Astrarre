@@ -46,7 +46,7 @@ public interface Input extends DataInput {
 	}
 
 	default Id readId() {
-		return Id.newInstance(this.readUTF(), this.readUTF());
+		return Id.create(this.readUTF(), this.readUTF());
 	}
 
 	int read(byte[] buffer);

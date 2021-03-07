@@ -13,7 +13,7 @@ public class Texture {
 	private final int width, height;
 
 	public Texture(String modid, String path, int width, int height) {
-		this(Id.newInstance(modid, path), width, height);
+		this(Id.create(modid, path), width, height);
 	}
 
 	/**

@@ -34,7 +34,7 @@ public class TestModBlock extends Block implements BlockEntityProvider {
 	private static final Recipe.Tri<Inventory, Val<Integer>, Inventory> RECIPE = Recipe.builder()
 			.add(FabricIngredients.STRICT_STACK)
 			.add(Ingredients.INTEGER)
-			.outputs(Id.newInstance("mymod", "ore_doubler"))
+			.outputs(Id.create("mymod", "ore_doubler"))
 			.add(FabricOutputs.ITEM_STACK)
 			.build("My Mod's Ore Doubler");
 
