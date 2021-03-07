@@ -1,10 +1,10 @@
-package io.github.astrarre.gui.v0.api.base;
+package io.github.astrarre.gui.v0.api.statik;
 
-import io.github.astrarre.gui.v0.api.Drawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
+import io.github.astrarre.gui.v0.api.base.RectangularDrawable;
+import io.github.astrarre.gui.v0.api.panel.CenteringPanel;
 import io.github.astrarre.networking.v0.api.io.Input;
-import io.github.astrarre.networking.v0.api.io.Output;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
 import io.github.astrarre.util.v0.api.Id;
@@ -12,13 +12,16 @@ import io.github.astrarre.util.v0.api.Id;
 /**
  * the standard inventory background
  */
-public class BeveledRectangle extends Drawable {
+public class BeveledRectangle extends RectangularDrawable {
 	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.newInstance("astrarre-gui-v0", "beveled_rectangle"),
 			BeveledRectangle::new);
-	protected final int width, height;
 
 	public BeveledRectangle(RootContainer container, CenteringPanel panel) {
 		this(container, panel.width, panel.height);
+	}
+
+	public BeveledRectangle(RootContainer container, RectangularDrawable drawable) {
+		this(container, drawable.width, drawable.height);
 	}
 
 	protected BeveledRectangle(RootContainer container, Input input) {
@@ -30,10 +33,7 @@ public class BeveledRectangle extends Drawable {
 	}
 
 	protected BeveledRectangle(RootContainer rootContainer, DrawableRegistry.Entry id, int width, int height) {
-		super(rootContainer, id);
-		this.setBoundsProtected(new Polygon.Builder(4).addVertex(0, 0).addVertex(0, height).addVertex(width, height).addVertex(width, 0).build());
-		this.width = width;
-		this.height = height;
+		super(rootContainer, id, width, height);
 	}
 
 	@Override
@@ -63,16 +63,8 @@ public class BeveledRectangle extends Drawable {
 		graphics.fillRect(2, this.height-3, 1, 1, 0xff000000);
 		graphics.fillRect(3, this.height-2, this.width - 6, 1, 0xff000000);
 		graphics.fillRect(this.width-3, this.height-3, 1, 1, 0xff000000);
-
-		this.getBounds().walk((x1, y1, x2, y2) -> graphics.drawLine(x1, y1, x2, y2, 0xffaaaaaa));
 	}
 
-
-	@Override
-	protected void write0(Output output) {
-		output.writeInt(this.width);
-		output.writeInt(this.height);
-	}
 
 	@Override
 	public void setBounds(Polygon polygon) {

@@ -1,6 +1,5 @@
 package io.github.astrarre.gui.internal;
 
-import io.github.astrarre.gui.internal.RootContainerInternal;
 import io.github.astrarre.gui.v0.api.panel.Panel;
 
 import net.minecraft.client.gui.Element;

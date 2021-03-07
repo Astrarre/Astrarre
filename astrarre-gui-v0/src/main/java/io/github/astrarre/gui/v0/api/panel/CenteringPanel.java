@@ -1,8 +1,7 @@
-package io.github.astrarre.gui.v0.api.base;
+package io.github.astrarre.gui.v0.api.panel;
 
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
-import io.github.astrarre.gui.v0.api.panel.Panel;
 import io.github.astrarre.networking.v0.api.io.Input;
 import io.github.astrarre.networking.v0.api.io.Output;
 import io.github.astrarre.rendering.v0.api.Transformation;

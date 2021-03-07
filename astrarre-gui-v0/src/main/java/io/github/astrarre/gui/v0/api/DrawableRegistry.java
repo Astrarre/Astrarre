@@ -4,9 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-import io.github.astrarre.gui.v0.api.base.Button;
-import io.github.astrarre.gui.v0.api.base.CenteringPanel;
-import io.github.astrarre.gui.v0.api.base.TextField;
+import io.github.astrarre.gui.v0.api.widgets.Button;
+import io.github.astrarre.gui.v0.api.panel.CenteringPanel;
+import io.github.astrarre.gui.v0.api.statik.DarkenedBackground;
+import io.github.astrarre.gui.v0.api.delegates.TaintedDrawable;
+import io.github.astrarre.gui.v0.api.widgets.TextField;
 import io.github.astrarre.gui.v0.api.panel.Panel;
 import io.github.astrarre.networking.v0.api.io.Input;
 import io.github.astrarre.util.v0.api.Id;
@@ -36,6 +38,8 @@ public class DrawableRegistry {
 		Panel.init();
 		TextField.init();
 		CenteringPanel.init();
+		DarkenedBackground.init();
+		TaintedDrawable.init();
 	}
 
 	@Nullable

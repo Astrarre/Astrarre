@@ -7,6 +7,7 @@ import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.access.Interactable;
 import io.github.astrarre.rendering.internal.MatrixGraphics;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
+import io.github.astrarre.rendering.v0.api.graphics.DelegateGraphics;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
 
 import net.minecraft.client.gui.screen.TickableElement;
@@ -30,11 +31,12 @@ public abstract class DrawableAdapter<T extends net.minecraft.client.gui.Drawabl
 
 	@Override
 	protected void render0(Graphics3d graphics, float tickDelta) {
-		if (graphics instanceof MatrixGraphics) {
+		Graphics3d matrix = DelegateGraphics.resolve(graphics);
+		if (matrix instanceof MatrixGraphics) {
 			// todo stop this terrible hack once mojang decides it's time to move everything over to MatrixStack instead of RenderSystem's
 			//  push/popMatrix
 			RenderSystem.pushMatrix();
-			RenderSystem.multMatrix(((MatrixGraphics) graphics).matrices.peek().getModel());
+			RenderSystem.multMatrix(((MatrixGraphics) matrix).matrices.peek().getModel());
 			this.drawable.render(new MatrixStack(), this.mx, this.my, tickDelta);
 			RenderSystem.color4f(1f, 1f, 1f, 1f);
 			RenderSystem.popMatrix();

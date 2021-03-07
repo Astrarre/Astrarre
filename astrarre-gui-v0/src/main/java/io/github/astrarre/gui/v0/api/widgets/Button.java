@@ -1,4 +1,4 @@
-package io.github.astrarre.gui.v0.api.base;
+package io.github.astrarre.gui.v0.api.widgets;
 
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.Drawable;

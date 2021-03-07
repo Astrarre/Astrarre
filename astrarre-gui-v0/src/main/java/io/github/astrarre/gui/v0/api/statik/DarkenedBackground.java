@@ -1,4 +1,4 @@
-package io.github.astrarre.gui.v0.api.base;
+package io.github.astrarre.gui.v0.api.statik;
 
 import io.github.astrarre.gui.v0.api.Drawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
@@ -32,4 +32,6 @@ public class DarkenedBackground extends Drawable {
 	@Override
 	protected void write0(Output output) {
 	}
+
+	public static void init() {}
 }

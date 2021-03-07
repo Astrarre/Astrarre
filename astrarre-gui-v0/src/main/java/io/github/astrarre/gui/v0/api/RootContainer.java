@@ -54,14 +54,25 @@ public interface RootContainer {
 	}
 
 	enum Type {
+		/**
+		 * @deprecated unsupported ATM
+		 */
+		@Deprecated
 		HUD,
 		SCREEN
 	}
 
 	Type getType();
 
+	/**
+	 * @return true if this RootContainer instance is representing a gui on the client (either clientside, or client-synced)
+	 */
 	boolean isClient();
 
+	/**
+	 * The content panel is the 'root' panel of the screen. Do not transform this
+	 * @return the panel where drawables are meant to be attached
+	 */
 	Panel getContentPanel();
 
 	/**

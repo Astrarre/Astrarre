@@ -14,6 +14,7 @@ import io.github.astrarre.networking.v0.fabric.FabricData;
 import io.github.astrarre.rendering.internal.MatrixGraphics;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.rendering.v0.api.Transformation;
+import io.github.astrarre.rendering.v0.api.graphics.DelegateGraphics;
 import io.github.astrarre.rendering.v0.api.textures.Texture;
 import io.github.astrarre.rendering.v0.api.util.Close;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
@@ -83,7 +84,7 @@ public abstract class Slot extends Drawable implements Interactable {
 
 	@Override
 	protected void render0(Graphics3d graphics, float tickDelta) {
-		Validate.isTrue(graphics instanceof MatrixGraphics, "Slot can only be rendered with matrix graphics!");
+		Validate.isTrue(DelegateGraphics.resolve(graphics) instanceof MatrixGraphics, "Slot can only be rendered with matrix graphics!");
 		this.renderBackground(graphics, tickDelta);
 		if (this.render) {
 			graphics.drawItem(this.override == null ? this.minecraftSlot.getStack() : this.override);

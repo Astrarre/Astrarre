@@ -1,4 +1,4 @@
-package io.github.astrarre.gui.v0.api.base;
+package io.github.astrarre.gui.v0.api.widgets;
 
 import java.nio.charset.StandardCharsets;
 
@@ -8,7 +8,6 @@ import io.github.astrarre.gui.v0.fabric.adapter.AbstractButtonAdapter;
 import io.github.astrarre.networking.v0.api.io.Input;
 import io.github.astrarre.networking.v0.api.io.Output;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
-import io.github.astrarre.rendering.v0.api.util.Polygon;
 import io.github.astrarre.util.v0.api.Id;
 import org.jetbrains.annotations.Nullable;
 
