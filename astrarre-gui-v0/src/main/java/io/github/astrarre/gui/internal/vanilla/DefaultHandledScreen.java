@@ -7,7 +7,7 @@ import net.minecraft.text.Text;
 
 public final class DefaultHandledScreen extends HandledScreen<DefaultScreenHandler> {
 	/**
-	 * this is the minimum 'guaranteed' window in which you can render for GUIs
+	 * this is the maximum 'guaranteed' window in which you can render for GUIs
 	 * In auto gui mode (in video settings) will rescale the coordinate grid to ensure that this 'window' in the center of the screen is always visible.
 	 * For normal GUIs (centered guis, like inventories for example): it's recommended to use this scale.
 	 */
@@ -16,6 +16,12 @@ public final class DefaultHandledScreen extends HandledScreen<DefaultScreenHandl
 		super(handler, inventory, title);
 		this.backgroundWidth = MIN_WIDTH;
 		this.backgroundHeight = MIN_HEIGHT;
+	}
+
+	@Override
+	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		super.render(matrices, mouseX, mouseY, delta);
+		this.drawMouseoverTooltip(matrices, mouseX, mouseY);
 	}
 
 	@Override

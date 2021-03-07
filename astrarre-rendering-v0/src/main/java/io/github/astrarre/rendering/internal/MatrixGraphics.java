@@ -1,5 +1,7 @@
 package io.github.astrarre.rendering.internal;
 
+import java.util.List;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import io.github.astrarre.rendering.internal.util.MatrixGraphicsUtil;
@@ -74,6 +76,21 @@ public class MatrixGraphics implements Graphics3d {
 		} else {
 			this.getTextRenderer().draw(this.matrices, text, 0, 0, color);
 		}
+	}
+
+	@Override
+	public void drawTooltip(List<Text> text) {
+		DummyScreen.INSTANCE.renderTooltip(this.matrices, text, 0, 0);
+	}
+
+	@Override
+	public void drawOrderedTooltip(List<OrderedText> text) {
+		DummyScreen.INSTANCE.renderOrderedTooltip(this.matrices, text, 0, 0);
+	}
+
+	@Override
+	public void drawTooltip(ItemStack stack) {
+		DummyScreen.INSTANCE.renderTooltip(this.matrices, stack, 0, 0);
 	}
 
 	@Override

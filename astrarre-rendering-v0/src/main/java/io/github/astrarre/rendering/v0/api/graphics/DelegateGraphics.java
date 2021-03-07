@@ -1,5 +1,7 @@
 package io.github.astrarre.rendering.v0.api.graphics;
 
+import java.util.List;
+
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.rendering.v0.api.Transformation;
@@ -88,5 +90,20 @@ public class DelegateGraphics implements Graphics3d {
 	@Override
 	public Close applyTransformation(Transformation transformation) {
 		return this.delegate.applyTransformation(transformation);
+	}
+
+	@Override
+	public void drawTooltip(List<Text> text) {
+		this.delegate.drawTooltip(text);
+	}
+
+	@Override
+	public void drawOrderedTooltip(List<OrderedText> text) {
+		this.delegate.drawOrderedTooltip(text);
+	}
+
+	@Override
+	public void drawTooltip(ItemStack stack) {
+		this.delegate.drawTooltip(stack);
 	}
 }

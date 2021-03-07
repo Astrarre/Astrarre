@@ -5,7 +5,9 @@ import io.github.astrarre.gui.v0.api.panel.CenteringPanel;
 import io.github.astrarre.gui.v0.api.panel.Panel;
 import io.github.astrarre.gui.v0.api.statik.BeveledRectangle;
 import io.github.astrarre.gui.v0.api.statik.DarkenedBackground;
+import io.github.astrarre.gui.v0.fabric.adapter.Slot;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
+import io.github.astrarre.rendering.v0.api.Transformation;
 
 import net.minecraft.server.network.ServerPlayerEntity;
 public class TestModGui {
@@ -26,7 +28,7 @@ public class TestModGui {
 		// we use the shortcut constructor to tell the beveled rectangle to fill up the entire centering panel
 		center.add(new BeveledRectangle(container, center));
 
-		/*for(int inventoryRow = 0; inventoryRow < 3; ++inventoryRow) {
+		for(int inventoryRow = 0; inventoryRow < 3; ++inventoryRow) {
 			for(int inventoryColumn = 0; inventoryColumn < 9; ++inventoryColumn) {
 				Slot slot = Slot.inventorySlot(container,
 						entity.inventory, inventoryColumn + inventoryRow * 9 + 9);
@@ -39,6 +41,6 @@ public class TestModGui {
 			Slot slot = Slot.inventorySlot(container, entity.inventory, hotbarIndex);
 			slot.setTransformation(Transformation.translate(6 + hotbarIndex * 18, 140, 0));
 			center.add(slot);
-		}*/
+		}
 	}
 }

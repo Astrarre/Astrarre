@@ -36,6 +36,9 @@ public abstract class Slot extends Drawable implements Interactable {
 	private final SlotInventory inventory;
 	protected MinecraftSlot minecraftSlot;
 	private boolean highlighted;
+	private boolean tooltip;
+	private double mX, mY;
+
 	@Environment (EnvType.CLIENT) private boolean render;
 	@Environment (EnvType.CLIENT) private ItemStack override;
 

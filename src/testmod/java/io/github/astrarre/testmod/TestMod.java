@@ -5,15 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.github.astrarre.gui.v0.api.RootContainer;
-import io.github.astrarre.gui.v0.api.statik.BeveledRectangle;
-import io.github.astrarre.gui.v0.api.panel.CenteringPanel;
-import io.github.astrarre.gui.v0.api.statik.DarkenedBackground;
-import io.github.astrarre.gui.v0.api.panel.Panel;
-import io.github.astrarre.gui.v0.fabric.adapter.Slot;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
 import io.github.astrarre.recipes.internal.recipe.RecipeParser;
 import io.github.astrarre.recipes.v0.api.recipe.Recipe;
-import io.github.astrarre.rendering.v0.api.Transformation;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -31,7 +25,7 @@ import net.fabricmc.api.ModInitializer;
 public class TestMod implements ModInitializer {
 	@Override
 	public void onInitialize() {
-		Registry.register(Registry.ITEM, new Identifier("testmod", "test"), new ItemA(new Item.Settings().group(ItemGroup.MISC)));
+		Registry.register(Registry.ITEM, new Identifier("testmod", "test"), new TestItem(new Item.Settings().group(ItemGroup.MISC)));
 		TestModBlock.modInit();
 		//Recipe.getInput(new IntIngredient(), "test");
 	}
@@ -43,8 +37,8 @@ public class TestMod implements ModInitializer {
 		parser.parseToCompletion(new StringReader(sample), "yeet");
 	}
 
-	static class ItemA extends Item {
-		public ItemA(Settings settings) {
+	static class TestItem extends Item {
+		public TestItem(Settings settings) {
 			super(settings);
 		}
 
@@ -53,9 +47,7 @@ public class TestMod implements ModInitializer {
 		public ActionResult useOnBlock(ItemUsageContext context) {
 			PlayerEntity entity = context.getPlayer();
 			if (!context.getWorld().isClient && entity != null) {
-				RootContainer.open((NetworkMember) entity, container -> {
-					TestModGui.open((ServerPlayerEntity) entity, container);
-				});
+				TestModGui.open((ServerPlayerEntity) entity);
 			}
 			return ActionResult.CONSUME;
 		}

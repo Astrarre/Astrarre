@@ -1,5 +1,7 @@
 package io.github.astrarre.rendering.v0.api;
 
+import java.util.List;
+
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import io.github.astrarre.rendering.v0.api.textures.SpriteInfo;
 import io.github.astrarre.rendering.v0.api.textures.Texture;
@@ -46,6 +48,12 @@ public interface Graphics3d {
 	void drawText(Text text, int color, boolean shadow);
 
 	void drawText(OrderedText text, int color, boolean shadow);
+
+	void drawTooltip(List<Text> text);
+
+	void drawOrderedTooltip(List<OrderedText> text);
+
+	void drawTooltip(ItemStack stack);
 
 	/**
 	 * draws a sprite along the xy plane
