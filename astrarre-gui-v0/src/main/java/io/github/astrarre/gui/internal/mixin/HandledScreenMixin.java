@@ -6,6 +6,7 @@ import io.github.astrarre.gui.internal.access.ExtraSlotAccess;
 import io.github.astrarre.gui.internal.access.ScreenRootAccess;
 import io.github.astrarre.gui.internal.containers.ScreenHandlerContainer;
 import io.github.astrarre.gui.internal.PanelElement;
+import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.networking.v0.api.io.Input;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -95,6 +96,13 @@ public abstract class HandledScreenMixin extends ScreenMixin {
 	public RootContainerInternal getRoot() {
 		ScreenHandlerContainer container = (ScreenHandlerContainer) ((ScreenRootAccess) this.getScreenHandler()).getRoot();
 		container.screen = (HandledScreen<?>) (Object) this;
+		if(container.resizeList != null) {
+			this.resizes.addAll(container.resizeList);
+			for (RootContainer.OnResize resize : container.resizeList) {
+				resize.resize(this.width, this.height);
+			}
+			container.resizeList.clear();
+		}
 		return container;
 	}
 

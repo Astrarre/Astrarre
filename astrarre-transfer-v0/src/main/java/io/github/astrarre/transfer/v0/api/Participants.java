@@ -3,17 +3,24 @@ package io.github.astrarre.transfer.v0.api;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.access.v0.api.FunctionAccess;
 import io.github.astrarre.access.v0.api.func.AccessFunction;
+import io.github.astrarre.access.v0.fabric.WorldAccess;
+import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import io.github.astrarre.transfer.v0.api.participants.ExtractableParticipant;
 import io.github.astrarre.transfer.v0.api.participants.InsertableParticipant;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import net.minecraft.fluid.Fluid;
+import net.minecraft.item.Item;
 
 public enum Participants implements Participant<Object> {
 	/**
@@ -84,6 +91,15 @@ public enum Participants implements Participant<Object> {
 	public static final FunctionAccess<Insertable<?>, Insertable<?>> DIRECT_WRAPPERS_INSERTABLE = new FunctionAccess<>();
 	public static final FunctionAccess<Extractable<?>, Iterable<Extractable<?>>> AGGREGATE_WRAPPERS_EXTRACTABLE = new FunctionAccess<>();
 	public static final FunctionAccess<Extractable<?>, Extractable<?>> DIRECT_WRAPPERS_EXTRACTABLE = new FunctionAccess<>();
+
+	/**
+	 * if a participant is looking for a limited set of items, this can help narrow it down
+	 */
+	public static final FunctionAccess<Insertable<ItemKey>, @NotNull Set<Item>> FILTERS = FunctionAccess.newInstance(sets -> {
+		Set<Item> combined = new HashSet<>();
+		sets.forEach(combined::addAll);
+		return combined;
+	});
 
 	/**
 	 * unwraps a delegate recursively

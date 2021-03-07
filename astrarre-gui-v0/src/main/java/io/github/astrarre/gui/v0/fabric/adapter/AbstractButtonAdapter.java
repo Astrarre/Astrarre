@@ -17,7 +17,7 @@ public abstract class AbstractButtonAdapter<T extends AbstractButtonWidget> exte
 		super(rootContainer, id);
 		this.width = width;
 		this.height = height;
-		this.setBounds(new Polygon.Builder(4).addVertex(0, 0).addVertex(0, height).addVertex(width, height).addVertex(width, 0).build());
+		this.setBoundsProtected(new Polygon.Builder(4).addVertex(0, 0).addVertex(0, height).addVertex(width, height).addVertex(width, 0).build());
 	}
 
 	protected AbstractButtonAdapter(RootContainer container, DrawableRegistry.Entry id, Input input) {

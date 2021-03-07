@@ -1,5 +1,6 @@
 package io.github.astrarre.networking.mixin;
 
+import io.github.astrarre.networking.internal.ModPacketHandlerImpl;
 import io.github.astrarre.networking.v0.api.ModPacketHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -20,9 +21,9 @@ public class ServerPlayNetworkHandlerMixin {
 	@Inject (method = "onCustomPayload", at = @At ("HEAD"))
 	private void onCustomPayloadAsync(CustomPayloadC2SPacket packet, CallbackInfo ci) {
 		if (this.player.getServerWorld().getServer().isOnThread()) {
-			ModPacketHandler.INSTANCE.onReceive(this.player, packet);
+			ModPacketHandlerImpl.INSTANCE.onReceive(this.player, packet);
 		} else {
-			ModPacketHandler.INSTANCE.onReceiveAsync(this.player, packet);
+			ModPacketHandlerImpl.INSTANCE.onReceiveAsync(this.player, packet);
 			NetworkThreadUtils.forceMainThread(packet, (ServerPlayPacketListener)this, this.player.getServerWorld());
 		}
 	}

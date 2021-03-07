@@ -6,11 +6,6 @@ import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
 
 public class GuiUtil {
-
-	public static void setSyncId(DrawableInternal drawable, int syncId) {
-		drawable.id = syncId;
-	}
-
 	public static void write(Polygon polygon, Output output) {
 		int vertices = polygon.vertices();
 		output.writeInt(vertices);
@@ -52,5 +47,9 @@ public class GuiUtil {
 				input.readFloat(),
 				input.readFloat(),
 				input.readFloat());
+	}
+
+	public static void setSyncId(DrawableInternal drawable, int syncId) {
+		drawable.id = syncId;
 	}
 }

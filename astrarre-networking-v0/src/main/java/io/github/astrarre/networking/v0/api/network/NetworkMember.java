@@ -3,7 +3,6 @@ package io.github.astrarre.networking.v0.api.network;
 import java.util.function.Consumer;
 
 import io.github.astrarre.networking.v0.api.io.Output;
-import io.github.astrarre.stripper.Hide;
 import io.github.astrarre.util.v0.api.Id;
 
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -18,7 +17,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 public interface NetworkMember {
 	void send(Id id, Consumer<Output> output);
 
-	@Hide
 	default ServerPlayerEntity to() {
 		return (ServerPlayerEntity) this;
 	}

@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "astrarre-transfer-compat",
+  "name": "Astrarre Transfer Compatibility Fabric",
+  "description": "Astrarre's ASM hacks to add cross compatibility between HopperBlockEntity#getInventoryAt and Transfer's Access API",
+  "version": "${version}",
+  "environment": "*",
+  "license": "LGPL-3.0",
+  "contact": {
+    "sources": "https://github.com/Astrarre/Astrarre"
+  },
+  "authors": [
+    "HalfOf2",
+    "Astrarre"
+  ],
+  "entrypoints": {
+    "main": [
+      "io.github.astrarre.transfer_compat.internal.TransferInternalAstrarre"
+    ]
+  },
+  "mixins": [
+    "astrarre-transfer-compat.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.8.9"
+  }
+}

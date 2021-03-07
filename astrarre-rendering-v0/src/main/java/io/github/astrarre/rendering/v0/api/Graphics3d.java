@@ -1,10 +1,9 @@
 package io.github.astrarre.rendering.v0.api;
 
-import io.github.astrarre.itemview.v0.fabric.TaggedItem;
+import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import io.github.astrarre.rendering.v0.api.textures.SpriteInfo;
 import io.github.astrarre.rendering.v0.api.textures.Texture;
 import io.github.astrarre.rendering.v0.api.util.Close;
-import io.github.astrarre.stripper.Hide;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
@@ -34,30 +33,23 @@ public interface Graphics3d {
 		return MinecraftClient.getInstance().textRenderer.getWidth(text);
 	}
 
-	@Hide
 	static int getWidth(Text text) {
 		return MinecraftClient.getInstance().textRenderer.getWidth(text);
 	}
 
-	@Hide
 	static int getWidth(OrderedText text) {
 		return MinecraftClient.getInstance().textRenderer.getWidth(text);
 	}
 
 	void drawText(String text, int color, boolean shadow);
 
-	// todo drawText, adventure text abstraction
-
-	@Hide
 	void drawText(Text text, int color, boolean shadow);
 
-	@Hide
 	void drawText(OrderedText text, int color, boolean shadow);
 
 	/**
 	 * draws a sprite along the xy plane
 	 */
-	@Hide
 	void drawSprite(SpriteInfo sprite);
 
 	/**
@@ -68,9 +60,8 @@ public interface Graphics3d {
 
 	void drawLine(float x1, float y1, float x2, float y2, int color);
 
-	void drawItem(TaggedItem stack);
+	void drawItem(ItemKey stack);
 
-	@Hide
 	void drawItem(ItemStack stack);
 
 	/**
@@ -79,12 +70,15 @@ public interface Graphics3d {
 	 */
 	void drawLine(float length, int color);
 
+	void fillRect(float x, float y, float width, float height, int color);
+
 	/**
 	 * Fills the specified region with a given color
 	 *
 	 * @param color {@link Graphics3d#getARGB(int, int, int)}
 	 */
 	void fillRect(float width, float height, int color);
+
 
 	/**
 	 * Fills in the specified region with a gradient which goes from the startColor (top) to the endColor (bottom)

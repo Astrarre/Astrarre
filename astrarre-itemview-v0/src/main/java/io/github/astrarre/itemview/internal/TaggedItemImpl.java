@@ -4,8 +4,7 @@ import java.util.Objects;
 
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.itemview.v0.fabric.FabricViews;
-import io.github.astrarre.itemview.v0.fabric.TaggedItem;
-import io.github.astrarre.stripper.Hide;
+import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.item.Item;
@@ -13,12 +12,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
 
-public class TaggedItemImpl implements TaggedItem {
+public class TaggedItemImpl implements ItemKey {
 	private final NBTagView nbtTag;
 	private final Item item;
 	private final int hashCode;
 
-	@Hide
 	public TaggedItemImpl(Item item, NBTagView tag) {
 		this.item = item;
 		this.nbtTag = tag == null ? NBTagView.EMPTY : tag.copy();
@@ -28,7 +26,6 @@ public class TaggedItemImpl implements TaggedItem {
 		this.hashCode = result;
 	}
 
-	@Hide
 	public TaggedItemImpl(Item item, CompoundTag tag) {
 		this(item, FabricViews.immutableView(tag));
 	}

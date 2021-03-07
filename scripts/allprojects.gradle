@@ -1,38 +1,11 @@
-buildscript {
-    repositories {
-        mavenCentral()
-        mavenLocal()
-        maven { url 'https://dl.bintray.com/astrarre/maven' }
-    }
-
-    dependencies {
-        classpath 'io.github.astrarre:astrarre-stripper:1.1.4'
-    }
-}
-import io.github.astrarre.stripper.gradle.StrippedJar
-
 allprojects {
     group 'io.github.astrarre'
     if (project != rootProject) {
-        buildscript {
-            repositories {
-                mavenCentral()
-                mavenLocal()
-                maven { url 'https://dl.bintray.com/astrarre/maven' }
-            }
-
-            dependencies {
-                classpath 'io.github.astrarre:astrarre-stripper:1.1.4'
-            }
-        }
-
-
         plugins.apply 'java'
         plugins.apply 'idea'
         plugins.apply 'eclipse'
         plugins.apply 'java-library'
         plugins.apply 'maven-publish'
-        plugins.apply "com.jfrog.bintray"
         plugins.apply "fabric-loom"
     }
 
@@ -58,15 +31,11 @@ allprojects {
     jar {
         from "$rootProject.projectDir/LICENSE"
     }
+
     dependencies {
         minecraft "com.mojang:minecraft:${minecraft_version}"
         mappings "net.fabricmc:yarn:${yarn_mappings}:v2"
         modImplementation "net.fabricmc:fabric-loader:${loader_version}"
-
-        compileOnly("io.github.astrarre:astrarre-stripper:1.1.4") {
-            transitive = false
-        }
-
         testImplementation 'junit:junit:4.13.1'
         testmodCompile sourceSets.main.output
     }
@@ -89,26 +58,6 @@ allprojects {
         from sourceSets.main.allSource
     }
 
-
-    task stripJar(type: StrippedJar) {
-        group = "astrarre"
-        archiveClassifier = "stripped"
-        from sourceSets.main.allJava
-        with jar
-    }
-
-    task apiJar(type: Jar) {
-        group = "astrarre"
-        archiveClassifier = "api"
-        with stripJar
-        afterEvaluate {
-            if (project.tasks.findByName("generateAbstractions") != null) {
-                from zipTree("$buildDir/abstracted/api.jar")
-                from zipTree("$buildDir/abstracted/api_sources.jar")
-            }
-        }
-    }
-
     publishing {
         publications {
             mavenJava(MavenPublication) {
@@ -122,34 +71,6 @@ allprojects {
                 artifact(sourcesJar) {
                     builtBy remapSourcesJar
                 }
-            }
-
-            mavenApi(MavenPublication) {
-                artifactId = "$project.name-api"
-                mavenApi(MavenPublication) {
-                    artifactId = "$project.name-api"
-                    artifact(apiJar) {
-                        builtBy apiJar
-                    }
-                }
-            }
-        }
-    }
-
-    bintray {
-        user = project.hasProperty('bintray_user') ? project.property('bintray_user') : ""
-        key = project.hasProperty('bintray_api_key') ? project.property('bintray_api_key') : ""
-        publications = ["mavenJava", "mavenApi"]
-        publish = true
-        //[Default: false] Whether version should be auto published after an upload
-        pkg {
-            repo = "maven"
-            name = project.name
-            userOrg = "astrarre"
-            licenses = ["LGPL-3.0"]
-            version {
-                name = version
-                released = new Date()
             }
         }
     }

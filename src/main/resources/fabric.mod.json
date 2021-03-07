@@ -6,7 +6,6 @@
   "version": "${version}",
   "environment": "*",
   "license": "LGPL-3.0",
-  "icon": "icon.png",
   "contact": {
     "sources": "https://github.com/Astrarre/Astrarre"
   },
@@ -16,16 +15,5 @@
   ],
   "depends": {
     "fabricloader": ">=0.8.9"
-  },
-  "mixins": [
-    "astrarre/astrarre-access.mixins.json",
-    "astrarre/astrarre-rendering.mixins.json",
-    "astrarre/astrarre-items.mixins.json",
-    "astrarre/astrarre-transfer.mixins.json"
-  ],
-  "entrypoints": {
-    "mm:early_risers": [
-      "io.github.astrarre.abstraction.internal.astrarre.AbstractionApplicator"
-    ]
   }
 }

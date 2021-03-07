@@ -1,8 +1,7 @@
 package io.github.astrarre.rendering.internal;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import io.github.astrarre.itemview.v0.fabric.TaggedItem;
+import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import io.github.astrarre.rendering.internal.util.MatrixGraphicsUtil;
 import io.github.astrarre.rendering.internal.util.SetupTeardown;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
@@ -10,21 +9,14 @@ import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.rendering.v0.api.textures.SpriteInfo;
 import io.github.astrarre.rendering.v0.api.textures.Texture;
 import io.github.astrarre.rendering.v0.api.util.Close;
-import io.github.astrarre.stripper.Hide;
 import io.github.astrarre.util.v0.api.Validate;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.render.DiffuseLighting;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.item.ItemRenderer;
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.OrderedText;
@@ -35,18 +27,16 @@ import net.fabricmc.api.Environment;
 
 @Environment (EnvType.CLIENT)
 public class MatrixGraphics implements Graphics3d {
-	@Hide public MatrixStack matrices;
+	public MatrixStack matrices;
 	private TextRenderer textRenderer;
 	private ItemRenderer itemRenderer;
 
-	@Hide private SetupTeardown stage;
+	private SetupTeardown stage;
 
-	@Hide
 	public MatrixGraphics(MatrixStack matrices) {
 		this.matrices = matrices;
 	}
 
-	@Hide
 	public MatrixStack getMatrices() {
 		return this.matrices;
 	}
@@ -127,7 +117,7 @@ public class MatrixGraphics implements Graphics3d {
 	}
 
 	@Override
-	public void drawItem(TaggedItem stack) {
+	public void drawItem(ItemKey stack) {
 		RenderSystem.pushMatrix();
 		RenderSystem.multMatrix(this.matrices.peek().getModel());
 		this.getItemRenderer().renderInGui(stack.createItemStack(1), 1, 1);
@@ -154,6 +144,11 @@ public class MatrixGraphics implements Graphics3d {
 	@Override
 	public void drawLine(float length, int color) {
 		this.fillRect(length, 1, color);
+	}
+
+	@Override
+	public void fillRect(float x, float y, float width, float height, int color) {
+		MatrixGraphicsUtil.fill(this.matrices.peek().getModel(), x, y, x + width, y + height, color);
 	}
 
 	@Override

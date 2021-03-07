@@ -1,6 +1,5 @@
 package io.github.astrarre.rendering.v0.api;
 
-import io.github.astrarre.stripper.Hide;
 
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
@@ -16,12 +15,10 @@ public final class Transformation {
 	public final float roll, pitch, yaw;
 	public final float offX, offY, offZ;
 	public final float scaleX, scaleY, scaleZ;
-	@Hide
-	public Matrix4f modelMatrixTransform;
+	private Matrix4f modelMatrixTransform;
 	/**
 	 * @see MatrixStack#scale(float, float, float)
 	 */
-	@Hide
 	private Matrix3f scaleNormal;
 
 	/**
@@ -75,15 +72,13 @@ public final class Transformation {
 				transformation.scaleZ * this.scaleZ);
 	}
 
-	@Hide
-	public void init() {
+	private void init() {
 		if (this.modelMatrixTransform == null) {
 			this.initNormalScale();
 			this.initRotateAndTranslate();
 		}
 	}
 
-	@Hide
 	public void apply(MatrixStack matricies) {
 		this.init();
 
@@ -122,5 +117,15 @@ public final class Transformation {
 		translateRotate.multiply(matrix4f);
 
 		this.modelMatrixTransform = translateRotate;
+	}
+
+	public Matrix4f getModelMatrixTransform() {
+		this.init();
+		return this.modelMatrixTransform;
+	}
+
+	public Matrix3f getScaleNormal() {
+		this.init();
+		return this.scaleNormal;
 	}
 }

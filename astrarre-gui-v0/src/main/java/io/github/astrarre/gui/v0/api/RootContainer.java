@@ -9,7 +9,6 @@ import io.github.astrarre.gui.v0.api.access.Interactable;
 import io.github.astrarre.gui.v0.api.panel.Panel;
 import io.github.astrarre.networking.internal.ByteBufDataOutput;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
-import io.github.astrarre.stripper.Hide;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.entity.player.PlayerEntity;
@@ -69,7 +68,6 @@ public interface RootContainer {
 	 * if {@link #getType()} == {@link Type#SCREEN} The iterable will be empty if on the clientside
 	 * if {@link #getType()} == {@link Type#HUD} and on the server, the iterable will just have the player with the hud
 	 */
-	@Hide
 	Iterable<NetworkMember> getViewers();
 
 	@Environment(EnvType.CLIENT)
@@ -88,4 +86,15 @@ public interface RootContainer {
 	Drawable forId(int id);
 
 	int tick();
+
+	interface OnResize {
+		void resize(int width, int height);
+	}
+
+	/**
+	 * this method only works for client-side guis, if you're serializing components to the client, your component should attach this on the client when it is deserialized
+	 * minecraft guis scale in such a way that you don't need to change the size of your component, but you may need to translate it
+	 */
+	@Environment(EnvType.CLIENT)
+	void addResizeListener(OnResize resize);
 }

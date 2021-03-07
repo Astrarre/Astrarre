@@ -1,25 +1,11 @@
-buildscript {
-    repositories {
-        mavenCentral()
-        mavenLocal()
-        maven { url 'https://dl.bintray.com/astrarre/maven' }
-    }
-
-    dependencies {
-        classpath 'io.github.astrarre:astrarre-stripper:1.1.4'
-    }
-}
-
 plugins {
     id 'java'
     id 'idea'
     id 'eclipse'
     id 'java-library'
     id 'maven-publish'
-    id "com.jfrog.bintray" version "1.8.4"
     id "fabric-loom" version "0.6-SNAPSHOT"
 }
-
 
 version '0.0.0'
 
@@ -30,17 +16,6 @@ loom {
 
 apply from: 'scripts/allprojects.gradle'
 
-dependencies {
-    dependsOn(project, subprojects)
-}
-
-sourceSets {
-    abstracter {
-        runtimeClasspath += configurations.minecraftNamed
-        compileClasspath += configurations.minecraftNamed
-    }
-}
-
 static def fapi(Project proj) {
     proj.configure(proj) {
         dependencies {
@@ -48,6 +23,12 @@ static def fapi(Project proj) {
         }
     }
 }
+
+dependencies {
+    dependsOn(project, subprojects)
+}
+
+fapi(project)
 
 static def nanoevents(Project proj) {
     proj.configure(proj) {
@@ -111,7 +92,3 @@ static def dependsOn(Project proj, String... projects) {
     List<Project> projs = projects.collect { proj.rootProject.project(it) }
     dependsOn(proj, projs)
 }
-
-fapi(project)
-
-apply from: 'scripts/abstraction.gradle'

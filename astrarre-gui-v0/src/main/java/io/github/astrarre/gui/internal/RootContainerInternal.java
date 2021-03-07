@@ -10,7 +10,6 @@ import io.github.astrarre.gui.v0.api.panel.Panel;
 import io.github.astrarre.networking.v0.api.io.Input;
 import io.github.astrarre.networking.v0.api.io.Output;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
-import io.github.astrarre.stripper.Hide;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -88,7 +87,6 @@ public abstract class RootContainerInternal implements RootContainer {
 	/**
 	 * @deprecated internal
 	 */
-	@Hide
 	@Deprecated
 	public void write(Output output) {
 		output.writeInt(this.componentRegistry.size());

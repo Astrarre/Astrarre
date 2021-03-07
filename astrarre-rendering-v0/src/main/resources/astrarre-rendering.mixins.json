@@ -5,6 +5,8 @@
   "mixins": [
     "Matrix4fAccessor",
     "Matrix4fMixin",
+    "SpriteAtlasHolderMixin",
+    "SpriteAtlasTextureMixin",
     "SpriteMixin"
   ],
   "client": [

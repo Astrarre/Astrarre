@@ -1,6 +1,5 @@
 package io.github.astrarre.rendering.v0.api.textures;
 
-import io.github.astrarre.stripper.Hide;
 import io.github.astrarre.util.v0.api.Id;
 import io.github.astrarre.util.v0.api.Validate;
 
@@ -26,7 +25,6 @@ public class Texture {
 		this((Identifier) texture, width, height);
 	}
 
-	@Hide
 	public Texture(Identifier texture, int width, int height) {
 		this.identifier = texture;
 		this.width = Validate.positive(width, "width");
@@ -37,7 +35,6 @@ public class Texture {
 		return (Id) this.identifier;
 	}
 
-	@Hide
 	public Identifier getIdentifier() {
 		return this.identifier;
 	}

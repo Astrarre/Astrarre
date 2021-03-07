@@ -18,14 +18,14 @@ public final class Polygon {
 	private final float[] vertices;
 	private final int offset, length;
 
-	public Polygon(float[] vertices) {
+	private Polygon(float[] vertices) {
 		this(vertices, 0, vertices.length);
 	}
 
 	/**
 	 * @param vertices the vertices buffer [x1, y1, x2, y2, x3, y3, etc.]
 	 */
-	public Polygon(float[] vertices, int offset, int length) {
+	private Polygon(float[] vertices, int offset, int length) {
 		if (length % 2 != 0) {
 			throw new IllegalArgumentException("verticies must be a multiple of three! [x1, y1, x2, y2, x3, y3]");
 		}
@@ -66,6 +66,10 @@ public final class Polygon {
 		return (count % 2 == 1); // Same as (count%2 == 1)
 	}
 
+	public static Polygon create(float width, float height) {
+		float[] buf = {0, 0, 0, height, width, height, width, 0};
+		return new Polygon(buf);
+	}
 
 	public int vertices() {
 		return this.length / 2;
@@ -128,13 +132,11 @@ public final class Polygon {
 
 		public Builder transform(Transformation transformation) {
 			Vector4f v4f = new Vector4f(0, 0, 0, 1);
-			transformation.init();
-
 			for (int i = 0; i < this.list.size(); i += 2) {
 				float f = this.list.getFloat(i);
 				float g = this.list.getFloat(i + 1);
 				v4f.set(f, g, 1, 1);
-				v4f.transform(transformation.modelMatrixTransform);
+				v4f.transform(transformation.getModelMatrixTransform());
 				this.list.set(i, v4f.getX());
 				this.list.set(i+1, v4f.getY());
 			}

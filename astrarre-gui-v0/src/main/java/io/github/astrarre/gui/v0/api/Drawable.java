@@ -14,9 +14,7 @@ import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.rendering.v0.api.util.Close;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
-import io.github.astrarre.stripper.Hide;
 import io.github.astrarre.util.v0.api.Id;
-import io.github.astrarre.util.v0.api.Validate;
 import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.util.math.Matrix4f;
@@ -66,7 +64,7 @@ public abstract class Drawable extends DrawableInternal {
 		Id id = input.readId();
 		BiFunction<RootContainer, Input, Drawable> function = DrawableRegistry.forId(id);
 		if (function == null || input.bytes() < 4) {
-			throw new IllegalStateException("Broken (d/s)erializer!");
+			throw new IllegalStateException("Broken (d/s)erializer! " + id);
 		} else {
 			int syncId = input.readInt();
 			Drawable drawable = function.apply(rootContainer, input);
@@ -156,6 +154,21 @@ public abstract class Drawable extends DrawableInternal {
 		return this.bounds;
 	}
 
+	/**
+	 * a second setBounds method that is protected, which allows you to throw UnsupportedOperationExceptions in {@link #setBounds(Polygon)} while
+	 * still being able to change the bounds yourself
+	 */
+	protected void setBoundsProtected(Polygon polygon) {
+		this.bounds = polygon;
+		this.sendToClients(BOUNDS_CHANGE, output -> GuiUtil.write(polygon, output));
+	}
+
+	protected void setTransformationProtected(Transformation transformation) {
+		this.transformation = transformation;
+		this.invertedMatrix = null;
+		this.sendToClients(TRANSFORM_CHANGE, output -> GuiUtil.write(transformation, output));
+	}
+
 	public void setBounds(Polygon polygon) {
 		this.bounds = polygon;
 		this.sendToClients(BOUNDS_CHANGE, output -> GuiUtil.write(polygon, output));
@@ -164,17 +177,15 @@ public abstract class Drawable extends DrawableInternal {
 	/**
 	 * @return get the matrix used to invert points so they make sense from the Drawable's perspective
 	 */
-	@Hide
 	public Matrix4f getInvertedMatrix() {
 		Matrix4f invertedMatrix = this.invertedMatrix;
 		if(invertedMatrix == null) {
 			Transformation transformation = this.transformation;
-			transformation.init();
-			Matrix4f m4f = transformation.modelMatrixTransform.copy();
+			Matrix4f m4f = transformation.getModelMatrixTransform().copy();
 			if(m4f.invert()) {
 				this.invertedMatrix = m4f;
 			} else {
-				this.invertedMatrix = transformation.modelMatrixTransform;
+				this.invertedMatrix = transformation.getModelMatrixTransform();
 			}
 			invertedMatrix = m4f;
 		}

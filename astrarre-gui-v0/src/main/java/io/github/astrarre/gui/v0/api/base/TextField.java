@@ -8,6 +8,7 @@ import io.github.astrarre.gui.v0.fabric.adapter.AbstractButtonAdapter;
 import io.github.astrarre.networking.v0.api.io.Input;
 import io.github.astrarre.networking.v0.api.io.Output;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
+import io.github.astrarre.rendering.v0.api.util.Polygon;
 import io.github.astrarre.util.v0.api.Id;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,8 +17,7 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 
 public class TextField extends AbstractButtonAdapter<TextFieldWidget> {
 	public static final int UPDATE_TEXT = 1;
-	public static final DrawableRegistry.Entry TEXT_FIELD = DrawableRegistry
-			                                                        .register(Id.newInstance("astrarre-gui-v0", "text_field"), TextField::new);
+	private static final DrawableRegistry.Entry TEXT_FIELD = DrawableRegistry.register(Id.newInstance("astrarre-gui-v0", "text_field"), TextField::new);
 	// only exists on the server
 	private String text = "";
 
@@ -108,4 +108,6 @@ public class TextField extends AbstractButtonAdapter<TextFieldWidget> {
 		super.keyPressed(keyCode, scanCode, modifiers);
 		return true;
 	}
+
+	public static void init() {}
 }

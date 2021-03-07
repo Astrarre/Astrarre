@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import io.github.astrarre.itemview.v0.fabric.FabricViews;
-import io.github.astrarre.stripper.Hide;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -243,7 +242,6 @@ public interface NBTagView extends Iterable<String> {
 	 */
 	NBTagView copy();
 
-	@Hide
 	@Nullable
 	default CompoundTag copyTag() {
 		CompoundTag tag = this.toTag();
@@ -255,7 +253,6 @@ public interface NBTagView extends Iterable<String> {
 	/**
 	 * @deprecated unsafe, does not copy tag!
 	 */
-	@Hide
 	@Nullable
 	@Deprecated
 	default CompoundTag toTag() {

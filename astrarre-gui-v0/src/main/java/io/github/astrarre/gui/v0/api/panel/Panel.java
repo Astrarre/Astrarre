@@ -13,9 +13,6 @@ import io.github.astrarre.gui.v0.api.access.Interactable;
 import io.github.astrarre.networking.v0.api.io.Input;
 import io.github.astrarre.networking.v0.api.io.Output;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
-import io.github.astrarre.rendering.v0.api.Transformation;
-import io.github.astrarre.rendering.v0.api.util.Polygon;
-import io.github.astrarre.stripper.Hide;
 import io.github.astrarre.util.v0.api.Id;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -31,7 +28,7 @@ import net.fabricmc.api.Environment;
 
 public class Panel extends Drawable implements Interactable, Container {
 	private static final Logger LOGGER = LogManager.getLogger("Astrarre Panel");
-	public static final DrawableRegistry.Entry PANEL = DrawableRegistry.register(Id.newInstance("astrarre-gui-v0", "panel"), Panel::new);
+	private static final DrawableRegistry.Entry PANEL = DrawableRegistry.register(Id.newInstance("astrarre-gui-v0", "panel"), Panel::new);
 	public static final int SYNC_CLIENT = 0;
 	private final List<Drawable> toDraw;
 	protected int index;
@@ -39,12 +36,22 @@ public class Panel extends Drawable implements Interactable, Container {
 	private IntList pendingDrawables;
 
 	public Panel(RootContainer rootContainer) {
-		super(rootContainer, PANEL);
+		this(rootContainer, PANEL);
+	}
+
+	protected Panel(RootContainer rootContainer, DrawableRegistry.Entry entry) {
+		super(rootContainer, entry);
 		this.toDraw = new ArrayList<>();
 	}
 
+	@Environment(EnvType.CLIENT)
 	public Panel(RootContainer rootContainer, Input input) {
-		super(rootContainer, PANEL);
+		this(rootContainer, PANEL, input);
+	}
+
+	@Environment(EnvType.CLIENT)
+	protected Panel(RootContainer rootContainer, DrawableRegistry.Entry entry, Input input) {
+		super(rootContainer, entry);
 		int size = input.readInt();
 		this.toDraw = new ArrayList<>(size);
 		this.pendingDrawables = new IntArrayList(size);
@@ -97,16 +104,6 @@ public class Panel extends Drawable implements Interactable, Container {
 		}
 	}
 
-	@Override
-	public void setTransformation(Transformation transformation) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void setBounds(Polygon polygon) {
-		throw new UnsupportedOperationException();
-	}
-
 	/**
 	 * If called on the client, the method is ignored. the panel will wait until the server sends the component so it does not desync
 	 *
@@ -114,7 +111,7 @@ public class Panel extends Drawable implements Interactable, Container {
 	 */
 	public void add(Drawable drawable) {
 		if (!this.rootContainer.isClient()) {
-			this.getToDraw().add(drawable);
+			this.getToDraw().add(0, drawable);
 			this.sendToClients(SYNC_CLIENT, drawable::write);
 		}
 	}
@@ -282,7 +279,6 @@ public class Panel extends Drawable implements Interactable, Container {
 	 * @see RootContainer#setFocus(Drawable)
 	 * @deprecated internal
 	 */
-	@Hide
 	@Deprecated
 	public void setFocused(@Nullable Interactable interactable, int index) {
 		Interactable old = this.focused;
@@ -324,4 +320,6 @@ public class Panel extends Drawable implements Interactable, Container {
 	public Iterator<Drawable> iterator() {
 		return this.getToDraw().iterator();
 	}
+
+	public static void init() {}
 }

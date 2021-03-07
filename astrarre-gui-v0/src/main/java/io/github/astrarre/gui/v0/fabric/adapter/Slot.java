@@ -17,7 +17,6 @@ import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.rendering.v0.api.textures.Texture;
 import io.github.astrarre.rendering.v0.api.util.Close;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
-import io.github.astrarre.stripper.Hide;
 import io.github.astrarre.util.v0.api.Id;
 import io.github.astrarre.util.v0.api.Validate;
 
@@ -34,7 +33,7 @@ public abstract class Slot extends Drawable implements Interactable {
 			                                                        .register(Id.newInstance("astrarre-gui-v0", "inventory_slot"), ClientSlot::new);
 	private static final Transformation TRANSFORMATION = Transformation.translate(1, 1, 0);
 	private final SlotInventory inventory;
-	@Hide public MinecraftSlot minecraftSlot;
+	protected MinecraftSlot minecraftSlot;
 	private boolean highlighted;
 	@Environment (EnvType.CLIENT) private boolean render;
 	@Environment (EnvType.CLIENT) private ItemStack override;
@@ -85,21 +84,29 @@ public abstract class Slot extends Drawable implements Interactable {
 	@Override
 	protected void render0(Graphics3d graphics, float tickDelta) {
 		Validate.isTrue(graphics instanceof MatrixGraphics, "Slot can only be rendered with matrix graphics!");
-		graphics.drawTexture(INVENTORY_TEXTURE, 55, 16, 18, 18);
+		this.renderBackground(graphics, tickDelta);
 		if (this.render) {
 			graphics.drawItem(this.override == null ? this.minecraftSlot.getStack() : this.override);
 			if (this.highlighted) {
-				try (Close close = graphics.applyTransformation(TRANSFORMATION)) {
-					graphics.fillGradient(16, 16, 0x80ffffff, 0x80ffffff);
-				}
+				this.renderGradient(graphics, tickDelta);
 			}
+		}
+	}
+
+	protected void renderBackground(Graphics3d graphics, float tickDelta) {
+		graphics.drawTexture(INVENTORY_TEXTURE, 55, 16, 18, 18);
+	}
+
+	protected void renderGradient(Graphics3d graphics, float tickDelta) {
+		try (Close close = graphics.applyTransformation(TRANSFORMATION)) {
+			graphics.fillGradient(16, 16, 0x80ffffff, 0x80ffffff);
 		}
 	}
 
 	@Override
 	protected void write0(Output output) {
 		FabricData.from(output).writeItemStack(this.getStack());
-		output.writeInt(this.minecraftSlot.override);
+		output.writeInt(this.minecraftSlot.id);
 	}
 
 	public abstract ItemStack getStack();

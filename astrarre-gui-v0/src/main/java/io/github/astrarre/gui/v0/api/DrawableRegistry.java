@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.function.BiFunction;
 
 import io.github.astrarre.gui.v0.api.base.Button;
+import io.github.astrarre.gui.v0.api.base.CenteringPanel;
+import io.github.astrarre.gui.v0.api.base.TextField;
 import io.github.astrarre.gui.v0.api.panel.Panel;
 import io.github.astrarre.networking.v0.api.io.Input;
 import io.github.astrarre.util.v0.api.Id;
@@ -30,8 +32,10 @@ public class DrawableRegistry {
 	}
 
 	static {
-		Validate.void_(Button.BUTTON);
-		Validate.void_(Panel.PANEL);
+		Button.init();
+		Panel.init();
+		TextField.init();
+		CenteringPanel.init();
 	}
 
 	@Nullable

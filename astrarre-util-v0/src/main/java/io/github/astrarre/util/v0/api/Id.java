@@ -1,6 +1,5 @@
 package io.github.astrarre.util.v0.api;
 
-import io.github.astrarre.stripper.Hide;
 
 import net.minecraft.util.Identifier;
 
@@ -8,7 +7,6 @@ import net.minecraft.util.Identifier;
  * overrides equals and hashcode
  */
 public interface Id {
-	@Hide
 	static Id of(Identifier identifier) {
 		return (Id) identifier;
 	}
@@ -31,7 +29,6 @@ public interface Id {
 	String id();
 	String path();
 
-	@Hide
 	default Identifier to() {
 		return (Identifier) this;
 	}

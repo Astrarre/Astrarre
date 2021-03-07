@@ -3,6 +3,7 @@ package io.github.astrarre.gui.internal.containers;
 import java.util.Collections;
 
 import io.github.astrarre.gui.internal.RootContainerInternal;
+import io.github.astrarre.gui.internal.access.ResizeListenerAccess;
 import io.github.astrarre.gui.internal.access.ScreenRootAccess;
 import io.github.astrarre.gui.v0.api.Drawable;
 import io.github.astrarre.gui.v0.api.access.Interactable;
@@ -36,6 +37,11 @@ public class ScreenRootContainer<T extends Screen> extends RootContainerInternal
 	@Override
 	public boolean isDragging() {
 		return this.screen.isDragging();
+	}
+
+	@Override
+	public void addResizeListener(OnResize resize) {
+		((ResizeListenerAccess)resize).addResizeListener(resize);
 	}
 
 	@Override

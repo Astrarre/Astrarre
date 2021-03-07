@@ -1,5 +1,6 @@
 package io.github.astrarre.networking.mixin;
 
+import io.github.astrarre.networking.internal.ModPacketHandlerImpl;
 import io.github.astrarre.networking.v0.api.ModPacketHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -22,7 +23,7 @@ public class ClientPlayNetworkHandlerMixin {
 	@Inject (method = "onCustomPayload", at = @At ("HEAD"))
 	private void onCustomPayloadAsync(CustomPayloadS2CPacket packet, CallbackInfo ci) {
 		if (!this.client.isOnThread()) {
-			ModPacketHandler.INSTANCE.onReceiveAsync(packet);
+			ModPacketHandlerImpl.INSTANCE.onReceiveAsync(packet);
 		}
 	}
 
@@ -32,6 +33,6 @@ public class ClientPlayNetworkHandlerMixin {
 					         "/listener/PacketListener;Lnet/minecraft/util/thread/ThreadExecutor;)V",
 					shift = At.Shift.AFTER))
 	private void onCustomPayload(CustomPayloadS2CPacket packet, CallbackInfo ci) {
-		ModPacketHandler.INSTANCE.onReceive(packet);
+		ModPacketHandlerImpl.INSTANCE.onReceive(packet);
 	}
 }

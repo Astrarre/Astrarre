@@ -1,6 +1,6 @@
 {
   "required": true,
-  "package": "io.github.astrarre.transfer.internal.fabric.mixin",
+  "package": "io.github.astrarre.transfer.internal.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "ItemStackMixin"

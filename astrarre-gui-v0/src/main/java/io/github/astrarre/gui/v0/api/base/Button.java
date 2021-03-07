@@ -16,7 +16,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 public class Button extends Drawable implements Interactable {
-	public static final DrawableRegistry.Entry BUTTON = DrawableRegistry.register(Id.newInstance("astrarre-gui-v0", "button"), Button::new);
+	private static final DrawableRegistry.Entry BUTTON = DrawableRegistry.register(Id.newInstance("astrarre-gui-v0", "button"), Button::new);
 	private static final Texture BEACON = new Texture("minecraft", "textures/gui/container/beacon.png", 256, 256);
 
 	public static final Polygon SQUARE_22x22 = new Polygon.Builder(4)
@@ -119,4 +119,6 @@ public class Button extends Drawable implements Interactable {
 		this.highlighted = true;
 		return true;
 	}
+
+	public static void init() {}
 }

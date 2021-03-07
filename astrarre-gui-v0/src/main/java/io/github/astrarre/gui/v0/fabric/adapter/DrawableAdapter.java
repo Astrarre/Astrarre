@@ -7,6 +7,7 @@ import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.access.Interactable;
 import io.github.astrarre.rendering.internal.MatrixGraphics;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
+import io.github.astrarre.rendering.v0.api.util.Polygon;
 
 import net.minecraft.client.gui.screen.TickableElement;
 import net.minecraft.client.util.math.MatrixStack;
@@ -55,5 +56,10 @@ public abstract class DrawableAdapter<T extends net.minecraft.client.gui.Drawabl
 		this.mx = (int) mouseX;
 		this.my = (int) mouseY;
 		return true;
+	}
+
+	@Override
+	public void setBounds(Polygon polygon) {
+		throw new UnsupportedOperationException();
 	}
 }

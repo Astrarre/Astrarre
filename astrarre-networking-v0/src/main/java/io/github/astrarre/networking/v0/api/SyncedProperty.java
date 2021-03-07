@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import io.github.astrarre.networking.v0.api.serializer.ToPacketSerializer;
-import io.github.astrarre.stripper.Hide;
 
 /**
  * a wrapper for a property that can be synced to the client or server
@@ -29,9 +28,7 @@ public abstract class SyncedProperty<T> {
 
 	/**
 	 * @deprecated internal
-	 * @param value
 	 */
-	@Hide
 	@Deprecated
 	public void onSync(Object value) {
 		this.value = (T) value;

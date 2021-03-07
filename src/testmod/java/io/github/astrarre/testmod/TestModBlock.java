@@ -1,13 +1,12 @@
 package io.github.astrarre.testmod;
 
-import io.github.astrarre.recipes.internal.recipe.RecipeParser;
 import io.github.astrarre.recipes.v0.api.ingredient.Ingredients;
 import io.github.astrarre.recipes.v0.api.recipe.Recipe;
 import io.github.astrarre.recipes.v0.api.recipe.Result;
 import io.github.astrarre.recipes.v0.api.util.Val;
 import io.github.astrarre.recipes.v0.fabric.ingredient.FabricIngredients;
 import io.github.astrarre.recipes.v0.fabric.output.FabricOutputs;
-import io.github.astrarre.transfer.internal.fabric.inventory.InventoryDelegate;
+import io.github.astrarre.transfer.internal.inventory.InventoryDelegate;
 import io.github.astrarre.util.v0.api.Id;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,8 +22,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Tickable;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.BlockView;
-
-import net.fabricmc.api.ModInitializer;
 
 public class TestModBlock extends Block implements BlockEntityProvider {
 	public static final Block TEST_BLOCK = Registry.register(Registry.BLOCK,

@@ -8,14 +8,16 @@ import java.util.Set;
 import io.github.astrarre.access.v0.api.BiFunctionAccess;
 import io.github.astrarre.access.v0.api.FunctionAccess;
 import io.github.astrarre.access.v0.api.func.AccessFunction;
-import io.github.astrarre.itemview.v0.fabric.TaggedItem;
-import io.github.astrarre.transfer.internal.fabric.NUtil;
-import io.github.astrarre.transfer.internal.fabric.SlotParticipant;
-import io.github.astrarre.transfer.internal.fabric.inventory.CombinedSidedInventory;
-import io.github.astrarre.transfer.internal.fabric.inventory.EmptyInventory;
-import io.github.astrarre.transfer.internal.fabric.inventory.SidedInventoryAccess;
-import io.github.astrarre.transfer.internal.fabric.participantInventory.AggregateParticipantInventory;
-import io.github.astrarre.transfer.internal.fabric.participantInventory.ParticipantInventory;
+import io.github.astrarre.access.v0.fabric.WorldAccess;
+import io.github.astrarre.access.v0.fabric.func.WorldFunction;
+import io.github.astrarre.itemview.v0.fabric.ItemKey;
+import io.github.astrarre.transfer.internal.NUtil;
+import io.github.astrarre.transfer.internal.SlotParticipant;
+import io.github.astrarre.transfer.internal.inventory.CombinedSidedInventory;
+import io.github.astrarre.transfer.internal.inventory.EmptyInventory;
+import io.github.astrarre.transfer.internal.inventory.SidedInventoryAccess;
+import io.github.astrarre.transfer.internal.participantInventory.AggregateParticipantInventory;
+import io.github.astrarre.transfer.internal.participantInventory.ParticipantInventory;
 import io.github.astrarre.transfer.v0.api.Insertable;
 import io.github.astrarre.transfer.v0.api.Participant;
 import io.github.astrarre.transfer.v0.api.Participants;
@@ -23,7 +25,10 @@ import io.github.astrarre.transfer.v0.api.participants.AggregateParticipant;
 import io.github.astrarre.transfer.v0.api.participants.FixedObjectVolume;
 import io.github.astrarre.transfer.v0.api.participants.ObjectVolume;
 import io.github.astrarre.transfer.v0.fabric.participants.item.ItemSlotParticipant;
+import org.jetbrains.annotations.Nullable;
 
+import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.HopperBlockEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
@@ -38,36 +43,32 @@ import net.minecraft.world.World;
  * get your inventories from {@link HopperBlockEntity#getInventoryAt(World, BlockPos)}
  */
 public final class FabricParticipants {
+	public static final WorldAccess<Participant<ItemKey>> ITEM_WORLD = new WorldAccess<>(Participants.EMPTY.cast());
+	public static final WorldAccess<Participant<Fluid>> FLUID_WORLD = new WorldAccess<>(Participants.EMPTY.cast());
+
 	/**
-	 * if a participant is looking for a limited set of items, this can help narrow it down
+	 * if an insertable is looking for a limited set of items, this can help narrow it down
 	 */
-	public static final FunctionAccess<Insertable<TaggedItem>, Set<Item>> FILTERS = FunctionAccess.newInstance(sets -> {
+	public static final FunctionAccess<Insertable<ItemKey>, Set<Item>> FILTERS = FunctionAccess.newInstance(sets -> {
 		Set<Item> combined = new HashSet<>();
 		sets.forEach(combined::addAll);
 		return combined;
 	});
 
-	/**
-	 * This can be used to extract fluids from items, the participant is where items are dumped or extracted from. For example, a water bucket will
-	 * try to insert empty buckets into the participant if it is emptied.
-	 *
-	 * todo just go with the direct access instead of trying to heuristically find the items
-	 */
-	public static final BiFunctionAccess<TaggedItem, Participant<TaggedItem>, Participant<Fluid>> ITEM_FLUID =
-			BiFunctionAccess.newInstance(AggregateParticipant::merge);
-
-	public static final FunctionAccess<Participant<TaggedItem>, Inventory> TO_INVENTORY = new FunctionAccess<>();
+	public static final FunctionAccess<Participant<ItemKey>, Inventory> TO_INVENTORY = new FunctionAccess<>();
 
 	/**
 	 * this is where you should access to convert, this contains astrarre's standard converters.
 	 */
-	public static final BiFunctionAccess<Direction, Inventory, Participant<TaggedItem>> FROM_INVENTORY = new BiFunctionAccess<>();
+	public static final BiFunctionAccess<Direction, Inventory, Participant<ItemKey>> FROM_INVENTORY = new BiFunctionAccess<>();
 
 	static {
+		ITEM_WORLD.addWorldProviderFunctions();
+		FLUID_WORLD.addWorldProviderFunctions();
 		TO_INVENTORY.addProviderFunction();
 		TO_INVENTORY.andThen(participant -> {
 			if (participant instanceof AggregateParticipant) {
-				return new AggregateParticipantInventory((AggregateParticipant<TaggedItem>) participant);
+				return new AggregateParticipantInventory((AggregateParticipant<ItemKey>) participant);
 			}
 			return null;
 		});
@@ -90,7 +91,7 @@ public final class FabricParticipants {
 				return ((AggregateParticipantInventory) inventory).participant;
 			}
 
-			Participant<TaggedItem>[] list = new Participant[inventory.size()];
+			Participant<ItemKey>[] list = new Participant[inventory.size()];
 			for (int i = 0; i < inventory.size(); i++) {
 				list[i] = new SlotParticipant(inventory, i);
 			}
@@ -126,7 +127,7 @@ public final class FabricParticipants {
 		return new ItemSlotParticipant();
 	}
 
-	public static ItemSlotParticipant createItemVolume(TaggedItem key, int quantity) {
+	public static ItemSlotParticipant createItemVolume(ItemKey key, int quantity) {
 		return new ItemSlotParticipant(key, quantity);
 	}
 
@@ -137,16 +138,37 @@ public final class FabricParticipants {
 	static {
 		FILTERS.addProviderFunction();
 		FILTERS.dependsOn(Participants.AGGREGATE_WRAPPERS_INSERTABLE, function -> insertable -> {
-			Collection<Insertable<TaggedItem>> wrapped = Participants.unwrapInternal((AccessFunction) function, insertable);
+			Collection<Insertable<ItemKey>> wrapped = Participants.unwrapInternal((AccessFunction) function, insertable);
 			if (wrapped == null) {
 				return Collections.emptySet();
 			}
 
 			Set<Item> combined = null;
-			for (Insertable<TaggedItem> delegate : wrapped) {
+			for (Insertable<ItemKey> delegate : wrapped) {
 				combined = NUtil.addAll(combined, FILTERS.get().apply(delegate));
 			}
 			return combined;
 		});
+	}
+
+	public static SidedInventory getSidedInventoryAt(WorldFunction<Participant<ItemKey>> function,
+			World world,
+			BlockPos pos,
+			@Nullable BlockState state,
+			@Nullable BlockEntity entity) {
+		if (state == null) {
+			state = world.getBlockState(pos);
+		}
+
+		if (entity == null && state.getBlock().hasBlockEntity()) {
+			entity = world.getBlockEntity(pos);
+		}
+
+		return new CombinedSidedInventory(FabricParticipants.TO_INVENTORY.get().apply(function.get(Direction.UP, state, world, pos, entity)),
+				FabricParticipants.TO_INVENTORY.get().apply(function.get(Direction.DOWN, state, world, pos, entity)),
+				FabricParticipants.TO_INVENTORY.get().apply(function.get(Direction.NORTH, state, world, pos, entity)),
+				FabricParticipants.TO_INVENTORY.get().apply(function.get(Direction.SOUTH, state, world, pos, entity)),
+				FabricParticipants.TO_INVENTORY.get().apply(function.get(Direction.WEST, state, world, pos, entity)),
+				FabricParticipants.TO_INVENTORY.get().apply(function.get(Direction.EAST, state, world, pos, entity)));
 	}
 }

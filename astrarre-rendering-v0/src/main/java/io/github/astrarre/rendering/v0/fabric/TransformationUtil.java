@@ -9,8 +9,7 @@ import net.minecraft.util.math.Matrix4f;
 
 public class TransformationUtil {
 	public static void transform(Vector3f vec3f, Transformation transformation) {
-		transformation.init();
-		Matrix4fAccessor matrix = (Matrix4fAccessor) (Object) transformation.modelMatrixTransform;
+		Matrix4fAccessor matrix = (Matrix4fAccessor) (Object) transformation.getModelMatrixTransform();
 		float f = vec3f.getX();
 		float g = vec3f.getY();
 		float h = vec3f.getZ();
@@ -20,8 +19,7 @@ public class TransformationUtil {
 	}
 
 	public static void transformInverse(Vector3f vec3f, Transformation transformation) {
-		transformation.init();
-		Matrix4f m4f = transformation.modelMatrixTransform.copy();
+		Matrix4f m4f = transformation.getModelMatrixTransform().copy();
 		m4f.invert();
 		Matrix4fAccessor matrix = (Matrix4fAccessor) (Object) m4f;
 		float f = vec3f.getX();
