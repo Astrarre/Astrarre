@@ -1,5 +1,5 @@
 allprojects {
-    group 'io.github.astrarre'
+    group = 'io.github.astrarre'
     if (project != rootProject) {
         plugins.apply 'java'
         plugins.apply 'idea'
