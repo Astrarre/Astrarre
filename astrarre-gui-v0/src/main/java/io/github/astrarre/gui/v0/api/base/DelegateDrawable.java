@@ -7,6 +7,7 @@ import io.github.astrarre.gui.v0.api.access.Interactable;
 import io.github.astrarre.networking.v0.api.io.Input;
 import io.github.astrarre.networking.v0.api.io.Output;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
+import io.github.astrarre.rendering.v0.api.util.Polygon;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -42,6 +43,7 @@ public class DelegateDrawable extends Drawable implements Interactable {
 	protected void write0(Output output) {
 		output.writeInt(this.delegate.getSyncId());
 	}
+
 
 	@Override
 	@Environment (EnvType.CLIENT)
@@ -154,5 +156,16 @@ public class DelegateDrawable extends Drawable implements Interactable {
 			return false;
 		}
 		return ((Interactable)this.getDelegate()).mouseHover(mouseX, mouseY);
+	}
+
+	@Override
+	public Polygon getBounds() {
+		return this.getDelegate().getBounds();
+	}
+
+	@Override
+	public void setBounds(Polygon polygon) {
+		super.setBounds(polygon);
+		this.delegate.setBounds(polygon);
 	}
 }

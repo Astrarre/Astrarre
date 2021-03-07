@@ -90,8 +90,8 @@ public interface RootContainer {
 	boolean isDragging();
 
 	/**
-	 * null if the container has not yet read the drawable or it does not exist
-	 * @return the drawable for the given sync id
+	 * @return the drawable for the given sync id (or null)
+	 * @throws IllegalStateException if called while the container is reading it's contents
 	 */
 	@Nullable
 	Drawable forId(int id);

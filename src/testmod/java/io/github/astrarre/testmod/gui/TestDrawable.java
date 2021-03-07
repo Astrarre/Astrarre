@@ -92,7 +92,7 @@ public class TestDrawable extends Drawable implements Interactable {
 
 	@Override
 	public boolean mouseHover(double mouseX, double mouseY) {
-		if(mouseX <= 9) { // within the icon space
+		if(mouseX <= 7) { // within the icon space
 			this.isHover = true;
 		}
 		return false;

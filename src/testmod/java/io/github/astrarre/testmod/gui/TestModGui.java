@@ -1,6 +1,7 @@
 package io.github.astrarre.testmod.gui;
 
 import io.github.astrarre.gui.v0.api.RootContainer;
+import io.github.astrarre.gui.v0.api.delegates.SimpleBorder;
 import io.github.astrarre.gui.v0.api.panel.CenteringPanel;
 import io.github.astrarre.gui.v0.api.panel.Panel;
 import io.github.astrarre.gui.v0.api.statik.BeveledRectangle;
@@ -43,6 +44,6 @@ public class TestModGui {
 			center.add(slot);
 		}
 
-		center.add(new TestDrawable(container).setTransformation(Transformation.translate(10, 10, 0)));
+		center.add(new SimpleBorder(container, new TestDrawable(container)).setTransformation(Transformation.translate(10, 10, 0)));
 	}
 }

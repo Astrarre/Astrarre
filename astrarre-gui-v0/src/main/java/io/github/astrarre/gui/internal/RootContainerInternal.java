@@ -21,6 +21,7 @@ public abstract class RootContainerInternal implements RootContainer {
 	private final Object2IntOpenHashMap<Drawable> componentRegistry = new Object2IntOpenHashMap<>();
 	private final Int2ObjectOpenHashMap<Drawable> reversedRegistry = new Int2ObjectOpenHashMap<>();
 	protected final Panel panel;
+	private boolean reading;
 	int tick;
 	private int nextId = RANDOM.nextInt(), nextClientId = this.nextId + Integer.MAX_VALUE;
 
@@ -29,12 +30,15 @@ public abstract class RootContainerInternal implements RootContainer {
 	}
 
 	protected RootContainerInternal(Consumer<RootContainerInternal> toRun, Input input) {
+		this.reading = true;
 		toRun.accept(this);
 		int size = input.readInt();
 		for (int i = 0; i < size && input.bytes() > 0; i++) {
 			Drawable drawable = Drawable.read(this, input);
 			this.addSynced(drawable);
 		}
+
+		this.reading = false;
 		int panelId = input.readInt();
 		this.panel = (Panel) this.forId(panelId);
 	}
@@ -71,6 +75,9 @@ public abstract class RootContainerInternal implements RootContainer {
 	@Override
 	@Nullable
 	public Drawable forId(int id) {
+		if(this.reading) {
+			throw new IllegalStateException("cannot check root container for id while it is being read (store the ids inside some internal buffer and query when you need to)");
+		}
 		return this.reversedRegistry.get(id);
 	}
 
