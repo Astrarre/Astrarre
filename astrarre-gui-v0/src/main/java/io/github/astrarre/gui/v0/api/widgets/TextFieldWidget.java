@@ -12,22 +12,21 @@ import io.github.astrarre.util.v0.api.Id;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.widget.TextFieldWidget;
 
-public class TextField extends AbstractButtonAdapter<TextFieldWidget> {
+public class TextFieldWidget extends AbstractButtonAdapter<net.minecraft.client.gui.widget.TextFieldWidget> {
 	public static final int UPDATE_TEXT = 1;
-	private static final DrawableRegistry.Entry TEXT_FIELD = DrawableRegistry.register(Id.create("astrarre-gui-v0", "text_field"), TextField::new);
+	private static final DrawableRegistry.Entry TEXT_FIELD = DrawableRegistry.register(Id.create("astrarre-gui-v0", "text_field"), TextFieldWidget::new);
 	// only exists on the server
 	private String text = "";
 
-	public TextField(RootContainer rootContainer, int width, int height) {
+	public TextFieldWidget(RootContainer rootContainer, int width, int height) {
 		super(rootContainer, TEXT_FIELD, width, height);
 	}
 
-	public TextField(RootContainer rootContainer, Input input) {
+	public TextFieldWidget(RootContainer rootContainer, Input input) {
 		super(rootContainer, TEXT_FIELD, input);
 		this.text = input.readUTF();
-		this.drawable = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, this.getWidth(), this.getHeight(), null);
+		this.drawable = new net.minecraft.client.gui.widget.TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, this.getWidth(), this.getHeight(), null);
 		this.drawable.active = this.enabled;
 		this.drawable.setEditable(this.isEnabled());
 		this.drawable.setChangedListener(s -> this.sendToServer(UPDATE_TEXT, o -> o.writeUTF(s)));

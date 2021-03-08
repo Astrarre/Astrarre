@@ -67,5 +67,6 @@ public class PanelElement implements Element, TickableElement {
 	@Override
 	public void tick() {
 		this.internal.tick++;
+		this.internal.tickComponents();
 	}
 }

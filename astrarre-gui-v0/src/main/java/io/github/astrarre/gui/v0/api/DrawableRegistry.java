@@ -2,14 +2,15 @@ package io.github.astrarre.gui.v0.api;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import io.github.astrarre.gui.v0.api.widgets.Button;
+import io.github.astrarre.gui.v0.api.widgets.ButtonWidget;
 import io.github.astrarre.gui.v0.api.panel.CenteringPanel;
 import io.github.astrarre.gui.v0.api.statik.DarkenedBackground;
 import io.github.astrarre.gui.v0.api.delegates.TaintedDrawable;
-import io.github.astrarre.gui.v0.api.widgets.TextField;
+import io.github.astrarre.gui.v0.api.widgets.TextFieldWidget;
 import io.github.astrarre.gui.v0.api.panel.Panel;
 import io.github.astrarre.networking.v0.api.io.Input;
 import io.github.astrarre.util.v0.api.Id;
@@ -28,6 +29,16 @@ public class DrawableRegistry {
 		}
 	}
 
+	public interface NewDrawable {
+		Drawable init(RootContainer container, Entry entry, Input input);
+	}
+
+	public static Entry registerForward(Id id, NewDrawable drawable) {
+		AtomicReference<Entry> reference = new AtomicReference<>();
+		Entry entry = register(id, (r, i) -> drawable.init(r, reference.get(), i));
+		reference.set(entry);
+		return entry;
+	}
 
 	public static Entry register(Id id, BiFunction<RootContainer, Input, Drawable> drawable) {
 		Validate.isNull(REGISTRY.put(id, drawable), "Registry entry was overriden!");
@@ -39,9 +50,9 @@ public class DrawableRegistry {
 	}
 
 	static {
-		Button.init();
+		ButtonWidget.init();
 		Panel.init();
-		TextField.init();
+		TextFieldWidget.init();
 		CenteringPanel.init();
 		DarkenedBackground.init();
 		TaintedDrawable.init();

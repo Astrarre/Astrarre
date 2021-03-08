@@ -28,15 +28,13 @@ public class TestDrawable extends Drawable implements Interactable {
 	private static final List<Text> TEXT = ImmutableList.of(new LiteralText("The amount of power contained in this item"));
 	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.registerNoInput(Id.create("mymod", "drawable"), TestDrawable::new);
 	private static final Transformation TRANSLATE = Transformation.translate(7, 0, 0);
-	public final SyncedProperty<Integer> power = this.createClientSyncedProperty(ToPacketSerializer.INTEGER, "power");
+
+	public final SyncedProperty<Integer> power = this.createClientSyncedProperty(ToPacketSerializer.INTEGER, "power", 0);
 	@Environment (EnvType.CLIENT) protected boolean isHover;
 
 	public TestDrawable(RootContainer rootContainer) {
 		super(rootContainer, ENTRY);
 		this.setBounds(Polygon.rectangle(47, 7)); // make longer and thinner to align with icon
-		if (!rootContainer.isClient()) {
-			this.power.set(0);
-		}
 	}
 
 	/**
@@ -58,6 +56,7 @@ public class TestDrawable extends Drawable implements Interactable {
 
 		if (this.isHover) {
 			graphics.drawTooltip(TEXT);
+			graphics.fillGradient(7, 7, 0x80ffffff, 0x80ffffff);
 			this.isHover = false;
 		}
 	}

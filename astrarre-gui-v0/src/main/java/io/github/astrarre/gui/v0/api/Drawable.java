@@ -59,13 +59,15 @@ public abstract class Drawable extends DrawableInternal {
 	 * properties are automatically serialized/deserialized
 	 * @return a new property who's values are synced to the server
 	 */
-	protected <T> SyncedProperty<T> createServerSyncedProperty(ToPacketSerializer<T> serializer, String id) {
+	protected <T> SyncedProperty<T> createServerSyncedProperty(ToPacketSerializer<T> serializer, String id, T defaultValue) {
 		SyncedProperty<T> property;
 		if(this.rootContainer.isClient()) {
-			property = new ClientSyncedProperty<>(serializer, this, id);
+			property = new ServerSyncedProperty<>(serializer, this, id);
+			property.set(defaultValue);
 		} else {
 			property = new DefaultProperty<>(serializer);
 		}
+
 		this.properties.put(id, property);
 		return property;
 	}
@@ -74,13 +76,15 @@ public abstract class Drawable extends DrawableInternal {
 	 * properties are automatically serialized/deserialized
 	 * @return a new property who's values are synced to the clients
 	 */
-	protected <T> SyncedProperty<T> createClientSyncedProperty(ToPacketSerializer<T> serializer, String id) {
+	protected <T> SyncedProperty<T> createClientSyncedProperty(ToPacketSerializer<T> serializer, String id, T defaultValue) {
 		SyncedProperty<T> property;
 		if(!this.rootContainer.isClient()) {
 			property = new ClientSyncedProperty<>(serializer, this, id);
+			property.set(defaultValue);
 		} else {
 			property = new DefaultProperty<>(serializer);
 		}
+
 		this.properties.put(id, property);
 		return property;
 	}

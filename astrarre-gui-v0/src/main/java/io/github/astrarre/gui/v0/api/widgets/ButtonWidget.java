@@ -15,8 +15,8 @@ import io.github.astrarre.util.v0.api.Id;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-public class Button extends Drawable implements Interactable {
-	private static final DrawableRegistry.Entry BUTTON = DrawableRegistry.register(Id.create("astrarre-gui-v0", "button"), Button::new);
+public class ButtonWidget extends Drawable implements Interactable {
+	private static final DrawableRegistry.Entry BUTTON = DrawableRegistry.register(Id.create("astrarre-gui-v0", "button"), ButtonWidget::new);
 	private static final Texture BEACON = new Texture("minecraft", "textures/gui/container/beacon.png", 256, 256);
 
 	public static final Polygon SQUARE_22x22 = new Polygon.Builder(4)
@@ -42,17 +42,17 @@ public class Button extends Drawable implements Interactable {
 	 */
 	public int clickCount;
 
-	protected Button(RootContainer rootContainer, DrawableRegistry.Entry id) {
+	protected ButtonWidget(RootContainer rootContainer, DrawableRegistry.Entry id) {
 		super(rootContainer, id);
 	}
 
-	public Button(RootContainer rootContainer) {
+	public ButtonWidget(RootContainer rootContainer) {
 		super(rootContainer, BUTTON);
 		this.setBounds(SQUARE_22x22);
 	}
 
 
-	public Button(RootContainer rootContainer, Input input) {
+	public ButtonWidget(RootContainer rootContainer, Input input) {
 		this(rootContainer);
 	}
 
