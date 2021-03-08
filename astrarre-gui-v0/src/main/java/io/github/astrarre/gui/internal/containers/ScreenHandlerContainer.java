@@ -28,21 +28,28 @@ public class ScreenHandlerContainer extends RootContainerInternal implements Slo
 	@Environment (EnvType.CLIENT) public List<OnResize> resizeList;
 	private ScreenHandler handler;
 	private boolean isClient;
+
 	public ScreenHandlerContainer(ScreenHandler handler) {
 		this.handler = handler;
 	}
+
 	public ScreenHandlerContainer(ScreenHandler handler, Input input) {
-		super(e -> ((ScreenHandlerContainer) e).handler = handler, input);
-		this.isClient = true;
+		super(e -> {
+			((ScreenHandlerContainer) e).handler = handler;
+			((ScreenHandlerContainer) e).isClient = true;
+		}, input);
 	}
+
 	@Override
 	public Type getType() {
 		return Type.SCREEN;
 	}
+
 	@Override
 	public boolean isClient() {
 		return this.isClient;
 	}
+
 	@Override
 	public Iterable<NetworkMember> getViewers() {
 		if (this.isClient) {
@@ -52,15 +59,17 @@ public class ScreenHandlerContainer extends RootContainerInternal implements Slo
 				Iterables.filter(MinecraftServers.activeServer.getPlayerManager().getPlayerList(), p -> p.currentScreenHandler == this.handler),
 				NetworkMember.class::cast);
 	}
+
 	@Override
 	public boolean isDragging() {
 		return this.isClient && this.screen != null && this.screen.isDragging();
 	}
+
 	@Override
 	@Environment (EnvType.CLIENT)
 	public void addResizeListener(OnResize resize) {
 		if (this.screen == null) {
-			if(this.resizeList == null) {
+			if (this.resizeList == null) {
 				this.resizeList = new ArrayList<>();
 			}
 			this.resizeList.add(resize);

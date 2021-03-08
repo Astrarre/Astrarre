@@ -1,5 +1,6 @@
 package io.github.astrarre.networking.internal;
 
+import java.util.Collections;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -93,8 +94,8 @@ public class ModPacketHandlerImpl implements ModPacketHandler {
 	 */
 	@Deprecated
 	@Environment(EnvType.CLIENT)
-	public void onReceiveAsync(CustomPayloadS2CPacket packet) {
-		this.fire((Id) packet.getChannel(), packet.getData(), this.asyncClientRegistry.get((Id) packet.getChannel()));
+	public boolean onReceiveAsync(CustomPayloadS2CPacket packet) {
+		return this.fire((Id) packet.getChannel(), packet.getData(), this.asyncClientRegistry.get((Id) packet.getChannel()));
 	}
 
 	/**
@@ -102,39 +103,42 @@ public class ModPacketHandlerImpl implements ModPacketHandler {
 	 */
 	@Deprecated
 	@Environment(EnvType.CLIENT)
-	public void onReceive(CustomPayloadS2CPacket packet) {
-		this.fire((Id) packet.getChannel(), packet.getData(), this.syncClientRegistry.get((Id) packet.getChannel()));
+	public boolean onReceive(CustomPayloadS2CPacket packet) {
+		return this.fire((Id) packet.getChannel(), packet.getData(), this.syncClientRegistry.get((Id) packet.getChannel()));
 	}
 
 	/**
 	 * @deprecated internal
 	 */
 	@Deprecated
-	public void onReceiveAsync(ServerPlayerEntity entity, CustomPayloadC2SPacket packet) {
+	public boolean onReceiveAsync(ServerPlayerEntity entity, CustomPayloadC2SPacket packet) {
 		CustomPayloadC2SPacketAccess access = (CustomPayloadC2SPacketAccess) packet;
 		Id identifier = (Id) access.getChannel();
 		PacketByteBuf data = access.getData();
-		this.fire(identifier, data, Iterables.<ServerReceiver, ClientReceiver>transform(this.asyncServerRegistry.get(identifier), c -> (i, d) -> c.accept((NetworkMember)entity, i, d)));
+		return this.fire(identifier, data, Iterables.<ServerReceiver, ClientReceiver>transform(this.asyncServerRegistry.get(identifier), c -> (i, d) -> c.accept((NetworkMember)entity, i, d)));
 	}
 
 	/**
 	 * @deprecated internal
 	 */
 	@Deprecated
-	public void onReceive(ServerPlayerEntity entity, CustomPayloadC2SPacket packet) {
+	public boolean onReceive(ServerPlayerEntity entity, CustomPayloadC2SPacket packet) {
 		CustomPayloadC2SPacketAccess access = (CustomPayloadC2SPacketAccess) packet;
 		Id identifier = (Id) access.getChannel();
 		PacketByteBuf data = access.getData();
-		this.fire(identifier, data, Iterables.<ServerReceiver, ClientReceiver>transform(this.syncServerRegistry.get(identifier), c -> (i, d) -> c.accept((NetworkMember)entity, i, d)));
+		return this.fire(identifier, data, Iterables.<ServerReceiver, ClientReceiver>transform(this.syncServerRegistry.get(identifier), c -> (i, d) -> c.accept((NetworkMember)entity, i, d)));
 	}
 
-	private void fire(Id identifier, PacketByteBuf data, Iterable<ClientReceiver> listeners) {
+	private boolean fire(Id identifier, PacketByteBuf data, Iterable<ClientReceiver> listeners) {
 		int readerIndex = data.readerIndex();
 		ByteBufDataInput input = new ByteBufDataInput(data);
+		boolean iter = false;
 		for (ClientReceiver receiver : listeners) {
 			data.readerIndex(readerIndex);
 			receiver.accept(identifier, input);
 			input.reset();
+			iter = true;
 		}
+		return iter;
 	}
 }

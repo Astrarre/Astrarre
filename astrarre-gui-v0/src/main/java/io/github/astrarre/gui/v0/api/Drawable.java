@@ -1,15 +1,23 @@
 package io.github.astrarre.gui.v0.api;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import io.github.astrarre.gui.internal.GuiUtil;
 import io.github.astrarre.gui.internal.DrawableInternal;
 import io.github.astrarre.gui.internal.GuiPacketHandler;
+import io.github.astrarre.gui.internal.properties.ClientSyncedProperty;
+import io.github.astrarre.gui.internal.properties.DefaultProperty;
+import io.github.astrarre.gui.internal.properties.ServerSyncedProperty;
 import io.github.astrarre.networking.v0.api.ModPacketHandler;
+import io.github.astrarre.networking.v0.api.SyncedProperty;
 import io.github.astrarre.networking.v0.api.io.Input;
 import io.github.astrarre.networking.v0.api.io.Output;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
+import io.github.astrarre.networking.v0.api.serializer.ToPacketSerializer;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.rendering.v0.api.util.Close;
@@ -22,6 +30,7 @@ import net.minecraft.util.math.Matrix4f;
 public abstract class Drawable extends DrawableInternal {
 	public static final int BOUNDS_CHANGE = -1;
 	public static final int TRANSFORM_CHANGE = -2;
+	public static final int PROPERTY_SYNC = -3;
 
 	/**
 	 * @see DrawableRegistry#register(Id, BiFunction)
@@ -30,6 +39,8 @@ public abstract class Drawable extends DrawableInternal {
 	Transformation transformation = Transformation.EMPTY;
 	Matrix4f invertedMatrix;
 	Polygon bounds = Polygon.EMPTY;
+
+	private final Map<String, SyncedProperty<?>> properties = new HashMap<>();
 
 	public Drawable(RootContainer rootContainer, DrawableRegistry.Entry id) {
 		super(rootContainer);
@@ -45,7 +56,38 @@ public abstract class Drawable extends DrawableInternal {
 	protected abstract void render0(Graphics3d graphics, float tickDelta);
 
 	/**
+	 * properties are automatically serialized/deserialized
+	 * @return a new property who's values are synced to the server
+	 */
+	protected <T> SyncedProperty<T> createServerSyncedProperty(ToPacketSerializer<T> serializer, String id) {
+		SyncedProperty<T> property;
+		if(this.rootContainer.isClient()) {
+			property = new ClientSyncedProperty<>(serializer, this, id);
+		} else {
+			property = new DefaultProperty<>(serializer);
+		}
+		this.properties.put(id, property);
+		return property;
+	}
+
+	/**
+	 * properties are automatically serialized/deserialized
+	 * @return a new property who's values are synced to the clients
+	 */
+	protected <T> SyncedProperty<T> createClientSyncedProperty(ToPacketSerializer<T> serializer, String id) {
+		SyncedProperty<T> property;
+		if(!this.rootContainer.isClient()) {
+			property = new ClientSyncedProperty<>(serializer, this, id);
+		} else {
+			property = new DefaultProperty<>(serializer);
+		}
+		this.properties.put(id, property);
+		return property;
+	}
+
+	/**
 	 * called when the drawable is removed
+	 * todo implement
 	 */
 	public void remove() {}
 
@@ -56,6 +98,15 @@ public abstract class Drawable extends DrawableInternal {
 		output.writeId(this.registryId.id);
 		output.writeInt(this.getSyncId());
 		this.write0(output);
+		int count = (int) this.properties.values().stream().filter(ClientSyncedProperty.class::isInstance).count();
+		output.writeInt(count);
+		for (SyncedProperty value : this.properties.values()) {
+			if(value instanceof ClientSyncedProperty) {
+				output.writeUTF(((ClientSyncedProperty<?>) value).id);
+				value.serializer.write(output, value.get());
+			}
+		}
+
 		GuiUtil.write(this.bounds, output);
 		GuiUtil.write(this.transformation, output);
 	}
@@ -69,6 +120,14 @@ public abstract class Drawable extends DrawableInternal {
 			int syncId = input.readInt();
 			Drawable drawable = function.apply(rootContainer, input);
 			GuiUtil.setSyncId(drawable, syncId);
+			int count = input.readInt();
+			for (int i = 0; i < count; i++) {
+				String propertyId = input.readUTF();
+				SyncedProperty<?> property = drawable.properties.get(propertyId);
+				if(property instanceof DefaultProperty) {
+					property.onSync(property.serializer.read(input));
+				}
+			}
 			drawable.bounds = GuiUtil.readPolygon(input);
 			drawable.transformation = GuiUtil.readTransformation(input);
 			drawable.invertedMatrix = null;
@@ -108,6 +167,7 @@ public abstract class Drawable extends DrawableInternal {
 		if(!this.rootContainer.isClient()) {
 			return;
 		}
+
 		ModPacketHandler.INSTANCE.sendToServer(GuiPacketHandler.DRAWABLE_PACKET_CHANNEL, output -> {
 			output.writeInt(channel);
 			output.writeEnum(this.rootContainer.getType());
@@ -129,12 +189,25 @@ public abstract class Drawable extends DrawableInternal {
 			this.invertedMatrix = null;
 		} else if(channel == BOUNDS_CHANGE) {
 			this.bounds = GuiUtil.readPolygon(input);
+		} else if(channel == PROPERTY_SYNC) {
+			String id = input.readUTF();
+			SyncedProperty<?> property = this.properties.get(id);
+			if(property instanceof DefaultProperty) {
+				property.onSync(property.serializer.read(input));
+			}
 		}
 	}
 
 	@Override
 	@ApiStatus.OverrideOnly
 	protected void receiveFromClient(NetworkMember member, int channel, Input input) {
+		if(channel == PROPERTY_SYNC) {
+			String id = input.readUTF();
+			SyncedProperty<?> property = this.properties.get(id);
+			if(property instanceof DefaultProperty) {
+				property.onSync(property.serializer.read(input));
+			}
+		}
 	}
 
 	public Transformation getTransformation() {

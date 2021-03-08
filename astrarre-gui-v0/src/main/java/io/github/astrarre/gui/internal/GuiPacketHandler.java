@@ -13,12 +13,11 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 public class GuiPacketHandler {
-	public static final Id OPEN_GUI = Id.create("astrarre-gui-v0", "open_gui");
 	public static final Id DRAWABLE_PACKET_CHANNEL = Id.create("astrarre-gui-v0", "sync");
 	public static final Id ADD_DRAWABLE = Id.create("astrarre-gui-v0", "add_drawable");
 
 	static {
-		ModPacketHandler.INSTANCE.registerClient(ADD_DRAWABLE, (id, buf) -> {
+		ModPacketHandler.INSTANCE.registerSynchronizedClient(ADD_DRAWABLE, (id, buf) -> {
 			RootContainer.Type type = buf.readEnum(RootContainer.Type.class);
 			RootContainerInternal internal = get(type);
 			if(internal != null) {
@@ -28,7 +27,7 @@ public class GuiPacketHandler {
 		});
 
 		// Drawable#sendToClient
-		ModPacketHandler.INSTANCE.registerClient(DRAWABLE_PACKET_CHANNEL, (id, buf) -> {
+		ModPacketHandler.INSTANCE.registerSynchronizedClient(DRAWABLE_PACKET_CHANNEL, (id, buf) -> {
 			int channel = buf.readInt();
 			RootContainer.Type type = buf.readEnum(RootContainer.Type.class);
 			RootContainerInternal container = get(type);
@@ -40,7 +39,7 @@ public class GuiPacketHandler {
 			}
 		});
 
-		ModPacketHandler.INSTANCE.registerServer(DRAWABLE_PACKET_CHANNEL, (member, id, buf) -> {
+		ModPacketHandler.INSTANCE.registerSynchronizedServer(DRAWABLE_PACKET_CHANNEL, (member, id, buf) -> {
 			int channel = buf.readInt();
 			RootContainer.Type type = buf.readEnum(RootContainer.Type.class);
 			int syncId = buf.readInt();

@@ -12,11 +12,11 @@ import io.github.astrarre.rendering.v0.api.Transformation;
 
 import net.minecraft.server.network.ServerPlayerEntity;
 public class TestModGui {
-	public static void open(ServerPlayerEntity entity) {
-		RootContainer.open((NetworkMember) entity, container -> open(entity, container));
+	public static TestDrawable open(ServerPlayerEntity entity) {
+		return RootContainer.open((NetworkMember) entity, container -> open(entity, container));
 	}
 
-	protected static void open(ServerPlayerEntity entity, RootContainer container) {
+	protected static TestDrawable open(ServerPlayerEntity entity, RootContainer container) {
 		// the content panel is the panel of the entire screen. It's origin is at [0, 0] (the top left of the screen)
 		Panel contentPanel = container.getContentPanel();
 		// to emulate minecraft guis, we want to make the background go dark-ish
@@ -44,6 +44,8 @@ public class TestModGui {
 			center.add(slot);
 		}
 
-		center.add(new SimpleBorder(container, new TestDrawable(container)).setTransformation(Transformation.translate(10, 10, 0)));
+		TestDrawable testDrawable = new TestDrawable(container);
+		center.add(new SimpleBorder(container, testDrawable).setTransformation(Transformation.translate(10, 10, 0)));
+		return testDrawable;
 	}
 }

@@ -3,6 +3,7 @@ package io.github.astrarre.gui.v0.api;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import io.github.astrarre.gui.v0.api.widgets.Button;
 import io.github.astrarre.gui.v0.api.panel.CenteringPanel;
@@ -31,6 +32,10 @@ public class DrawableRegistry {
 	public static Entry register(Id id, BiFunction<RootContainer, Input, Drawable> drawable) {
 		Validate.isNull(REGISTRY.put(id, drawable), "Registry entry was overriden!");
 		return new Entry(id, drawable);
+	}
+
+	public static Entry registerNoInput(Id id, Function<RootContainer, Drawable> drawable) {
+		return register(id, (r, i) -> drawable.apply(r));
 	}
 
 	static {

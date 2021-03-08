@@ -1,6 +1,7 @@
 package io.github.astrarre.gui.v0.api;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import io.github.astrarre.gui.internal.RootContainerInternal;
 import io.github.astrarre.gui.internal.access.ScreenRootAccess;
@@ -27,8 +28,9 @@ import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
  * root container, this is not meant to be implemented. Astrarre implements it for Screen and HUD
  */
 public interface RootContainer {
-	static void open(NetworkMember member, Consumer<RootContainer> consumer) {
+	static <T> T open(NetworkMember member, Function<RootContainer, T> function) {
 		ServerPlayerEntity entity = (ServerPlayerEntity) member;
+		Object[] ref = new Object[] {null};
 		entity.openHandledScreen(new ExtendedScreenHandlerFactory() {
 			private RootContainerInternal contentPanel;
 
@@ -46,11 +48,12 @@ public interface RootContainer {
 			public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
 				DefaultScreenHandler handler = new DefaultScreenHandler(syncId);
 				RootContainerInternal container = ((ScreenRootAccess)handler).getRoot();
-				consumer.accept(container);
+				ref[0] = function.apply(container);
 				this.contentPanel = container;
 				return handler;
 			}
 		});
+		return (T) ref[0];
 	}
 
 	enum Type {

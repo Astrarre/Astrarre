@@ -1,7 +1,6 @@
 package io.github.astrarre.networking.mixin;
 
 import io.github.astrarre.networking.internal.ModPacketHandlerImpl;
-import io.github.astrarre.networking.v0.api.ModPacketHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,19 +19,25 @@ import net.fabricmc.api.Environment;
 public class ClientPlayNetworkHandlerMixin {
 	@Shadow private MinecraftClient client;
 
-	@Inject (method = "onCustomPayload", at = @At ("HEAD"))
+	@Inject (method = "onCustomPayload", at = @At ("HEAD"), cancellable = true)
 	private void onCustomPayloadAsync(CustomPayloadS2CPacket packet, CallbackInfo ci) {
 		if (!this.client.isOnThread()) {
-			ModPacketHandlerImpl.INSTANCE.onReceiveAsync(packet);
+			if(ModPacketHandlerImpl.INSTANCE.onReceiveAsync(packet)) {
+				ci.cancel();
+			}
 		}
 	}
 
 	@Inject (method = "onCustomPayload",
 			at = @At (value = "INVOKE",
-					target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/Packet;" + "Lnet/minecraft/network" +
-					         "/listener/PacketListener;Lnet/minecraft/util/thread/ThreadExecutor;)V",
-					shift = At.Shift.AFTER))
+					target =
+							"Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/Packet;" + "Lnet/minecraft/network" +
+							"/listener/PacketListener;Lnet/minecraft/util/thread/ThreadExecutor;)V",
+					shift = At.Shift.AFTER),
+			cancellable = true)
 	private void onCustomPayload(CustomPayloadS2CPacket packet, CallbackInfo ci) {
-		ModPacketHandlerImpl.INSTANCE.onReceive(packet);
+		if (ModPacketHandlerImpl.INSTANCE.onReceive(packet)) {
+			ci.cancel();
+		}
 	}
 }
