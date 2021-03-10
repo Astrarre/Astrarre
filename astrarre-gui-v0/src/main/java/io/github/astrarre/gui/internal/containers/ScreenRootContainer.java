@@ -1,7 +1,5 @@
 package io.github.astrarre.gui.internal.containers;
 
-import java.util.Collections;
-
 import io.github.astrarre.gui.internal.RootContainerInternal;
 import io.github.astrarre.gui.internal.access.ResizeListenerAccess;
 import io.github.astrarre.gui.internal.access.ScreenRootAccess;
@@ -30,8 +28,8 @@ public class ScreenRootContainer<T extends Screen> extends RootContainerInternal
 	}
 
 	@Override
-	public Iterable<NetworkMember> getViewers() {
-		return Collections.emptyList();
+	public NetworkMember getViewer() {
+		return null;
 	}
 
 	@Override

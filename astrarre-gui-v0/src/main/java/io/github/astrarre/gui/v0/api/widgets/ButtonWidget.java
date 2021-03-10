@@ -30,18 +30,18 @@ public class ButtonWidget extends Drawable implements Interactable {
 	protected final Data part;
 	protected boolean highlight, pressed, disabled;
 
-	public ButtonWidget(RootContainer rootContainer, Data part) {
-		this(rootContainer, ENTRY, part);
+	public ButtonWidget(Data part) {
+		this(ENTRY, part);
 	}
 
-	protected ButtonWidget(RootContainer rootContainer, DrawableRegistry.Entry id, Data part) {
-		super(rootContainer, id);
+	protected ButtonWidget(DrawableRegistry.Entry id, Data part) {
+		super(id);
 		this.part = part;
 		this.setBounds(Polygon.rectangle(part.active.width, part.active.height));
 	}
 
-	public ButtonWidget(RootContainer container, DrawableRegistry.Entry entry, Input input) {
-		super(container, entry);
+	public ButtonWidget(DrawableRegistry.Entry entry, Input input) {
+		super(entry);
 		this.part = readData(input);
 		this.disabled = input.readBoolean();
 	}
@@ -60,7 +60,7 @@ public class ButtonWidget extends Drawable implements Interactable {
 	}
 
 	@Override
-	protected void render0(Graphics3d graphics, float tickDelta) {
+	protected void render0(RootContainer container, Graphics3d graphics, float tickDelta) {
 		if (this.disabled) {
 			graphics.drawTexture(this.part.disabled);
 		} else if (this.pressed) {
@@ -73,29 +73,29 @@ public class ButtonWidget extends Drawable implements Interactable {
 	}
 
 	@Override
-	protected void receiveFromServer(int channel, Input input) {
-		super.receiveFromServer(channel, input);
+	protected void receiveFromServer(RootContainer container, int channel, Input input) {
+		super.receiveFromServer(container, channel, input);
 		if (channel == DISABLE) {
 			this.disabled = input.readBoolean();
 		}
 	}
 
 	@Override
-	protected void receiveFromClient(NetworkMember member, int channel, Input input) {
-		super.receiveFromClient(member, channel, input);
+	protected void receiveFromClient(RootContainer container, NetworkMember member, int channel, Input input) {
+		super.receiveFromClient(container, member, channel, input);
 		if(channel == PRESSED) {
 			this.onPressServer();
 		}
 	}
 
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+	public boolean mouseClicked(RootContainer container, double mouseX, double mouseY, int button) {
 		this.pressed = true;
 		return true;
 	}
 
 	@Override
-	public boolean mouseReleased(double mouseX, double mouseY, int button) {
+	public boolean mouseReleased(RootContainer container, double mouseX, double mouseY, int button) {
 		if(this.pressed) {
 			this.onPressClient();
 		}
@@ -104,18 +104,18 @@ public class ButtonWidget extends Drawable implements Interactable {
 	}
 
 	@Override
-	public void onLoseHover() {
+	public void onLoseHover(RootContainer container) {
 		this.pressed = false;
 		this.highlight = false;
 	}
 
 	@Override
-	public boolean isHovering(double mouseX, double mouseY) {
+	public boolean isHovering(RootContainer container, double mouseX, double mouseY) {
 		return true;
 	}
 
 	@Override
-	public void mouseHover(double mouseX, double mouseY) {
+	public void mouseHover(RootContainer container, double mouseX, double mouseY) {
 		this.highlight = true;
 	}
 
@@ -160,7 +160,7 @@ public class ButtonWidget extends Drawable implements Interactable {
 	}
 
 	@Override
-	protected void write0(Output output) {
+	protected void write0(RootContainer container, Output output) {
 		writeData(this.part, output);
 		output.writeBoolean(this.disabled);
 	}

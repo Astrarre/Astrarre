@@ -11,6 +11,5 @@ public class TestModPreLaunchTesting implements PreLaunchEntrypoint {
 				.set("hello", 0)
 				.build();
 		System.out.println(builder);
-		System.exit(0);
 	}
 }

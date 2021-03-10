@@ -21,8 +21,9 @@ public class GuiPacketHandler {
 			RootContainer.Type type = buf.readEnum(RootContainer.Type.class);
 			RootContainerInternal internal = get(type);
 			if(internal != null) {
-				Drawable drawable = Drawable.read(internal, buf);
+				Drawable drawable = Drawable.read(buf);
 				internal.addSynced(drawable);
+				((DrawableInternal) drawable).onAdded(internal);
 			}
 		});
 
@@ -30,11 +31,11 @@ public class GuiPacketHandler {
 		ModPacketHandler.INSTANCE.registerSynchronizedClient(DRAWABLE_PACKET_CHANNEL, (id, buf) -> {
 			int channel = buf.readInt();
 			RootContainer.Type type = buf.readEnum(RootContainer.Type.class);
-			RootContainerInternal container = get(type);
-			if(container != null) {
-				Drawable drawable = container.forId(buf.readInt());
+			RootContainerInternal internal = get(type);
+			if(internal != null) {
+				Drawable drawable = internal.forId(buf.readInt());
 				if (drawable != null) {
-					((DrawableInternal) drawable).receiveFromServer(channel, buf);
+					((DrawableInternal) drawable).receiveFromServer(internal, channel, buf);
 				}
 			}
 		});
@@ -52,7 +53,7 @@ public class GuiPacketHandler {
 				if(internal != null) {
 					Drawable drawable = internal.forId(syncId);
 					if(drawable != null) {
-						((DrawableInternal)drawable).receiveFromClient(member, channel, buf);
+						((DrawableInternal)drawable).receiveFromClient(internal, member, channel, buf);
 					}
 				}
 			}

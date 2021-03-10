@@ -25,12 +25,12 @@ public abstract class DrawableAdapter<T extends net.minecraft.client.gui.Drawabl
 	/**
 	 * the drawable must be centered at 0, 0
 	 */
-	public DrawableAdapter(RootContainer rootContainer, DrawableRegistry.Entry id) {
-		super(rootContainer, id);
+	public DrawableAdapter(DrawableRegistry.Entry id) {
+		super(id);
 	}
 
 	@Override
-	protected void render0(Graphics3d graphics, float tickDelta) {
+	protected void render0(RootContainer container, Graphics3d graphics, float tickDelta) {
 		Graphics3d matrix = DelegateGraphics.resolve(graphics);
 		if (matrix instanceof MatrixGraphics) {
 			// todo stop this terrible hack once mojang decides it's time to move everything over to MatrixStack instead of RenderSystem's
@@ -42,7 +42,7 @@ public abstract class DrawableAdapter<T extends net.minecraft.client.gui.Drawabl
 			RenderSystem.popMatrix();
 		}
 
-		int tick = this.rootContainer.tick();
+		int tick = container.getTick();
 		if (tick != this.tick) {
 			this.tick = tick;
 			this.mx = 1_000_000;
@@ -54,7 +54,7 @@ public abstract class DrawableAdapter<T extends net.minecraft.client.gui.Drawabl
 	}
 
 	@Override
-	public boolean isHovering(double mouseX, double mouseY) {
+	public boolean isHovering(RootContainer container, double mouseX, double mouseY) {
 		this.mx = (int) mouseX;
 		this.my = (int) mouseY;
 		return true;

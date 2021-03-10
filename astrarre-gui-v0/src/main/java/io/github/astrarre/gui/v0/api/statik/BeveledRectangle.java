@@ -12,32 +12,32 @@ import io.github.astrarre.util.v0.api.Id;
 /**
  * the standard inventory background
  */
-public class BeveledRectangle extends RectangularDrawable {
+public final class BeveledRectangle extends RectangularDrawable {
 	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "beveled_rectangle"),
 			BeveledRectangle::new);
 
-	public BeveledRectangle(RootContainer container, CenteringPanel panel) {
-		this(container, panel.width, panel.height);
+	public BeveledRectangle(CenteringPanel panel) {
+		this(panel.width, panel.height);
 	}
 
-	public BeveledRectangle(RootContainer container, RectangularDrawable drawable) {
-		this(container, drawable.width, drawable.height);
+	public BeveledRectangle(RectangularDrawable drawable) {
+		this(drawable.width, drawable.height);
 	}
 
-	protected BeveledRectangle(RootContainer container, Input input) {
-		this(container, input.readInt(), input.readInt());
+	private BeveledRectangle(Input input) {
+		this(input.readInt(), input.readInt());
 	}
 
-	public BeveledRectangle(RootContainer container, int width, int height) {
-		this(container, ENTRY, width, height);
+	public BeveledRectangle(int width, int height) {
+		this(ENTRY, width, height);
 	}
 
-	protected BeveledRectangle(RootContainer rootContainer, DrawableRegistry.Entry id, int width, int height) {
-		super(rootContainer, id, width, height);
+	private BeveledRectangle(DrawableRegistry.Entry id, int width, int height) {
+		super(id, width, height);
 	}
 
 	@Override
-	protected void render0(Graphics3d graphics, float tickDelta) {
+	protected void render0(RootContainer container, Graphics3d graphics, float tickDelta) {
 		// the background part
 		graphics.fillRect(2, 2, this.width - 5, this.height - 5, 0xffc6c6c6);
 		// the top shiny part

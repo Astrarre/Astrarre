@@ -2,13 +2,12 @@ package io.github.astrarre.gui.v0.api;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
-import io.github.astrarre.gui.internal.GuiUtil;
 import io.github.astrarre.gui.internal.DrawableInternal;
 import io.github.astrarre.gui.internal.GuiPacketHandler;
+import io.github.astrarre.gui.internal.GuiUtil;
 import io.github.astrarre.gui.internal.properties.ClientSyncedProperty;
 import io.github.astrarre.gui.internal.properties.DefaultProperty;
 import io.github.astrarre.gui.internal.properties.ServerSyncedProperty;
@@ -33,35 +32,35 @@ public abstract class Drawable extends DrawableInternal {
 	public static final int PROPERTY_SYNC = -3;
 
 	/**
-	 * @see DrawableRegistry#register(Id, BiFunction)
+	 * @see DrawableRegistry#register(Id, Function)
 	 */
 	public final DrawableRegistry.Entry registryId;
+
+	private final Map<String, SyncedProperty<?>> properties = new HashMap<>();
 	Transformation transformation = Transformation.EMPTY;
 	Matrix4f invertedMatrix;
 	Polygon bounds = Polygon.EMPTY;
 
-	private final Map<String, SyncedProperty<?>> properties = new HashMap<>();
-
-	public Drawable(RootContainer rootContainer, DrawableRegistry.Entry id) {
-		super(rootContainer);
+	public Drawable(DrawableRegistry.Entry id) {
 		this.registryId = id;
 	}
 
-	public final void render(Graphics3d graphics, float tickDelta) {
+	public final void render(RootContainer container, Graphics3d graphics, float tickDelta) {
 		try (Close close = graphics.applyTransformation(this.transformation)) {
-			this.render0(graphics, tickDelta);
+			this.render0(container, graphics, tickDelta);
 		}
 	}
 
-	protected abstract void render0(Graphics3d graphics, float tickDelta);
+	protected abstract void render0(RootContainer container, Graphics3d graphics, float tickDelta);
 
 	/**
 	 * properties are automatically serialized/deserialized
+	 *
 	 * @return a new property who's values are synced to the server
 	 */
 	protected <T> SyncedProperty<T> createServerSyncedProperty(ToPacketSerializer<T> serializer, String id, T defaultValue) {
 		SyncedProperty<T> property;
-		if(this.rootContainer.isClient()) {
+		if (this.isClient()) {
 			property = new ServerSyncedProperty<>(serializer, this, id);
 			property.setRaw(defaultValue);
 		} else {
@@ -74,11 +73,12 @@ public abstract class Drawable extends DrawableInternal {
 
 	/**
 	 * properties are automatically serialized/deserialized
+	 *
 	 * @return a new property who's values are synced to the clients
 	 */
 	protected <T> SyncedProperty<T> createClientSyncedProperty(ToPacketSerializer<T> serializer, String id, T defaultValue) {
 		SyncedProperty<T> property;
-		if(!this.rootContainer.isClient()) {
+		if (!this.isClient()) {
 			property = new ClientSyncedProperty<>(serializer, this, id);
 			property.setRaw(defaultValue);
 		} else {
@@ -92,19 +92,20 @@ public abstract class Drawable extends DrawableInternal {
 	/**
 	 * called when the drawable is removed
 	 */
-	public void remove() {}
+	public void remove(RootContainer container) {
+	}
 
 	/**
 	 * @throws UnsupportedOperationException if this is a clientside component only and cannot be sent from the server
 	 */
-	public final void write(Output output) {
+	public final void write(RootContainer container, Output output) {
 		output.writeId(this.registryId.id);
 		output.writeInt(this.getSyncId());
-		this.write0(output);
+		this.write0(container, output);
 		int count = (int) this.properties.values().stream().filter(ClientSyncedProperty.class::isInstance).count();
 		output.writeInt(count);
 		for (SyncedProperty value : this.properties.values()) {
-			if(value instanceof ClientSyncedProperty) {
+			if (value instanceof ClientSyncedProperty) {
 				output.writeUTF(((ClientSyncedProperty<?>) value).id);
 				value.serializer.write(output, value.get());
 			}
@@ -114,20 +115,22 @@ public abstract class Drawable extends DrawableInternal {
 		GuiUtil.write(this.transformation, output);
 	}
 
-	public static Drawable read(RootContainer rootContainer, Input input) {
+	public static Drawable read(Input input) {
 		Id id = input.readId();
-		BiFunction<RootContainer, Input, Drawable> function = DrawableRegistry.forId(id);
+		Function<Input, Drawable> function = DrawableRegistry.forId(id);
 		if (function == null || input.bytes() < 4) {
 			throw new IllegalStateException("Broken (d/s)erializer! " + id);
 		} else {
 			int syncId = input.readInt();
-			Drawable drawable = function.apply(rootContainer, input);
+			IS_CLIENT.set(true);
+			Drawable drawable = function.apply(input);
+			IS_CLIENT.set(false);
 			GuiUtil.setSyncId(drawable, syncId);
 			int count = input.readInt();
 			for (int i = 0; i < count; i++) {
 				String propertyId = input.readUTF();
 				SyncedProperty<?> property = drawable.properties.get(propertyId);
-				if(property instanceof DefaultProperty) {
+				if (property instanceof DefaultProperty) {
 					property.onSync(property.serializer.read(input));
 				}
 			}
@@ -138,45 +141,27 @@ public abstract class Drawable extends DrawableInternal {
 		}
 	}
 
-	protected abstract void write0(Output output);
-
-	/**
-	 * send a packet to the client side counterparts of this drawable
-	 *
-	 * @param channel an internal channel id for this specific drawable
-	 */
-	public final void sendToClients(int channel, Consumer<Output> consumer) {
-		if(this.rootContainer.isClient()) {
-			return;
-		}
-
-		for (NetworkMember viewer : this.rootContainer.getViewers()) {
-			viewer.send(GuiPacketHandler.DRAWABLE_PACKET_CHANNEL, output -> {
-				output.writeInt(channel);
-				output.writeEnum(this.rootContainer.getType());
-				output.writeInt(this.getSyncId());
-				consumer.accept(output);
-			});
-		}
-	}
+	protected abstract void write0(RootContainer container, Output output);
 
 	/**
 	 * send a packet to the server side counterpart of this drawable
 	 *
 	 * @param channel an internal channel id for this specific drawable
-	 * @see #receiveFromServer(int, Input)
+	 * @see DrawableInternal#receiveFromServer(RootContainer, int, Input)
 	 */
 	public final void sendToServer(int channel, Consumer<Output> consumer) {
-		if(!this.rootContainer.isClient()) {
+		if (!this.isClient()) {
 			return;
 		}
 
-		ModPacketHandler.INSTANCE.sendToServer(GuiPacketHandler.DRAWABLE_PACKET_CHANNEL, output -> {
-			output.writeInt(channel);
-			output.writeEnum(this.rootContainer.getType());
-			output.writeInt(this.getSyncId());
-			consumer.accept(output);
-		});
+		for (RootContainer root : this.roots) {
+			ModPacketHandler.INSTANCE.sendToServer(GuiPacketHandler.DRAWABLE_PACKET_CHANNEL, output -> {
+				output.writeInt(channel);
+				output.writeEnum(root.getType());
+				output.writeInt(this.getSyncId());
+				consumer.accept(output);
+			});
+		}
 	}
 
 	/**
@@ -186,16 +171,16 @@ public abstract class Drawable extends DrawableInternal {
 	 */
 	@Override
 	@ApiStatus.OverrideOnly
-	protected void receiveFromServer(int channel, Input input) {
-		if(channel == TRANSFORM_CHANGE) {
+	protected void receiveFromServer(RootContainer container, int channel, Input input) {
+		if (channel == TRANSFORM_CHANGE) {
 			this.transformation = GuiUtil.readTransformation(input);
 			this.invertedMatrix = null;
-		} else if(channel == BOUNDS_CHANGE) {
+		} else if (channel == BOUNDS_CHANGE) {
 			this.bounds = GuiUtil.readPolygon(input);
-		} else if(channel == PROPERTY_SYNC) {
+		} else if (channel == PROPERTY_SYNC) {
 			String id = input.readUTF();
 			SyncedProperty<?> property = this.properties.get(id);
-			if(property instanceof DefaultProperty) {
+			if (property instanceof DefaultProperty) {
 				property.onSync(property.serializer.read(input));
 			}
 		}
@@ -203,11 +188,11 @@ public abstract class Drawable extends DrawableInternal {
 
 	@Override
 	@ApiStatus.OverrideOnly
-	protected void receiveFromClient(NetworkMember member, int channel, Input input) {
-		if(channel == PROPERTY_SYNC) {
+	protected void receiveFromClient(RootContainer container, NetworkMember member, int channel, Input input) {
+		if (channel == PROPERTY_SYNC) {
 			String id = input.readUTF();
 			SyncedProperty<?> property = this.properties.get(id);
-			if(property instanceof DefaultProperty) {
+			if (property instanceof DefaultProperty) {
 				property.onSync(property.serializer.read(input));
 			}
 		}
@@ -224,11 +209,44 @@ public abstract class Drawable extends DrawableInternal {
 		return this;
 	}
 
+	@Override
+	@ApiStatus.OverrideOnly
+	protected void onAdded(RootContainer container) {
+		super.onAdded(container);
+	}
+
+	/**
+	 * send a packet to the client side counterparts of this drawable
+	 *
+	 * @param channel an internal channel id for this specific drawable
+	 */
+	public final void sendToClients(int channel, Consumer<Output> consumer) {
+		if (this.isClient()) {
+			return;
+		}
+
+		for (RootContainer root : this.roots) {
+			NetworkMember member = root.getViewer();
+			if(member != null)
+			member.send(GuiPacketHandler.DRAWABLE_PACKET_CHANNEL, output -> {
+				output.writeInt(channel);
+				output.writeEnum(root.getType());
+				output.writeInt(this.getSyncId());
+				consumer.accept(output);
+			});
+		}
+	}
+
 	/**
 	 * @return the untransformed bounds of this drawable
 	 */
 	public Polygon getBounds() {
 		return this.bounds;
+	}
+
+	public void setBounds(Polygon polygon) {
+		this.bounds = polygon;
+		this.sendToClients(BOUNDS_CHANGE, output -> GuiUtil.write(polygon, output));
 	}
 
 	/**
@@ -246,20 +264,15 @@ public abstract class Drawable extends DrawableInternal {
 		this.sendToClients(TRANSFORM_CHANGE, output -> GuiUtil.write(transformation, output));
 	}
 
-	public void setBounds(Polygon polygon) {
-		this.bounds = polygon;
-		this.sendToClients(BOUNDS_CHANGE, output -> GuiUtil.write(polygon, output));
-	}
-
 	/**
 	 * @return get the matrix used to invert points so they make sense from the Drawable's perspective
 	 */
 	public Matrix4f getInvertedMatrix() {
 		Matrix4f invertedMatrix = this.invertedMatrix;
-		if(invertedMatrix == null) {
+		if (invertedMatrix == null) {
 			Transformation transformation = this.transformation;
 			Matrix4f m4f = transformation.getModelMatrixTransform().copy();
-			if(m4f.invert()) {
+			if (m4f.invert()) {
 				this.invertedMatrix = m4f;
 			} else {
 				this.invertedMatrix = transformation.getModelMatrixTransform();

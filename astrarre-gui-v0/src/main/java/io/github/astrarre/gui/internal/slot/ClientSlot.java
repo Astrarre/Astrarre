@@ -1,7 +1,6 @@
 package io.github.astrarre.gui.internal.slot;
 
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
-import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.fabric.adapter.Slot;
 import io.github.astrarre.networking.v0.api.io.Input;
 import io.github.astrarre.util.v0.api.Id;
@@ -14,12 +13,12 @@ public final class ClientSlot extends Slot {
 
 	private ItemStack stack = ItemStack.EMPTY;
 
-	protected ClientSlot(RootContainer rootContainer) {
-		super(rootContainer, CLIENT);
+	protected ClientSlot() {
+		super(CLIENT);
 	}
 
-	public ClientSlot(RootContainer rootContainer, Input input) {
-		super(rootContainer, CLIENT, input);
+	public ClientSlot(Input input) {
+		super(CLIENT, input);
 	}
 
 	@Override

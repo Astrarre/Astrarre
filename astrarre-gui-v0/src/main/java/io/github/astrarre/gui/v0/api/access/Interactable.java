@@ -1,5 +1,7 @@
 package io.github.astrarre.gui.v0.api.access;
 
+import io.github.astrarre.gui.v0.api.RootContainer;
+
 import net.minecraft.client.gui.Element;
 
 import net.fabricmc.api.EnvType;
@@ -11,7 +13,7 @@ import net.fabricmc.api.Environment;
  */
 public interface Interactable {
 	@Environment(EnvType.CLIENT)
-	default void mouseMoved(double mouseX, double mouseY) {
+	default void mouseMoved(RootContainer container, double mouseX, double mouseY) {
 	}
 
 	/**
@@ -24,13 +26,12 @@ public interface Interactable {
 	 * @return {@code true} to indicate that the event handling is successful/valid
 	 * @see net.minecraft.client.Mouse#onMouseButton(long, int, int, int)
 	 * @see org.lwjgl.glfw.GLFW#GLFW_MOUSE_BUTTON_1
-	 *
 	 * @param mouseX the X coordinate of the mouse
 	 * @param mouseY the Y coordinate of the mouse
 	 * @param button the mouse button number
 	 */
 	@Environment(EnvType.CLIENT)
-	default boolean mouseClicked(double mouseX, double mouseY, int button) {
+	default boolean mouseClicked(RootContainer container, double mouseX, double mouseY, int button) {
 		return false;
 	}
 
@@ -44,13 +45,12 @@ public interface Interactable {
 	 * @return {@code true} to indicate that the event handling is successful/valid
 	 * @see net.minecraft.client.Mouse#onMouseButton(long, int, int, int)
 	 * @see org.lwjgl.glfw.GLFW#GLFW_MOUSE_BUTTON_1
-	 *
 	 * @param mouseX the X coordinate of the mouse
 	 * @param mouseY the Y coordinate of the mouse
 	 * @param button the mouse button number
 	 */
 	@Environment(EnvType.CLIENT)
-	default boolean mouseReleased(double mouseX, double mouseY, int button) {
+	default boolean mouseReleased(RootContainer container, double mouseX, double mouseY, int button) {
 		return false;
 	}
 
@@ -64,7 +64,6 @@ public interface Interactable {
 	 * @return {@code true} to indicate that the event handling is successful/valid
 	 * @see net.minecraft.client.Mouse#onCursorPos(long, double, double)
 	 * @see org.lwjgl.glfw.GLFW#GLFW_MOUSE_BUTTON_1
-	 *
 	 * @param mouseX the current X coordinate of the mouse
 	 * @param mouseY the current Y coordinate of the mouse
 	 * @param button the mouse button number
@@ -72,7 +71,7 @@ public interface Interactable {
 	 * @param deltaY the difference of the current Y with the previous Y coordinate
 	 */
 	@Environment(EnvType.CLIENT)
-	default boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+	default boolean mouseDragged(RootContainer container, double mouseX, double mouseY, int button, double deltaX, double deltaY) {
 		return false;
 	}
 
@@ -82,13 +81,12 @@ public interface Interactable {
 	 *
 	 * @return {@code true} to indicate that the event handling is successful/valid
 	 * @see net.minecraft.client.Mouse#onMouseScroll(long, double, double)
-	 *
 	 * @param mouseX the X coordinate of the mouse
 	 * @param mouseY the Y coordinate of the mouse
 	 * @param amount value is {@code > 1} if scrolled down, {@code < 1} if scrolled up
 	 */
 	@Environment(EnvType.CLIENT)
-	default boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+	default boolean mouseScrolled(RootContainer container, double mouseX, double mouseY, double amount) {
 		return false;
 	}
 
@@ -102,13 +100,12 @@ public interface Interactable {
 	 * @see net.minecraft.client.Keyboard#onKey(long, int, int, int, int)
 	 * @see org.lwjgl.glfw.GLFW#GLFW_KEY_Q
 	 * @see org.lwjgl.glfw.GLFWKeyCallbackI#invoke(long, int, int, int, int)
-	 *
 	 * @param keyCode the named key code of the event as described in the {@link org.lwjgl.glfw.GLFW GLFW} class
 	 * @param scanCode the unique/platform-specific scan code of the keyboard input
 	 * @param modifiers a GLFW bitfield describing the modifier keys that are held down (see {@linkplain https://www.glfw.org/docs/3.3/group__mods.html GLFW Modifier key flags})
 	 */
 	@Environment(EnvType.CLIENT)
-	default boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+	default boolean keyPressed(RootContainer container, int keyCode, int scanCode, int modifiers) {
 		return false;
 	}
 
@@ -122,13 +119,12 @@ public interface Interactable {
 	 * @see net.minecraft.client.Keyboard#onKey(long, int, int, int, int)
 	 * @see org.lwjgl.glfw.GLFW#GLFW_KEY_Q
 	 * @see org.lwjgl.glfw.GLFWKeyCallbackI#invoke(long, int, int, int, int)
-	 *
 	 * @param keyCode the named key code of the event as described in the {@link org.lwjgl.glfw.GLFW GLFW} class
 	 * @param scanCode the unique/platform-specific scan code of the keyboard input
 	 * @param modifiers a GLFW bitfield describing the modifier keys that are held down (see {@linkplain https://www.glfw.org/docs/3.3/group__mods.html GLFW Modifier key flags})
 	 */
 	@Environment(EnvType.CLIENT)
-	default boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+	default boolean keyReleased(RootContainer container, int keyCode, int scanCode, int modifiers) {
 		return false;
 	}
 
@@ -142,12 +138,11 @@ public interface Interactable {
 	 * @see net.minecraft.client.Keyboard#onChar(long, int, int)
 	 * @see org.lwjgl.glfw.GLFW#GLFW_KEY_Q
 	 * @see org.lwjgl.glfw.GLFWKeyCallbackI#invoke(long, int, int, int, int)
-	 *
 	 * @param chr the captured character
 	 * @param modifiers a GLFW bitfield describing the modifier keys that are held down (see <a href="https://www.glfw.org/docs/3.3/group__mods.html">GLFW Modifier key flags</a>)
 	 */
 	@Environment(EnvType.CLIENT)
-	default boolean charTyped(char chr, int modifiers) {
+	default boolean charTyped(RootContainer container, char chr, int modifiers) {
 		return false;
 	}
 
@@ -155,30 +150,30 @@ public interface Interactable {
 	 * This method is for handling tab / ctrl+tab calls, if the function returns false
 	 * @return true if the component handled the cycle forward call.
 	 */
-	default boolean handleFocusCycle(boolean forward) {
+	default boolean handleFocusCycle(RootContainer container, boolean forward) {
 		return false;
 	}
 
-	default boolean canFocus() {return false;}
-	default void onFocus() {}
-	default void onLostFocus() {}
+	default boolean canFocus(RootContainer container) {return false;}
+	default void onFocus(RootContainer container) {}
+	default void onLostFocus(RootContainer container) {}
 
 	/**
 	 * @return {@code true} if the mouse hover event should be captured (Panel already checks if it's inside the Drawable bounds)
 	 * @param mouseX the X coordinate of the mouse
 	 * @param mouseY the Y coordinate of the mouse
-	 * @see #mouseHover(double, double)
+	 * @see #mouseHover(RootContainer, double, double)
 	 */
 	@Environment(EnvType.CLIENT)
-	default boolean isHovering(double mouseX, double mouseY) {
+	default boolean isHovering(RootContainer container, double mouseX, double mouseY) {
 		return false;
 	}
 
-	default void mouseHover(double mouseX, double mouseY) {
+	default void mouseHover(RootContainer container, double mouseX, double mouseY) {
 	}
 
 	/**
 	 * fired when the mouse moves out of the bounds of the component. This is only fired if the mouseHover event is handled
 	 */
-	default void onLoseHover() {}
+	default void onLoseHover(RootContainer container) {}
 }

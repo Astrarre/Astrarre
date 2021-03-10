@@ -32,8 +32,8 @@ public class TestDrawable extends Drawable implements Interactable {
 	public final SyncedProperty<Integer> power = this.createClientSyncedProperty(ToPacketSerializer.INTEGER, "power", 0);
 	@Environment (EnvType.CLIENT) protected boolean isHover;
 
-	public TestDrawable(RootContainer rootContainer) {
-		super(rootContainer, ENTRY);
+	public TestDrawable() {
+		super(ENTRY);
 		this.setBounds(Polygon.rectangle(47, 7)); // make longer and thinner to align with icon
 	}
 
@@ -43,7 +43,7 @@ public class TestDrawable extends Drawable implements Interactable {
 	public static void init() {}
 
 	@Override
-	protected void render0(Graphics3d graphics, float tickDelta) {
+	protected void render0(RootContainer container, Graphics3d graphics, float tickDelta) {
 		graphics.drawTexture(AstrarreIcons.INFO);
 		try (Close close = graphics.applyTransformation(TRANSLATE)) { // shift the power bar 9 pixels to the right to leave space for the icon
 			// this is where you render your component
@@ -62,16 +62,16 @@ public class TestDrawable extends Drawable implements Interactable {
 	}
 
 	@Override
-	protected void write0(Output output) {}
+	protected void write0(RootContainer container, Output output) {}
 
 	@Override
-	public boolean isHovering(double mouseX, double mouseY) {
+	public boolean isHovering(RootContainer container, double mouseX, double mouseY) {
 		// within the icon space
 		return mouseX <= 7;
 	}
 
 	@Override
-	public void mouseHover(double mouseX, double mouseY) {
+	public void mouseHover(RootContainer container, double mouseX, double mouseY) {
 		this.isHover = true;
 	}
 }

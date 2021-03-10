@@ -13,15 +13,15 @@ public abstract class AbstractButtonAdapter<T extends AbstractButtonWidget> exte
 	protected boolean enabled = true;
 	private final int width, height;
 
-	public AbstractButtonAdapter(RootContainer rootContainer, DrawableRegistry.Entry id, int width, int height) {
-		super(rootContainer, id);
+	public AbstractButtonAdapter(DrawableRegistry.Entry id, int width, int height) {
+		super(id);
 		this.width = width;
 		this.height = height;
 		this.setBoundsProtected(new Polygon.Builder(4).addVertex(0, 0).addVertex(0, height).addVertex(width, height).addVertex(width, 0).build());
 	}
 
-	protected AbstractButtonAdapter(RootContainer container, DrawableRegistry.Entry id, Input input) {
-		this(container, id, input.readInt(), input.readInt());
+	protected AbstractButtonAdapter(DrawableRegistry.Entry id, Input input) {
+		this(id, input.readInt(), input.readInt());
 		this.enabled = input.readBoolean();
 	}
 
@@ -30,15 +30,15 @@ public abstract class AbstractButtonAdapter<T extends AbstractButtonWidget> exte
 	}
 
 	@Override
-	protected void receiveFromServer(int channel, Input input) {
+	protected void receiveFromServer(RootContainer container, int channel, Input input) {
 		if (channel == LOCK) {
 			this.onActiveClient(input.readBoolean());
 		}
-		super.receiveFromServer(channel, input);
+		super.receiveFromServer(container, channel, input);
 	}
 
 	@Override
-	protected void write0(Output output) {
+	protected void write0(RootContainer container, Output output) {
 		output.writeInt(this.width);
 		output.writeInt(this.height);
 		output.writeBoolean(this.enabled);
@@ -53,14 +53,14 @@ public abstract class AbstractButtonAdapter<T extends AbstractButtonWidget> exte
 	}
 
 	public boolean isEnabled() {
-		if (this.rootContainer.isClient() && this.drawable != null) {
+		if (this.isClient() && this.drawable != null) {
 			return this.drawable.active;
 		}
 		return this.enabled;
 	}
 
 	public void setEnabled(boolean enabled) {
-		if (this.rootContainer.isClient()) {
+		if (this.isClient()) {
 			this.onActiveClient(enabled);
 		} else {
 			this.sendToClients(LOCK, output -> output.writeBoolean(enabled));

@@ -12,25 +12,30 @@ public class DarkenedBackground extends Drawable {
 	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "darkened_background"), DarkenedBackground::new);
 	private int width, height;
 
-	public DarkenedBackground(RootContainer rootContainer) {
-		super(rootContainer, ENTRY);
+	public DarkenedBackground() {
+		super(ENTRY);
 	}
 
-	public DarkenedBackground(RootContainer container, Input input) {
-		this(container);
-		this.rootContainer.addResizeListener((width, height) -> {
+	public DarkenedBackground(Input input) {
+		this();
+	}
+
+	@Override
+	protected void onAdded(RootContainer container) {
+		super.onAdded(container);
+		container.addResizeListener((width, height) -> {
 			this.width = width;
 			this.height = height;
 		});
 	}
 
 	@Override
-	protected void render0(Graphics3d graphics, float tickDelta) {
+	protected void render0(RootContainer container, Graphics3d graphics, float tickDelta) {
 		graphics.fillGradient(this.width, this.height, -1072689136, -804253680);
 	}
 
 	@Override
-	protected void write0(Output output) {
+	protected void write0(RootContainer container, Output output) {
 	}
 
 	public static void init() {}

@@ -1,6 +1,5 @@
 package io.github.astrarre.gui.v0.api;
 
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import io.github.astrarre.gui.internal.RootContainerInternal;
@@ -79,10 +78,18 @@ public interface RootContainer {
 	Panel getContentPanel();
 
 	/**
-	 * if {@link #getType()} == {@link Type#SCREEN} The iterable will be empty if on the clientside
-	 * if {@link #getType()} == {@link Type#HUD} and on the server, the iterable will just have the player with the hud
+	 * you <b>MUST</b> call this method for each drawable you add. Some classes will automatically register the component though (calling it anyways doesn't hurt)
+	 *
+	 * @see Panel adding components will automatically register it
 	 */
-	Iterable<NetworkMember> getViewers();
+	void addRoot(Drawable drawable);
+
+	/**
+	 * The result will be null if on the clientside
+	 * if {@link #getType()} == {@link Type#SCREEN}
+	 * if {@link #getType()} == {@link Type#HUD} and on the server
+	 */
+	NetworkMember getViewer();
 
 	@Environment(EnvType.CLIENT)
 	<T extends Drawable & Interactable> void setFocus(T drawable);
@@ -99,7 +106,7 @@ public interface RootContainer {
 	@Nullable
 	Drawable forId(int id);
 
-	int tick();
+	int getTick();
 
 	interface OnResize {
 		void resize(int width, int height);

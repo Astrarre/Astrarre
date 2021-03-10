@@ -30,17 +30,17 @@ public class InfoWidget extends Drawable implements Interactable {
 
 	@Environment(EnvType.CLIENT)
 	protected boolean isHover;
-	protected InfoWidget(RootContainer rootContainer, DrawableRegistry.Entry id, List<Text> tooltip) {
-		super(rootContainer, id);
+	protected InfoWidget(DrawableRegistry.Entry id, List<Text> tooltip) {
+		super(id);
 		this.tooltip = Collections.unmodifiableList(tooltip);
 	}
 
-	public InfoWidget(RootContainer container, List<Text> tooltip) {
-		this(container, ENTRY, tooltip);
+	public InfoWidget(List<Text> tooltip) {
+		this(ENTRY, tooltip);
 	}
 
-	protected InfoWidget(RootContainer container, DrawableRegistry.Entry id, Input input) {
-		super(container, id);
+	protected InfoWidget(DrawableRegistry.Entry id, Input input) {
+		super(id);
 		int count = input.readInt();
 		List<Text> list = new ArrayList<>(count);
 		for (int i = 0; i < count; i++) {
@@ -50,7 +50,7 @@ public class InfoWidget extends Drawable implements Interactable {
 	}
 
 	@Override
-	protected void render0(Graphics3d graphics, float tickDelta) {
+	protected void render0(RootContainer container, Graphics3d graphics, float tickDelta) {
 		if(this.isEnabled.get()) {
 			graphics.drawTexture(AstrarreIcons.INFO);
 			if(this.isHover) {
@@ -63,7 +63,7 @@ public class InfoWidget extends Drawable implements Interactable {
 	}
 
 	@Override
-	protected void write0(Output output) {
+	protected void write0(RootContainer container, Output output) {
 		output.writeInt(this.tooltip.size());
 		for (Text text : this.tooltip) {
 			FabricData.from(output).writeText(text);
@@ -71,17 +71,17 @@ public class InfoWidget extends Drawable implements Interactable {
 	}
 
 	@Override
-	public boolean isHovering(double mouseX, double mouseY) {
+	public boolean isHovering(RootContainer container, double mouseX, double mouseY) {
 		return true;
 	}
 
 	@Override
-	public void mouseHover(double mouseX, double mouseY) {
+	public void mouseHover(RootContainer container, double mouseX, double mouseY) {
 		this.isHover = true;
 	}
 
 	@Override
-	public void onLoseHover() {
+	public void onLoseHover(RootContainer container) {
 		this.isHover = false;
 	}
 }

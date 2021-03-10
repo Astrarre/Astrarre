@@ -21,20 +21,25 @@ public class CenteringPanel extends Panel {
 	protected Transformation original;
 	public final int width, height;
 
-	public CenteringPanel(RootContainer rootContainer, int width, int height) {
-		super(rootContainer, ENTRY);
+	public CenteringPanel(int width, int height) {
+		super(ENTRY);
 		this.width = width;
 		this.height = height;
 		this.setBoundsProtected(Polygon.rectangle(width, height));
 	}
 
 	@Environment(EnvType.CLIENT)
-	public CenteringPanel(RootContainer rootContainer, Input input) {
-		super(rootContainer, ENTRY, input);
+	private CenteringPanel(Input input) {
+		super(ENTRY, input);
 		this.original = this.getTransformation();
 		this.width = input.readInt();
 		this.height = input.readInt();
-		rootContainer.addResizeListener((width, height) -> this.setTransformationProtected(Transformation.translate(width/2f - this.width/2f, height/2f - this.height/2f, 0).combine(this.original)));
+	}
+
+	@Override
+	protected void onAdded(RootContainer container) {
+		super.onAdded(container);
+		container.addResizeListener((width, height) -> this.setTransformationProtected(Transformation.translate(width/2f - this.width/2f, height/2f - this.height/2f, 0).combine(this.original)));
 	}
 
 	@Override
@@ -46,8 +51,8 @@ public class CenteringPanel extends Panel {
 	}
 
 	@Override
-	public void write0(Output output) {
-		super.write0(output);
+	public void write0(RootContainer container, Output output) {
+		super.write0(container, output);
 		output.writeInt(this.width);
 		output.writeInt(this.height);
 	}

@@ -1,5 +1,8 @@
 package io.github.astrarre.gui.v0.fabric.adapter;
 
+import java.util.Map;
+import java.util.WeakHashMap;
+
 import io.github.astrarre.gui.internal.access.ExtraSlotAccess;
 import io.github.astrarre.gui.internal.access.SlotAddAccess;
 import io.github.astrarre.gui.internal.slot.ClientSlot;
@@ -30,44 +33,48 @@ import net.fabricmc.api.Environment;
 public abstract class Slot extends Drawable implements Interactable {
 	public static final Polygon SQUARE_16x16 = new Polygon.Builder(4).addVertex(0, 0).addVertex(0, 18).addVertex(18, 18).addVertex(18, 0).build();
 	private static final Texture INVENTORY_TEXTURE = new Texture("minecraft", "textures/gui/container/furnace.png", 256, 256);
-	private static final DrawableRegistry.Entry INVENTORY = DrawableRegistry
-			                                                        .register(Id.create("astrarre-gui-v0", "inventory_slot"), ClientSlot::new);
+	private static final DrawableRegistry.Entry INVENTORY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "inventory_slot"), ClientSlot::new);
 	private static final Transformation TRANSFORMATION = Transformation.translate(1, 1, 0);
 	private final SlotInventory inventory;
-	protected MinecraftSlot minecraftSlot;
+	protected Map<RootContainer, MinecraftSlot> minecraftSlots = new WeakHashMap<>();
 	private boolean highlighted;
-	private boolean tooltip;
-	private double mX, mY;
 
+	@Environment(EnvType.CLIENT) private int overrideClient = -1;
 	@Environment (EnvType.CLIENT) private boolean render;
 	@Environment (EnvType.CLIENT) private ItemStack override;
 
-	protected Slot(RootContainer rootContainer, DrawableRegistry.Entry id, Input input) {
-		super(rootContainer, id);
+	@Environment(EnvType.CLIENT)
+	protected Slot(DrawableRegistry.Entry id, Input input) {
+		super(id);
 		this.setStack(FabricData.readStack(input));
-		this.validate(rootContainer);
 		this.setBounds(SQUARE_16x16);
 		this.inventory = new SlotInventory(this);
-		this.minecraftSlot = new MinecraftSlot();
-		this.minecraftSlot.override = input.readInt();
-		((SlotAddAccess) rootContainer).addSlot(this.minecraftSlot);
+		this.overrideClient = input.readInt();
 	}
 
-	protected final void validate(RootContainer rootContainer) {
-		Validate.isTrue(rootContainer instanceof SlotAddAccess, "cannot add slot to non-handled screens!");
+	@Override
+	protected void onAdded(RootContainer container) {
+		super.onAdded(container);
+		Validate.isTrue(container instanceof SlotAddAccess, "cannot add slot to non-handled screens!");
+		MinecraftSlot slot = new MinecraftSlot(container);
+		this.minecraftSlots.put(container, slot);
+		if(this.isClient()) {
+			if(this.overrideClient != -1) {
+				slot.override = this.overrideClient;
+				slot.id = this.overrideClient;
+			}
+		}
+		((SlotAddAccess) container).addSlot(slot);
 	}
 
-	protected Slot(RootContainer rootContainer, DrawableRegistry.Entry id) {
-		super(rootContainer, id);
-		this.validate(rootContainer);
+	protected Slot(DrawableRegistry.Entry id) {
+		super(id);
 		this.setBounds(SQUARE_16x16);
 		this.inventory = new SlotInventory(this);
-		this.minecraftSlot = new MinecraftSlot();
-		((SlotAddAccess) rootContainer).addSlot(this.minecraftSlot);
 	}
 
-	public static Slot inventorySlot(RootContainer container, Inventory inventory, int index) {
-		return new Slot(container, INVENTORY) {
+	public static Slot inventorySlot(Inventory inventory, int index) {
+		return new Slot(INVENTORY) {
 			@Override
 			public ItemStack getStack() {
 				return inventory.getStack(index);
@@ -86,11 +93,11 @@ public abstract class Slot extends Drawable implements Interactable {
 	}
 
 	@Override
-	protected void render0(Graphics3d graphics, float tickDelta) {
+	protected void render0(RootContainer container, Graphics3d graphics, float tickDelta) {
 		Validate.isTrue(DelegateGraphics.resolve(graphics) instanceof MatrixGraphics, "Slot can only be rendered with matrix graphics!");
 		this.renderBackground(graphics, tickDelta);
 		if (this.render) {
-			graphics.drawItem(this.override == null ? this.minecraftSlot.getStack() : this.override);
+			graphics.drawItem(this.override == null ? this.getStack() : this.override);
 			if (this.highlighted) {
 				this.renderGradient(graphics, tickDelta);
 			}
@@ -108,9 +115,9 @@ public abstract class Slot extends Drawable implements Interactable {
 	}
 
 	@Override
-	protected void write0(Output output) {
+	protected void write0(RootContainer container, Output output) {
 		FabricData.from(output).writeItemStack(this.getStack());
-		output.writeInt(this.minecraftSlot.id);
+		output.writeInt(this.minecraftSlots.get(container).id);
 	}
 
 	public abstract ItemStack getStack();
@@ -118,7 +125,7 @@ public abstract class Slot extends Drawable implements Interactable {
 	public abstract void setStack(ItemStack stack);
 
 	@Override
-	public boolean isHovering(double mouseX, double mouseY) {
+	public boolean isHovering(RootContainer container, double mouseX, double mouseY) {
 		return true;
 	}
 
@@ -128,14 +135,16 @@ public abstract class Slot extends Drawable implements Interactable {
 
 	private class MinecraftSlot extends net.minecraft.screen.slot.Slot implements ExtraSlotAccess {
 		public int override = -1;
+		public final RootContainer container;
 
-		public MinecraftSlot() {
+		public MinecraftSlot(RootContainer container) {
 			super(Slot.this.inventory, 0, 0, 0);
+			this.container = container;
 		}
 
 		@Override
 		public boolean astrarre_isPointOverSlot(double x, double y) {
-			return Slot.this.rootContainer.getContentPanel().drawableAt(x, y) == Slot.this;
+			return this.container.getContentPanel().drawableAt(this.container, x, y) == Slot.this;
 		}
 
 		@Override

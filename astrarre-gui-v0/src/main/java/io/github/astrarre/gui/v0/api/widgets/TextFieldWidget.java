@@ -19,12 +19,12 @@ public class TextFieldWidget extends AbstractButtonAdapter<net.minecraft.client.
 	// only exists on the server
 	private String text = "";
 
-	public TextFieldWidget(RootContainer rootContainer, int width, int height) {
-		super(rootContainer, TEXT_FIELD, width, height);
+	public TextFieldWidget(int width, int height) {
+		super(TEXT_FIELD, width, height);
 	}
 
-	public TextFieldWidget(RootContainer rootContainer, Input input) {
-		super(rootContainer, TEXT_FIELD, input);
+	public TextFieldWidget(Input input) {
+		super(TEXT_FIELD, input);
 		this.text = input.readUTF();
 		this.drawable = new net.minecraft.client.gui.widget.TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, this.getWidth(), this.getHeight(), null);
 		this.drawable.active = this.enabled;
@@ -40,14 +40,14 @@ public class TextFieldWidget extends AbstractButtonAdapter<net.minecraft.client.
 	}
 
 	@Override
-	protected void write0(Output output) {
-		super.write0(output);
+	protected void write0(RootContainer container, Output output) {
+		super.write0(container, output);
 		String text = this.getText();
 		output.writeUTF(text);
 	}
 
 	public String getText() {
-		if(this.rootContainer.isClient() && this.drawable != null) {
+		if(this.isClient() && this.drawable != null) {
 			return this.drawable.getText();
 		}
 		return this.text;
@@ -59,7 +59,7 @@ public class TextFieldWidget extends AbstractButtonAdapter<net.minecraft.client.
 
 	public boolean setText(String text) {
 		if(this.sanitize(text)) {
-			if(this.rootContainer.isClient()) {
+			if(this.isClient()) {
 				this.drawable.setText(text);
 				this.sendToServer(UPDATE_TEXT, o -> o.writeUTF(text));
 			} else {
@@ -76,7 +76,7 @@ public class TextFieldWidget extends AbstractButtonAdapter<net.minecraft.client.
 	}
 
 	@Override
-	protected void receiveFromClient(NetworkMember member, int channel, Input input) {
+	protected void receiveFromClient(RootContainer container, NetworkMember member, int channel, Input input) {
 		if(channel == UPDATE_TEXT) {
 			String str = input.readUTF();
 			if(this.sanitize(str)) {
@@ -84,26 +84,26 @@ public class TextFieldWidget extends AbstractButtonAdapter<net.minecraft.client.
 				// todo update to all other viewers
 			}
 		}
-		super.receiveFromClient(member, channel, input);
+		super.receiveFromClient(container, member, channel, input);
 	}
 
 	@Override
-	protected void receiveFromServer(int channel, Input input) {
+	protected void receiveFromServer(RootContainer container, int channel, Input input) {
 		if(channel == UPDATE_TEXT) {
 			this.drawable.setText(this.text = input.readUTF());
 		}
-		super.receiveFromServer(channel, input);
+		super.receiveFromServer(container, channel, input);
 	}
 
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		this.rootContainer.setFocus(this);
-		return super.mouseClicked(mouseX, mouseY, button);
+	public boolean mouseClicked(RootContainer container, double mouseX, double mouseY, int button) {
+		container.setFocus(this);
+		return super.mouseClicked(container, mouseX, mouseY, button);
 	}
 
 	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		super.keyPressed(keyCode, scanCode, modifiers);
+	public boolean keyPressed(RootContainer container, int keyCode, int scanCode, int modifiers) {
+		super.keyPressed(container, keyCode, scanCode, modifiers);
 		return true;
 	}
 
