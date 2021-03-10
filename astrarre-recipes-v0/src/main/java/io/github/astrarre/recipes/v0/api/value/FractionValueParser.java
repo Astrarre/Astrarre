@@ -8,27 +8,22 @@ import org.jetbrains.annotations.NotNull;
 public class FractionValueParser implements ValueParser<Fraction> {
 	@Override
 	public @NotNull Either<Fraction, String> parse(PeekableReader reader) {
-		PeekableReader peek = reader.createSubReader();
-		Either<Integer, String> numerator = INTEGER.parse(peek);
+		Either<Integer, String> numerator = INTEGER.parse(reader);
 		if (numerator.hasRight()) {
-			reader.abort(peek);
 			return Either.ofRight("invalid numerator");
 		}
 
-		ValueParser.skipWhitespace(peek, 10);
-		if (peek.read() == '/') {
-			ValueParser.skipWhitespace(peek, 10);
-			Either<Integer, String> denominator = INTEGER.parse(peek);
+		ValueParser.skipWhitespace(reader, 10);
+		if (reader.read() == '/') {
+			ValueParser.skipWhitespace(reader, 10);
+			Either<Integer, String> denominator = INTEGER.parse(reader);
 			if (denominator.hasRight()) {
-				reader.abort(peek);
 				return Either.ofRight("invalid denominator");
 			}
 
-			reader.commit(peek);
 			return Either.ofLeft(Fraction.getFraction(numerator.getLeft(), denominator.getLeft()));
 		}
 
-		reader.commit(peek);
 		return Either.ofLeft(Fraction.getFraction(numerator.getLeft(), 1));
 	}
 

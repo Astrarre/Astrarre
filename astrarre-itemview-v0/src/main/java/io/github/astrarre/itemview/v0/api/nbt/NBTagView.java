@@ -19,6 +19,10 @@ import net.minecraft.nbt.CompoundTag;
 public interface NBTagView extends Iterable<String> {
 	NBTagView EMPTY = (NBTagView) new CompoundTag();
 
+	static Builder builder() {
+		return (Builder) new CompoundTag();
+	}
+
 	/**
 	 * equivalent to
 	 * <code>
@@ -194,8 +198,9 @@ public interface NBTagView extends Iterable<String> {
 	String getString(String path, String def);
 
 	/**
-	 * if in the future multiple objects of different types can have the same key, it'll choose one at random if some keys don't have their own nbt
-	 * representation (at the time of this writing) so they will default to another form at the current time boolean -> byte, and char -> short
+	 * if in the future multiple objects of different types can have the same key, the behavior is undefined.
+	 * Some keys don't have their own nbt representation (at the time of this writing) so they will default to another form.
+	 * At the current time boolean -> byte, and char -> short
 	 */
 	@Nullable Object get(String path);
 
@@ -238,7 +243,7 @@ public interface NBTagView extends Iterable<String> {
 	Iterator<String> iterator();
 
 	/**
-	 * NBTagView is Unmodifiable, but copying it will prevent it's backer's mutations from affecting it
+	 * NBTagView is Unmodifiable, but copying it will prevent it's backer's mutations from affecting the returned instance, making it immutable
 	 */
 	NBTagView copy();
 
@@ -251,7 +256,7 @@ public interface NBTagView extends Iterable<String> {
 	boolean isEmpty();
 
 	/**
-	 * @deprecated unsafe, does not copy tag!
+	 * @deprecated unsafe, may not copy tag!
 	 */
 	@Nullable
 	@Deprecated
@@ -260,5 +265,18 @@ public interface NBTagView extends Iterable<String> {
 			return null;
 		}
 		return (CompoundTag) this;
+	}
+
+	interface Builder extends NBTagView {
+		Builder set(String key, byte b);
+		Builder set(String key, boolean b);
+		Builder set(String key, char c);
+		Builder set(String key, short s);
+		Builder set(String key, float f);
+		Builder set(String key, int i);
+		Builder set(String key, double d);
+		Builder set(String key, long l);
+		<T> Builder set(String path, NBTType<T> type, T object);
+		NBTagView build();
 	}
 }

@@ -27,12 +27,12 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 public class Panel extends Drawable implements Interactable, Container {
+	public static final int SYNC_CLIENT = 0;
 	private static final Logger LOGGER = LogManager.getLogger("Astrarre Panel");
 	private static final DrawableRegistry.Entry PANEL = DrawableRegistry.register(Id.create("astrarre-gui-v0", "panel"), Panel::new);
-	public static final int SYNC_CLIENT = 0;
 	private final List<Drawable> toDraw;
 	protected int index;
-	protected Interactable focused;
+	protected Interactable focused, hovered;
 	private IntList pendingDrawables;
 
 	public Panel(RootContainer rootContainer) {
@@ -44,12 +44,12 @@ public class Panel extends Drawable implements Interactable, Container {
 		this.toDraw = new ArrayList<>();
 	}
 
-	@Environment(EnvType.CLIENT)
+	@Environment (EnvType.CLIENT)
 	public Panel(RootContainer rootContainer, Input input) {
 		this(rootContainer, PANEL, input);
 	}
 
-	@Environment(EnvType.CLIENT)
+	@Environment (EnvType.CLIENT)
 	protected Panel(RootContainer rootContainer, DrawableRegistry.Entry entry, Input input) {
 		super(rootContainer, entry);
 		int size = input.readInt();
@@ -59,6 +59,8 @@ public class Panel extends Drawable implements Interactable, Container {
 			this.pendingDrawables.add(input.readInt());
 		}
 	}
+
+	public static void init() {}
 
 	@Override
 	protected void render0(Graphics3d graphics, float tickDelta) {
@@ -75,6 +77,15 @@ public class Panel extends Drawable implements Interactable, Container {
 		}
 	}
 
+	@Override
+	protected void receiveFromServer(int channel, Input input) {
+		super.receiveFromServer(channel, input);
+		if (channel == SYNC_CLIENT) {
+			Drawable drawable = read(this.rootContainer, input);
+			this.getToDraw().add(drawable);
+		}
+	}
+
 	private List<Drawable> getToDraw() {
 		if (this.pendingDrawables != null) {
 			for (int i = this.pendingDrawables.size() - 1; i >= 0; i--) {
@@ -88,20 +99,11 @@ public class Panel extends Drawable implements Interactable, Container {
 				}
 			}
 
-			if(this.pendingDrawables.isEmpty()) {
+			if (this.pendingDrawables.isEmpty()) {
 				this.pendingDrawables = null;
 			}
 		}
 		return this.toDraw;
-	}
-
-	@Override
-	protected void receiveFromServer(int channel, Input input) {
-		super.receiveFromServer(channel, input);
-		if (channel == SYNC_CLIENT) {
-			Drawable drawable = read(this.rootContainer, input);
-			this.getToDraw().add(drawable);
-		}
 	}
 
 	/**
@@ -126,7 +128,7 @@ public class Panel extends Drawable implements Interactable, Container {
 	}
 
 	@Override
-	@Environment(EnvType.CLIENT)
+	@Environment (EnvType.CLIENT)
 	public void mouseMoved(double mouseX, double mouseY) {
 		Vector4f v3f = new Vector4f(0, 0, 0, 0);
 		for (Interactable interactable : this.interactables()) {
@@ -167,7 +169,7 @@ public class Panel extends Drawable implements Interactable, Container {
 	}
 
 	@Override
-	@Environment(EnvType.CLIENT)
+	@Environment (EnvType.CLIENT)
 	public boolean mouseReleased(double mouseX, double mouseY, int button) {
 		Vector4f v3f = new Vector4f(0, 0, 0, 1);
 		for (Interactable interactable : this.interactables()) {
@@ -181,14 +183,14 @@ public class Panel extends Drawable implements Interactable, Container {
 	}
 
 	@Override
-	@Environment(EnvType.CLIENT)
+	@Environment (EnvType.CLIENT)
 	public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
 		Vector4f v3f = new Vector4f(0, 0, 0, 1);
 		for (Interactable interactable : this.interactables()) {
 			transformation(interactable, v3f, mouseX, mouseY);
 			float mX = v3f.getX(), mY = v3f.getY();
 			transformation(interactable, v3f, deltaX, deltaY);
-			if (((Drawable)interactable).getBounds().isInside(mX, mY) && interactable.mouseDragged(mX, mY, button, v3f.getX(), v3f.getY())) {
+			if (((Drawable) interactable).getBounds().isInside(mX, mY) && interactable.mouseDragged(mX, mY, button, v3f.getX(), v3f.getY())) {
 				return true;
 			}
 		}
@@ -196,7 +198,7 @@ public class Panel extends Drawable implements Interactable, Container {
 	}
 
 	@Override
-	@Environment(EnvType.CLIENT)
+	@Environment (EnvType.CLIENT)
 	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
 		Vector4f v3f = new Vector4f(0, 0, 0, 1);
 		for (Interactable interactable : this.interactables()) {
@@ -210,7 +212,7 @@ public class Panel extends Drawable implements Interactable, Container {
 	}
 
 	@Override
-	@Environment(EnvType.CLIENT)
+	@Environment (EnvType.CLIENT)
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		if (this.focused != null) {
 			return this.focused.keyPressed(keyCode, scanCode, modifiers);
@@ -219,7 +221,7 @@ public class Panel extends Drawable implements Interactable, Container {
 	}
 
 	@Override
-	@Environment(EnvType.CLIENT)
+	@Environment (EnvType.CLIENT)
 	public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
 		if (this.focused != null) {
 			return this.focused.keyReleased(keyCode, scanCode, modifiers);
@@ -228,7 +230,7 @@ public class Panel extends Drawable implements Interactable, Container {
 	}
 
 	@Override
-	@Environment(EnvType.CLIENT)
+	@Environment (EnvType.CLIENT)
 	public boolean charTyped(char chr, int modifiers) {
 		if (this.focused != null) {
 			return this.focused.charTyped(chr, modifiers);
@@ -237,7 +239,7 @@ public class Panel extends Drawable implements Interactable, Container {
 	}
 
 	@Override
-	@Environment(EnvType.CLIENT)
+	@Environment (EnvType.CLIENT)
 	public boolean handleFocusCycle(boolean forward) {
 		if (this.focused != null && this.focused.handleFocusCycle(forward)) {
 			return true;
@@ -262,17 +264,46 @@ public class Panel extends Drawable implements Interactable, Container {
 	}
 
 	@Override
-	@Environment(EnvType.CLIENT)
-	public boolean mouseHover(double mouseX, double mouseY) {
+	@Environment (EnvType.CLIENT)
+	public boolean isHovering(double mouseX, double mouseY) {
 		Vector4f v3f = new Vector4f(0, 0, 0, 1);
 		for (Interactable interactable : this.interactables()) {
 			Drawable drawable = (Drawable) interactable;
 			transformation(interactable, v3f, mouseX, mouseY);
-			if (drawable.getBounds().isInside(v3f.getX(), v3f.getY()) && interactable.mouseHover(v3f.getX(), v3f.getY())) {
+			if (drawable.getBounds().isInside(v3f.getX(), v3f.getY()) && interactable.  isHovering(v3f.getX(), v3f.getY())) {
 				return true;
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public void mouseHover(double mouseX, double mouseY) {
+		Interactable interactable = this.drawableAt(mouseX, mouseY);
+		if (this.hovered != interactable && this.hovered != null) {
+			this.hovered.onLoseHover();
+		}
+		this.hovered = interactable;
+		if (interactable != null) {
+			interactable.mouseHover(mouseX, mouseY);
+		}
+	}
+
+	@Override
+	public <T extends Drawable & Interactable> T drawableAt(double x, double y) {
+		Vector4f v3f = new Vector4f(0, 0, 0, 1);
+		for (Interactable interactable : this.interactables()) {
+			transformation(interactable, v3f, x, y);
+			if (((Drawable) interactable).getBounds().isInside(v3f.getX(), v3f.getY())) {
+				if (interactable instanceof Container) {
+					return ((Container) interactable).drawableAt(v3f.getX(), v3f.getY());
+				} else if (interactable.isHovering(v3f.getX(), v3f.getY())) {
+					return (T) interactable;
+				}
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -298,28 +329,9 @@ public class Panel extends Drawable implements Interactable, Container {
 		return this.focused;
 	}
 
-	@Override
-	public <T extends Drawable & Interactable> T drawableAt(double x, double y) {
-		Vector4f v3f = new Vector4f(0, 0, 0, 1);
-		for (Interactable interactable : this.interactables()) {
-			transformation(interactable, v3f, x, y);
-			if (((Drawable) interactable).getBounds().isInside(v3f.getX(), v3f.getY())) {
-				if (interactable instanceof Container) {
-					return ((Container) interactable).drawableAt(v3f.getX(), v3f.getY());
-				} else if (interactable.mouseHover(v3f.getX(), v3f.getY())) {
-					return (T) interactable;
-				}
-			}
-		}
-
-		return null;
-	}
-
 	@NotNull
 	@Override
 	public Iterator<Drawable> iterator() {
 		return this.getToDraw().iterator();
 	}
-
-	public static void init() {}
 }

@@ -1,5 +1,6 @@
 package io.github.astrarre.testmod;
 
+import io.github.astrarre.recipes.v0.api.RecipeFile;
 import io.github.astrarre.recipes.v0.api.ingredient.Ingredients;
 import io.github.astrarre.recipes.v0.api.recipe.Recipe;
 import io.github.astrarre.recipes.v0.api.recipe.Result;
@@ -37,14 +38,14 @@ public class TestModBlock extends Block implements BlockEntityProvider {
 			.outputs(Id.create("mymod", "ore_doubler"))
 			.add(FabricOutputs.ITEM_STACK)
 			.build("My Mod's Ore Doubler");
+	private static final RecipeFile FILE = new RecipeFile("test", "ore_doubler")
+			.add(RECIPE);
 
 	public TestModBlock(Settings settings) {
 		super(settings);
 	}
 
 	public static void modInit() {
-		TestMod.load(RECIPE, "iron_ore + 4 --[mymod:ore_doubler]-> iron_ingot x10");
-		// io.github.astrarre.testmod.TestModBlock::modInit
 	}
 
 	@Nullable
@@ -56,6 +57,7 @@ public class TestModBlock extends Block implements BlockEntityProvider {
 	public static class Entity extends BlockEntity implements InventoryDelegate, Tickable {
 		public final Inventory inventory = new SimpleInventory(1);
 		public Val<Integer> progress = Val.ofInteger();
+
 		public Entity() {
 			super(BE_TYPE);
 		}

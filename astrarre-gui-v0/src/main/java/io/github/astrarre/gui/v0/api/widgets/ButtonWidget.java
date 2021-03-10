@@ -1,14 +1,16 @@
 package io.github.astrarre.gui.v0.api.widgets;
 
-import io.github.astrarre.gui.v0.api.RootContainer;
+import io.github.astrarre.gui.v0.api.AstrarreIcons;
 import io.github.astrarre.gui.v0.api.Drawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
+import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.access.Interactable;
 import io.github.astrarre.networking.v0.api.io.Input;
 import io.github.astrarre.networking.v0.api.io.Output;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.rendering.v0.api.textures.Texture;
+import io.github.astrarre.rendering.v0.api.textures.TexturePart;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
 import io.github.astrarre.util.v0.api.Id;
 
@@ -16,109 +18,185 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 public class ButtonWidget extends Drawable implements Interactable {
-	private static final DrawableRegistry.Entry BUTTON = DrawableRegistry.register(Id.create("astrarre-gui-v0", "button"), ButtonWidget::new);
-	private static final Texture BEACON = new Texture("minecraft", "textures/gui/container/beacon.png", 256, 256);
+	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.registerForward(Id.create("astrarre-gui-v0", "button"), ButtonWidget::new);
+	public static final Data MEDIUM = new Data(
+			AstrarreIcons.MEDIUM_BUTTON_ACTIVE,
+			AstrarreIcons.MEDIUM_BUTTON_HIGHLIGHTED,
+			AstrarreIcons.MEDIUM_BUTTON_PRESSED,
+			AstrarreIcons.MEDIUM_BUTTON_DISABLED);
 
-	public static final Polygon SQUARE_22x22 = new Polygon.Builder(4)
-			.addVertex(0, 0)
-			.addVertex(0, 22)
-			.addVertex(22, 22)
-			.addVertex(22, 0)
-			.build();
+	private static final int DISABLE = 0;
+	private static final int PRESSED = 1;
+	protected final Data part;
+	protected boolean highlight, pressed, disabled;
 
-	/**
-	 * the channel id for button toggling
-	 */
-	public static final int ON_CLICK = 0;
+	public ButtonWidget(RootContainer rootContainer, Data part) {
+		this(rootContainer, ENTRY, part);
+	}
 
-
-	@Environment(EnvType.CLIENT)
-	protected boolean pressed;
-	@Environment(EnvType.CLIENT)
-	protected boolean highlighted;
-
-	/**
-	 * the number of times the button has been clicked. This is updated on the server and client
-	 */
-	public int clickCount;
-
-	protected ButtonWidget(RootContainer rootContainer, DrawableRegistry.Entry id) {
+	protected ButtonWidget(RootContainer rootContainer, DrawableRegistry.Entry id, Data part) {
 		super(rootContainer, id);
+		this.part = part;
+		this.setBounds(Polygon.rectangle(part.active.width, part.active.height));
 	}
 
-	public ButtonWidget(RootContainer rootContainer) {
-		super(rootContainer, BUTTON);
-		this.setBounds(SQUARE_22x22);
-	}
-
-
-	public ButtonWidget(RootContainer rootContainer, Input input) {
-		this(rootContainer);
+	public ButtonWidget(RootContainer container, DrawableRegistry.Entry entry, Input input) {
+		super(container, entry);
+		this.part = readData(input);
+		this.disabled = input.readBoolean();
 	}
 
 	/**
-	 * called when the button is clicked on the clientside, sends a packet to the server.
-	 * If you're using this as a clientside only button, override this method and don't call super.
-	 *
-	 * If you are serializing the component to the client, you must register your overriden class
+	 * fired when the button is pressed on the server, if overriden you don't need to register the class
+	 */
+	public void onPressServer() {}
+
+	/**
+	 * fired when the button is pressed on the client, if serializing you must register the class
 	 */
 	@Environment(EnvType.CLIENT)
-	protected void clickedClient() {
-		this.sendToServer(ON_CLICK, o -> {});
-		this.clickCount++;
-	}
-
-	/**
-	 * if just overriding this method, you technically don't need to register it since this logic wont be called on the client anyways.
-	 */
-	protected void clickedServer() {
-		this.clickCount++;
+	public void onPressClient() {
+		this.sendToServer(PRESSED, o -> {});
 	}
 
 	@Override
 	protected void render0(Graphics3d graphics, float tickDelta) {
-		if(this.pressed) {
-			graphics.drawTexture(BEACON, 22, 219, 22, 22);
-		} else if(this.highlighted){
-			graphics.drawTexture(BEACON, 66, 219, 22, 22);
+		if (this.disabled) {
+			graphics.drawTexture(this.part.disabled);
+		} else if (this.pressed) {
+			graphics.drawTexture(this.part.pressed);
+		} else if (this.highlight) {
+			graphics.drawTexture(this.part.highlighted);
 		} else {
-			graphics.drawTexture(BEACON, 0, 219, 22, 22);
+			graphics.drawTexture(this.part.active);
 		}
-		this.highlighted = false;
 	}
 
 	@Override
-	protected void write0(Output output) {}
+	protected void receiveFromServer(int channel, Input input) {
+		super.receiveFromServer(channel, input);
+		if (channel == DISABLE) {
+			this.disabled = input.readBoolean();
+		}
+	}
 
 	@Override
 	protected void receiveFromClient(NetworkMember member, int channel, Input input) {
 		super.receiveFromClient(member, channel, input);
-		if(channel == ON_CLICK) {
-			this.clickedServer();
+		if(channel == PRESSED) {
+			this.onPressServer();
 		}
 	}
 
 	@Override
-	@Environment(EnvType.CLIENT)
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		this.pressed = true;
 		return true;
 	}
 
 	@Override
-	@Environment(EnvType.CLIENT)
 	public boolean mouseReleased(double mouseX, double mouseY, int button) {
+		if(this.pressed) {
+			this.onPressClient();
+		}
 		this.pressed = false;
-		this.clickedClient();
 		return true;
 	}
 
 	@Override
-	@Environment(EnvType.CLIENT)
-	public boolean mouseHover(double mouseX, double mouseY) {
-		this.highlighted = true;
+	public void onLoseHover() {
+		this.pressed = false;
+		this.highlight = false;
+	}
+
+	@Override
+	public boolean isHovering(double mouseX, double mouseY) {
 		return true;
 	}
 
+	@Override
+	public void mouseHover(double mouseX, double mouseY) {
+		this.highlight = true;
+	}
+
+	public boolean isDisabled() {
+		return this.disabled;
+	}
+
+	public void setDisabled(boolean disabled) {
+		this.disabled = disabled;
+		this.sendToClients(DISABLE, output -> output.writeBoolean(disabled));
+	}
+
+	public final static class Data {
+		public final TexturePart active, highlighted, pressed, disabled;
+
+		public Data() {
+			this(null, null, null, null);
+		}
+
+		public Data(TexturePart active, TexturePart highlighted, TexturePart pressed, TexturePart disabled) {
+			this.active = active;
+			this.highlighted = highlighted;
+			this.pressed = pressed;
+			this.disabled = disabled;
+		}
+
+		public Data withActive(TexturePart part) {
+			return new Data(part, this.highlighted, this.pressed, this.disabled);
+		}
+
+		public Data withHighlighted(TexturePart part) {
+			return new Data(this.active, part, this.pressed, this.disabled);
+		}
+
+		public Data withPressed(TexturePart part) {
+			return new Data(this.active, this.highlighted, part, this.disabled);
+		}
+
+		public Data withDisabled(TexturePart part) {
+			return new Data(this.active, this.highlighted, this.pressed, part);
+		}
+	}
+
+	@Override
+	protected void write0(Output output) {
+		writeData(this.part, output);
+		output.writeBoolean(this.disabled);
+	}
+
+	public static Data readData(Input input) {
+		return new Data(readPart(input), readPart(input), readPart(input), readPart(input));
+	}
+
+	public static TexturePart readPart(Input input) {
+		return new TexturePart(readTexture(input), input.readInt(), input.readInt(), input.readInt(), input.readInt());
+	}
+
+	public static Texture readTexture(Input input) {
+		return new Texture(input.readId(), input.readInt(), input.readInt());
+	}
+
 	public static void init() {}
+
+	public static void writeData(Data data, Output output) {
+		writePart(data.active, output);
+		writePart(data.highlighted, output);
+		writePart(data.pressed, output);
+		writePart(data.disabled, output);
+	}
+
+	public static void writePart(TexturePart part, Output output) {
+		write(part.texture, output);
+		output.writeInt(part.offX);
+		output.writeInt(part.offY);
+		output.writeInt(part.height);
+		output.writeInt(part.width);
+	}
+
+	public static void write(Texture texture, Output output) {
+		output.writeId(texture.getId());
+		output.writeInt(texture.getHeight());
+		output.writeInt(texture.getWidth());
+	}
 }

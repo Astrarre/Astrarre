@@ -10,18 +10,18 @@ import net.minecraft.nbt.ListTag;
 
 @Mixin(ListTag.class)
 public abstract class ListTagMixin implements AbstractListTagAccess {
-
 	@Shadow public abstract byte getType();
-
 	@Shadow public abstract byte getElementType();
 
 	private Object view;
 
 	@Override
 	public Object itemview_getListTag(NBTType<?> type) {
-		NBTType<?> component = type.getComponent();
-		if(component == null || !(type.internalTypeEquals(this.getType()) && component.internalTypeEquals(this.getElementType()))) {
-			throw new IllegalArgumentException("NbtType does not reflect list type!");
+		NBTType<?> component = type == null ? null : type.getComponent();
+		if(type != null) {
+			if (component == null || !(type.internalTypeEquals(this.getType()) && component.internalTypeEquals(this.getElementType()))) {
+				throw new IllegalArgumentException("NbtType does not reflect list type!");
+			}
 		}
 
 		Object view = this.view;

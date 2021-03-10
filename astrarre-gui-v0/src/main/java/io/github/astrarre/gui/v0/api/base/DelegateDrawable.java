@@ -151,11 +151,27 @@ public class DelegateDrawable extends Drawable implements Interactable {
 
 	@Override
 	@Environment (EnvType.CLIENT)
-	public boolean mouseHover(double mouseX, double mouseY) {
+	public boolean isHovering(double mouseX, double mouseY) {
 		if(!(this.getDelegate() instanceof Interactable)) {
 			return false;
 		}
-		return ((Interactable)this.getDelegate()).mouseHover(mouseX, mouseY);
+		return ((Interactable)this.getDelegate()).isHovering(mouseX, mouseY);
+	}
+
+	@Override
+	public void onLoseHover() {
+		if(!(this.getDelegate() instanceof Interactable)) {
+			return;
+		}
+		((Interactable)this.getDelegate()).onLoseHover();
+	}
+
+	@Override
+	public void mouseHover(double mouseX, double mouseY) {
+		if(!(this.getDelegate() instanceof Interactable)) {
+			return;
+		}
+		((Interactable)this.getDelegate()).mouseHover(mouseX, mouseY);
 	}
 
 	@Override

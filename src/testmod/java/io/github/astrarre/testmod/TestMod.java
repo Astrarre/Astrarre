@@ -1,13 +1,5 @@
 package io.github.astrarre.testmod;
 
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
-
-import io.github.astrarre.gui.v0.api.RootContainer;
-import io.github.astrarre.networking.v0.api.network.NetworkMember;
-import io.github.astrarre.recipes.internal.recipe.RecipeParser;
-import io.github.astrarre.recipes.v0.api.recipe.Recipe;
 import io.github.astrarre.testmod.gui.TestDrawable;
 import io.github.astrarre.testmod.gui.TestModGui;
 
@@ -30,13 +22,6 @@ public class TestMod implements ModInitializer {
 		Registry.register(Registry.ITEM, new Identifier("testmod", "test"), new TestItem(new Item.Settings().group(ItemGroup.MISC)));
 		TestModBlock.modInit();
 		//Recipe.getInput(new IntIngredient(), "test");
-	}
-
-	public static void load(Recipe recipe, String sample) {
-		List impls = new ArrayList();
-		impls.add(recipe);
-		RecipeParser parser = new RecipeParser(impls);
-		parser.parseToCompletion(new StringReader(sample), "yeet");
 	}
 
 	static class TestItem extends Item {

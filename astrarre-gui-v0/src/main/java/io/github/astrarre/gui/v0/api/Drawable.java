@@ -63,7 +63,7 @@ public abstract class Drawable extends DrawableInternal {
 		SyncedProperty<T> property;
 		if(this.rootContainer.isClient()) {
 			property = new ServerSyncedProperty<>(serializer, this, id);
-			property.set(defaultValue);
+			property.setRaw(defaultValue);
 		} else {
 			property = new DefaultProperty<>(serializer);
 		}
@@ -80,7 +80,7 @@ public abstract class Drawable extends DrawableInternal {
 		SyncedProperty<T> property;
 		if(!this.rootContainer.isClient()) {
 			property = new ClientSyncedProperty<>(serializer, this, id);
-			property.set(defaultValue);
+			property.setRaw(defaultValue);
 		} else {
 			property = new DefaultProperty<>(serializer);
 		}
@@ -91,7 +91,6 @@ public abstract class Drawable extends DrawableInternal {
 
 	/**
 	 * called when the drawable is removed
-	 * todo implement
 	 */
 	public void remove() {}
 

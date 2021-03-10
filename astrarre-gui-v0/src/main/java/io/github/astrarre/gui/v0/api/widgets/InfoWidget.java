@@ -56,7 +56,6 @@ public class InfoWidget extends Drawable implements Interactable {
 			if(this.isHover) {
 				graphics.drawTooltip(this.tooltip);
 				graphics.fillGradient(7, 7, 0x80ffffff, 0x80ffffff);
-				this.isHover = false;
 			}
 		} else {
 			graphics.drawTexture(AstrarreIcons.INFO_DARK);
@@ -72,8 +71,17 @@ public class InfoWidget extends Drawable implements Interactable {
 	}
 
 	@Override
-	public boolean mouseHover(double mouseX, double mouseY) {
-		this.isHover = true;
+	public boolean isHovering(double mouseX, double mouseY) {
 		return true;
+	}
+
+	@Override
+	public void mouseHover(double mouseX, double mouseY) {
+		this.isHover = true;
+	}
+
+	@Override
+	public void onLoseHover() {
+		this.isHover = false;
 	}
 }

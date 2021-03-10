@@ -65,10 +65,13 @@ public class TestDrawable extends Drawable implements Interactable {
 	protected void write0(Output output) {}
 
 	@Override
-	public boolean mouseHover(double mouseX, double mouseY) {
-		if (mouseX <= 7) { // within the icon space
-			this.isHover = true;
-		}
-		return false;
+	public boolean isHovering(double mouseX, double mouseY) {
+		// within the icon space
+		return mouseX <= 7;
+	}
+
+	@Override
+	public void mouseHover(double mouseX, double mouseY) {
+		this.isHover = true;
 	}
 }

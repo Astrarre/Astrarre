@@ -24,6 +24,10 @@ public abstract class SyncedProperty<T> {
 		this.synchronize(value);
 	}
 
+	public void setRaw(T value) {
+		this.value = value;
+	}
+
 	protected abstract void synchronize(T value);
 
 	/**

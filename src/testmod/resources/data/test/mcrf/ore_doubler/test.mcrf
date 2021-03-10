@@ -1,0 +1,2 @@
+iron_ore + 4 --[mymod:ore_doubler]-> iron_ingot x10
+gold_ore + 4 --[mymod:ore_doubler]-> gold_ingot x4

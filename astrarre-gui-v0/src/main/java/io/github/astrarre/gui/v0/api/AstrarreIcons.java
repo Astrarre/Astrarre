@@ -33,6 +33,13 @@ public class AstrarreIcons {
 	 */
 	public static final TexturePart X = icon(23, 0, 9, 9);
 
+	// -- medium button --
+	// the active, highlighted, disabled and pressed textures of a 20x20 button
+	public static final TexturePart MEDIUM_BUTTON_ACTIVE = icon(0, 14, 20, 20);
+	public static final TexturePart MEDIUM_BUTTON_HIGHLIGHTED = icon(0, 34, 20, 20);
+	public static final TexturePart MEDIUM_BUTTON_DISABLED = icon(0, 54, 20, 20);
+	public static final TexturePart MEDIUM_BUTTON_PRESSED = icon(0, 74, 20, 20);
+
 	private static TexturePart icon(int x1, int y1, int width, int height) {
 		return new TexturePart(ICON, x1, y1, width, height);
 	}

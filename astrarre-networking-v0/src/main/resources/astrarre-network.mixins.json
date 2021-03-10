@@ -3,6 +3,7 @@
   "package": "io.github.astrarre.networking.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "BlockEntityMixin_SyncedProperty",
     "CustomPayloadC2SPacketAccess",
     "ServerPlayerEntityMixin",
     "ServerPlayNetworkHandlerMixin"

@@ -16,16 +16,14 @@ public class ItemStackValueParser implements ValueParser<ItemStack> {
 
 	@Override
 	public Either<ItemStack, String> parse(PeekableReader reader) {
-		PeekableReader sub = reader.createSubReader();
-		Either<Id, String> either = ValueParser.ID.parse(sub);
+		Either<Id, String> either = ValueParser.ID.parse(reader);
 		if(either.hasLeft()) {
 			Id id = either.getLeft();
 			Item item = Registry.ITEM.get(id.to());
 			if(item == Items.AIR && !id.equals(AIR)) {
-				reader.abort(sub);
 				return Either.ofRight("item not found " + id);
 			}
-			reader.commit(sub);
+
 			ValueParser.skipWhitespace(reader, 10);
 			ItemStack stack = new ItemStack(item);
 			Either<NBTagView, String> tag = ValueParser.NBT.parse(reader);
@@ -35,22 +33,16 @@ public class ItemStackValueParser implements ValueParser<ItemStack> {
 			}
 			ValueParser.skipWhitespace(reader, 10);
 			if(reader.peek() == 'x') {
-				PeekableReader sub2 = reader.createSubReader();
-				sub2.read(); // skip x
-
-				Either<Integer, String> val = ValueParser.INTEGER.parse(sub2);
+				reader.read(); // skip x
+				Either<Integer, String> val = ValueParser.INTEGER.parse(reader);
 				if(val.hasLeft()) {
 					stack.setCount(val.getLeft());
-					reader.commit(sub2);
 				} else {
-					reader.abort(sub2);
 					return Either.ofRight("invalid stack amount");
 				}
 			}
-
 			return Either.ofLeft(stack);
 		}
-		reader.abort(sub);
 		return Either.ofRight("no item id");
 	}
 }

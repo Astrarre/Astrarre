@@ -54,7 +54,7 @@ public abstract class DrawableAdapter<T extends net.minecraft.client.gui.Drawabl
 	}
 
 	@Override
-	public boolean mouseHover(double mouseX, double mouseY) {
+	public boolean isHovering(double mouseX, double mouseY) {
 		this.mx = (int) mouseX;
 		this.my = (int) mouseY;
 		return true;

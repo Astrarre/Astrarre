@@ -20,4 +20,5 @@ include 'astrarre-gui-v0'
 include 'astrarre-networking-v0'
 include 'astrarre-recipes-v0'
 include 'astrarre-transfer-compat-v0'
+include 'astrarre-recipe-transfer-compat-v0'
 

@@ -164,12 +164,21 @@ public interface Interactable {
 	default void onLostFocus() {}
 
 	/**
-	 * @return {@code true} if the mouse is within the bound of the element
+	 * @return {@code true} if the mouse hover event should be captured (Panel already checks if it's inside the Drawable bounds)
 	 * @param mouseX the X coordinate of the mouse
 	 * @param mouseY the Y coordinate of the mouse
+	 * @see #mouseHover(double, double)
 	 */
 	@Environment(EnvType.CLIENT)
-	default boolean mouseHover(double mouseX, double mouseY) {
+	default boolean isHovering(double mouseX, double mouseY) {
 		return false;
 	}
+
+	default void mouseHover(double mouseX, double mouseY) {
+	}
+
+	/**
+	 * fired when the mouse moves out of the bounds of the component. This is only fired if the mouseHover event is handled
+	 */
+	default void onLoseHover() {}
 }

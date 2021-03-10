@@ -14,8 +14,10 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
@@ -59,5 +61,12 @@ public abstract class ScreenHandlerMixin implements ScreenRootAccess {
 	@Override
 	public void astrarre_focusPanel() {
 		throw new UnsupportedOperationException();
+	}
+
+	@Inject(method = "close", at = @At("HEAD"))
+	public void close(PlayerEntity player, CallbackInfo ci) {
+		if(this.internal != null) {
+			this.internal.onClose();
+		}
 	}
 }

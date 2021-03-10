@@ -118,7 +118,7 @@ public abstract class Slot extends Drawable implements Interactable {
 	public abstract void setStack(ItemStack stack);
 
 	@Override
-	public boolean mouseHover(double mouseX, double mouseY) {
+	public boolean isHovering(double mouseX, double mouseY) {
 		return true;
 	}
 

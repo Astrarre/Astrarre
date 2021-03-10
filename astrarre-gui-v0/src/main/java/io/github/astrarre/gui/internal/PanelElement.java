@@ -61,7 +61,7 @@ public class PanelElement implements Element, TickableElement {
 
 	@Override
 	public boolean isMouseOver(double mouseX, double mouseY) {
-		return this.panel.mouseHover(mouseX, mouseY);
+		return this.panel.isHovering(mouseX, mouseY);
 	}
 
 	@Override

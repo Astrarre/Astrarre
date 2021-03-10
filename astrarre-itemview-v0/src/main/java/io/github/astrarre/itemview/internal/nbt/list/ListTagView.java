@@ -4,14 +4,16 @@ import java.util.AbstractList;
 
 import io.github.astrarre.itemview.v0.fabric.FabricViews;
 import io.github.astrarre.itemview.v0.api.nbt.NBTType;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.nbt.ListTag;
 
 public class ListTagView extends AbstractList<Object> {
 	private final ListTag tag;
+	@Nullable
 	private final NBTType<?> component;
 
-	public ListTagView(ListTag tag, NBTType<?> component) {
+	public ListTagView(ListTag tag, @Nullable NBTType<?> component) {
 		this.tag = tag;
 		this.component = component;
 	}

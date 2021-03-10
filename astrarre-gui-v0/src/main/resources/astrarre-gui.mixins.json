@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "HandledScreenMixin",
+    "MinecraftClientMixin",
     "ScreenHandlerMixin",
     "ScreenMixin",
     "access.HandledScreenAccess",

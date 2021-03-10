@@ -14,10 +14,16 @@ import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.nbt.AbstractNumberTag;
 import net.minecraft.nbt.ByteArrayTag;
+import net.minecraft.nbt.ByteTag;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.DoubleTag;
+import net.minecraft.nbt.FloatTag;
 import net.minecraft.nbt.IntArrayTag;
+import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.LongArrayTag;
+import net.minecraft.nbt.LongTag;
+import net.minecraft.nbt.ShortTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 
@@ -54,7 +60,7 @@ public class FabricViews {
 	}
 
 	@SuppressWarnings ("unchecked")
-	public static <T> T view(Tag tag, NBTType<T> type) {
+	public static <T> T view(Tag tag, @Nullable NBTType<T> type) {
 		Object ret = null;
 		if (tag instanceof AbstractNumberTag) {
 			Number number = ((AbstractNumberTag) tag).getNumber();
@@ -78,11 +84,47 @@ public class FabricViews {
 			throw new IllegalArgumentException("unknown tag type " + tag + "(" + tag.getClass() + ")");
 		}
 
-		if (type.getClassType().isInstance(ret)) {
+		if (type == null || type.getClassType().isInstance(ret)) {
 			return (T) ret;
 		} else {
 			throw new ClassCastException(tag.getClass() + " != " + type.getClassType());
 		}
+	}
+
+	public static Tag from(Object object) {
+		if(object instanceof Boolean) {
+			return ByteTag.of((Boolean)object);
+		} else if(object instanceof Byte) {
+			return ByteTag.of((Byte) object);
+		} else if(object instanceof Character) {
+			return ShortTag.of((short) ((Character)object).charValue());
+		} else if(object instanceof Short) {
+			return ShortTag.of((Short) object);
+		} else if(object instanceof Float) {
+			return FloatTag.of((Float) object);
+		} else if(object instanceof Integer) {
+			return IntTag.of((Integer) object);
+		} else if(object instanceof Double) {
+			return DoubleTag.of((Double) object);
+		} else if(object instanceof Long) {
+			return LongTag.of((Long) object);
+		} else if(object instanceof NBTagView) {
+			return ((NBTagView) object).copyTag();
+		} else if(object instanceof IntList) {
+			return new IntArrayTag(((IntList) object).toIntArray());
+		} else if(object instanceof ByteList) {
+			return new ByteArrayTag(((ByteList) object).toByteArray());
+		} else if(object instanceof LongList) {
+			return new LongArrayTag(((LongList) object).toLongArray());
+		} else if(object instanceof List) {
+			List<?> objects = (List<?>) object;
+			ListTag tag = new ListTag();
+			for (Object o : objects) {
+				tag.add(from(o));
+			}
+			return tag;
+		}
+		throw new UnsupportedOperationException(object + "");
 	}
 
 	// todo from methods

@@ -57,7 +57,7 @@ public abstract class ElementAdapter<T extends Drawable & Element> extends Drawa
 	}
 
 	@Override
-	public boolean mouseHover(double mouseX, double mouseY) {
-		return this.drawable.isMouseOver(mouseX, mouseY) && super.mouseHover(mouseX, mouseY);
+	public boolean isHovering(double mouseX, double mouseY) {
+		return this.drawable.isMouseOver(mouseX, mouseY) && super.isHovering(mouseX, mouseY);
 	}
 }

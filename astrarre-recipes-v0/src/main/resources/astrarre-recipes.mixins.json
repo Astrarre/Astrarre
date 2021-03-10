@@ -3,7 +3,11 @@
   "package": "io.github.astrarre.recipes.internal.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "IdentifierAccess"
+    "FluidTagsAccessor",
+    "IdentifierAccess",
+    "SetTagAccess",
+    "TagDelegateAccess",
+    "TagWrapperAccess"
   ],
   "client": [
   ],

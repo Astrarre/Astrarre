@@ -6,12 +6,12 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import io.github.astrarre.gui.v0.api.widgets.ButtonWidget;
-import io.github.astrarre.gui.v0.api.panel.CenteringPanel;
-import io.github.astrarre.gui.v0.api.statik.DarkenedBackground;
 import io.github.astrarre.gui.v0.api.delegates.TaintedDrawable;
-import io.github.astrarre.gui.v0.api.widgets.TextFieldWidget;
+import io.github.astrarre.gui.v0.api.panel.CenteringPanel;
 import io.github.astrarre.gui.v0.api.panel.Panel;
+import io.github.astrarre.gui.v0.api.statik.DarkenedBackground;
+import io.github.astrarre.gui.v0.api.widgets.ButtonWidget;
+import io.github.astrarre.gui.v0.api.widgets.TextFieldWidget;
 import io.github.astrarre.networking.v0.api.io.Input;
 import io.github.astrarre.util.v0.api.Id;
 import io.github.astrarre.util.v0.api.Validate;

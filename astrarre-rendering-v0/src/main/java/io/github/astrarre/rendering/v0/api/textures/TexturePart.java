@@ -11,4 +11,8 @@ public class TexturePart {
 		this.width = width;
 		this.height = height;
 	}
+
+	public TexturePart(String modid, String name, int totalWidth, int totalHeight, int offX, int offY, int width, int height) {
+		this(new Texture(modid, name, totalWidth, totalHeight), offX, offY, width, height);
+	}
 }

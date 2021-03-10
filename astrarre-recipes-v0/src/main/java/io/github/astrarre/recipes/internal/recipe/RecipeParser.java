@@ -43,7 +43,6 @@ public class RecipeParser {
 	}
 
 	public void parse(PeekableReader reader, String fileName) {
-
 		List<String> errors = new ArrayList<>();
 		List<RecipeImpl> list = this.recipes;
 		outer:
