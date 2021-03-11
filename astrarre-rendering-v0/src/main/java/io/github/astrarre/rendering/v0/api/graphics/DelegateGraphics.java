@@ -3,10 +3,12 @@ package io.github.astrarre.rendering.v0.api.graphics;
 import java.util.List;
 
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
+import io.github.astrarre.rendering.v0.api.Graphics2d;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.rendering.v0.api.textures.SpriteInfo;
 import io.github.astrarre.rendering.v0.api.textures.Texture;
+import io.github.astrarre.rendering.v0.api.textures.TexturePart;
 import io.github.astrarre.rendering.v0.api.util.Close;
 
 import net.minecraft.item.ItemStack;
@@ -28,6 +30,11 @@ public class DelegateGraphics implements Graphics3d {
 	}
 
 	@Override
+	public void drawLine(float length, int color) {
+		this.delegate.drawLine(length, color);
+	}
+
+	@Override
 	public void drawText(String text, int color, boolean shadow) {
 		this.delegate.drawText(text, color, shadow);
 	}
@@ -43,6 +50,21 @@ public class DelegateGraphics implements Graphics3d {
 	}
 
 	@Override
+	public void drawTooltip(List<Text> text) {
+		this.delegate.drawTooltip(text);
+	}
+
+	@Override
+	public void drawOrderedTooltip(List<OrderedText> text) {
+		this.delegate.drawOrderedTooltip(text);
+	}
+
+	@Override
+	public void drawTooltip(ItemStack stack) {
+		this.delegate.drawTooltip(stack);
+	}
+
+	@Override
 	public void drawSprite(SpriteInfo sprite) {
 		this.delegate.drawSprite(sprite);
 	}
@@ -53,28 +75,18 @@ public class DelegateGraphics implements Graphics3d {
 	}
 
 	@Override
-	public void drawLine(float x1, float y1, float x2, float y2, int color) {
-		this.delegate.drawLine(x1, y1, x2, y2, color);
-	}
-
-	@Override
-	public void drawItem(ItemKey stack) {
-		this.delegate.drawItem(stack);
-	}
-
-	@Override
-	public void drawItem(ItemStack stack) {
-		this.delegate.drawItem(stack);
-	}
-
-	@Override
-	public void drawLine(float length, int color) {
-		this.delegate.drawLine(length, color);
+	public void drawTexture(TexturePart part) {
+		this.delegate.drawTexture(part);
 	}
 
 	@Override
 	public void fillRect(float x, float y, float width, float height, int color) {
 		this.delegate.fillRect(x, y, width, height, color);
+	}
+
+	@Override
+	public void fillGradient(float x, float y, float width, float height, int startColor, int endColor) {
+		this.delegate.fillGradient(x, y, width, height, startColor, endColor);
 	}
 
 	@Override
@@ -88,22 +100,44 @@ public class DelegateGraphics implements Graphics3d {
 	}
 
 	@Override
+	public void drawItem(ItemKey stack) {
+		this.delegate.drawItem(stack);
+	}
+
+	@Override
+	public void drawItem(ItemStack stack) {
+		this.delegate.drawItem(stack);
+	}
+
+	@Override
 	public Close applyTransformation(Transformation transformation) {
 		return this.delegate.applyTransformation(transformation);
 	}
 
 	@Override
-	public void drawTooltip(List<Text> text) {
-		this.delegate.drawTooltip(text);
+	public void drawLine(float x1, float y1, float z1, float x2, float y2, float z2, int color) {
+		this.delegate.drawLine(x1, y1, z1, x2, y2, z2, color);
 	}
 
 	@Override
-	public void drawOrderedTooltip(List<OrderedText> text) {
-		this.delegate.drawOrderedTooltip(text);
+	public void drawLine(float x1, float y1, float x2, float y2, int color) {
+		this.delegate.drawLine(x1, y1, x2, y2, color);
 	}
 
 	@Override
-	public void drawTooltip(ItemStack stack) {
-		this.delegate.drawTooltip(stack);
+	public void fillRect(float x1,
+			float y1,
+			float z1,
+			float x2,
+			float y2,
+			float z2,
+			float x3,
+			float y3,
+			float z3,
+			float x4,
+			float y4,
+			float z4,
+			int color) {
+		this.delegate.fillRect(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4, color);
 	}
 }

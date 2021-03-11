@@ -13,6 +13,10 @@ import net.minecraft.client.gui.screen.Screen;
 public class ScreenRootContainer<T extends Screen> extends RootContainerInternal {
 	public T screen;
 
+	public ScreenRootContainer(T screen) {
+		this.screen = screen;
+	}
+
 	public ScreenRootContainer(T screen, Input input) {
 		super(c -> ((ScreenRootContainer)c).screen = screen,input);
 	}

@@ -15,6 +15,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 public class GuiPacketHandler {
 	public static final Id DRAWABLE_PACKET_CHANNEL = Id.create("astrarre-gui-v0", "sync");
 	public static final Id ADD_DRAWABLE = Id.create("astrarre-gui-v0", "add_drawable");
+	public static final Id REMOVE_DRAWABLE = Id.create("astrarre-gui-v0", "remove_drawable");
 
 	static {
 		ModPacketHandler.INSTANCE.registerSynchronizedClient(ADD_DRAWABLE, (id, buf) -> {
@@ -24,6 +25,15 @@ public class GuiPacketHandler {
 				Drawable drawable = Drawable.read(buf);
 				internal.addSynced(drawable);
 				((DrawableInternal) drawable).onAdded(internal);
+			}
+		});
+
+		ModPacketHandler.INSTANCE.registerSynchronizedClient(REMOVE_DRAWABLE, (id, buf) -> {
+			RootContainer.Type type = buf.readEnum(RootContainer.Type.class);
+			RootContainerInternal internal = get(type);
+			if(internal != null) {
+				int syncId = buf.readInt();
+				internal.removeRoot(internal.forId(syncId));
 			}
 		});
 

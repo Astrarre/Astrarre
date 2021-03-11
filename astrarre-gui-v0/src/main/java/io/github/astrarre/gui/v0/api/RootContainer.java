@@ -1,9 +1,11 @@
 package io.github.astrarre.gui.v0.api;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 import io.github.astrarre.gui.internal.RootContainerInternal;
 import io.github.astrarre.gui.internal.access.ScreenRootAccess;
+import io.github.astrarre.gui.internal.vanilla.DefaultScreen;
 import io.github.astrarre.gui.internal.vanilla.DefaultScreenHandler;
 import io.github.astrarre.gui.v0.api.access.Interactable;
 import io.github.astrarre.gui.v0.api.panel.Panel;
@@ -11,6 +13,8 @@ import io.github.astrarre.networking.internal.ByteBufDataOutput;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
 import org.jetbrains.annotations.Nullable;
 
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.network.PacketByteBuf;
@@ -55,6 +59,21 @@ public interface RootContainer {
 		return (T) ref[0];
 	}
 
+	/**
+	 * opens a new clientside only gui
+	 */
+	@Environment(EnvType.CLIENT)
+	static RootContainer openClientOnly() {
+		Screen screen = new DefaultScreen();
+		MinecraftClient.getInstance().openScreen(screen);
+		return ((ScreenRootAccess)screen).getClientRoot();
+	}
+
+	@Environment(EnvType.CLIENT)
+	static Optional<RootContainer> currentScreen() {
+		return Optional.ofNullable(MinecraftClient.getInstance().currentScreen).map(ScreenRootAccess.class::cast).map(ScreenRootAccess::getClientRoot);
+	}
+
 	enum Type {
 		/**
 		 * @deprecated unsupported ATM
@@ -83,6 +102,12 @@ public interface RootContainer {
 	 * @see Panel adding components will automatically register it
 	 */
 	void addRoot(Drawable drawable);
+
+	/**
+	 * This should only be called once all references that this container may have to the drawable have also been removed.
+	 * For example if the same drawable is in the content panel, and inside a list inside that content panel, both have to be removed before this should be called
+	 */
+	void removeRoot(Drawable drawable);
 
 	/**
 	 * The result will be null if on the clientside

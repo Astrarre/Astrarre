@@ -7,6 +7,10 @@ import io.github.astrarre.networking.v0.api.io.Input;
 public interface ScreenRootAccess {
 	RootContainerInternal getRoot();
 
+	default RootContainerInternal getClientRoot() {
+		throw new UnsupportedOperationException();
+	}
+
 	void readRoot(Input input);
 
 	void astrarre_focusPanel();

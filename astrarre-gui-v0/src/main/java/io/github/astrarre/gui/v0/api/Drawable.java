@@ -22,7 +22,9 @@ import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.rendering.v0.api.util.Close;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
 import io.github.astrarre.util.v0.api.Id;
+import io.github.astrarre.util.v0.api.Validate;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.util.math.Matrix4f;
 
@@ -32,8 +34,10 @@ public abstract class Drawable extends DrawableInternal {
 	public static final int PROPERTY_SYNC = -3;
 
 	/**
+	 * null if client only component
 	 * @see DrawableRegistry#register(Id, Function)
 	 */
+	@Nullable
 	public final DrawableRegistry.Entry registryId;
 
 	private final Map<String, SyncedProperty<?>> properties = new HashMap<>();
@@ -41,12 +45,12 @@ public abstract class Drawable extends DrawableInternal {
 	Matrix4f invertedMatrix;
 	Polygon bounds = Polygon.EMPTY;
 
-	public Drawable(DrawableRegistry.Entry id) {
+	public Drawable(DrawableRegistry.@Nullable Entry id) {
 		this.registryId = id;
 	}
 
 	public final void render(RootContainer container, Graphics3d graphics, float tickDelta) {
-		try (Close close = graphics.applyTransformation(this.transformation)) {
+		try (Close close = graphics.applyTransformation(this.getTransformation())) {
 			this.render0(container, graphics, tickDelta);
 		}
 	}
@@ -99,6 +103,10 @@ public abstract class Drawable extends DrawableInternal {
 	 * @throws UnsupportedOperationException if this is a clientside component only and cannot be sent from the server
 	 */
 	public final void write(RootContainer container, Output output) {
+		if(this.registryId == null) {
+			throw new IllegalStateException("Tried to serialize client-only component!");
+		}
+
 		output.writeId(this.registryId.id);
 		output.writeInt(this.getSyncId());
 		this.write0(container, output);
@@ -111,8 +119,8 @@ public abstract class Drawable extends DrawableInternal {
 			}
 		}
 
-		GuiUtil.write(this.bounds, output);
-		GuiUtil.write(this.transformation, output);
+		GuiUtil.write(this.getBounds(), output);
+		GuiUtil.write(this.getTransformation(), output);
 	}
 
 	public static Drawable read(Input input) {
@@ -244,7 +252,11 @@ public abstract class Drawable extends DrawableInternal {
 		return this.bounds;
 	}
 
+	/**
+	 * it is expected that the bounds of the polygon has it's origin at [0, 0]. For example, a square's top left corner should be [0, 0]
+	 */
 	public void setBounds(Polygon polygon) {
+		this.validateBounds(polygon);
 		this.bounds = polygon;
 		this.sendToClients(BOUNDS_CHANGE, output -> GuiUtil.write(polygon, output));
 	}
@@ -254,6 +266,7 @@ public abstract class Drawable extends DrawableInternal {
 	 * still being able to change the bounds yourself
 	 */
 	protected void setBoundsProtected(Polygon polygon) {
+		this.validateBounds(polygon);
 		this.bounds = polygon;
 		this.sendToClients(BOUNDS_CHANGE, output -> GuiUtil.write(polygon, output));
 	}
@@ -270,7 +283,7 @@ public abstract class Drawable extends DrawableInternal {
 	public Matrix4f getInvertedMatrix() {
 		Matrix4f invertedMatrix = this.invertedMatrix;
 		if (invertedMatrix == null) {
-			Transformation transformation = this.transformation;
+			Transformation transformation = this.getTransformation();
 			Matrix4f m4f = transformation.getModelMatrixTransform().copy();
 			if (m4f.invert()) {
 				this.invertedMatrix = m4f;
@@ -280,5 +293,23 @@ public abstract class Drawable extends DrawableInternal {
 			invertedMatrix = m4f;
 		}
 		return invertedMatrix;
+	}
+
+	protected void validateBounds(Polygon polygon) {
+		if(Validate.IS_DEV) {
+			float minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE;
+			for (int i = 0; i < polygon.vertices(); i++) {
+				float x = polygon.getX(i), y = polygon.getY(i);
+				if(x < minX) {
+					minX = x;
+				}
+				if(y < minY) {
+					minY = y;
+				}
+			}
+			if(Math.abs(minX) > .01f || Math.abs(minY) > .01f) {
+				throw new IllegalArgumentException(minX + " < 0 | " + minY + " < 0");
+			}
+		}
 	}
 }

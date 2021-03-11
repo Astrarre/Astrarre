@@ -40,6 +40,16 @@ public class AstrarreIcons {
 	public static final TexturePart MEDIUM_BUTTON_DISABLED = icon(0, 54, 20, 20);
 	public static final TexturePart MEDIUM_BUTTON_PRESSED = icon(0, 74, 20, 20);
 
+	// arrow buttons, 7x7 textures with pressed and unpressed variants
+	public static final TexturePart UP_ARROW_ACTIVE = icon(0, 32, 7, 7);
+	public static final TexturePart DOWN_ARROW_ACTIVE = icon(0, 39, 7, 7);
+	public static final TexturePart UP_ARROW_PRESSED = icon(7, 32, 7, 7);
+	public static final TexturePart DOWN_ARROW_PRESSED = icon(7, 39, 7, 7);
+	public static final TexturePart RIGHT_ARROW_ACTIVE = icon(0, 46, 7, 7);
+	public static final TexturePart LEFT_ARROW_ACTIVE = icon(0, 53, 7, 7);
+	public static final TexturePart RIGHT_ARROW_PRESSED = icon(7, 46, 7, 7);
+	public static final TexturePart LEFT_ARROW_PRESSED = icon(7, 53, 7, 7);
+
 	private static TexturePart icon(int x1, int y1, int width, int height) {
 		return new TexturePart(ICON, x1, y1, width, height);
 	}

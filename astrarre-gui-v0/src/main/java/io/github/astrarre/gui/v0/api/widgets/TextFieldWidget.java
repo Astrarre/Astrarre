@@ -8,28 +8,43 @@ import io.github.astrarre.gui.v0.fabric.adapter.AbstractButtonAdapter;
 import io.github.astrarre.networking.v0.api.io.Input;
 import io.github.astrarre.networking.v0.api.io.Output;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
+import io.github.astrarre.rendering.v0.api.util.Polygon;
 import io.github.astrarre.util.v0.api.Id;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.MinecraftClient;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 public class TextFieldWidget extends AbstractButtonAdapter<net.minecraft.client.gui.widget.TextFieldWidget> {
 	public static final int UPDATE_TEXT = 1;
-	private static final DrawableRegistry.Entry TEXT_FIELD = DrawableRegistry.register(Id.create("astrarre-gui-v0", "text_field"), TextFieldWidget::new);
+	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "text_field"), TextFieldWidget::new);
 	// only exists on the server
 	private String text = "";
 
 	public TextFieldWidget(int width, int height) {
-		super(TEXT_FIELD, width, height);
+		super(ENTRY, width, height);
 	}
 
-	public TextFieldWidget(Input input) {
-		super(TEXT_FIELD, input);
+	@Environment(EnvType.CLIENT)
+	private TextFieldWidget(Input input) {
+		this(ENTRY, input);
+	}
+
+	protected TextFieldWidget(DrawableRegistry.Entry id, int width, int height) {
+		super(id, width, height);
+	}
+
+	@Environment(EnvType.CLIENT)
+	protected TextFieldWidget(DrawableRegistry.Entry id, Input input) {
+		super(id, input);
 		this.text = input.readUTF();
-		this.drawable = new net.minecraft.client.gui.widget.TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, this.getWidth(), this.getHeight(), null);
+		Polygon enclosing = this.getBounds().getEnclosing();
+		this.drawable = new net.minecraft.client.gui.widget.TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, (int)enclosing.getX(2), (int)enclosing.getY(2), null);
 		this.drawable.active = this.enabled;
 		this.drawable.setEditable(this.isEnabled());
-		this.drawable.setChangedListener(s -> this.sendToServer(UPDATE_TEXT, o -> o.writeUTF(s)));
+		this.drawable.setChangedListener(this::sendTextToServer);
 		this.drawable.setTextPredicate(this::sanitize);
 	}
 
@@ -57,11 +72,15 @@ public class TextFieldWidget extends AbstractButtonAdapter<net.minecraft.client.
 		return text != null && StandardCharsets.US_ASCII.newEncoder().canEncode(text);
 	}
 
+	protected void sendTextToServer(String text) {
+		this.sendToServer(UPDATE_TEXT, o -> o.writeUTF(text));
+	}
+
 	public boolean setText(String text) {
 		if(this.sanitize(text)) {
 			if(this.isClient()) {
 				this.drawable.setText(text);
-				this.sendToServer(UPDATE_TEXT, o -> o.writeUTF(text));
+				this.sendTextToServer(text);
 			} else {
 				this.text = text;
 				this.sendToClients(UPDATE_TEXT, o -> o.writeUTF(text));
@@ -81,7 +100,6 @@ public class TextFieldWidget extends AbstractButtonAdapter<net.minecraft.client.
 			String str = input.readUTF();
 			if(this.sanitize(str)) {
 				this.syncedFromClient(str);
-				// todo update to all other viewers
 			}
 		}
 		super.receiveFromClient(container, member, channel, input);

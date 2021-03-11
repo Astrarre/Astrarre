@@ -50,7 +50,6 @@ public abstract class RootContainerInternal implements RootContainer {
 		for (Drawable value : this.reversedRegistry.values()) {
 			((DrawableInternal) value).onAdded(this);
 		}
-
 	}
 
 	void addSynced(Drawable drawable) {
@@ -59,14 +58,6 @@ public abstract class RootContainerInternal implements RootContainer {
 		}
 
 		this.componentRegistry.put(drawable, drawable.getSyncId());
-		ObjectIterator<Int2ObjectMap.Entry<Drawable>> iterator = this.reversedRegistry.int2ObjectEntrySet().iterator();
-		while (iterator.hasNext()) {
-			Int2ObjectMap.Entry<Drawable> entry = iterator.next();
-			if (entry.getValue() == drawable) {
-				iterator.remove();
-				break;
-			}
-		}
 		this.reversedRegistry.put(drawable.getSyncId(), drawable);
 		((DrawableInternal) drawable).rootsInternal.add(this);
 		((DrawableInternal) drawable).setClient(this.isClient());
@@ -117,6 +108,29 @@ public abstract class RootContainerInternal implements RootContainer {
 				member.send(GuiPacketHandler.ADD_DRAWABLE, output -> {
 					output.writeEnum(this.getType());
 					drawable.write(this, output);
+				});
+			}
+		}
+	}
+
+	@Override
+	public void removeRoot(Drawable drawable) {
+		if(drawable == null) return;
+
+		int id = drawable.getSyncId();
+		this.reversedRegistry.remove(id);
+		this.componentRegistry.removeInt(drawable);
+		if(drawable instanceof Tickable) {
+			this.tickables.remove(drawable);
+		}
+		drawable.remove(this);
+		((DrawableInternal) drawable).rootsInternal.remove(this);
+		if (!this.isClient()) {
+			NetworkMember member = this.getViewer();
+			if (member != null) {
+				member.send(GuiPacketHandler.REMOVE_DRAWABLE, output -> {
+					output.writeEnum(this.getType());
+					output.writeInt(id);
 				});
 			}
 		}

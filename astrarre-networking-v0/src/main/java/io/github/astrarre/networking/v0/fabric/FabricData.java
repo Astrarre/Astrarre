@@ -16,6 +16,7 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.util.math.BlockPos;
 
 public class FabricData {
 	private static final ThreadLocal<PacketByteBuf> BUFFERS = ThreadLocal.withInitial(() -> new PacketByteBuf(null));
@@ -30,6 +31,7 @@ public class FabricData {
 	public static UUID readUUID(Input buf) {
 		return read(buf, PacketByteBuf::readUuid);
 	}
+	public static BlockPos readPos(Input buf) {return read(buf, PacketByteBuf::readBlockPos);}
 
 	public static PacketByteBuf from(Output output) {
 		if(output instanceof ByteBufDataOutput) {

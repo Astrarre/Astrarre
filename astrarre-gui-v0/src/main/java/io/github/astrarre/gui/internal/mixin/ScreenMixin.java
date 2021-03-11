@@ -50,6 +50,13 @@ public abstract class ScreenMixin implements ScreenRootAccess, ParentElement, Re
 		}
 	}
 
+	@Inject(method = "tick", at = @At("HEAD"))
+	public void onTick(CallbackInfo ci) {
+		if(this.panel != null) {
+			this.panel.tick();
+		}
+	}
+
 	@Inject(method = "init(Lnet/minecraft/client/MinecraftClient;II)V", at = @At("HEAD"))
 	public void init(MinecraftClient client, int width, int height, CallbackInfo ci) {
 		for (RootContainer.OnResize resize : this.resizes) {
@@ -71,6 +78,15 @@ public abstract class ScreenMixin implements ScreenRootAccess, ParentElement, Re
 
 	@Override
 	public RootContainerInternal getRoot() {
+		return this.internal;
+	}
+
+	@Override
+	public RootContainerInternal getClientRoot() {
+		if(this.internal == null) {
+			this.internal = new ScreenRootContainer<>((Screen) (Object) this);
+			this.attachListener(this.internal);
+		}
 		return this.internal;
 	}
 

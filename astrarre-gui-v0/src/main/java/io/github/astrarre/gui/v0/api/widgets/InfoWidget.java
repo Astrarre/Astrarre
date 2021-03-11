@@ -84,4 +84,7 @@ public class InfoWidget extends Drawable implements Interactable {
 	public void onLoseHover(RootContainer container) {
 		this.isHover = false;
 	}
+
+	public static void init() {
+	}
 }

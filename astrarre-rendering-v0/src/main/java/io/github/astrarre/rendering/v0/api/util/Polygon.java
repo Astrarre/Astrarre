@@ -4,6 +4,7 @@ import io.github.astrarre.rendering.internal.util.MathUtil;
 import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.util.v0.api.Validate;
 import io.github.astrarre.util.v0.api.collection.UnsafeFloatArrayList;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.util.math.Vector4f;
 
@@ -15,6 +16,7 @@ public final class Polygon {
 			                                    .addVertex(EPSILON, 0)
 			                                    .build();
 
+	private Polygon enclosing;
 	private final float[] vertices;
 	private final int offset, length;
 
@@ -49,7 +51,6 @@ public final class Polygon {
 		return this.vertices[index];
 	}
 
-
 	public boolean isInside(float px, float py) {
 		int count = 0;
 		int vertices = this.vertices();
@@ -64,6 +65,20 @@ public final class Polygon {
 			}
 		}
 		return (count % 2 == 1); // Same as (count%2 == 1)
+	}
+
+	public Polygon getEnclosing() {
+		Polygon enclosing = this.enclosing;
+		if(enclosing == null) {
+			float maxX = 0, maxY = 0;
+			for (int i = 0; i < this.vertices(); i++) {
+				float x = this.getX(i), y = this.getY(i);
+				if(x > maxX) maxX = x;
+				if(y > maxY) maxY = y;
+			}
+			return this.enclosing = Polygon.rectangle(maxX, maxY);
+		}
+		return enclosing;
 	}
 
 	public static Polygon rectangle(float width, float height) {
@@ -112,12 +127,11 @@ public final class Polygon {
 	}
 
 	/**
-	 * this builder can be re-used
-	 *
+	 * this builder cannot be re-used
 	 * @implNote the polygon is passed the original length, and since we only add to the list, the old polygon should never be modified
 	 */
 	public static final class Builder {
-		private final UnsafeFloatArrayList list;
+		private UnsafeFloatArrayList list;
 
 		/**
 		 * @param expectedVertices the number of expected vertices, if you don't know ahead of time, just guess
@@ -140,7 +154,6 @@ public final class Polygon {
 				this.list.set(i, v4f.getX());
 				this.list.set(i+1, v4f.getY());
 			}
-
 			return this;
 		}
 
@@ -150,8 +163,13 @@ public final class Polygon {
 			return this;
 		}
 
+		/**
+		 * @return a new polygon, with the points in counter-clockwise order
+		 */
 		public Polygon build() {
-			return new Polygon(this.list.arr(), 0, this.list.size());
+			Polygon polygon = new Polygon(this.list.arr(), 0, this.list.size());
+			this.list = null;
+			return polygon;
 		}
 	}
 }

@@ -150,12 +150,16 @@ public interface Interactable {
 	 * This method is for handling tab / ctrl+tab calls, if the function returns false
 	 * @return true if the component handled the cycle forward call.
 	 */
+	@Environment(EnvType.CLIENT)
 	default boolean handleFocusCycle(RootContainer container, boolean forward) {
 		return false;
 	}
 
 	default boolean canFocus(RootContainer container) {return false;}
+
+	@Environment(EnvType.CLIENT)
 	default void onFocus(RootContainer container) {}
+	@Environment(EnvType.CLIENT)
 	default void onLostFocus(RootContainer container) {}
 
 	/**
@@ -164,16 +168,17 @@ public interface Interactable {
 	 * @param mouseY the Y coordinate of the mouse
 	 * @see #mouseHover(RootContainer, double, double)
 	 */
-	@Environment(EnvType.CLIENT)
 	default boolean isHovering(RootContainer container, double mouseX, double mouseY) {
 		return false;
 	}
 
+	@Environment(EnvType.CLIENT)
 	default void mouseHover(RootContainer container, double mouseX, double mouseY) {
 	}
 
 	/**
 	 * fired when the mouse moves out of the bounds of the component. This is only fired if the mouseHover event is handled
 	 */
+	@Environment(EnvType.CLIENT)
 	default void onLoseHover(RootContainer container) {}
 }

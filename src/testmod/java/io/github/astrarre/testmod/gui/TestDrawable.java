@@ -11,6 +11,7 @@ import io.github.astrarre.gui.v0.api.access.Interactable;
 import io.github.astrarre.networking.v0.api.SyncedProperty;
 import io.github.astrarre.networking.v0.api.io.Output;
 import io.github.astrarre.networking.v0.api.serializer.ToPacketSerializer;
+import io.github.astrarre.rendering.v0.api.Graphics2d;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.rendering.v0.api.util.Close;
@@ -48,7 +49,7 @@ public class TestDrawable extends Drawable implements Interactable {
 		try (Close close = graphics.applyTransformation(TRANSLATE)) { // shift the power bar 9 pixels to the right to leave space for the icon
 			// this is where you render your component
 			// first we draw a background
-			graphics.fillRect(40, 7, Graphics3d.getARGB(255, 255, 255));
+			graphics.fillRect(40, 7, Graphics2d.getARGB(255, 255, 255));
 			graphics.drawLine(0, 0, 0, 7, 0xff000000);
 			// then we fill a bar up to whatever our power level is
 			graphics.fillGradient(Math.min(this.power.get(), 40), 7, 0xff00ffaa, 0xffaaff00);

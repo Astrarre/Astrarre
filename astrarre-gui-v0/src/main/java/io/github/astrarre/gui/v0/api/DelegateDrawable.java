@@ -1,18 +1,27 @@
-package io.github.astrarre.gui.v0.api.base;
+package io.github.astrarre.gui.v0.api;
 
+import java.util.Iterator;
+
+import com.google.common.collect.Iterators;
 import io.github.astrarre.gui.v0.api.Drawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
+import io.github.astrarre.gui.v0.api.access.Container;
 import io.github.astrarre.gui.v0.api.access.Interactable;
 import io.github.astrarre.networking.v0.api.io.Input;
 import io.github.astrarre.networking.v0.api.io.Output;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
+import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import net.minecraft.util.math.Matrix4f;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-public class DelegateDrawable extends Drawable implements Interactable {
+public class DelegateDrawable extends Drawable implements Interactable, Container {
 	private final int id;
 	private Drawable delegate;
 
@@ -40,7 +49,7 @@ public class DelegateDrawable extends Drawable implements Interactable {
 
 	@Override
 	protected void render0(RootContainer container, Graphics3d graphics, float tickDelta) {
-		this.getDelegate().render(container, graphics, tickDelta);
+		this.getDelegate().render0(container, graphics, tickDelta);
 	}
 
 	@Override
@@ -192,5 +201,43 @@ public class DelegateDrawable extends Drawable implements Interactable {
 	public void setBounds(Polygon polygon) {
 		super.setBounds(polygon);
 		this.delegate.setBounds(polygon);
+	}
+
+	@Override
+	public Drawable setTransformation(Transformation transformation) {
+		this.delegate.setTransformation(transformation);
+		return this;
+	}
+
+	@Override
+	public Transformation getTransformation() {
+		return this.delegate.getTransformation();
+	}
+
+	@Override
+	public Matrix4f getInvertedMatrix() {
+		return this.delegate.getInvertedMatrix();
+	}
+
+	@Override
+	public void remove(RootContainer container) {
+		super.remove(container);
+		this.delegate.remove(container);
+	}
+
+	@Override
+	public <T extends Drawable & Interactable> @Nullable T drawableAt(RootContainer container, double x, double y) {
+		if(this.delegate instanceof Container) {
+			return ((Container) this.delegate).drawableAt(container, x, y);
+		} else if(this.delegate instanceof Interactable && ((Interactable) this.delegate).isHovering(container, x, y)) {
+			return (T) this.delegate;
+		}
+		return null;
+	}
+
+	@NotNull
+	@Override
+	public Iterator<Drawable> iterator() {
+		return Iterators.singletonIterator(this.delegate);
 	}
 }

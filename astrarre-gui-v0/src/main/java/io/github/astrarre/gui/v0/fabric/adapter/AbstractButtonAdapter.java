@@ -17,7 +17,7 @@ public abstract class AbstractButtonAdapter<T extends AbstractButtonWidget> exte
 		super(id);
 		this.width = width;
 		this.height = height;
-		this.setBoundsProtected(new Polygon.Builder(4).addVertex(0, 0).addVertex(0, height).addVertex(width, height).addVertex(width, 0).build());
+		this.setBoundsProtected(Polygon.rectangle(width, height));
 	}
 
 	protected AbstractButtonAdapter(DrawableRegistry.Entry id, Input input) {
@@ -42,14 +42,6 @@ public abstract class AbstractButtonAdapter<T extends AbstractButtonWidget> exte
 		output.writeInt(this.width);
 		output.writeInt(this.height);
 		output.writeBoolean(this.enabled);
-	}
-
-	public int getWidth() {
-		return this.width;
-	}
-
-	public int getHeight() {
-		return this.height;
 	}
 
 	public boolean isEnabled() {

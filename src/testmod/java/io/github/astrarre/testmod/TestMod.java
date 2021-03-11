@@ -1,6 +1,5 @@
 package io.github.astrarre.testmod;
 
-import io.github.astrarre.testmod.gui.TestDrawable;
 import io.github.astrarre.testmod.gui.TestModGui;
 
 import net.minecraft.entity.player.PlayerEntity;
@@ -34,8 +33,7 @@ public class TestMod implements ModInitializer {
 		public ActionResult useOnBlock(ItemUsageContext context) {
 			PlayerEntity entity = context.getPlayer();
 			if (!context.getWorld().isClient && entity != null) {
-				TestDrawable drawable = TestModGui.open((ServerPlayerEntity) entity);
-				drawable.power.set((int) context.getHitPos().y);
+				TestModGui.open((ServerPlayerEntity) entity);
 			}
 			return ActionResult.CONSUME;
 		}
