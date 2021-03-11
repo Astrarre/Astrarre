@@ -155,6 +155,11 @@ public class MatrixGraphics implements Graphics3d {
 		return () -> this.matrices.pop();
 	}
 
+	@Override
+	public void flush() {
+		this.pushStage(null);
+	}
+
 	// todo setup/teardown
 	@Override
 	public void drawLine(float x1, float y1, float z1, float x2, float y2, float z2, int color) {

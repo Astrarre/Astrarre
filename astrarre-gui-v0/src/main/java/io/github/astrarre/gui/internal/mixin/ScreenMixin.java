@@ -44,6 +44,7 @@ public abstract class ScreenMixin implements ScreenRootAccess, ParentElement, Re
 				Graphics3d g3d = new MatrixGraphics(matrices);
 				internal.getContentPanel().mouseHover(internal, mouseX, mouseY);
 				internal.getContentPanel().render(internal, g3d, delta);
+				g3d.flush();
 			} catch (Throwable t) {
 				t.printStackTrace();
 			}

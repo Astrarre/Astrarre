@@ -115,6 +115,11 @@ public class DelegateGraphics implements Graphics3d {
 	}
 
 	@Override
+	public void flush() {
+		this.delegate.flush();
+	}
+
+	@Override
 	public void drawLine(float x1, float y1, float z1, float x2, float y2, float z2, int color) {
 		this.delegate.drawLine(x1, y1, z1, x2, y2, z2, color);
 	}

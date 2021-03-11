@@ -105,4 +105,6 @@ public interface Graphics2d {
 	 * @return an object, when it's closed, will return the graphics instance to the state it was in prior to the transformation
 	 */
 	Close applyTransformation(Transformation transformation);
+
+	void flush();
 }
