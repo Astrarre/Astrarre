@@ -1,15 +1,14 @@
 package io.github.astrarre.rendering.v0.fabric;
 
-import io.github.astrarre.rendering.internal.mixin.Matrix4fAccessor;
+import io.github.astrarre.rendering.internal.mixin.Matrix4fAccess;
 import io.github.astrarre.rendering.v0.api.Transformation;
 
 import net.minecraft.client.util.math.Vector3f;
-import net.minecraft.client.util.math.Vector4f;
 import net.minecraft.util.math.Matrix4f;
 
 public class TransformationUtil {
 	public static void transform(Vector3f vec3f, Transformation transformation) {
-		Matrix4fAccessor matrix = (Matrix4fAccessor) (Object) transformation.getModelMatrixTransform();
+		Matrix4fAccess matrix = (Matrix4fAccess) (Object) transformation.getModelMatrixTransform();
 		float f = vec3f.getX();
 		float g = vec3f.getY();
 		float h = vec3f.getZ();
@@ -21,7 +20,7 @@ public class TransformationUtil {
 	public static void transformInverse(Vector3f vec3f, Transformation transformation) {
 		Matrix4f m4f = transformation.getModelMatrixTransform().copy();
 		m4f.invert();
-		Matrix4fAccessor matrix = (Matrix4fAccessor) (Object) m4f;
+		Matrix4fAccess matrix = (Matrix4fAccess) (Object) m4f;
 		float f = vec3f.getX();
 		float g = vec3f.getY();
 		float h = vec3f.getZ();

@@ -3,8 +3,7 @@
   "package": "io.github.astrarre.rendering.internal.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "Matrix4fAccessor",
-    "Matrix4fMixin"
+    "Matrix4fAccess"
   ],
   "client": [
     "SpriteAtlasHolderMixin",

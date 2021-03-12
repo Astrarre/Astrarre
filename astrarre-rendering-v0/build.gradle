@@ -1,4 +1,6 @@
 version '0.0.0'
 fapi(project)
 dependsOn(project, 'astrarre-util-v0', 'astrarre-itemview-v0')
-
+dependencies {
+    implementation group: 'org.apache.xmlgraphics', name: 'org.apache.batik.ext.awt', version: '1.6.0.v201011041432'
+}

@@ -1,9 +1,12 @@
 package io.github.astrarre.testmod.gui;
 
+import javax.swing.JButton;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.astrarre.gui.v0.api.Drawable;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.panel.Panel;
+import io.github.astrarre.gui.v0.swing.adapter.ComponentAdapter;
 import io.github.astrarre.networking.v0.api.io.Output;
 import io.github.astrarre.rendering.internal.MatrixGraphics;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
@@ -16,7 +19,9 @@ public class TestClientOnlyGui {
 	public static void clientOnly() {
 		RootContainer container = RootContainer.openClientOnly();
 		Panel panel = container.getContentPanel();
-		panel.addClient(new BoundedDrawable());
+		JButton button = new JButton();
+		button.setSize(100, 100);
+		panel.addClient(new ComponentAdapter(null, button) {});
 	}
 
 	public static class BoundedDrawable extends Drawable {
