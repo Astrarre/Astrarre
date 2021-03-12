@@ -52,7 +52,7 @@ public class ParticipantInventory implements Inventory, FilteringInventory {
 	public ItemStack getStack(int slot) {
 		this.test(slot);
 		if (slot == BUFFER_EXTRACTION_SLOT) {
-			try (Transaction transaction = new Transaction(false)) {
+			try (Transaction transaction = Transaction.create(false)) {
 				this.participant.extract(transaction, this.slot);
 				// mutations need to be reflected in the participant
 				final int oldCount = this.slot.getQuantity(transaction);
@@ -116,7 +116,7 @@ public class ParticipantInventory implements Inventory, FilteringInventory {
 				return;
 			}
 
-			try (Transaction commit = new Transaction(true)) {
+			try (Transaction commit = Transaction.create(true)) {
 				int leftover = oldCount - this.participant.extract(commit, item, oldCount);
 				int toInsert = count - leftover;
 				boolean abort = false;
@@ -157,7 +157,7 @@ public class ParticipantInventory implements Inventory, FilteringInventory {
 		if (slot == BUFFER_EXTRACTION_SLOT) {
 			return false;
 		} else {
-			try (Transaction transaction = new Transaction(false)) {
+			try (Transaction transaction = Transaction.create(false)) {
 				int count = stack.getCount();
 				return this.participant.insert(transaction, ItemKey.of(stack), count) == count;
 			}

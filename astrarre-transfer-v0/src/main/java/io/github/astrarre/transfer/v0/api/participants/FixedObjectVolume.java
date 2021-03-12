@@ -1,10 +1,18 @@
 package io.github.astrarre.transfer.v0.api.participants;
 
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
+import io.github.astrarre.transfer.v0.fabric.participants.item.ItemSlotParticipant;
 
+/**
+ * an object volume that has a maximum quantity.
+ * @see ItemSlotParticipant
+ */
 public class FixedObjectVolume<T> extends ObjectVolume<T> {
 	protected int max;
 
+	/**
+	 * @param empty the 'empty' version of the object (eg. Fluid#EMPTY)
+	 */
 	public FixedObjectVolume(T empty, int max) {
 		super(empty);
 		this.max = max;

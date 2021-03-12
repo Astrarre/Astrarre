@@ -4,6 +4,8 @@ package io.github.astrarre.util.v0.api;
 import net.minecraft.util.Identifier;
 
 /**
+ * A small abstraction over Identifier with a shorter name
+ *
  * overrides equals and hashcode
  */
 public interface Id {

@@ -17,7 +17,7 @@ public class ItemStackOutput implements RecipePart<ItemStack, Insertable<ItemKey
 
 	@Override
 	public boolean test(Insertable<ItemKey> inp, ItemStack val) {
-		try(Transaction transaction = new Transaction(false)) {
+		try(Transaction transaction = Transaction.create(false)) {
 			return inp.insert(transaction, ItemKey.of(val), val.getCount()) == val.getCount();
 		}
 	}

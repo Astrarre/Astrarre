@@ -20,6 +20,9 @@ import net.minecraft.util.Identifier;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 
+/**
+ * a single file can choose between multiple recipes this file will load recipes. Keep in mind a that this does not check if 2 recipes will conflict in parsing
+ */
 public class RecipeFile implements SimpleSynchronousResourceReloadListener {
 	private final List<RecipeImpl> recipes = new ArrayList<>();
 	private final Identifier fileId;

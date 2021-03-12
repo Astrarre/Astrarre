@@ -4,7 +4,10 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 import com.google.common.collect.Iterables;
+import io.github.astrarre.access.v0.api.Access;
+import io.github.astrarre.access.v0.api.provider.Provider;
 import io.github.astrarre.transfer.v0.api.Insertable;
+import io.github.astrarre.transfer.v0.api.Participants;
 import io.github.astrarre.transfer.v0.fabric.participants.FabricParticipants;
 import io.github.astrarre.util.v0.api.collection.DualIterator;
 import io.github.astrarre.transfer.v0.api.Participant;
@@ -14,11 +17,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * inventory conversion function is registered for this class exactly
+ * A participant that delegates to other participants
+ *
+ * inventory conversion function is registered for this class already
  * @see FabricParticipants#FROM_INVENTORY
  * @implNote {@link #iterator()}
  */
-public class AggregateParticipant<T> implements Participant<T>, Iterable<Participant<T>> {
+public class AggregateParticipant<T> implements Participant<T>, Iterable<Participant<T>>, Provider {
 	private final Iterable<Participant<T>> participants;
 
 	public static <T> AggregateParticipant<T> merge(Participant<T> a, Participant<T> b) {
@@ -172,5 +177,10 @@ public class AggregateParticipant<T> implements Participant<T>, Iterable<Partici
 				return current;
 			}
 		};
+	}
+
+	@Override
+	public @Nullable Object get(Access<?> access) {
+		return access == Participants.AGGREGATE_WRAPPERS ? this.participants : null;
 	}
 }

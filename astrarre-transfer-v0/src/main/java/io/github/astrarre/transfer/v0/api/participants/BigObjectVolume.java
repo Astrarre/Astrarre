@@ -1,46 +1,45 @@
 package io.github.astrarre.transfer.v0.api.participants;
 
+import java.math.BigInteger;
+
 import io.github.astrarre.transfer.v0.api.Insertable;
 import io.github.astrarre.transfer.v0.api.Participant;
 import io.github.astrarre.transfer.v0.api.transaction.Key;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import io.github.astrarre.transfer.v0.api.transaction.keys.ObjectKeyImpl;
-import io.github.astrarre.transfer.v0.api.transaction.keys.generated.IntKeyImpl;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * a volume with unlimited* (int_max) storage capacity
- */
-public class ObjectVolume<T> implements Participant<T> {
+public class BigObjectVolume<T> implements Participant<T> {
+	public static final BigInteger INT_MAX = BigInteger.valueOf(Integer.MAX_VALUE);
 	protected final T empty;
 	protected final Key.Object<T> type;
-	protected final Key.Int quantity;
+	protected final Key.Object<BigInteger> quantity;
 
-	public ObjectVolume(T empty) {
-		this(empty, empty, 0);
+	public BigObjectVolume(T empty) {
+		this(empty, empty, BigInteger.ZERO);
 	}
 
-	public ObjectVolume(T empty, T object, int quantity) {
+	public BigObjectVolume(T empty, T object, BigInteger quantity) {
 		this.empty = empty;
-		if (object == this.empty && quantity != 0) {
+		if (object == this.empty && !BigInteger.ZERO.equals(quantity)) {
 			throw new IllegalArgumentException("cannot have " + quantity + " units of EMPTY!");
-		} else if (quantity < 0) {
+		} else if (quantity.signum() == -1) {
 			throw new IllegalArgumentException("Cannot have negative units of " + object);
 		}
 
-		if (quantity == 0) {
+		if (BigInteger.ZERO.equals(quantity)) {
 			object = empty;
 		}
 
 		this.type = new ObjectKeyImpl<>(object);
-		this.quantity = new IntKeyImpl(quantity);
+		this.quantity = new ObjectKeyImpl<>(quantity);
 	}
 
 	public T getType(@Nullable Transaction transaction) {
 		return this.type.get(transaction);
 	}
 
-	public int getQuantity(@Nullable Transaction transaction) {
+	public BigInteger getQuantity(@Nullable Transaction transaction) {
 		return this.quantity.get(transaction);
 	}
 
@@ -56,11 +55,8 @@ public class ObjectVolume<T> implements Participant<T> {
 				this.type.set(transaction, type);
 			}
 
-			int current = this.quantity.get(transaction);
-
-			quantity = Math.min(Integer.MAX_VALUE - current, quantity);
-
-			this.quantity.set(transaction, current + quantity);
+			BigInteger current = this.quantity.get(transaction);
+			this.quantity.set(transaction, current.add(BigInteger.valueOf(quantity)));
 			return quantity;
 		}
 		return 0;
@@ -68,11 +64,11 @@ public class ObjectVolume<T> implements Participant<T> {
 
 	@Override
 	public void extract(@Nullable Transaction transaction, Insertable<T> insertable) {
-		int oldLevel = this.quantity.get(transaction);
-		int amount = insertable.insert(transaction, this.type.get(transaction), oldLevel);
-		int newLevel = oldLevel - amount;
+		BigInteger oldLevel = this.quantity.get(transaction);
+		int amount = insertable.insert(transaction, this.type.get(transaction), INT_MAX.min(oldLevel).intValue());
+		BigInteger newLevel = oldLevel.subtract(BigInteger.valueOf(amount));
 		this.quantity.set(transaction, newLevel);
-		if (newLevel == 0) {
+		if (BigInteger.ZERO.equals(newLevel)) {
 			this.type.set(transaction, this.empty);
 		}
 	}
@@ -84,13 +80,13 @@ public class ObjectVolume<T> implements Participant<T> {
 		}
 
 		if (this.type.get(transaction) == type) {
-			int oldLevel = this.quantity.get(transaction);
-			int toExtract = Math.min(oldLevel, quantity);
-			int newLevel = oldLevel - toExtract;
-			if (newLevel == 0) {
+			BigInteger oldLevel = this.quantity.get(transaction);
+			BigInteger toExtract = BigInteger.valueOf(quantity).min(oldLevel);
+			BigInteger newLevel = oldLevel.subtract(toExtract);
+			if (BigInteger.ZERO.equals(newLevel)) {
 				this.type.set(transaction, this.empty);
 			}
-			return toExtract;
+			return toExtract.intValueExact();
 		}
 
 		return 0;
@@ -104,6 +100,6 @@ public class ObjectVolume<T> implements Participant<T> {
 	@Override
 	public void clear(@Nullable Transaction transaction) {
 		this.type.set(transaction, this.empty);
-		this.quantity.set(transaction, 0);
+		this.quantity.set(transaction, BigInteger.ZERO);
 	}
 }

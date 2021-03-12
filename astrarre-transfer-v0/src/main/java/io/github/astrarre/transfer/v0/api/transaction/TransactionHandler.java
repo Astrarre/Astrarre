@@ -4,7 +4,7 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * For fields that will always be set together (you must call both key's set together) you can use the same transaction handler
+ * a little utility class to manage transactions in keys
  */
 public class TransactionHandler {
 	private final IntArrayList transactions = new IntArrayList();

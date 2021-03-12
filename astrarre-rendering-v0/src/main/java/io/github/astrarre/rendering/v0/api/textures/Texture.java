@@ -1,5 +1,7 @@
 package io.github.astrarre.rendering.v0.api.textures;
 
+import java.util.Objects;
+
 import io.github.astrarre.util.v0.api.Id;
 import io.github.astrarre.util.v0.api.Validate;
 
@@ -45,5 +47,33 @@ public class Texture {
 
 	public int getHeight() {
 		return this.height;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof Texture)) {
+			return false;
+		}
+
+		Texture texture = (Texture) o;
+
+		if (this.width != texture.width) {
+			return false;
+		}
+		if (this.height != texture.height) {
+			return false;
+		}
+		return Objects.equals(this.identifier, texture.identifier);
+	}
+
+	@Override
+	public int hashCode() {
+		int result = this.identifier != null ? this.identifier.hashCode() : 0;
+		result = 31 * result + this.width;
+		result = 31 * result + this.height;
+		return result;
 	}
 }

@@ -10,6 +10,10 @@ import io.github.astrarre.transfer.v0.api.Participants;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * a participant wrapper over Extractable
+ * @param <T>
+ */
 public final class ExtractableParticipant<T> implements Participant<T>, Provider {
 	public final Extractable<T> extractable;
 

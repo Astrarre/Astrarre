@@ -38,7 +38,7 @@ public class AggregateParticipantInventory implements Inventory, Provider {
 	@Override
 	public ItemStack getStack(int slot) {
 		Participant<ItemKey> participant = this.participant.getParticipant(slot);
-		try (Transaction transaction = new Transaction(false)) {
+		try (Transaction transaction = Transaction.create(false)) {
 			participant.extract(transaction, this.access);
 			return this.access.getType(transaction).createItemStack(this.access.getQuantity(transaction));
 		}
@@ -99,7 +99,7 @@ public class AggregateParticipantInventory implements Inventory, Provider {
 	public boolean isValid(int slot, ItemStack stack) {
 		Participant<ItemKey> participant = this.participant.getParticipant(slot);
 		if (participant.isFull(null) && participant.supportsInsertion()) {
-			try (Transaction transaction = new Transaction(false)) {
+			try (Transaction transaction = Transaction.create(false)) {
 				return participant.insert(transaction, ItemKey.of(stack), stack.getCount()) == stack.getCount();
 			}
 		}
@@ -108,7 +108,7 @@ public class AggregateParticipantInventory implements Inventory, Provider {
 
 	@Override
 	public int count(Item item) {
-		try(Transaction transaction = new Transaction(false)) {
+		try(Transaction transaction = Transaction.create(false)) {
 			SetMatchingInsertable insertable = new SetMatchingInsertable(Collections.singleton(item), Integer.MAX_VALUE);
 			this.participant.extract(transaction, ItemKey.of(item), Integer.MAX_VALUE);
 			return insertable.found.get(transaction);
@@ -117,7 +117,7 @@ public class AggregateParticipantInventory implements Inventory, Provider {
 
 	@Override
 	public boolean containsAny(Set<Item> items) {
-		try(Transaction transaction = new Transaction(false)) {
+		try(Transaction transaction = Transaction.create(false)) {
 			SetMatchingInsertable insertable = new SetMatchingInsertable(items, 1);
 			this.participant.extract(transaction, insertable);
 			return insertable.isFull(transaction);

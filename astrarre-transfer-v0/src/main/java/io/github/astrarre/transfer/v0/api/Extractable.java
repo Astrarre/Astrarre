@@ -5,6 +5,9 @@ import io.github.astrarre.transfer.internal.TransferInternal;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * @see Droplet
+ */
 public interface Extractable<T> {
 	static <T> Participant<T> asParticipant(Extractable<T> extractable) {
 		return new ExtractableParticipant<>(extractable);

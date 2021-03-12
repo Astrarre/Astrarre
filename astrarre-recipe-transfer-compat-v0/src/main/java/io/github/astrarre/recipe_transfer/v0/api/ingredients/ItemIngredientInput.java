@@ -21,7 +21,7 @@ public class ItemIngredientInput implements RecipePart<ItemIngredient, Extractab
 
 	@Override
 	public boolean test(Extractable<ItemKey> inp, ItemIngredient val) {
-		try(Transaction transaction = new Transaction(false)) {
+		try(Transaction transaction = Transaction.create(false)) {
 			ItemIngredientInsertable insertable = new ItemIngredientInsertable(val);
 			inp.extract(transaction, insertable);
 			return insertable.count == val.amount;
@@ -30,7 +30,7 @@ public class ItemIngredientInput implements RecipePart<ItemIngredient, Extractab
 
 	@Override
 	public void apply(Extractable<ItemKey> inp, ItemIngredient val) {
-		try(Transaction transaction = new Transaction(true)) {
+		try(Transaction transaction = Transaction.create(true)) {
 			ItemIngredientInsertable insertable = new ItemIngredientInsertable(val);
 			inp.extract(transaction, insertable);
 		}

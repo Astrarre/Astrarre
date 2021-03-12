@@ -4,6 +4,9 @@ package io.github.astrarre.transfer.v0.api;
  * Defined as 1/81,000 of a bucket, a droplet (dp) is the fluid unit standard of the astrarre transfer api
  */
 public final class Droplet {
+	/**
+	 * one bucket in droplets
+	 */
 	public static final int BUCKET = 81_000;
 	/**
 	 * the number of droplets in a bucket

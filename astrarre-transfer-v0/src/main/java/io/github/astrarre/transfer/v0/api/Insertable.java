@@ -5,6 +5,9 @@ import io.github.astrarre.transfer.internal.TransferInternal;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * @see Droplet
+ */
 public interface Insertable<T> {
 	static <T> Participant<T> asParticipant(Insertable<T> insertable) {
 		return new InsertableParticipant<>(insertable);

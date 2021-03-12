@@ -28,6 +28,9 @@ public interface Graphics2d {
 		return getARGB(0xff, red, green, blue);
 	}
 
+	/**
+	 * @return the width, int pixels of the text
+	 */
 	static int getWidth(String text) {
 		return MinecraftClient.getInstance().textRenderer.getWidth(text);
 	}

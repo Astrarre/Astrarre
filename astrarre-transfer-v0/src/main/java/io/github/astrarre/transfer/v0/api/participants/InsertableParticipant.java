@@ -9,6 +9,9 @@ import io.github.astrarre.transfer.v0.api.Participants;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * a participant wrapper over insertable
+ */
 public final class InsertableParticipant<T> implements Participant<T>, Provider {
 	public final Insertable<T> insertable;
 

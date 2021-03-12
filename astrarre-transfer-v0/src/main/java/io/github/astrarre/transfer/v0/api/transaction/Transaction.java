@@ -1,7 +1,16 @@
 package io.github.astrarre.transfer.v0.api.transaction;
 
 // todo some way of de-duplicating containers
+
+/**
+ * a 'serialized world state' more documentation on the concept can be seen
+ */
 public final class Transaction implements AutoCloseable {
+	/**
+	 * the 'global' transaction state
+	 */
+	public static final Transaction GLOBAL = null;
+
 	private static final ThreadLocal<Transaction> ACTIVE = new ThreadLocal<>();
 	private final Transaction parent;
 	private final int nest;
@@ -9,20 +18,10 @@ public final class Transaction implements AutoCloseable {
 	// this is composited with andThen
 	private Key compositeKey;
 
-	/**
-	 * <code>
-	 * new Transaction(true)
-	 * </code>
-	 */
-	public Transaction() {
+	private Transaction() {
 		this(true);
 	}
-
-	/**
-	 * @param intent {@link AutoCloseable#close()} will commit/abort the transaction if it has not been invalidated already. (true = commit, false =
-	 * 		abort)
-	 */
-	public Transaction(boolean intent) {
+	private Transaction(boolean intent) {
 		this.intent = intent;
 		this.parent = ACTIVE.get();
 		if (this.parent == null) {
@@ -31,6 +30,23 @@ public final class Transaction implements AutoCloseable {
 			this.nest = this.parent.nest + 1;
 		}
 		ACTIVE.set(this);
+	}
+
+	/**
+	 * <code>
+	 * new Transaction(true)
+	 * </code>
+	 */
+	public static Transaction create() {
+		return create(true);
+	}
+
+	/**
+	 * @param intent {@link AutoCloseable#close()} will commit/abort the transaction if it has not been invalidated already. (true = commit, false =
+	 * 		abort)
+	 */
+	public static Transaction create(boolean intent) {
+		return new Transaction(intent);
 	}
 
 	/**
