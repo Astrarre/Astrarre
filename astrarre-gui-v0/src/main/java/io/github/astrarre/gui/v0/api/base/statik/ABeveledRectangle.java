@@ -1,4 +1,4 @@
-package io.github.astrarre.gui.v0.api.statik;
+package io.github.astrarre.gui.v0.api.base.statik;
 
 import io.github.astrarre.gui.v0.api.Drawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
@@ -12,16 +12,16 @@ import io.github.astrarre.util.v0.api.Id;
 /**
  * the standard inventory background. If you want it to resize with the drawable
  */
-public final class BeveledRectangle extends Drawable {
+public final class ABeveledRectangle extends Drawable {
 	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "beveled_rectangle"),
-			BeveledRectangle::new);
+			ABeveledRectangle::new);
 
 	protected final float width, height;
 
 	/**
 	 * captures the width and height of the panel
 	 */
-	public BeveledRectangle(Drawable panel) {
+	public ABeveledRectangle(Drawable panel) {
 		super(ENTRY);
 		Polygon enclosing = panel.getBounds().getEnclosing();
 		this.setBounds(enclosing);
@@ -29,15 +29,15 @@ public final class BeveledRectangle extends Drawable {
 		this.height = enclosing.getY(2);
 	}
 
-	private BeveledRectangle(Input input) {
+	private ABeveledRectangle(Input input) {
 		this(input.readFloat(), input.readFloat());
 	}
 
-	public BeveledRectangle(float width, float height) {
+	public ABeveledRectangle(float width, float height) {
 		this(ENTRY, width, height);
 	}
 
-	private BeveledRectangle(DrawableRegistry.Entry id, float width, float height) {
+	private ABeveledRectangle(DrawableRegistry.Entry id, float width, float height) {
 		super(id);
 		this.setBounds(Polygon.rectangle(width, height));
 		this.width = width;

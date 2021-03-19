@@ -1,4 +1,4 @@
-package io.github.astrarre.gui.v0.api.widgets;
+package io.github.astrarre.gui.v0.api.base.widgets;
 
 import java.nio.charset.StandardCharsets;
 
@@ -17,27 +17,27 @@ import net.minecraft.client.MinecraftClient;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-public class TextFieldWidget extends AbstractButtonAdapter<net.minecraft.client.gui.widget.TextFieldWidget> {
+public class ATextFieldWidget extends AbstractButtonAdapter<net.minecraft.client.gui.widget.TextFieldWidget> {
 	public static final int UPDATE_TEXT = 1;
-	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "text_field"), TextFieldWidget::new);
+	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "text_field"), ATextFieldWidget::new);
 	// only exists on the server
 	private String text = "";
 
-	public TextFieldWidget(int width, int height) {
+	public ATextFieldWidget(int width, int height) {
 		super(ENTRY, width, height);
 	}
 
 	@Environment(EnvType.CLIENT)
-	private TextFieldWidget(Input input) {
+	private ATextFieldWidget(Input input) {
 		this(ENTRY, input);
 	}
 
-	protected TextFieldWidget(DrawableRegistry.Entry id, int width, int height) {
+	protected ATextFieldWidget(DrawableRegistry.Entry id, int width, int height) {
 		super(id, width, height);
 	}
 
 	@Environment(EnvType.CLIENT)
-	protected TextFieldWidget(DrawableRegistry.Entry id, Input input) {
+	protected ATextFieldWidget(DrawableRegistry.Entry id, Input input) {
 		super(id, input);
 		this.text = input.readUTF();
 		Polygon enclosing = this.getBounds().getEnclosing();

@@ -9,11 +9,10 @@ import io.github.astrarre.gui.v0.api.Drawable;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.access.Interactable;
 import io.github.astrarre.gui.v0.api.access.Tickable;
-import io.github.astrarre.gui.v0.api.panel.Panel;
+import io.github.astrarre.gui.v0.api.base.panel.APanel;
 import io.github.astrarre.networking.v0.api.io.Input;
 import io.github.astrarre.networking.v0.api.io.Output;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
@@ -22,14 +21,14 @@ import org.jetbrains.annotations.Nullable;
 public abstract class RootContainerInternal implements RootContainer {
 	static final AtomicInteger ID = new AtomicInteger(), CLIENT_ID = new AtomicInteger(Integer.MIN_VALUE);
 	protected final List<Tickable> tickables = new ArrayList<>();
-	protected final Panel panel;
+	protected final APanel panel;
 	private final Object2IntOpenHashMap<Drawable> componentRegistry = new Object2IntOpenHashMap<>();
 	private final Int2ObjectOpenHashMap<Drawable> reversedRegistry = new Int2ObjectOpenHashMap<>();
 	int tick;
 	private boolean reading;
 
 	protected RootContainerInternal() {
-		this.addRoot(this.panel = new Panel());
+		this.addRoot(this.panel = new APanel());
 	}
 
 	protected RootContainerInternal(Input input) {
@@ -46,7 +45,7 @@ public abstract class RootContainerInternal implements RootContainer {
 		}
 		int panelId = input.readInt();
 		this.reading = false;
-		this.panel = (Panel) this.forId(panelId);
+		this.panel = (APanel) this.forId(panelId);
 		for (Drawable value : this.reversedRegistry.values()) {
 			((DrawableInternal) value).onAdded(this);
 		}
@@ -64,7 +63,7 @@ public abstract class RootContainerInternal implements RootContainer {
 	}
 
 	@Override
-	public Panel getContentPanel() {
+	public APanel getContentPanel() {
 		return this.panel;
 	}
 

@@ -8,7 +8,7 @@ import io.github.astrarre.gui.internal.access.ScreenRootAccess;
 import io.github.astrarre.gui.internal.vanilla.DefaultScreen;
 import io.github.astrarre.gui.internal.vanilla.DefaultScreenHandler;
 import io.github.astrarre.gui.v0.api.access.Interactable;
-import io.github.astrarre.gui.v0.api.panel.Panel;
+import io.github.astrarre.gui.v0.api.base.panel.APanel;
 import io.github.astrarre.networking.internal.ByteBufDataOutput;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
 import org.jetbrains.annotations.Nullable;
@@ -94,12 +94,12 @@ public interface RootContainer {
 	 * The content panel is the 'root' panel of the screen. Do not transform this
 	 * @return the panel where drawables are meant to be attached
 	 */
-	Panel getContentPanel();
+	APanel getContentPanel();
 
 	/**
 	 * you <b>MUST</b> call this method for each drawable you add. Some classes will automatically register the component though (calling it anyways doesn't hurt)
 	 *
-	 * @see Panel adding components will automatically register it
+	 * @see APanel adding components will automatically register it
 	 */
 	void addRoot(Drawable drawable);
 

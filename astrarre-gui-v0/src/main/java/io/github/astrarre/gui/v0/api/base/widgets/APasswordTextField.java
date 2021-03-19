@@ -1,4 +1,4 @@
-package io.github.astrarre.gui.v0.api.widgets;
+package io.github.astrarre.gui.v0.api.base.widgets;
 
 import com.google.common.hash.Hasher;
 import com.google.common.hash.Hashing;
@@ -12,23 +12,23 @@ import net.fabricmc.api.Environment;
 /**
  * a text widget but it hashes the password before sending it over the internet. This isn't that secure, but whatever
  */
-public class PasswordWidget extends TextFieldWidget {
-	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "text_field"), PasswordWidget::new);
+public class APasswordTextField extends ATextFieldWidget {
+	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "text_field"), APasswordTextField::new);
 
-	public PasswordWidget(int width, int height) {
+	public APasswordTextField(int width, int height) {
 		super(ENTRY, width, height);
 	}
 
 	@Environment(EnvType.CLIENT)
-	private PasswordWidget(Input input) {
+	private APasswordTextField(Input input) {
 		super(ENTRY, input);
 	}
 
-	protected PasswordWidget(DrawableRegistry.Entry id, int width, int height) {
+	protected APasswordTextField(DrawableRegistry.Entry id, int width, int height) {
 		super(id, width, height);
 	}
 
-	protected PasswordWidget(DrawableRegistry.Entry id, Input input) {
+	protected APasswordTextField(DrawableRegistry.Entry id, Input input) {
 		super(id, input);
 	}
 

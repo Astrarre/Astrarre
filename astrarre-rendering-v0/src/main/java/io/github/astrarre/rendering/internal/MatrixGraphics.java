@@ -10,8 +10,9 @@ import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.rendering.v0.api.textures.SpriteInfo;
 import io.github.astrarre.rendering.v0.api.textures.Texture;
-import io.github.astrarre.rendering.v0.api.textures.TexturePart;
 import io.github.astrarre.rendering.v0.api.util.Close;
+import io.github.astrarre.rendering.v0.api.util.Polygon;
+import io.github.astrarre.rendering.v0.edge.Stencil;
 import io.github.astrarre.util.v0.api.Validate;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,6 +25,7 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.texture.Sprite;
+import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.OrderedText;
@@ -35,11 +37,13 @@ import net.fabricmc.api.Environment;
 
 @Environment (EnvType.CLIENT)
 public class MatrixGraphics implements Graphics3d {
+	private static final Stencil STENCIL = Stencil.newInstance();
 	public MatrixStack matrices;
 	private TextRenderer textRenderer;
 	private ItemRenderer itemRenderer;
 
 	private SetupTeardown stage;
+	private final TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
 
 	public MatrixGraphics(MatrixStack matrices) {
 		this.matrices = matrices;
@@ -98,6 +102,16 @@ public class MatrixGraphics implements Graphics3d {
 	}
 
 	@Override
+	public void fillPolygon(Polygon polygon, int color) {
+		this.pushStage(SetupTeardown.FILL);
+		int a = color >> 24 & 255;
+		int r = color >> 16 & 255;
+		int g = color >> 8 & 255;
+		int b = color & 255;
+		polygon.triangleBuffer(VertexFormats.POSITION_COLOR, consumer -> consumer.color(a, r, g, b), color | Polygon.COLOR);
+	}
+
+	@Override
 	public void drawSprite(SpriteInfo info) {
 		this.pushStage(null);
 		Sprite sprite = (Sprite) info;
@@ -111,7 +125,7 @@ public class MatrixGraphics implements Graphics3d {
 		Validate.positive(width, "Width cannot be negative!");
 		Validate.positive(height, "Height cannot be negative!");
 		this.pushStage(null);
-		MinecraftClient.getInstance().getTextureManager().bindTexture(texture.getIdentifier());
+		this.textureManager.bindTexture(texture.getIdentifier());
 		DrawableHelper.drawTexture(this.matrices, 0, 0, x1, y1, width, height, texture.getWidth(), texture.getHeight());
 	}
 
@@ -128,6 +142,7 @@ public class MatrixGraphics implements Graphics3d {
 
 	@Override
 	public void drawItem(ItemStack stack) {
+		//this.renderGuiItemModel(itemStack, x, y, this.getHeldItemModel(itemStack, (World)null, entity))
 		this.pushStage(null);
 		this.getItemRenderer().zOffset = 0;
 		RenderSystem.pushMatrix();
@@ -160,15 +175,19 @@ public class MatrixGraphics implements Graphics3d {
 		this.pushStage(null);
 	}
 
-	// todo setup/teardown
+	@Override
+	public Stencil stencil() {
+		return STENCIL;
+	}
+
 	@Override
 	public void drawLine(float x1, float y1, float z1, float x2, float y2, float z2, int color) {
 		this.pushStage(SetupTeardown.FILL);
 		Matrix4f matrix = this.matrices.peek().getModel();
-		float a = (float)(color >> 24 & 255) / 255.0F;
-		float r = (float)(color >> 16 & 255) / 255.0F;
-		float g = (float)(color >> 8 & 255) / 255.0F;
-		float b = (float)(color & 255) / 255.0F;
+		int a = color >> 24 & 255;
+		int r = color >> 16 & 255;
+		int g = color >> 8 & 255;
+		int b = color & 255;
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		bufferBuilder.begin(1, VertexFormats.POSITION_COLOR);
 		bufferBuilder.vertex(matrix, x1, y1, x1).color(r, g, b, a).next();

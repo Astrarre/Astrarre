@@ -1,4 +1,4 @@
-package io.github.astrarre.gui.v0.api.widgets;
+package io.github.astrarre.gui.v0.api.base.widgets;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,23 +23,23 @@ import net.minecraft.text.Text;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-public class InfoWidget extends Drawable implements Interactable {
-	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.registerForward(Id.create("astrarre-gui-v0", "info_widget"), InfoWidget::new);
-	public final SyncedProperty<Boolean> isEnabled = this.createClientSyncedProperty(ToPacketSerializer.BOOLEAN, "enabled", true);
+public class AInfo extends Drawable implements Interactable {
+	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.registerForward(Id.create("astrarre-gui-v0", "info_widget"), AInfo::new);
+	public final SyncedProperty<Boolean> isEnabled = this.createClientSyncedProperty(ToPacketSerializer.BOOLEAN, true);
 	public final List<Text> tooltip;
 
 	@Environment(EnvType.CLIENT)
 	protected boolean isHover;
-	protected InfoWidget(DrawableRegistry.Entry id, List<Text> tooltip) {
+	protected AInfo(DrawableRegistry.Entry id, List<Text> tooltip) {
 		super(id);
 		this.tooltip = Collections.unmodifiableList(tooltip);
 	}
 
-	public InfoWidget(List<Text> tooltip) {
+	public AInfo(List<Text> tooltip) {
 		this(ENTRY, tooltip);
 	}
 
-	protected InfoWidget(DrawableRegistry.Entry id, Input input) {
+	protected AInfo(DrawableRegistry.Entry id, Input input) {
 		super(id);
 		int count = input.readInt();
 		List<Text> list = new ArrayList<>(count);

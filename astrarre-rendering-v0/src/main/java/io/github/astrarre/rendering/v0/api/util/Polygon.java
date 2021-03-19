@@ -1,24 +1,36 @@
 package io.github.astrarre.rendering.v0.api.util;
 
+import java.util.Objects;
+import java.util.function.Consumer;
+
+import earcut4j.Earcut;
+import io.github.astrarre.rendering.internal.mixin.BufferBuilderAccess;
 import io.github.astrarre.rendering.internal.util.MathUtil;
 import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.util.v0.api.Validate;
 import io.github.astrarre.util.v0.api.collection.UnsafeFloatArrayList;
-import org.jetbrains.annotations.Nullable;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.IntLists;
+import org.lwjgl.opengl.GL11;
 
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.Vector4f;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 public final class Polygon {
 	public static final float EPSILON = .0001f;
-	public static final Polygon EMPTY = new Polygon.Builder(3)
-			                                    .addVertex(0, 0)
-			                                    .addVertex(0, EPSILON)
-			                                    .addVertex(EPSILON, 0)
-			                                    .build();
-
-	private Polygon enclosing;
+	public static final Polygon EMPTY = new Polygon.Builder(3).addVertex(0, 0).addVertex(0, EPSILON).addVertex(EPSILON, 0).build();
 	private final float[] vertices;
 	private final int offset, length;
+	private IntList triangulation;
+	@Environment (EnvType.CLIENT) private BufferBuilder cachedBuffer;
+	private Polygon enclosing;
 
 	private Polygon(float[] vertices) {
 		this(vertices, 0, vertices.length);
@@ -45,6 +57,28 @@ public final class Polygon {
 		this.vertices = vertices;
 	}
 
+
+	public int indexOf(float px, float py) {
+		for (int i = 0; i < this.vertices(); i++) {
+			if (this.getX(i) == px && this.getY(i) == py) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	public int vertices() {
+		return this.length / 2;
+	}
+
+	public float getX(int vertex) {
+		return this.get(vertex, 0);
+	}
+
+	public float getY(int vertex) {
+		return this.get(vertex, 1);
+	}
+
 	private float get(int vertex, int offset) {
 		int index = (this.offset + vertex * 2) + offset;
 		Validate.lessThan(index, this.length, index + " out of bounds!");
@@ -69,12 +103,16 @@ public final class Polygon {
 
 	public Polygon getEnclosing() {
 		Polygon enclosing = this.enclosing;
-		if(enclosing == null) {
+		if (enclosing == null) {
 			float maxX = 0, maxY = 0;
 			for (int i = 0; i < this.vertices(); i++) {
 				float x = this.getX(i), y = this.getY(i);
-				if(x > maxX) maxX = x;
-				if(y > maxY) maxY = y;
+				if (x > maxX) {
+					maxX = x;
+				}
+				if (y > maxY) {
+					maxY = y;
+				}
 			}
 			return this.enclosing = Polygon.rectangle(maxX, maxY);
 		}
@@ -82,20 +120,88 @@ public final class Polygon {
 	}
 
 	public static Polygon rectangle(float width, float height) {
-		float[] buf = {0, 0, 0, height, width, height, width, 0};
+		float[] buf = {
+				0,
+				0,
+				0,
+				height,
+				width,
+				height,
+				width,
+				0
+		};
 		return new Polygon(buf);
 	}
 
-	public int vertices() {
-		return this.length / 2;
+	/**
+	 * @return a new regular polygon centered at [0, 0] for the given radii
+	 */
+	public static Polygon regular(int vertices, float radii) {
+		Polygon.Builder builder = new Builder(vertices);
+		for (int i = 0; i < vertices; i++) {
+			double angle = 2 * Math.PI * i / vertices;
+			double x = radii * Math.cos(angle), y = radii * Math.sin(angle);
+			builder.addVertex((float)x, (float)y);
+		}
+		return builder.build();
 	}
 
-	public float getX(int vertex) {
-		return this.get(vertex, 0);
+	/**
+	 * @return a list of 3 vertex indices of the triangles that compose this polygon
+	 */
+	public IntList triangulate() {
+		IntList triangulation = this.triangulation;
+		if (triangulation == null) {
+			IntList list = Earcut.earcut(this.vertices, this.offset, this.length, null, 2);
+			((IntArrayList) list).trim();
+			return this.triangulation = IntLists.unmodifiable(list);
+		}
+		return triangulation;
 	}
 
-	public float getY(int vertex) {
-		return this.get(vertex, 1);
+	public Builder toBuilder() {
+		return new Builder(new UnsafeFloatArrayList(this.vertices, this.offset, this.length));
+	}
+
+	public void walk(PointWalker walker) {
+		int vertices = this.vertices();
+		for (int i = 0; i < vertices; i++) {
+			walker.accept(this.getX(i), this.getY(i), this.getX((i + 1) % vertices), this.getY((i + 1) % vertices));
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 1;
+		for (int i = 0; i < this.length; i++) {
+			hash = 31 * hash + Float.floatToIntBits(this.vertices[this.offset + i]);
+		}
+		return hash;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof Polygon)) {
+			return false;
+		}
+
+		Polygon polygon = (Polygon) o;
+		if(polygon.vertices() != this.vertices()) {
+			return false;
+		}
+
+		int startIndex = polygon.indexOf(this.getX(0), this.getY(0));
+		int vertices = this.vertices();
+		for (int i = 0; i < vertices; i++) {
+			if(this.getX(i) != polygon.getX((startIndex + i) % vertices) || this.getY(i) != polygon.getY((startIndex + i) % vertices)) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	@Override
@@ -111,23 +217,13 @@ public final class Polygon {
 		return builder.toString();
 	}
 
-	public Builder toBuilder() {
-		return new Builder(new UnsafeFloatArrayList(this.vertices, this.offset, this.length));
-	}
-
 	public interface PointWalker {
 		void accept(float x1, float y1, float x2, float y2);
 	}
 
-	public void walk(PointWalker walker) {
-		int vertices = this.vertices();
-		for (int i = 0; i < vertices; i++) {
-			walker.accept(this.getX(i), this.getY(i), this.getX((i + 1) % vertices), this.getY((i + 1) % vertices));
-		}
-	}
-
 	/**
 	 * this builder cannot be re-used
+	 *
 	 * @implNote the polygon is passed the original length, and since we only add to the list, the old polygon should never be modified
 	 */
 	public static final class Builder {
@@ -152,7 +248,7 @@ public final class Polygon {
 				v4f.set(f, g, 1, 1);
 				v4f.transform(transformation.getModelMatrixTransform());
 				this.list.set(i, v4f.getX());
-				this.list.set(i+1, v4f.getY());
+				this.list.set(i + 1, v4f.getY());
 			}
 			return this;
 		}
@@ -171,5 +267,32 @@ public final class Polygon {
 			this.list = null;
 			return polygon;
 		}
+	}
+
+	public static final long COLOR = 0L << 32;
+	public static final long TEXTURE = 1L << 32;
+
+	public static int packId(int type, int id) {
+		return type | id;
+	}
+
+	private long id;
+	/**
+	 * @deprecated internal
+	 */
+	@Deprecated
+	@Environment(EnvType.CLIENT)
+	public BufferBuilder triangleBuffer(VertexFormat format, Consumer<VertexConsumer> consumer, long id) {
+		BufferBuilder builder = this.cachedBuffer;
+		if(builder == null || ((BufferBuilderAccess)builder).getFormat() != format || this.id != id) {
+			this.id = id;
+			BufferBuilder buffer = new BufferBuilder((this.length * 3) / 2);
+			buffer.begin(GL11.GL_TRIANGLES, format);
+			IntList triangles = this.triangulate();
+			for (int i = 0; i < triangles.size(); i++) {
+				consumer.accept(buffer.vertex(this.getX(i), this.getY(i), 0));
+			}
+		}
+		return builder;
 	}
 }

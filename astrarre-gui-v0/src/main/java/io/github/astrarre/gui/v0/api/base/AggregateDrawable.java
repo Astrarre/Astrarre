@@ -74,13 +74,25 @@ public abstract class AggregateDrawable extends Drawable implements Interactable
 		}
 	}
 
+	protected void onDrawablesChange() {}
+
 	protected boolean onRemove(Drawable drawable) {
 		this.drawables.remove(drawable);
+		this.onDrawablesChange();
 		return true;
 	}
 
 	protected boolean onAdd(Drawable drawable) {
 		this.drawables.add(0, drawable);
+		this.onDrawablesChange();
+		return true;
+	}
+
+	protected boolean onSync(Drawable drawable) {
+		return true;
+	}
+
+	protected boolean onSyncRemove(Drawable drawable) {
 		return true;
 	}
 
@@ -94,6 +106,7 @@ public abstract class AggregateDrawable extends Drawable implements Interactable
 			}
 			if (this.onAdd(drawable)) {
 				this.drawables.add(0, drawable);
+				this.onDrawablesChange();
 			}
 		}
 	}
@@ -101,6 +114,7 @@ public abstract class AggregateDrawable extends Drawable implements Interactable
 	public void removeClient(Drawable drawable) {
 		if(this.isClient() && this.onRemove(drawable)) {
 			this.drawables.remove(drawable);
+			this.onDrawablesChange();
 		}
 	}
 
@@ -118,16 +132,18 @@ public abstract class AggregateDrawable extends Drawable implements Interactable
 		if (channel == ADD_DRAWABLE) {
 			int id = input.readInt();
 			Drawable drawable = container.forId(id);
-			if (drawable != null) {
+			if (drawable != null && this.onSync(drawable)) {
 				this.drawables.add(0, drawable);
+				this.onDrawablesChange();
 			} else {
 				LOGGER.warn("No component found for id " + id);
 			}
 		} else if(channel == REMOVE_DRAWABLE) {
 			int id = input.readInt();
 			Drawable drawable = container.forId(id);
-			if (drawable != null) {
+			if (drawable != null && this.onSyncRemove(drawable)) {
 				this.drawables.remove(drawable);
+				this.onDrawablesChange();
 			} else {
 				LOGGER.warn("No component found for id " + id);
 			}
@@ -140,11 +156,14 @@ public abstract class AggregateDrawable extends Drawable implements Interactable
 		if (this.pendingDrawables != null) {
 			for (int i = this.pendingDrawables.size() - 1; i >= 0; i--) {
 				Drawable drawable = container.forId(this.pendingDrawables.getInt(i));
-				if (drawable != null) {
+				if (drawable != null && this.onSync(drawable)) {
 					this.pendingDrawables.removeInt(i);
 					this.drawables.add(drawable);
+					this.onDrawablesChange();
 				}
 			}
+		} else {
+			this.drawables.forEach(container::addRoot);
 		}
 	}
 

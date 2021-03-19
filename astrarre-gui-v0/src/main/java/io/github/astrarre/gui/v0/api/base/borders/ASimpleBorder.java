@@ -1,4 +1,4 @@
-package io.github.astrarre.gui.v0.api.delegates.borders;
+package io.github.astrarre.gui.v0.api.base.borders;
 
 import io.github.astrarre.gui.v0.api.Drawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
@@ -14,14 +14,14 @@ import net.fabricmc.api.Environment;
 /**
  * makes a black line around the bounds of the delegate drawable
  */
-public final class SimpleBorder extends DelegateDrawable {
-	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "simple_border"), SimpleBorder::new);
-	public SimpleBorder(Drawable delegate) {
+public final class ASimpleBorder extends DelegateDrawable {
+	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "simple_border"), ASimpleBorder::new);
+	public ASimpleBorder(Drawable delegate) {
 		super(ENTRY, delegate);
 	}
 
 	@Environment(EnvType.CLIENT)
-	protected SimpleBorder(Input input) {
+	protected ASimpleBorder(Input input) {
 		super(ENTRY, input);
 	}
 

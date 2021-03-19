@@ -1,7 +1,7 @@
 package io.github.astrarre.gui.v0.api;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -19,6 +19,7 @@ import io.github.astrarre.networking.v0.api.network.NetworkMember;
 import io.github.astrarre.networking.v0.api.serializer.ToPacketSerializer;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.rendering.v0.api.Transformation;
+import io.github.astrarre.gui.v0.api.event.DrawableChange;
 import io.github.astrarre.rendering.v0.api.util.Close;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
 import io.github.astrarre.util.v0.api.Id;
@@ -40,7 +41,9 @@ public abstract class Drawable extends DrawableInternal {
 	@Nullable
 	public final DrawableRegistry.Entry registryId;
 
-	private final Map<String, SyncedProperty<?>> properties = new HashMap<>();
+	private final List<SyncedProperty<?>> properties = new ArrayList<>();
+	private final List<DrawableChange.BoundsListener> boundsListeners = new ArrayList<>();
+	private final List<DrawableChange.TransformationListener> transformListeners = new ArrayList<>();
 	Transformation transformation = Transformation.EMPTY;
 	Matrix4f invertedMatrix;
 	Polygon bounds = Polygon.EMPTY;
@@ -58,38 +61,38 @@ public abstract class Drawable extends DrawableInternal {
 	protected abstract void render0(RootContainer container, Graphics3d graphics, float tickDelta);
 
 	/**
-	 * properties are automatically serialized/deserialized
+	 * properties are automatically serialized/deserialized. The order in which these are initialized must be consistent between server and client
 	 *
 	 * @return a new property who's values are synced to the server
 	 */
-	protected <T> SyncedProperty<T> createServerSyncedProperty(ToPacketSerializer<T> serializer, String id, T defaultValue) {
+	protected <T> SyncedProperty<T> createServerSyncedProperty(ToPacketSerializer<T> serializer, T defaultValue) {
 		SyncedProperty<T> property;
 		if (this.isClient()) {
-			property = new ServerSyncedProperty<>(serializer, this, id);
+			property = new ServerSyncedProperty<>(serializer, this, this.properties.size());
 			property.setRaw(defaultValue);
 		} else {
 			property = new DefaultProperty<>(serializer);
 		}
 
-		this.properties.put(id, property);
+		this.properties.add(property);
 		return property;
 	}
 
 	/**
-	 * properties are automatically serialized/deserialized
+	 * properties are automatically serialized/deserialized. The order in which these are initialized must be consistent between server and client
 	 *
 	 * @return a new property who's values are synced to the clients
 	 */
-	protected <T> SyncedProperty<T> createClientSyncedProperty(ToPacketSerializer<T> serializer, String id, T defaultValue) {
+	protected <T> SyncedProperty<T> createClientSyncedProperty(ToPacketSerializer<T> serializer, T defaultValue) {
 		SyncedProperty<T> property;
 		if (!this.isClient()) {
-			property = new ClientSyncedProperty<>(serializer, this, id);
+			property = new ClientSyncedProperty<>(serializer, this, this.properties.size());
 			property.setRaw(defaultValue);
 		} else {
 			property = new DefaultProperty<>(serializer);
 		}
 
-		this.properties.put(id, property);
+		this.properties.add(property);
 		return property;
 	}
 
@@ -110,11 +113,11 @@ public abstract class Drawable extends DrawableInternal {
 		output.writeId(this.registryId.id);
 		output.writeInt(this.getSyncId());
 		this.write0(container, output);
-		int count = (int) this.properties.values().stream().filter(ClientSyncedProperty.class::isInstance).count();
+		int count = (int) this.properties.stream().filter(ClientSyncedProperty.class::isInstance).count();
 		output.writeInt(count);
-		for (SyncedProperty value : this.properties.values()) {
+		for (SyncedProperty value : this.properties) {
 			if (value instanceof ClientSyncedProperty) {
-				output.writeUTF(((ClientSyncedProperty<?>) value).id);
+				output.writeInt(((ClientSyncedProperty<?>) value).id);
 				value.serializer.write(output, value.get());
 			}
 		}
@@ -136,7 +139,7 @@ public abstract class Drawable extends DrawableInternal {
 			GuiUtil.setSyncId(drawable, syncId);
 			int count = input.readInt();
 			for (int i = 0; i < count; i++) {
-				String propertyId = input.readUTF();
+				int propertyId = input.readInt();
 				SyncedProperty<?> property = drawable.properties.get(propertyId);
 				if (property instanceof DefaultProperty) {
 					property.onSync(property.serializer.read(input));
@@ -181,12 +184,24 @@ public abstract class Drawable extends DrawableInternal {
 	@ApiStatus.OverrideOnly
 	protected void receiveFromServer(RootContainer container, int channel, Input input) {
 		if (channel == TRANSFORM_CHANGE) {
-			this.transformation = GuiUtil.readTransformation(input);
-			this.invertedMatrix = null;
+			Transformation old = this.transformation;
+			Transformation current = this.transformation = GuiUtil.readTransformation(input);
+			if(!old.equals(current)) {
+				this.invertedMatrix = null;
+				for (DrawableChange.TransformationListener listener : this.transformListeners) {
+					listener.onTransformationChange(this, old, current);
+				}
+			}
 		} else if (channel == BOUNDS_CHANGE) {
-			this.bounds = GuiUtil.readPolygon(input);
+			Polygon old = this.bounds;
+			Polygon current = this.bounds = GuiUtil.readPolygon(input);
+			if(!old.equals(current)) {
+				for (DrawableChange.BoundsListener listener : this.boundsListeners) {
+					listener.onBoundsChange(this, old, current);
+				}
+			}
 		} else if (channel == PROPERTY_SYNC) {
-			String id = input.readUTF();
+			int id = input.readInt();
 			SyncedProperty<?> property = this.properties.get(id);
 			if (property instanceof DefaultProperty) {
 				property.onSync(property.serializer.read(input));
@@ -198,7 +213,7 @@ public abstract class Drawable extends DrawableInternal {
 	@ApiStatus.OverrideOnly
 	protected void receiveFromClient(RootContainer container, NetworkMember member, int channel, Input input) {
 		if (channel == PROPERTY_SYNC) {
-			String id = input.readUTF();
+			int id = input.readInt();
 			SyncedProperty<?> property = this.properties.get(id);
 			if (property instanceof DefaultProperty) {
 				property.onSync(property.serializer.read(input));
@@ -211,8 +226,12 @@ public abstract class Drawable extends DrawableInternal {
 	}
 
 	public Drawable setTransformation(Transformation transformation) {
+		Transformation old = this.transformation;
 		this.transformation = transformation;
 		this.invertedMatrix = null;
+		for (DrawableChange.TransformationListener listener : this.transformListeners) {
+			listener.onTransformationChange(this, old, transformation);
+		}
 		this.sendToClients(TRANSFORM_CHANGE, output -> GuiUtil.write(transformation, output));
 		return this;
 	}
@@ -257,7 +276,11 @@ public abstract class Drawable extends DrawableInternal {
 	 */
 	public void setBounds(Polygon polygon) {
 		this.validateBounds(polygon);
+		Polygon old = this.bounds;
 		this.bounds = polygon;
+		for (DrawableChange.BoundsListener listener : this.boundsListeners) {
+			listener.onBoundsChange(this, old, polygon);
+		}
 		this.sendToClients(BOUNDS_CHANGE, output -> GuiUtil.write(polygon, output));
 	}
 
@@ -267,13 +290,21 @@ public abstract class Drawable extends DrawableInternal {
 	 */
 	protected void setBoundsProtected(Polygon polygon) {
 		this.validateBounds(polygon);
+		Polygon old = this.bounds;
 		this.bounds = polygon;
+		for (DrawableChange.BoundsListener listener : this.boundsListeners) {
+			listener.onBoundsChange(this, old, polygon);
+		}
 		this.sendToClients(BOUNDS_CHANGE, output -> GuiUtil.write(polygon, output));
 	}
 
 	protected void setTransformationProtected(Transformation transformation) {
+		Transformation old = this.transformation;
 		this.transformation = transformation;
 		this.invertedMatrix = null;
+		for (DrawableChange.TransformationListener listener : this.transformListeners) {
+			listener.onTransformationChange(this, old, transformation);
+		}
 		this.sendToClients(TRANSFORM_CHANGE, output -> GuiUtil.write(transformation, output));
 	}
 
@@ -311,5 +342,23 @@ public abstract class Drawable extends DrawableInternal {
 				throw new IllegalArgumentException(minX + " < 0 | " + minY + " < 0");
 			}
 		}
+	}
+
+	// listeners are not synced to the server!
+
+	public void addTransformationChangeListener(DrawableChange.TransformationListener listener) {
+		this.transformListeners.add(listener);
+	}
+
+	public void addBoundsChangeListener(DrawableChange.BoundsListener listener) {
+		this.boundsListeners.add(listener);
+	}
+
+	public void removeListener(DrawableChange.TransformationListener drawables) {
+		this.transformListeners.remove(drawables);
+	}
+
+	public void removeListener(DrawableChange.BoundsListener drawables) {
+		this.boundsListeners.remove(drawables);
 	}
 }

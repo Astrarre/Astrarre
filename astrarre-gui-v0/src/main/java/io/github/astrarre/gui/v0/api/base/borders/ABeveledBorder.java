@@ -1,10 +1,10 @@
-package io.github.astrarre.gui.v0.api.delegates.borders;
+package io.github.astrarre.gui.v0.api.base.borders;
 
 import io.github.astrarre.gui.v0.api.Drawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.DelegateDrawable;
-import io.github.astrarre.gui.v0.api.statik.BeveledRectangle;
+import io.github.astrarre.gui.v0.api.base.statik.ABeveledRectangle;
 import io.github.astrarre.networking.v0.api.io.Input;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.rendering.v0.api.Transformation;
@@ -15,17 +15,17 @@ import io.github.astrarre.util.v0.api.Id;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-public final class BeveledBorder extends DelegateDrawable {
+public final class ABeveledBorder extends DelegateDrawable {
 	public static final Transformation TRANSLATE_N2_N2_0 = Transformation.translate(-4, -4, 0);
 	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "beveled_border"),
-			BeveledBorder::new);
+			ABeveledBorder::new);
 
-	public BeveledBorder(Drawable delegate) {
+	public ABeveledBorder(Drawable delegate) {
 		super(ENTRY, delegate);
 	}
 
 	@Environment (EnvType.CLIENT)
-	private BeveledBorder(Input input) {
+	private ABeveledBorder(Input input) {
 		super(ENTRY, input);
 	}
 
@@ -33,7 +33,7 @@ public final class BeveledBorder extends DelegateDrawable {
 	protected void render0(RootContainer container, Graphics3d graphics, float tickDelta) {
 		Polygon polygon = this.getDelegate().getBounds().getEnclosing();
 		Close close = graphics.applyTransformation(TRANSLATE_N2_N2_0);
-		BeveledRectangle.drawBevel(graphics, polygon.getX(2) + 8, polygon.getY(2) + 8);
+		ABeveledRectangle.drawBevel(graphics, polygon.getX(2) + 8, polygon.getY(2) + 8);
 		close.close();
 		super.render0(container, graphics, tickDelta);
 	}

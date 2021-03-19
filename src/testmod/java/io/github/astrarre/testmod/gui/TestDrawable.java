@@ -30,7 +30,7 @@ public class TestDrawable extends Drawable implements Interactable {
 	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.registerNoInput(Id.create("mymod", "drawable"), TestDrawable::new);
 	private static final Transformation TRANSLATE = Transformation.translate(7, 0, 0);
 
-	public final SyncedProperty<Integer> power = this.createClientSyncedProperty(ToPacketSerializer.INTEGER, "power", 0);
+	public final SyncedProperty<Integer> power = this.createClientSyncedProperty(ToPacketSerializer.INTEGER, 0);
 	@Environment (EnvType.CLIENT) protected boolean isHover;
 
 	public TestDrawable() {

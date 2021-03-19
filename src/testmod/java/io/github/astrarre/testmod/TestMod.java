@@ -1,5 +1,6 @@
 package io.github.astrarre.testmod;
 
+import io.github.astrarre.testmod.gui.TestClientOnlyGui;
 import io.github.astrarre.testmod.gui.TestModGui;
 
 import net.minecraft.entity.player.PlayerEntity;
@@ -34,6 +35,7 @@ public class TestMod implements ModInitializer {
 			PlayerEntity entity = context.getPlayer();
 			if (!context.getWorld().isClient && entity != null) {
 				TestModGui.open((ServerPlayerEntity) entity);
+				//TestClientOnlyGui.clientOnly();
 			}
 			return ActionResult.CONSUME;
 		}

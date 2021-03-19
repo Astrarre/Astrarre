@@ -5,9 +5,11 @@ import java.util.function.Predicate;
 import org.jetbrains.annotations.Nullable;
 
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.launch.common.FabricLauncherBase;
 
 public class Validate {
-	public static final boolean IS_DEV = FabricLoader.getInstance().isDevelopmentEnvironment() && !Boolean.getBoolean("astrarre-disable-debug");
+	public static final FabricLoader LOADER = FabricLoader.getInstance();
+	public static final boolean IS_DEV = (FabricLauncherBase.getLauncher() == null || LOADER.isDevelopmentEnvironment()) && !Boolean.getBoolean("astrarre-disable-debug");
 	public static void void_(Object object) {}
 
 	/**

@@ -24,14 +24,14 @@ public class AstrarreIcons {
 	public static final TexturePart ALERT_DARK = icon(7, 7, 7, 7);
 
 	/**
-	 * a 9x9 icon of a shaded bright green square with a checkmark on it
+	 * a 8x8 icon of a shaded bright green square with a checkmark on it
 	 */
-	public static final TexturePart CHECK = icon(14, 0, 9, 9);
+	public static final TexturePart CHECK = icon(14, 0, 8, 8);
 
 	/**
-	 * a 9x9 icon of a shaded red square with an 'x' in the middle
+	 * a 8x8 icon of a shaded red square with an 'x' in the middle
 	 */
-	public static final TexturePart X = icon(23, 0, 9, 9);
+	public static final TexturePart X = icon(23, 0, 8, 8);
 
 	// -- medium button --
 	// the active, highlighted, disabled and pressed textures of a 20x20 button
@@ -41,14 +41,14 @@ public class AstrarreIcons {
 	public static final TexturePart MEDIUM_BUTTON_PRESSED = icon(0, 74, 20, 20);
 
 	// arrow buttons, 7x7 textures with pressed and unpressed variants
-	public static final TexturePart UP_ARROW_ACTIVE = icon(0, 32, 7, 7);
-	public static final TexturePart DOWN_ARROW_ACTIVE = icon(0, 39, 7, 7);
-	public static final TexturePart UP_ARROW_PRESSED = icon(7, 32, 7, 7);
-	public static final TexturePart DOWN_ARROW_PRESSED = icon(7, 39, 7, 7);
-	public static final TexturePart RIGHT_ARROW_ACTIVE = icon(0, 46, 7, 7);
-	public static final TexturePart LEFT_ARROW_ACTIVE = icon(0, 53, 7, 7);
-	public static final TexturePart RIGHT_ARROW_PRESSED = icon(7, 46, 7, 7);
-	public static final TexturePart LEFT_ARROW_PRESSED = icon(7, 53, 7, 7);
+	public static final TexturePart UP_ARROW_ACTIVE = icon(30, 0, 7, 7);
+	public static final TexturePart DOWN_ARROW_ACTIVE = icon(37, 0, 7, 7);
+	public static final TexturePart UP_ARROW_PRESSED = icon(30, 7, 7, 7);
+	public static final TexturePart DOWN_ARROW_PRESSED = icon(37, 7, 7, 7);
+	public static final TexturePart RIGHT_ARROW_ACTIVE = icon(44, 0, 7, 7);
+	public static final TexturePart LEFT_ARROW_ACTIVE = icon(51, 0, 7, 7);
+	public static final TexturePart RIGHT_ARROW_PRESSED = icon(44, 7, 7, 7);
+	public static final TexturePart LEFT_ARROW_PRESSED = icon(51, 7, 7, 7);
 
 	private static TexturePart icon(int x1, int y1, int width, int height) {
 		return new TexturePart(ICON, x1, y1, width, height);

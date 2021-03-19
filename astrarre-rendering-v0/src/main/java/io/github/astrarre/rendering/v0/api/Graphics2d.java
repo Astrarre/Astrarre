@@ -6,6 +6,10 @@ import io.github.astrarre.rendering.v0.api.textures.SpriteInfo;
 import io.github.astrarre.rendering.v0.api.textures.Texture;
 import io.github.astrarre.rendering.v0.api.textures.TexturePart;
 import io.github.astrarre.rendering.v0.api.util.Close;
+import io.github.astrarre.rendering.v0.api.util.Polygon;
+import io.github.astrarre.rendering.v0.edge.Stencil;
+import it.unimi.dsi.fastutil.ints.IntList;
+import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
@@ -63,6 +67,19 @@ public interface Graphics2d {
 
 	void drawTooltip(ItemStack stack);
 
+	default void tracePolygon(Polygon polygon, int color) {
+		int lastVertex = polygon.vertices() - 1;
+		float lastX = polygon.getX(lastVertex), lastY = polygon.getY(lastVertex);
+		for (int i = 0; i < polygon.vertices(); i++) {
+			float currX = polygon.getX(i), currY = polygon.getY(i);
+			this.drawLine(lastX, lastY, currX, currY, color);
+			lastX = currX;
+			lastY = currY;
+		}
+	}
+
+	void fillPolygon(Polygon polygon, int color);
+
 	/**
 	 * draws a sprite along the xy plane
 	 */
@@ -110,4 +127,10 @@ public interface Graphics2d {
 	Close applyTransformation(Transformation transformation);
 
 	void flush();
+
+	/**
+	 * @return the stencil manager for this instance
+	 */
+	@ApiStatus.Experimental
+	Stencil stencil();
 }

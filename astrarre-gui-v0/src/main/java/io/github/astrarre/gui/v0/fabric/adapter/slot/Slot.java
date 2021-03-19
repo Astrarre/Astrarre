@@ -87,7 +87,6 @@ public abstract class Slot extends Drawable implements Interactable {
 
 	@Override
 	protected void render0(RootContainer container, Graphics3d graphics, float tickDelta) {
-		Validate.isTrue(DelegateGraphics.resolve(graphics) instanceof MatrixGraphics, "Slot can only be rendered with matrix graphics!");
 		this.renderBackground(graphics, tickDelta);
 		if (this.render) {
 			graphics.drawItem(this.override == null ? this.getStack() : this.override);

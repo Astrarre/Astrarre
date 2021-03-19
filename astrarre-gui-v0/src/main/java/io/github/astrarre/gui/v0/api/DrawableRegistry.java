@@ -6,17 +6,18 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import io.github.astrarre.gui.v0.api.delegates.borders.BeveledBorder;
-import io.github.astrarre.gui.v0.api.delegates.borders.SimpleBorder;
-import io.github.astrarre.gui.v0.api.panel.CenteringPanel;
-import io.github.astrarre.gui.v0.api.panel.Panel;
-import io.github.astrarre.gui.v0.api.statik.BeveledRectangle;
-import io.github.astrarre.gui.v0.api.statik.DarkenedBackground;
-import io.github.astrarre.gui.v0.api.widgets.ButtonWidget;
-import io.github.astrarre.gui.v0.api.widgets.InfoWidget;
-import io.github.astrarre.gui.v0.api.widgets.VerticalListWidget;
-import io.github.astrarre.gui.v0.api.widgets.PasswordWidget;
-import io.github.astrarre.gui.v0.api.widgets.TextFieldWidget;
+import io.github.astrarre.gui.v0.api.base.borders.ABeveledBorder;
+import io.github.astrarre.gui.v0.api.base.borders.ASimpleBorder;
+import io.github.astrarre.gui.v0.api.base.panel.ACenteringPanel;
+import io.github.astrarre.gui.v0.api.base.panel.APanel;
+import io.github.astrarre.gui.v0.api.base.statik.ABeveledRectangle;
+import io.github.astrarre.gui.v0.api.base.statik.ADarkenedBackground;
+import io.github.astrarre.gui.v0.api.base.widgets.AButton;
+import io.github.astrarre.gui.v0.api.base.widgets.AInfo;
+import io.github.astrarre.gui.v0.api.base.widgets.list.ScrollBar;
+import io.github.astrarre.gui.v0.api.base.widgets.list.VerticalListWidget;
+import io.github.astrarre.gui.v0.api.base.widgets.APasswordTextField;
+import io.github.astrarre.gui.v0.api.base.widgets.ATextFieldWidget;
 import io.github.astrarre.gui.v0.fabric.adapter.slot.PlayerSlot;
 import io.github.astrarre.gui.v0.fabric.adapter.slot.WorldInventorySlot;
 import io.github.astrarre.networking.v0.api.io.Input;
@@ -61,19 +62,20 @@ public class DrawableRegistry {
 	}
 
 	static {
-		BeveledBorder.init();
-		SimpleBorder.init();
-		CenteringPanel.init();
-		Panel.init();
-		BeveledRectangle.init();
-		DarkenedBackground.init();
-		ButtonWidget.init();
-		InfoWidget.init();
+		ABeveledBorder.init();
+		ASimpleBorder.init();
+		ACenteringPanel.init();
+		APanel.init();
+		ABeveledRectangle.init();
+		ADarkenedBackground.init();
+		AButton.init();
+		AInfo.init();
 		VerticalListWidget.init();
-		PasswordWidget.init();
-		TextFieldWidget.init();
+		APasswordTextField.init();
+		ATextFieldWidget.init();
 		PlayerSlot.init();
 		WorldInventorySlot.init();
+		ScrollBar.init();
 	}
 
 	@Nullable

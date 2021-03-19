@@ -1,4 +1,4 @@
-package io.github.astrarre.gui.v0.api.statik;
+package io.github.astrarre.gui.v0.api.base.statik;
 
 import io.github.astrarre.gui.v0.api.Drawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
@@ -8,15 +8,15 @@ import io.github.astrarre.networking.v0.api.io.Output;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.util.v0.api.Id;
 
-public class DarkenedBackground extends Drawable {
-	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "darkened_background"), DarkenedBackground::new);
+public class ADarkenedBackground extends Drawable {
+	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "darkened_background"), ADarkenedBackground::new);
 	private int width, height;
 
-	public DarkenedBackground() {
+	public ADarkenedBackground() {
 		super(ENTRY);
 	}
 
-	public DarkenedBackground(Input input) {
+	public ADarkenedBackground(Input input) {
 		this();
 	}
 

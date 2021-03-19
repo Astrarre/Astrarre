@@ -128,4 +128,56 @@ public final class Transformation {
 		this.init();
 		return this.scaleNormal;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof Transformation)) {
+			return false;
+		}
+
+		Transformation that = (Transformation) o;
+
+		if (Float.compare(that.roll, this.roll) != 0) {
+			return false;
+		}
+		if (Float.compare(that.pitch, this.pitch) != 0) {
+			return false;
+		}
+		if (Float.compare(that.yaw, this.yaw) != 0) {
+			return false;
+		}
+		if (Float.compare(that.offX, this.offX) != 0) {
+			return false;
+		}
+		if (Float.compare(that.offY, this.offY) != 0) {
+			return false;
+		}
+		if (Float.compare(that.offZ, this.offZ) != 0) {
+			return false;
+		}
+		if (Float.compare(that.scaleX, this.scaleX) != 0) {
+			return false;
+		}
+		if (Float.compare(that.scaleY, this.scaleY) != 0) {
+			return false;
+		}
+		return Float.compare(that.scaleZ, this.scaleZ) == 0;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = (this.roll != +0.0f ? Float.floatToIntBits(this.roll) : 0);
+		result = 31 * result + (this.pitch != +0.0f ? Float.floatToIntBits(this.pitch) : 0);
+		result = 31 * result + (this.yaw != +0.0f ? Float.floatToIntBits(this.yaw) : 0);
+		result = 31 * result + (this.offX != +0.0f ? Float.floatToIntBits(this.offX) : 0);
+		result = 31 * result + (this.offY != +0.0f ? Float.floatToIntBits(this.offY) : 0);
+		result = 31 * result + (this.offZ != +0.0f ? Float.floatToIntBits(this.offZ) : 0);
+		result = 31 * result + (this.scaleX != +0.0f ? Float.floatToIntBits(this.scaleX) : 0);
+		result = 31 * result + (this.scaleY != +0.0f ? Float.floatToIntBits(this.scaleY) : 0);
+		result = 31 * result + (this.scaleZ != +0.0f ? Float.floatToIntBits(this.scaleZ) : 0);
+		return result;
+	}
 }

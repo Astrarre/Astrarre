@@ -6,8 +6,8 @@ import io.github.astrarre.networking.v0.api.serializer.ToPacketSerializer;
 
 public final class ServerSyncedProperty<T> extends SyncedProperty<T> {
 	private final Drawable drawable;
-	private final String id;
-	public ServerSyncedProperty(ToPacketSerializer<T> serializer, Drawable drawable, String id) {
+	private final int id;
+	public ServerSyncedProperty(ToPacketSerializer<T> serializer, Drawable drawable, int id) {
 		super(serializer);
 		this.drawable = drawable;
 		this.id = id;
@@ -16,7 +16,7 @@ public final class ServerSyncedProperty<T> extends SyncedProperty<T> {
 	@Override
 	protected void synchronize(T value) {
 		this.drawable.sendToServer(Drawable.PROPERTY_SYNC, output -> {
-			output.writeUTF(this.id);
+			output.writeInt(this.id);
 			this.serializer.write(output, value);
 		});
 	}

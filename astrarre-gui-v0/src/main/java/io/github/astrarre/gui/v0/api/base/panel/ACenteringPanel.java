@@ -1,4 +1,4 @@
-package io.github.astrarre.gui.v0.api.panel;
+package io.github.astrarre.gui.v0.api.base.panel;
 
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
@@ -14,14 +14,14 @@ import net.fabricmc.api.Environment;
 /**
  * a panel who's [0, 0] lies at [centerX - width/2, centerY - height/2] of the root container
  */
-public class CenteringPanel extends Panel {
-	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "centering_panel"), CenteringPanel::new);
+public class ACenteringPanel extends APanel {
+	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "centering_panel"), ACenteringPanel::new);
 
 	@Environment(EnvType.CLIENT)
 	protected Transformation original;
 	public final int width, height;
 
-	public CenteringPanel(int width, int height) {
+	public ACenteringPanel(int width, int height) {
 		super(ENTRY);
 		this.width = width;
 		this.height = height;
@@ -29,7 +29,7 @@ public class CenteringPanel extends Panel {
 	}
 
 	@Environment(EnvType.CLIENT)
-	private CenteringPanel(Input input) {
+	private ACenteringPanel(Input input) {
 		super(ENTRY, input);
 		this.original = this.getTransformation();
 		this.width = input.readInt();
@@ -44,7 +44,7 @@ public class CenteringPanel extends Panel {
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	public CenteringPanel setTransformation(Transformation transformation) {
+	public ACenteringPanel setTransformation(Transformation transformation) {
 		this.original = transformation;
 		super.setTransformationProtected(transformation);
 		return this;

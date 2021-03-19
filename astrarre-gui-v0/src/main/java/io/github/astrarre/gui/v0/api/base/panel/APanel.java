@@ -1,4 +1,4 @@
-package io.github.astrarre.gui.v0.api.panel;
+package io.github.astrarre.gui.v0.api.base.panel;
 
 import io.github.astrarre.gui.v0.api.Drawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
@@ -11,24 +11,24 @@ import io.github.astrarre.util.v0.api.Id;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-public class Panel extends AggregateDrawable {
-	private static final DrawableRegistry.Entry PANEL = DrawableRegistry.register(Id.create("astrarre-gui-v0", "panel"), Panel::new);
+public class APanel extends AggregateDrawable {
+	private static final DrawableRegistry.Entry PANEL = DrawableRegistry.register(Id.create("astrarre-gui-v0", "panel"), APanel::new);
 
-	public Panel() {
+	public APanel() {
 		this(PANEL);
 	}
 
-	protected Panel(DrawableRegistry.Entry entry) {
+	protected APanel(DrawableRegistry.Entry entry) {
 		super(entry);
 	}
 
 	@Environment (EnvType.CLIENT)
-	private Panel(Input input) {
+	private APanel(Input input) {
 		this(PANEL, input);
 	}
 
 	@Environment (EnvType.CLIENT)
-	protected Panel(DrawableRegistry.Entry entry, Input input) {
+	protected APanel(DrawableRegistry.Entry entry, Input input) {
 		super(entry, input);
 	}
 

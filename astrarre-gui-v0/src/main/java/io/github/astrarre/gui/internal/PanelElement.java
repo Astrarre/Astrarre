@@ -1,15 +1,15 @@
 package io.github.astrarre.gui.internal;
 
-import io.github.astrarre.gui.v0.api.panel.Panel;
+import io.github.astrarre.gui.v0.api.base.panel.APanel;
 
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.TickableElement;
 
 public class PanelElement implements Element, TickableElement {
-	protected final Panel panel;
+	protected final APanel panel;
 	protected final RootContainerInternal internal;
 
-	public PanelElement(Panel interactable, RootContainerInternal internal) {
+	public PanelElement(APanel interactable, RootContainerInternal internal) {
 		this.panel = interactable;
 		this.internal = internal;
 	}

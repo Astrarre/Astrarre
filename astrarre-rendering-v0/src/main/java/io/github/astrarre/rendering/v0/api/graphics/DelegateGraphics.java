@@ -10,6 +10,8 @@ import io.github.astrarre.rendering.v0.api.textures.SpriteInfo;
 import io.github.astrarre.rendering.v0.api.textures.Texture;
 import io.github.astrarre.rendering.v0.api.textures.TexturePart;
 import io.github.astrarre.rendering.v0.api.util.Close;
+import io.github.astrarre.rendering.v0.api.util.Polygon;
+import io.github.astrarre.rendering.v0.edge.Stencil;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.OrderedText;
@@ -120,6 +122,11 @@ public class DelegateGraphics implements Graphics3d {
 	}
 
 	@Override
+	public Stencil stencil() {
+		return this.delegate.stencil();
+	}
+
+	@Override
 	public void drawLine(float x1, float y1, float z1, float x2, float y2, float z2, int color) {
 		this.delegate.drawLine(x1, y1, z1, x2, y2, z2, color);
 	}
@@ -144,5 +151,15 @@ public class DelegateGraphics implements Graphics3d {
 			float z4,
 			int color) {
 		this.delegate.fillRect(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4, color);
+	}
+
+	@Override
+	public void tracePolygon(Polygon polygon, int color) {
+		this.delegate.tracePolygon(polygon, color);
+	}
+
+	@Override
+	public void fillPolygon(Polygon polygon, int color) {
+		this.delegate.fillPolygon(polygon, color);
 	}
 }
