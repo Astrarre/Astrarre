@@ -1,11 +1,10 @@
-package io.github.astrarre.gui.v0.api.base.widgets.list;
+package io.github.astrarre.gui.v0.api.base.widgets;
 
 import io.github.astrarre.gui.v0.api.Drawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.access.Tickable;
 import io.github.astrarre.gui.v0.api.base.AggregateDrawable;
-import io.github.astrarre.gui.v0.api.base.widgets.AButton;
 import io.github.astrarre.networking.v0.api.io.Input;
 import io.github.astrarre.networking.v0.api.io.Output;
 import io.github.astrarre.rendering.v0.api.Graphics3d;

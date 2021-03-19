@@ -14,7 +14,7 @@ import io.github.astrarre.gui.v0.api.base.statik.ABeveledRectangle;
 import io.github.astrarre.gui.v0.api.base.statik.ADarkenedBackground;
 import io.github.astrarre.gui.v0.api.base.widgets.AButton;
 import io.github.astrarre.gui.v0.api.base.widgets.AInfo;
-import io.github.astrarre.gui.v0.api.base.widgets.list.ScrollBar;
+import io.github.astrarre.gui.v0.api.base.widgets.ScrollBar;
 import io.github.astrarre.gui.v0.api.base.widgets.list.VerticalListWidget;
 import io.github.astrarre.gui.v0.api.base.widgets.APasswordTextField;
 import io.github.astrarre.gui.v0.api.base.widgets.ATextFieldWidget;

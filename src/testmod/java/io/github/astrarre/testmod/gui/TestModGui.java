@@ -5,7 +5,7 @@ import io.github.astrarre.gui.v0.api.base.borders.ABeveledBorder;
 import io.github.astrarre.gui.v0.api.base.panel.ACenteringPanel;
 import io.github.astrarre.gui.v0.api.base.panel.APanel;
 import io.github.astrarre.gui.v0.api.base.statik.ADarkenedBackground;
-import io.github.astrarre.gui.v0.api.base.widgets.list.ScrollBar;
+import io.github.astrarre.gui.v0.api.base.widgets.ScrollBar;
 import io.github.astrarre.gui.v0.api.base.widgets.list.VerticalListWidget;
 import io.github.astrarre.gui.v0.fabric.adapter.slot.PlayerSlot;
 import io.github.astrarre.gui.v0.fabric.adapter.slot.Slot;
