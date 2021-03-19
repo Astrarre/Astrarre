@@ -10,13 +10,16 @@ import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.access.Interactable;
 import io.github.astrarre.gui.v0.api.access.Tickable;
 import io.github.astrarre.gui.v0.api.base.panel.APanel;
-import io.github.astrarre.networking.v0.api.io.Input;
-import io.github.astrarre.networking.v0.api.io.Output;
+import io.github.astrarre.itemview.v0.api.Serializer;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
+import io.github.astrarre.itemview.v0.fabric.FabricViews;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import org.jetbrains.annotations.Nullable;
+
+import net.minecraft.network.PacketByteBuf;
 
 public abstract class RootContainerInternal implements RootContainer {
 	static final AtomicInteger ID = new AtomicInteger(), CLIENT_ID = new AtomicInteger(Integer.MIN_VALUE);
@@ -26,21 +29,22 @@ public abstract class RootContainerInternal implements RootContainer {
 	private final Int2ObjectOpenHashMap<Drawable> reversedRegistry = new Int2ObjectOpenHashMap<>();
 	int tick;
 	private boolean reading;
+	private final Serializer<Drawable> serializer = new DrawableSerializer(this);
 
 	protected RootContainerInternal() {
 		this.addRoot(this.panel = new APanel());
 	}
 
-	protected RootContainerInternal(Input input) {
+	protected RootContainerInternal(PacketByteBuf input) {
 		this(internal -> {}, input);
 	}
 
-	protected RootContainerInternal(Consumer<RootContainerInternal> toRun, Input input) {
+	protected RootContainerInternal(Consumer<RootContainerInternal> toRun, PacketByteBuf input) {
 		this.reading = true;
 		toRun.accept(this);
 		int size = input.readInt();
-		for (int i = 0; i < size && input.bytes() > 0; i++) {
-			Drawable drawable = Drawable.read(input);
+		for (int i = 0; i < size; i++) {
+			Drawable drawable = this.getSerializer().read(FabricViews.view(input.readCompoundTag()), "drawable");
 			this.addSynced(drawable);
 		}
 		int panelId = input.readInt();
@@ -51,6 +55,20 @@ public abstract class RootContainerInternal implements RootContainer {
 		}
 	}
 
+	/**
+	 * @deprecated internal
+	 */
+	@Deprecated
+	public void write(PacketByteBuf output) {
+		output.writeInt(this.componentRegistry.size());
+		for (Drawable drawable : this.componentRegistry.keySet()) {
+			NBTagView.Builder builder = NBTagView.builder();
+			this.getSerializer().save(builder, "drawable", drawable);
+			output.writeCompoundTag(builder.toTag());
+		}
+		output.writeInt(this.panel.getSyncId());
+	}
+
 	void addSynced(Drawable drawable) {
 		if (drawable instanceof Tickable) {
 			this.tickables.add((Tickable) drawable);
@@ -59,7 +77,7 @@ public abstract class RootContainerInternal implements RootContainer {
 		this.componentRegistry.put(drawable, drawable.getSyncId());
 		this.reversedRegistry.put(drawable.getSyncId(), drawable);
 		((DrawableInternal) drawable).rootsInternal.add(this);
-		((DrawableInternal) drawable).setClient(this.isClient());
+		((DrawableInternal) drawable).isClient = this.isClient();
 	}
 
 	@Override
@@ -98,16 +116,13 @@ public abstract class RootContainerInternal implements RootContainer {
 		this.componentRegistry.put(drawable, id);
 		this.reversedRegistry.put(id, drawable);
 		((DrawableInternal) drawable).rootsInternal.add(this);
-		((DrawableInternal) drawable).setClient(this.isClient());
+		((DrawableInternal) drawable).isClient = this.isClient();
 		((DrawableInternal) drawable).onAdded(this);
 
 		if (!this.isClient()) {
 			NetworkMember member = this.getViewer();
 			if (member != null) {
-				member.send(GuiPacketHandler.ADD_DRAWABLE, output -> {
-					output.writeEnum(this.getType());
-					drawable.write(this, output);
-				});
+				GuiPacketHandler.addDrawable(this, member, drawable);
 			}
 		}
 	}
@@ -127,10 +142,7 @@ public abstract class RootContainerInternal implements RootContainer {
 		if (!this.isClient()) {
 			NetworkMember member = this.getViewer();
 			if (member != null) {
-				member.send(GuiPacketHandler.REMOVE_DRAWABLE, output -> {
-					output.writeEnum(this.getType());
-					output.writeInt(id);
-				});
+				GuiPacketHandler.removeDrawable(member, this, id);
 			}
 		}
 	}
@@ -165,19 +177,12 @@ public abstract class RootContainerInternal implements RootContainer {
 		}
 	}
 
-	/**
-	 * @deprecated internal
-	 */
-	@Deprecated
-	public void write(Output output) {
-		output.writeInt(this.componentRegistry.size());
-		for (Drawable drawable : this.componentRegistry.keySet()) {
-			drawable.write(this, output);
-		}
-		output.writeInt(this.panel.getSyncId());
-	}
-
 	void tickComponents() {
 		this.tickables.forEach(tickable -> tickable.tick(this));
+	}
+
+	@Override
+	public Serializer<Drawable> getSerializer() {
+		return this.serializer;
 	}
 }

@@ -1,8 +1,7 @@
 package io.github.astrarre.gui.v0.fabric.adapter.slot;
 
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
-import io.github.astrarre.networking.v0.api.io.Input;
-import io.github.astrarre.networking.v0.api.io.Output;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
 import io.github.astrarre.util.v0.api.Id;
 
@@ -18,7 +17,7 @@ public final class PlayerSlot extends Slot {
 	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "player_slot"), PlayerSlot::new);
 
 	@Environment(EnvType.CLIENT)
-	private PlayerSlot(Input input) {
+	private PlayerSlot(NBTagView input) {
 		super(ENTRY, input);
 	}
 
@@ -34,10 +33,10 @@ public final class PlayerSlot extends Slot {
 	}
 
 	@Override
-	protected void writeInventoryData(Output output, Inventory inventory) {}
+	protected void writeInventoryData(NBTagView.Builder output, Inventory inventory) {}
 
 	@Override
-	protected Inventory readInventoryData(Input input) {
+	protected Inventory readInventoryData(NBTagView input) {
 		PlayerEntity player = MinecraftClient.getInstance().player;
 		return player.inventory;
 	}

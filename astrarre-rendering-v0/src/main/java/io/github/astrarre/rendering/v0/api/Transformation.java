@@ -1,6 +1,10 @@
 package io.github.astrarre.rendering.v0.api;
 
 
+import io.github.astrarre.itemview.v0.api.Serializable;
+import io.github.astrarre.itemview.v0.api.Serializer;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
+
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Matrix3f;
@@ -10,7 +14,9 @@ import net.minecraft.util.math.Quaternion;
 /**
  * To take full advantage of optimization capabilities, store these in static fields
  */
-public final class Transformation {
+public final class Transformation implements Serializable {
+	public static final Serializer<Transformation> SERIALIZER = Serializer.of(Transformation::new);
+
 	public static final Transformation EMPTY = Transformation.translate(0, 0, 0);
 	public final float roll, pitch, yaw;
 	public final float offX, offY, offZ;
@@ -25,6 +31,7 @@ public final class Transformation {
 	 * first scale, rotate, then translate
 	 *
 	 * rotation always rotates about the origin!
+	 *
 	 * @param pitch for guis yaw 'rolls' the graphics
 	 */
 	public Transformation(float roll, float pitch, float yaw, float offX, float offY, float offZ, float scaleX, float scaleY, float scaleZ) {
@@ -37,6 +44,19 @@ public final class Transformation {
 		this.scaleX = scaleX;
 		this.scaleY = scaleY;
 		this.scaleZ = scaleZ;
+	}
+
+	protected Transformation(NBTagView tag, String key) {
+		NBTagView data = tag.getTag(key);
+		this.roll = data.getFloat("roll");
+		this.pitch = data.getFloat("pitch");
+		this.yaw = data.getFloat("yaw");
+		this.offX = data.getFloat("offX");
+		this.offY = data.getFloat("offY");
+		this.offZ = data.getFloat("offZ");
+		this.scaleX = data.getFloat("scaleX");
+		this.scaleY = data.getFloat("scaleY");
+		this.scaleZ = data.getFloat("scaleZ");
 	}
 
 	/**
@@ -57,11 +77,14 @@ public final class Transformation {
 	}
 
 	/**
-	 * The order in which combines are called does not impact the order of transformation. a single Transformation instance will always scale, rotate then translate
+	 * The order in which combines are called does not impact the order of transformation. a single Transformation instance will always scale, rotate
+	 * then translate
+	 *
 	 * @return a new transaction created by adding together rotation and offset, and multiplying the scales
 	 */
 	public Transformation combine(Transformation transformation) {
-		return new Transformation(transformation.roll + this.roll,
+		return new Transformation(
+				transformation.roll + this.roll,
 				transformation.pitch + this.pitch,
 				transformation.yaw + this.yaw,
 				transformation.offX + this.offX,
@@ -70,13 +93,6 @@ public final class Transformation {
 				transformation.scaleX * this.scaleX,
 				transformation.scaleY * this.scaleY,
 				transformation.scaleZ * this.scaleZ);
-	}
-
-	private void init() {
-		if (this.modelMatrixTransform == null) {
-			this.initNormalScale();
-			this.initRotateAndTranslate();
-		}
 	}
 
 	public void apply(MatrixStack matricies) {
@@ -89,6 +105,13 @@ public final class Transformation {
 			stack.getNormal().multiply(-1.0f);
 		} else {
 			stack.getNormal().multiply(this.scaleNormal);
+		}
+	}
+
+	private void init() {
+		if (this.modelMatrixTransform == null) {
+			this.initNormalScale();
+			this.initRotateAndTranslate();
 		}
 	}
 
@@ -130,6 +153,20 @@ public final class Transformation {
 	}
 
 	@Override
+	public int hashCode() {
+		int result = (this.roll != +0.0f ? Float.floatToIntBits(this.roll) : 0);
+		result = 31 * result + (this.pitch != +0.0f ? Float.floatToIntBits(this.pitch) : 0);
+		result = 31 * result + (this.yaw != +0.0f ? Float.floatToIntBits(this.yaw) : 0);
+		result = 31 * result + (this.offX != +0.0f ? Float.floatToIntBits(this.offX) : 0);
+		result = 31 * result + (this.offY != +0.0f ? Float.floatToIntBits(this.offY) : 0);
+		result = 31 * result + (this.offZ != +0.0f ? Float.floatToIntBits(this.offZ) : 0);
+		result = 31 * result + (this.scaleX != +0.0f ? Float.floatToIntBits(this.scaleX) : 0);
+		result = 31 * result + (this.scaleY != +0.0f ? Float.floatToIntBits(this.scaleY) : 0);
+		result = 31 * result + (this.scaleZ != +0.0f ? Float.floatToIntBits(this.scaleZ) : 0);
+		return result;
+	}
+
+	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
 			return true;
@@ -168,16 +205,10 @@ public final class Transformation {
 	}
 
 	@Override
-	public int hashCode() {
-		int result = (this.roll != +0.0f ? Float.floatToIntBits(this.roll) : 0);
-		result = 31 * result + (this.pitch != +0.0f ? Float.floatToIntBits(this.pitch) : 0);
-		result = 31 * result + (this.yaw != +0.0f ? Float.floatToIntBits(this.yaw) : 0);
-		result = 31 * result + (this.offX != +0.0f ? Float.floatToIntBits(this.offX) : 0);
-		result = 31 * result + (this.offY != +0.0f ? Float.floatToIntBits(this.offY) : 0);
-		result = 31 * result + (this.offZ != +0.0f ? Float.floatToIntBits(this.offZ) : 0);
-		result = 31 * result + (this.scaleX != +0.0f ? Float.floatToIntBits(this.scaleX) : 0);
-		result = 31 * result + (this.scaleY != +0.0f ? Float.floatToIntBits(this.scaleY) : 0);
-		result = 31 * result + (this.scaleZ != +0.0f ? Float.floatToIntBits(this.scaleZ) : 0);
-		return result;
+	public void save(NBTagView.Builder tag, String key) {
+		NBTagView.Builder builder = NBTagView.builder().putFloat("roll", this.roll).putFloat("pitch", this.pitch).putFloat("yaw", this.yaw)
+				                            .putFloat("offX", this.offX).putFloat("offY", this.offY).putFloat("offZ", this.offZ)
+				                            .putFloat("scaleX", this.scaleX).putFloat("scaleY", this.scaleY).putFloat("scaleZ", this.scaleZ);
+		tag.putTag(key, builder);
 	}
 }

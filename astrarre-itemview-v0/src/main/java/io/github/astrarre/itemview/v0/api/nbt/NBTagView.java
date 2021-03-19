@@ -261,22 +261,33 @@ public interface NBTagView extends Iterable<String> {
 	@Nullable
 	@Deprecated
 	default CompoundTag toTag() {
-		if (this.isEmpty()) {
-			return null;
-		}
 		return (CompoundTag) this;
 	}
 
+	default Builder toBuilder() {
+		return (Builder) this.copyTag();
+	}
+
 	interface Builder extends NBTagView {
-		Builder set(String key, byte b);
-		Builder set(String key, boolean b);
-		Builder set(String key, char c);
-		Builder set(String key, short s);
-		Builder set(String key, float f);
-		Builder set(String key, int i);
-		Builder set(String key, double d);
-		Builder set(String key, long l);
-		<T> Builder set(String path, NBTType<T> type, T object);
+		Builder putByte(String key, byte b);
+		Builder putBool(String key, boolean b);
+		Builder putChar(String key, char c);
+		Builder putShort(String key, short s);
+		Builder putFloat(String key, float f);
+		Builder putInt(String key, int i);
+		Builder putDouble(String key, double d);
+		Builder putLong(String key, long l);
+		default Builder putTag(String key, NBTagView n) {
+			return this.put(key, NBTType.TAG, n);
+		}
+
+		default Builder putString(String key, String s) {
+			return this.put(key, NBTType.STRING, s);
+		}
+
+		<T> Builder put(String path, NBTType<T> type, T object);
+
 		NBTagView build();
+
 	}
 }

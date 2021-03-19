@@ -3,13 +3,12 @@ package io.github.astrarre.gui.internal.mixin;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.github.astrarre.gui.internal.PanelElement;
 import io.github.astrarre.gui.internal.RootContainerInternal;
 import io.github.astrarre.gui.internal.access.ResizeListenerAccess;
 import io.github.astrarre.gui.internal.access.ScreenRootAccess;
 import io.github.astrarre.gui.internal.containers.ScreenRootContainer;
-import io.github.astrarre.gui.internal.PanelElement;
 import io.github.astrarre.gui.v0.api.RootContainer;
-import io.github.astrarre.networking.v0.api.io.Input;
 import io.github.astrarre.rendering.internal.MatrixGraphics;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
 import org.spongepowered.asm.mixin.Final;
@@ -24,6 +23,7 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.ParentElement;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.network.PacketByteBuf;
 
 @Mixin (Screen.class)
 public abstract class ScreenMixin implements ScreenRootAccess, ParentElement, ResizeListenerAccess {
@@ -92,7 +92,7 @@ public abstract class ScreenMixin implements ScreenRootAccess, ParentElement, Re
 	}
 
 	@Override
-	public void readRoot(Input input) {
+	public void readRoot(PacketByteBuf input) {
 		this.internal = new ScreenRootContainer<>((Screen) (Object) this, input);
 	}
 

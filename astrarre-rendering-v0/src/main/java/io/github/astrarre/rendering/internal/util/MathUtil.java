@@ -3,7 +3,6 @@ package io.github.astrarre.rendering.internal.util;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
 
 public class MathUtil {
-
 	public static void main(String[] args) {
 		System.out.println(areCoplanar(0, 0, 0, 1, 1, 1, 1, 2, 0, 3, 3, 3));
 	}

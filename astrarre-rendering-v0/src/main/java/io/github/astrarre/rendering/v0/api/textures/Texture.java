@@ -2,6 +2,9 @@ package io.github.astrarre.rendering.v0.api.textures;
 
 import java.util.Objects;
 
+import io.github.astrarre.itemview.v0.api.Serializable;
+import io.github.astrarre.itemview.v0.api.Serializer;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.util.v0.api.Id;
 import io.github.astrarre.util.v0.api.Validate;
 
@@ -10,7 +13,8 @@ import net.minecraft.util.Identifier;
 /**
  * a path to an image, and it's size
  */
-public class Texture {
+public class Texture implements Serializable {
+	public static final Serializer<Texture> SERIALIZER = Serializer.of(Texture::new);
 	private final Identifier identifier;
 	private final int width, height;
 
@@ -31,6 +35,13 @@ public class Texture {
 		this.identifier = texture;
 		this.width = Validate.positive(width, "width");
 		this.height = Validate.positive(height, "height");
+	}
+
+	public Texture(NBTagView tag, String key) {
+		NBTagView view = tag.getTag(key);
+		this.identifier = Serializer.ID.read(view, "id").to();
+		this.width = view.getInt("width");
+		this.height = view.getInt("height");
 	}
 
 	public Id getId() {
@@ -75,5 +86,14 @@ public class Texture {
 		result = 31 * result + this.width;
 		result = 31 * result + this.height;
 		return result;
+	}
+
+	@Override
+	public void save(NBTagView.Builder tag, String key) {
+		NBTagView.Builder builder = NBTagView.builder()
+				.putInt("height", this.height)
+				.putInt("width", this.width);
+		Serializer.ID.save(builder, "id", Id.of(this.identifier));
+		tag.putTag(key, builder);
 	}
 }

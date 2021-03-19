@@ -3,8 +3,7 @@ package io.github.astrarre.gui.v0.api.base.statik;
 import io.github.astrarre.gui.v0.api.Drawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
-import io.github.astrarre.networking.v0.api.io.Input;
-import io.github.astrarre.networking.v0.api.io.Output;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
 import io.github.astrarre.util.v0.api.Id;
@@ -29,8 +28,8 @@ public final class ABeveledRectangle extends Drawable {
 		this.height = enclosing.getY(2);
 	}
 
-	private ABeveledRectangle(Input input) {
-		this(input.readFloat(), input.readFloat());
+	private ABeveledRectangle(NBTagView input) {
+		this(input.getFloat("width"), input.getFloat("height"));
 	}
 
 	public ABeveledRectangle(float width, float height) {
@@ -50,9 +49,9 @@ public final class ABeveledRectangle extends Drawable {
 	}
 
 	@Override
-	protected void write0(RootContainer container, Output output) {
-		output.writeFloat(this.width);
-		output.writeFloat(this.height);
+	protected void write0(RootContainer container, NBTagView.Builder output) {
+		output.putFloat("width", this.width);
+		output.putFloat("height", this.height);
 	}
 
 	public static void drawBevel(Graphics3d graphics, float width, float height) {

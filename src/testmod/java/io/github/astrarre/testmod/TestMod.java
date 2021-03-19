@@ -1,6 +1,5 @@
 package io.github.astrarre.testmod;
 
-import io.github.astrarre.testmod.gui.TestClientOnlyGui;
 import io.github.astrarre.testmod.gui.TestModGui;
 
 import net.minecraft.entity.player.PlayerEntity;

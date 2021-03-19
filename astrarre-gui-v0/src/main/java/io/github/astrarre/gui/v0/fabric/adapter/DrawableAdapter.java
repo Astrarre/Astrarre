@@ -59,9 +59,4 @@ public abstract class DrawableAdapter<T extends net.minecraft.client.gui.Drawabl
 		this.my = (int) mouseY;
 		return true;
 	}
-
-	@Override
-	public void setBounds(Polygon polygon) {
-		throw new UnsupportedOperationException();
-	}
 }

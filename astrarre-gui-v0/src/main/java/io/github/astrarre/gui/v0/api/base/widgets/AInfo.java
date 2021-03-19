@@ -9,15 +9,13 @@ import io.github.astrarre.gui.v0.api.Drawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.access.Interactable;
+import io.github.astrarre.itemview.v0.api.Serializer;
+import io.github.astrarre.itemview.v0.api.nbt.NBTType;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.networking.v0.api.SyncedProperty;
-import io.github.astrarre.networking.v0.api.io.Input;
-import io.github.astrarre.networking.v0.api.io.Output;
-import io.github.astrarre.networking.v0.api.serializer.ToPacketSerializer;
-import io.github.astrarre.networking.v0.fabric.FabricData;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.util.v0.api.Id;
 
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.Text;
 
 import net.fabricmc.api.EnvType;
@@ -25,7 +23,7 @@ import net.fabricmc.api.Environment;
 
 public class AInfo extends Drawable implements Interactable {
 	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.registerForward(Id.create("astrarre-gui-v0", "info_widget"), AInfo::new);
-	public final SyncedProperty<Boolean> isEnabled = this.createClientSyncedProperty(ToPacketSerializer.BOOLEAN, true);
+	public final SyncedProperty<Boolean> isEnabled = this.createClientSyncedProperty(Serializer.BOOLEAN, true);
 	public final List<Text> tooltip;
 
 	@Environment(EnvType.CLIENT)
@@ -39,12 +37,12 @@ public class AInfo extends Drawable implements Interactable {
 		this(ENTRY, tooltip);
 	}
 
-	protected AInfo(DrawableRegistry.Entry id, Input input) {
+	protected AInfo(DrawableRegistry.Entry id, NBTagView input) {
 		super(id);
-		int count = input.readInt();
-		List<Text> list = new ArrayList<>(count);
-		for (int i = 0; i < count; i++) {
-			list.add(FabricData.read(input, PacketByteBuf::readText));
+		List<String> texts = input.get("tooltip", NBTType.listOf(NBTType.STRING));
+		List<Text> list = new ArrayList<>(texts.size());
+		for (String text : texts) {
+			list.add(Text.Serializer.fromJson(text));
 		}
 		this.tooltip = Collections.unmodifiableList(list);
 	}
@@ -63,11 +61,12 @@ public class AInfo extends Drawable implements Interactable {
 	}
 
 	@Override
-	protected void write0(RootContainer container, Output output) {
-		output.writeInt(this.tooltip.size());
+	protected void write0(RootContainer container, NBTagView.Builder output) {
+		List<String> texts = new ArrayList<>(this.tooltip.size());
 		for (Text text : this.tooltip) {
-			FabricData.from(output).writeText(text);
+			texts.add(Text.Serializer.toJson(text));
 		}
+		output.put("tooltip", NBTType.listOf(NBTType.STRING), texts);
 	}
 
 	@Override

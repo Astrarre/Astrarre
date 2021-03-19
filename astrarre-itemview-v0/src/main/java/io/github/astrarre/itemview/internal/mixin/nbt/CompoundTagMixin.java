@@ -33,19 +33,19 @@ public abstract class CompoundTagMixin implements ImmutableAccess, NBTagView.Bui
 
 	@Mutable @Shadow @Final private Map<String, Tag> tags;
 
-	@Shadow public abstract void putByte(String key, byte value);
+	@Shadow public abstract void shadow$putByte(String key, byte value);
 
-	@Shadow public abstract void putBoolean(String key, boolean value);
+	@Shadow public abstract void shadow$putBoolean(String key, boolean value);
 
-	@Shadow public abstract void putShort(String key, short value);
+	@Shadow public abstract void shadow$putShort(String key, short value);
 
-	@Shadow public abstract void putFloat(String key, float value);
+	@Shadow public abstract void shadow$putFloat(String key, float value);
 
-	@Shadow public abstract void putInt(String key, int value);
+	@Shadow public abstract void shadow$putInt(String key, int value);
 
-	@Shadow public abstract void putDouble(String key, double value);
+	@Shadow public abstract void shadow$putDouble(String key, double value);
 
-	@Shadow public abstract void putLong(String key, long value);
+	@Shadow public abstract void shadow$putLong(String key, long value);
 
 	@Shadow @Nullable public abstract Tag put(String key, Tag tag);
 
@@ -188,55 +188,55 @@ public abstract class CompoundTagMixin implements ImmutableAccess, NBTagView.Bui
 	}
 
 	@Override
-	public Builder set(String key, byte b) {
-		this.putByte(key, b);
+	public Builder putByte(String key, byte b) {
+		this.shadow$putByte(key, b);
 		return this;
 	}
 
 	@Override
-	public Builder set(String key, boolean b) {
-		this.putBoolean(key, b);
+	public Builder putBool(String key, boolean b) {
+		this.shadow$putBoolean(key, b);
 		return this;
 	}
 
 	@Override
-	public Builder set(String key, char c) {
-		this.putShort(key, (short) c);
+	public Builder putChar(String key, char c) {
+		this.shadow$putShort(key, (short) c);
 		return this;
 	}
 
 	@Override
-	public Builder set(String key, short s) {
-		this.putShort(key, s);
+	public Builder putShort(String key, short s) {
+		this.shadow$putShort(key, s);
 		return this;
 	}
 
 	@Override
-	public Builder set(String key, float f) {
-		this.putFloat(key, f);
+	public Builder putFloat(String key, float f) {
+		this.shadow$putFloat(key, f);
 		return this;
 	}
 
 	@Override
-	public Builder set(String key, int i) {
-		this.putInt(key, i);
+	public Builder putInt(String key, int i) {
+		this.shadow$putInt(key, i);
 		return this;
 	}
 
 	@Override
-	public Builder set(String key, double d) {
-		this.putDouble(key, d);
+	public Builder putDouble(String key, double d) {
+		this.shadow$putDouble(key, d);
 		return this;
 	}
 
 	@Override
-	public Builder set(String key, long l) {
-		this.putLong(key, l);
+	public Builder putLong(String key, long l) {
+		this.shadow$putLong(key, l);
 		return this;
 	}
 
 	@Override
-	public <T> Builder set(String path, NBTType<T> type, T object) {
+	public <T> Builder put(String path, NBTType<T> type, T object) {
 		this.put(path, FabricViews.from(object));
 		return this;
 	}

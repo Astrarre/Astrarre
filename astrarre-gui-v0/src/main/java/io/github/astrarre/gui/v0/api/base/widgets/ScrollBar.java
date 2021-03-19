@@ -5,8 +5,7 @@ import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.access.Tickable;
 import io.github.astrarre.gui.v0.api.base.AggregateDrawable;
-import io.github.astrarre.networking.v0.api.io.Input;
-import io.github.astrarre.networking.v0.api.io.Output;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
@@ -43,11 +42,11 @@ public class ScrollBar extends AggregateDrawable implements Tickable {
 		down.setTransformation(Transformation.translate(0, height - this.down.height(), 0));
 	}
 
-	protected ScrollBar(DrawableRegistry.Entry id, Input input) {
+	protected ScrollBar(DrawableRegistry.Entry id, NBTagView input) {
 		super(id, input);
-		this.width = input.readFloat();
-		this.height = input.readFloat();
-		this.fraction = input.readFloat();
+		this.width = input.getFloat("width");
+		this.height = input.getFloat("height");
+		this.fraction = input.getFloat("fraction");
 	}
 
 	@Override
@@ -55,7 +54,7 @@ public class ScrollBar extends AggregateDrawable implements Tickable {
 		super.onAdded(container);
 		if(container.isClient()) {
 			this.up = ((AButton) this.drawables.get(0));
-			this.up.onPress(() -> this.onChangeClient(Math.max(this.scrollPercent + 1 / this.fraction, 0)));
+			this.up.onPress(() -> this.onChangeClient(Math.max(this.scrollPercent - 1 / this.fraction, 0)));
 			this.down = ((AButton) this.drawables.get(1));
 			this.down.onPress(() -> this.onChangeClient(Math.min(this.scrollPercent + 1 / this.fraction, 1)));
 			this.addClient(this.scrollBar = new Bar());
@@ -77,16 +76,16 @@ public class ScrollBar extends AggregateDrawable implements Tickable {
 	}
 
 	@Override
-	protected void write0(RootContainer container, Output output) {
+	protected void write0(RootContainer container, NBTagView.Builder output) {
 		super.write0(container, output);
-		output.writeFloat(this.width);
-		output.writeFloat(this.height);
-		output.writeFloat(this.fraction);
+		output.putFloat("width", this.width);
+		output.putFloat("height", this.height);
+		output.putFloat("fraction", this.fraction);
 	}
 
 	@Override
 	public void tick(RootContainer container) {
-		this.scrollBar.setTransformation(Transformation.translate(0, this.up.height() + this.scrollPercent * (this.height - this.down.height() - (this.height / this.fraction)), 0));
+		this.scrollBar.setTransformation(Transformation.translate(0, this.up.height() + this.scrollPercent * (this.height - this.down.height() - this.up.height() - (this.height / this.fraction)), 0));
 	}
 
 	public class Bar extends AButton {
@@ -118,6 +117,7 @@ public class ScrollBar extends AggregateDrawable implements Tickable {
 
 		@Override
 		public boolean mouseDragged(RootContainer container, double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+			deltaY = deltaY / ScrollBar.this.height;
 			double percent = ScrollBar.this.scrollPercent + deltaY / (1f + Math.abs(deltaY * 10));
 			if (percent > 1) {
 				percent = 1;

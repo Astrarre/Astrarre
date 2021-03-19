@@ -1,11 +1,11 @@
 package io.github.astrarre.gui.v0.api.base.borders;
 
+import io.github.astrarre.gui.v0.api.DelegateDrawable;
 import io.github.astrarre.gui.v0.api.Drawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
-import io.github.astrarre.gui.v0.api.DelegateDrawable;
 import io.github.astrarre.gui.v0.api.base.statik.ABeveledRectangle;
-import io.github.astrarre.networking.v0.api.io.Input;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.rendering.v0.api.util.Close;
@@ -25,7 +25,7 @@ public final class ABeveledBorder extends DelegateDrawable {
 	}
 
 	@Environment (EnvType.CLIENT)
-	private ABeveledBorder(Input input) {
+	private ABeveledBorder(NBTagView input) {
 		super(ENTRY, input);
 	}
 

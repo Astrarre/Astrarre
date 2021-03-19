@@ -3,8 +3,7 @@ package io.github.astrarre.gui.v0.api.base.statik;
 import io.github.astrarre.gui.v0.api.Drawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
-import io.github.astrarre.networking.v0.api.io.Input;
-import io.github.astrarre.networking.v0.api.io.Output;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.util.v0.api.Id;
 
@@ -16,7 +15,7 @@ public class ADarkenedBackground extends Drawable {
 		super(ENTRY);
 	}
 
-	public ADarkenedBackground(Input input) {
+	public ADarkenedBackground(NBTagView input) {
 		this();
 	}
 
@@ -35,7 +34,7 @@ public class ADarkenedBackground extends Drawable {
 	}
 
 	@Override
-	protected void write0(RootContainer container, Output output) {
+	protected void write0(RootContainer container, NBTagView.Builder output) {
 	}
 
 	public static void init() {}

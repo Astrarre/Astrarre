@@ -4,7 +4,7 @@ import io.github.astrarre.gui.v0.api.Drawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.base.AggregateDrawable;
-import io.github.astrarre.networking.v0.api.io.Input;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.util.v0.api.Id;
 
@@ -23,12 +23,12 @@ public class APanel extends AggregateDrawable {
 	}
 
 	@Environment (EnvType.CLIENT)
-	private APanel(Input input) {
+	private APanel(NBTagView input) {
 		this(PANEL, input);
 	}
 
 	@Environment (EnvType.CLIENT)
-	protected APanel(DrawableRegistry.Entry entry, Input input) {
+	protected APanel(DrawableRegistry.Entry entry, NBTagView input) {
 		super(entry, input);
 	}
 

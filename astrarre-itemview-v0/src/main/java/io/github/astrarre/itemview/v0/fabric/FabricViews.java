@@ -4,6 +4,7 @@ import java.util.List;
 
 import io.github.astrarre.itemview.internal.access.AbstractListTagAccess;
 import io.github.astrarre.itemview.internal.access.ImmutableAccess;
+import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.itemview.v0.api.nbt.NBTType;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import it.unimi.dsi.fastutil.bytes.ByteList;
@@ -12,6 +13,7 @@ import it.unimi.dsi.fastutil.longs.LongList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.nbt.AbstractNumberTag;
 import net.minecraft.nbt.ByteArrayTag;
 import net.minecraft.nbt.ByteTag;
@@ -29,6 +31,7 @@ import net.minecraft.nbt.Tag;
 
 @SuppressWarnings ("ConstantConditions")
 public class FabricViews {
+
 	/**
 	 * @return an immutable compound tag view
 	 */
@@ -51,7 +54,7 @@ public class FabricViews {
 	 * @return an unmodifiable compound tag view
 	 */
 	@NotNull
-	public static NBTagView view(@NotNull CompoundTag tag) {
+	public static NBTagView view(@Nullable CompoundTag tag) {
 		return (tag == null || tag.isEmpty()) ? NBTagView.EMPTY : (NBTagView) tag;
 	}
 
@@ -78,6 +81,8 @@ public class FabricViews {
 			ret = tag;
 		} else if (tag instanceof StringTag) {
 			ret = tag.asString();
+		} else if(tag == null) {
+			return null;
 		}
 
 		if (ret == null) {
@@ -123,6 +128,8 @@ public class FabricViews {
 				tag.add(from(o));
 			}
 			return tag;
+		} else if(object instanceof String) {
+			return StringTag.of((String) object);
 		}
 		throw new UnsupportedOperationException(object + "");
 	}

@@ -9,7 +9,7 @@ import io.github.astrarre.gui.internal.vanilla.DefaultScreen;
 import io.github.astrarre.gui.internal.vanilla.DefaultScreenHandler;
 import io.github.astrarre.gui.v0.api.access.Interactable;
 import io.github.astrarre.gui.v0.api.base.panel.APanel;
-import io.github.astrarre.networking.internal.ByteBufDataOutput;
+import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,7 +39,7 @@ public interface RootContainer {
 
 			@Override
 			public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
-				this.contentPanel.write(new ByteBufDataOutput(buf));
+				this.contentPanel.write(buf);
 			}
 
 			@Override
@@ -74,6 +74,7 @@ public interface RootContainer {
 		return Optional.ofNullable(MinecraftClient.getInstance().currentScreen).map(ScreenRootAccess.class::cast).map(ScreenRootAccess::getClientRoot);
 	}
 
+	Serializer<Type> TYPE_SERIALIZER = Serializer.ofEnum(Type.class);
 	enum Type {
 		/**
 		 * @deprecated unsupported ATM
@@ -143,4 +144,6 @@ public interface RootContainer {
 	 */
 	@Environment(EnvType.CLIENT)
 	void addResizeListener(OnResize resize);
+
+	Serializer<Drawable> getSerializer();
 }

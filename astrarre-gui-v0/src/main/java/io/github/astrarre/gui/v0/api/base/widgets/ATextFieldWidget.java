@@ -5,8 +5,7 @@ import java.nio.charset.StandardCharsets;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.fabric.adapter.AbstractButtonAdapter;
-import io.github.astrarre.networking.v0.api.io.Input;
-import io.github.astrarre.networking.v0.api.io.Output;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
 import io.github.astrarre.util.v0.api.Id;
@@ -28,7 +27,7 @@ public class ATextFieldWidget extends AbstractButtonAdapter<net.minecraft.client
 	}
 
 	@Environment(EnvType.CLIENT)
-	private ATextFieldWidget(Input input) {
+	private ATextFieldWidget(NBTagView input) {
 		this(ENTRY, input);
 	}
 
@@ -37,9 +36,9 @@ public class ATextFieldWidget extends AbstractButtonAdapter<net.minecraft.client
 	}
 
 	@Environment(EnvType.CLIENT)
-	protected ATextFieldWidget(DrawableRegistry.Entry id, Input input) {
+	protected ATextFieldWidget(DrawableRegistry.Entry id, NBTagView input) {
 		super(id, input);
-		this.text = input.readUTF();
+		this.text = input.getString("text");
 		Polygon enclosing = this.getBounds().getEnclosing();
 		this.drawable = new net.minecraft.client.gui.widget.TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, (int)enclosing.getX(2), (int)enclosing.getY(2), null);
 		this.drawable.active = this.enabled;
@@ -55,10 +54,9 @@ public class ATextFieldWidget extends AbstractButtonAdapter<net.minecraft.client
 	}
 
 	@Override
-	protected void write0(RootContainer container, Output output) {
+	protected void write0(RootContainer container, NBTagView.Builder output) {
 		super.write0(container, output);
-		String text = this.getText();
-		output.writeUTF(text);
+		output.putString("text", this.getText());
 	}
 
 	public String getText() {
@@ -73,7 +71,7 @@ public class ATextFieldWidget extends AbstractButtonAdapter<net.minecraft.client
 	}
 
 	protected void sendTextToServer(String text) {
-		this.sendToServer(UPDATE_TEXT, o -> o.writeUTF(text));
+		this.sendToServer(UPDATE_TEXT, NBTagView.builder().putString("text", text));
 	}
 
 	public boolean setText(String text) {
@@ -83,7 +81,7 @@ public class ATextFieldWidget extends AbstractButtonAdapter<net.minecraft.client
 				this.sendTextToServer(text);
 			} else {
 				this.text = text;
-				this.sendToClients(UPDATE_TEXT, o -> o.writeUTF(text));
+				this.sendToClients(UPDATE_TEXT, NBTagView.builder().putString("text", text));
 			}
 			return true;
 		}
@@ -95,9 +93,9 @@ public class ATextFieldWidget extends AbstractButtonAdapter<net.minecraft.client
 	}
 
 	@Override
-	protected void receiveFromClient(RootContainer container, NetworkMember member, int channel, Input input) {
+	protected void receiveFromClient(RootContainer container, NetworkMember member, int channel, NBTagView input) {
 		if(channel == UPDATE_TEXT) {
-			String str = input.readUTF();
+			String str = input.getString("text");
 			if(this.sanitize(str)) {
 				this.syncedFromClient(str);
 			}
@@ -106,9 +104,9 @@ public class ATextFieldWidget extends AbstractButtonAdapter<net.minecraft.client
 	}
 
 	@Override
-	protected void receiveFromServer(RootContainer container, int channel, Input input) {
+	protected void receiveFromServer(RootContainer container, int channel, NBTagView input) {
 		if(channel == UPDATE_TEXT) {
-			this.drawable.setText(this.text = input.readUTF());
+			this.drawable.setText(this.text = input.getString("text"));
 		}
 		super.receiveFromServer(container, channel, input);
 	}

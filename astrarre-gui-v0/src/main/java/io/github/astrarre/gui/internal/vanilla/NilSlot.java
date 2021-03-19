@@ -1,4 +1,4 @@
-package io.github.astrarre.gui.internal.slot;
+package io.github.astrarre.gui.internal.vanilla;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;

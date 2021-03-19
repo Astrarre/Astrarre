@@ -2,8 +2,7 @@ package io.github.astrarre.gui.v0.fabric.adapter;
 
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
-import io.github.astrarre.networking.v0.api.io.Input;
-import io.github.astrarre.networking.v0.api.io.Output;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
 
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
@@ -17,12 +16,12 @@ public abstract class AbstractButtonAdapter<T extends AbstractButtonWidget> exte
 		super(id);
 		this.width = width;
 		this.height = height;
-		this.setBoundsProtected(Polygon.rectangle(width, height));
+		this.setBounds(Polygon.rectangle(width, height));
 	}
 
-	protected AbstractButtonAdapter(DrawableRegistry.Entry id, Input input) {
-		this(id, input.readInt(), input.readInt());
-		this.enabled = input.readBoolean();
+	protected AbstractButtonAdapter(DrawableRegistry.Entry id, NBTagView input) {
+		this(id, input.getInt("width"), input.getInt("height"));
+		this.enabled = input.getBool("enabled");
 	}
 
 	protected void onActiveClient(boolean isActive) {
@@ -30,18 +29,18 @@ public abstract class AbstractButtonAdapter<T extends AbstractButtonWidget> exte
 	}
 
 	@Override
-	protected void receiveFromServer(RootContainer container, int channel, Input input) {
+	protected void receiveFromServer(RootContainer container, int channel, NBTagView input) {
 		if (channel == LOCK) {
-			this.onActiveClient(input.readBoolean());
+			this.onActiveClient(input.getBool("enabled"));
 		}
 		super.receiveFromServer(container, channel, input);
 	}
 
 	@Override
-	protected void write0(RootContainer container, Output output) {
-		output.writeInt(this.width);
-		output.writeInt(this.height);
-		output.writeBoolean(this.enabled);
+	protected void write0(RootContainer container, NBTagView.Builder output) {
+		output.putInt("width", this.width);
+		output.putInt("height",this.height);
+		output.putBool("enabled", this.enabled);
 	}
 
 	public boolean isEnabled() {
@@ -55,7 +54,7 @@ public abstract class AbstractButtonAdapter<T extends AbstractButtonWidget> exte
 		if (this.isClient()) {
 			this.onActiveClient(enabled);
 		} else {
-			this.sendToClients(LOCK, output -> output.writeBoolean(enabled));
+			this.sendToClients(LOCK, NBTagView.builder().putBool("enabled", enabled));
 		}
 		this.enabled = enabled;
 	}

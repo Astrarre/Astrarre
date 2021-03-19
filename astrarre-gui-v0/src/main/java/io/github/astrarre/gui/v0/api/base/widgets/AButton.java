@@ -8,11 +8,11 @@ import io.github.astrarre.gui.v0.api.Drawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.access.Interactable;
-import io.github.astrarre.networking.v0.api.io.Input;
-import io.github.astrarre.networking.v0.api.io.Output;
+import io.github.astrarre.itemview.v0.api.Serializable;
+import io.github.astrarre.itemview.v0.api.Serializer;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
-import io.github.astrarre.rendering.v0.api.textures.Texture;
 import io.github.astrarre.rendering.v0.api.textures.TexturePart;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
 import io.github.astrarre.util.v0.api.Id;
@@ -56,10 +56,10 @@ public class AButton extends Drawable implements Interactable {
 		return this.part.active.height;
 	}
 
-	protected AButton(DrawableRegistry.Entry entry, Input input) {
+	protected AButton(DrawableRegistry.Entry entry, NBTagView input) {
 		super(entry);
-		this.part = readData(input);
-		this.disabled = input.readBoolean();
+		this.part = SERIALIZER.read(input, "part");
+		this.disabled = input.getBool("disabled");
 	}
 
 	/**
@@ -85,21 +85,23 @@ public class AButton extends Drawable implements Interactable {
 	}
 
 	@Override
-	protected void write0(RootContainer container, Output output) {
-		writeData(this.part, output);
-		output.writeBoolean(this.disabled);
+	protected void write0(RootContainer container, NBTagView.Builder output) {
+		if(this.part != null) {
+			this.part.save(output, "part");
+		}
+		output.putBool("disabled", this.disabled);
 	}
 
 	@Override
-	protected void receiveFromServer(RootContainer container, int channel, Input input) {
+	protected void receiveFromServer(RootContainer container, int channel, NBTagView input) {
 		super.receiveFromServer(container, channel, input);
 		if (channel == DISABLE) {
-			this.disabled = input.readBoolean();
+			this.disabled = input.getBool("disabled");
 		}
 	}
 
 	@Override
-	protected void receiveFromClient(RootContainer container, NetworkMember member, int channel, Input input) {
+	protected void receiveFromClient(RootContainer container, NetworkMember member, int channel, NBTagView input) {
 		super.receiveFromClient(container, member, channel, input);
 		if (channel == PRESSED) {
 			this.onPressServer();
@@ -164,7 +166,7 @@ public class AButton extends Drawable implements Interactable {
 	 */
 	@Environment (EnvType.CLIENT)
 	public void onPressClient() {
-		this.sendToServer(PRESSED, o -> {});
+		this.sendToServer(PRESSED, NBTagView.EMPTY);
 		this.onPress.forEach(Runnable::run);
 	}
 
@@ -190,22 +192,38 @@ public class AButton extends Drawable implements Interactable {
 
 	public void setDisabled(boolean disabled) {
 		this.disabled = disabled;
-		this.sendToClients(DISABLE, output -> output.writeBoolean(disabled));
+		this.sendToClients(DISABLE, NBTagView.builder().putBool("disabled", disabled));
 	}
 
-	public final static class Data {
-		public final TexturePart active, pressed;
-		@Nullable public final TexturePart highlighted, disabled;
+	public static final Serializer<Data> SERIALIZER = Serializer.of(Data::new);
+	public final static class Data implements Serializable {
+		public final TexturePart active;
+		@Nullable public final TexturePart highlighted, disabled, pressed;
 
 		public Data() {
 			this(null, null, null, null);
 		}
 
-		public Data(TexturePart active, @Nullable TexturePart highlighted, TexturePart pressed, @Nullable TexturePart disabled) {
+		public Data(TexturePart active, @Nullable TexturePart highlighted, @Nullable TexturePart pressed, @Nullable TexturePart disabled) {
 			this.active = active;
 			this.highlighted = highlighted;
 			this.pressed = pressed;
 			this.disabled = disabled;
+		}
+
+		protected Data(NBTagView tag, String s) {
+			NBTagView tagView = tag.getTag(s);
+			if(tagView.get("highlighted") != null) {
+				this.highlighted = TexturePart.SERIALIZER.read(tagView, "highlighted");
+			} else this.highlighted = null;
+			if(tagView.get("pressed") != null) {
+				this.pressed = TexturePart.SERIALIZER.read(tagView, "pressed");
+			} else this.pressed = null;
+			if(tagView.get("disabled") != null) {
+				this.disabled = TexturePart.SERIALIZER.read(tagView, "disabled");
+			} else this.disabled = null;
+
+			this.active = TexturePart.SERIALIZER.read(tagView, "active");
 		}
 
 		public Data withActive(TexturePart part) {
@@ -223,46 +241,22 @@ public class AButton extends Drawable implements Interactable {
 		public Data withDisabled(TexturePart part) {
 			return new Data(this.active, this.highlighted, this.pressed, part);
 		}
-	}
 
-	public static Data readData(Input input) {
-		return new Data(readPart(input), readPart(input), readPart(input), readPart(input));
-	}
+		@Override
+		public void save(NBTagView.Builder tag, String key) {
+			NBTagView.Builder builder = NBTagView.builder();
+			if(this.highlighted != null) {
+				TexturePart.SERIALIZER.save(builder, "highlighted", this.highlighted);
+			}
+			if(this.disabled != null) {
+				TexturePart.SERIALIZER.save(builder, "disabled", this.disabled);
+			}
+			if(this.pressed != null) {
+				TexturePart.SERIALIZER.save(builder, "pressed", this.pressed);
+			}
 
-	public static TexturePart readPart(Input input) {
-		if (input.readBoolean()) {
-			return null;
+			TexturePart.SERIALIZER.save(builder, "active", this.active);
+			tag.putTag(key, builder);
 		}
-
-		return new TexturePart(readTexture(input), input.readInt(), input.readInt(), input.readInt(), input.readInt());
-	}
-
-
-	public static Texture readTexture(Input input) {
-		return new Texture(input.readId(), input.readInt(), input.readInt());
-	}
-
-	public static void writeData(Data data, Output output) {
-		writePart(data.active, output);
-		writePart(data.highlighted, output);
-		writePart(data.pressed, output);
-		writePart(data.disabled, output);
-	}
-
-	public static void writePart(TexturePart part, Output output) {
-		output.writeBoolean(part == null);
-		if (part != null) {
-			write(part.texture, output);
-			output.writeInt(part.offX);
-			output.writeInt(part.offY);
-			output.writeInt(part.height);
-			output.writeInt(part.width);
-		}
-	}
-
-	public static void write(Texture texture, Output output) {
-		output.writeId(texture.getId());
-		output.writeInt(texture.getHeight());
-		output.writeInt(texture.getWidth());
 	}
 }

@@ -3,8 +3,6 @@ package io.github.astrarre.gui.internal;
 import io.github.astrarre.gui.internal.access.ScreenRootAccess;
 import io.github.astrarre.gui.internal.vanilla.DefaultHandledScreen;
 import io.github.astrarre.gui.internal.vanilla.DefaultScreenHandler;
-import io.github.astrarre.networking.internal.ByteBufDataInput;
-import io.github.astrarre.networking.v0.fabric.FabricData;
 
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
@@ -20,7 +18,7 @@ public class AstrarreInitializer implements ModInitializer {
 			"astrarre-gui-v0",
 			"default_screen"), (syncId, inventory, buf) -> {
 		DefaultScreenHandler handler = new DefaultScreenHandler(syncId);
-		((ScreenRootAccess)handler).readRoot(new ByteBufDataInput(buf));
+		((ScreenRootAccess)handler).readRoot(buf);
 		return handler;
 	});
 

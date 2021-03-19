@@ -1,7 +1,6 @@
 package io.github.astrarre.gui.internal.containers;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import com.google.common.collect.Iterables;
@@ -9,14 +8,15 @@ import io.github.astrarre.gui.internal.RootContainerInternal;
 import io.github.astrarre.gui.internal.access.ResizeListenerAccess;
 import io.github.astrarre.gui.internal.access.ScreenRootAccess;
 import io.github.astrarre.gui.internal.access.SlotAddAccess;
-import io.github.astrarre.gui.internal.mixin.access.ScreenHandlerAccess;
+import io.github.astrarre.gui.internal.mixin.ScreenHandlerAccess;
 import io.github.astrarre.gui.v0.api.Drawable;
 import io.github.astrarre.gui.v0.api.access.Interactable;
-import io.github.astrarre.networking.v0.api.io.Input;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
 import io.github.astrarre.util.v0.fabric.MinecraftServers;
 
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 
@@ -33,7 +33,7 @@ public class ScreenHandlerContainer extends RootContainerInternal implements Slo
 		this.handler = handler;
 	}
 
-	public ScreenHandlerContainer(ScreenHandler handler, Input input) {
+	public ScreenHandlerContainer(ScreenHandler handler, PacketByteBuf input) {
 		super(e -> {
 			((ScreenHandlerContainer) e).handler = handler;
 			((ScreenHandlerContainer) e).isClient = true;

@@ -3,9 +3,9 @@ package io.github.astrarre.gui.v0.fabric.adapter.slot;
 import java.util.Objects;
 
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
-import io.github.astrarre.networking.v0.api.io.Input;
-import io.github.astrarre.networking.v0.api.io.Output;
-import io.github.astrarre.networking.v0.fabric.FabricData;
+import io.github.astrarre.itemview.v0.api.Serializer;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
+import io.github.astrarre.itemview.v0.fabric.FabricSerializers;
 import io.github.astrarre.util.v0.api.Id;
 
 import net.minecraft.block.entity.HopperBlockEntity;
@@ -35,12 +35,12 @@ public class WorldInventorySlot extends Slot {
 	}
 
 	@Environment(EnvType.CLIENT)
-	private WorldInventorySlot(Input input) {
+	private WorldInventorySlot(NBTagView input) {
 		this(ENTRY, input);
 	}
 
 	@Environment(EnvType.CLIENT)
-	protected WorldInventorySlot(DrawableRegistry.Entry id, Input input) {
+	protected WorldInventorySlot(DrawableRegistry.Entry id, NBTagView input) {
 		super(id, input);
 	}
 
@@ -48,18 +48,18 @@ public class WorldInventorySlot extends Slot {
 	}
 
 	@Override
-	protected void writeInventoryData(Output output, Inventory inventory) {
-		output.writeId(Id.of(this.world.getRegistryKey().getValue()));
-		FabricData.from(output).writeBlockPos(this.pos);
+	protected void writeInventoryData(NBTagView.Builder output, Inventory inventory) {
+		Serializer.ID.save(output, "world", Id.of(this.world.getRegistryKey().getValue()));
+		FabricSerializers.BLOCK_POS.save(output, "pos", this.pos);
 	}
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	protected Inventory readInventoryData(Input input) {
+	protected Inventory readInventoryData(NBTagView input) {
 		MinecraftClient client = MinecraftClient.getInstance();
-		if(client.world != null && Objects.equals(client.world.getRegistryKey().getValue(), input.readId().to())) {
+		if(client.world != null && Objects.equals(client.world.getRegistryKey().getValue(), Serializer.ID.read(input, "world"))) {
 			this.world = client.world;
-			this.pos = FabricData.readPos(input);
+			this.pos = FabricSerializers.BLOCK_POS.read(input, "pos");
 			return HopperBlockEntity.getInventoryAt(this.world, this.pos);
 		}
 		return null;

@@ -6,19 +6,18 @@ import io.github.astrarre.gui.internal.RootContainerInternal;
 import io.github.astrarre.gui.internal.access.ExtraSlotAccess;
 import io.github.astrarre.gui.internal.access.ScreenRootAccess;
 import io.github.astrarre.gui.internal.containers.ScreenHandlerContainer;
-import io.github.astrarre.gui.internal.slot.NilSlot;
-import io.github.astrarre.networking.v0.api.io.Input;
+import io.github.astrarre.gui.internal.vanilla.NilSlot;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.collection.DefaultedList;
@@ -55,7 +54,7 @@ public abstract class ScreenHandlerMixin implements ScreenRootAccess {
 	}
 
 	@Override
-	public void readRoot(Input input) {
+	public void readRoot(PacketByteBuf input) {
 		this.internal = new ScreenHandlerContainer((ScreenHandler) (Object) this, input);
 	}
 

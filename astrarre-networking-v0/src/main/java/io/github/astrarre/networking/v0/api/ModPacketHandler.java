@@ -1,10 +1,7 @@
 package io.github.astrarre.networking.v0.api;
 
-import java.util.function.Consumer;
-
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.networking.internal.ModPacketHandlerImpl;
-import io.github.astrarre.networking.v0.api.io.Input;
-import io.github.astrarre.networking.v0.api.io.Output;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
 import io.github.astrarre.util.v0.api.Id;
 
@@ -17,9 +14,9 @@ public interface ModPacketHandler {
 	ModPacketHandler INSTANCE = ModPacketHandlerImpl.INSTANCE;
 
 	@Environment (EnvType.CLIENT)
-	void sendToServer(Id id, Consumer<Output> output);
+	void sendToServer(Id id, NBTagView output);
 
-	void sendToClient(ServerPlayerEntity entity, Id id, Consumer<Output> out);
+	void sendToClient(ServerPlayerEntity entity, Id id, NBTagView out);
 
 	void registerClient(Id id, ClientReceiver receiver);
 
@@ -30,10 +27,10 @@ public interface ModPacketHandler {
 	void registerSynchronizedServer(Id id, ServerReceiver receiver);
 
 	interface ClientReceiver {
-		void accept(Id id, Input buf);
+		void accept(Id id, NBTagView tag);
 	}
 
 	interface ServerReceiver {
-		void accept(NetworkMember member, Id id, Input buf);
+		void accept(NetworkMember member, Id id, NBTagView tag);
 	}
 }

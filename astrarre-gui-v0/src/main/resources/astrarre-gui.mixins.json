@@ -7,8 +7,7 @@
     "MinecraftClientMixin",
     "ScreenHandlerMixin",
     "ScreenMixin",
-    "access.HandledScreenAccess",
-    "access.ScreenHandlerAccess"
+    "ScreenHandlerAccess"
   ],
   "injectors": {
     "defaultRequire": 1

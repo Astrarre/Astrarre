@@ -1,7 +1,5 @@
 package io.github.astrarre.rendering.internal.util;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gui.DrawableHelper;

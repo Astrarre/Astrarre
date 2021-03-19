@@ -1,18 +1,14 @@
 package io.github.astrarre.networking.internal;
 
-import java.util.Collections;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
-import io.github.astrarre.networking.internal.ByteBufDataInput;
-import io.github.astrarre.networking.internal.ByteBufDataOutput;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
+import io.github.astrarre.itemview.v0.fabric.FabricViews;
 import io.github.astrarre.networking.mixin.CustomPayloadC2SPacketAccess;
 import io.github.astrarre.networking.v0.api.ModPacketHandler;
-import io.github.astrarre.networking.v0.api.io.Input;
-import io.github.astrarre.networking.v0.api.io.Output;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
 import io.github.astrarre.util.v0.api.Id;
 import io.netty.buffer.Unpooled;
@@ -38,16 +34,16 @@ public class ModPacketHandlerImpl implements ModPacketHandler {
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	public void sendToServer(Id id, Consumer<Output> output) {
+	public void sendToServer(Id id, NBTagView output) {
 		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-		output.accept(new ByteBufDataOutput(buf));
-		Objects.requireNonNull(MinecraftClient.getInstance().getNetworkHandler(), "No Active Server!").sendPacket(new CustomPayloadC2SPacket((Identifier) id, buf));
+		buf.writeCompoundTag(output.toTag());
+		Objects.requireNonNull(MinecraftClient.getInstance().getNetworkHandler(), "No Active Server!").sendPacket(new CustomPayloadC2SPacket(id.to(), buf));
 	}
 
 	@Override
-	public void sendToClient(ServerPlayerEntity entity, Id id, Consumer<Output> out) {
+	public void sendToClient(ServerPlayerEntity entity, Id id, NBTagView out) {
 		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-		out.accept(new ByteBufDataOutput(buf));
+		buf.writeCompoundTag(out.toTag());
 		entity.networkHandler.sendPacket(new CustomPayloadS2CPacket((Identifier) id, buf));
 	}
 
@@ -130,13 +126,12 @@ public class ModPacketHandlerImpl implements ModPacketHandler {
 	}
 
 	private boolean fire(Id identifier, PacketByteBuf data, Iterable<ClientReceiver> listeners) {
-		int readerIndex = data.readerIndex();
-		ByteBufDataInput input = new ByteBufDataInput(data);
+		System.out.println(identifier + " " + Iterables.toString(listeners));
 		boolean iter = false;
+		NBTagView view = null;
 		for (ClientReceiver receiver : listeners) {
-			data.readerIndex(readerIndex);
-			receiver.accept(identifier, input);
-			input.reset();
+			if(view == null) view = FabricViews.view(data.readCompoundTag());
+			receiver.accept(identifier, view);
 			iter = true;
 		}
 		return iter;

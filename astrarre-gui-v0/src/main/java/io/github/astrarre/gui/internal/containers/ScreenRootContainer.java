@@ -5,10 +5,10 @@ import io.github.astrarre.gui.internal.access.ResizeListenerAccess;
 import io.github.astrarre.gui.internal.access.ScreenRootAccess;
 import io.github.astrarre.gui.v0.api.Drawable;
 import io.github.astrarre.gui.v0.api.access.Interactable;
-import io.github.astrarre.networking.v0.api.io.Input;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
 
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.network.PacketByteBuf;
 
 public class ScreenRootContainer<T extends Screen> extends RootContainerInternal {
 	public T screen;
@@ -17,8 +17,8 @@ public class ScreenRootContainer<T extends Screen> extends RootContainerInternal
 		this.screen = screen;
 	}
 
-	public ScreenRootContainer(T screen, Input input) {
-		super(c -> ((ScreenRootContainer)c).screen = screen,input);
+	public ScreenRootContainer(T screen, PacketByteBuf input) {
+		super(c -> ((ScreenRootContainer) c).screen = screen, input);
 	}
 
 	@Override
@@ -43,12 +43,12 @@ public class ScreenRootContainer<T extends Screen> extends RootContainerInternal
 
 	@Override
 	public void addResizeListener(OnResize resize) {
-		((ResizeListenerAccess)resize).addResizeListener(resize);
+		((ResizeListenerAccess) resize).addResizeListener(resize);
 	}
 
 	@Override
 	public <T extends Drawable & Interactable> void setFocus(T drawable) {
 		super.setFocus(drawable);
-		((ScreenRootAccess)this.screen).astrarre_focusPanel();
+		((ScreenRootAccess) this.screen).astrarre_focusPanel();
 	}
 }

@@ -1,9 +1,12 @@
 package io.github.astrarre.rendering.v0.api.util;
 
-import java.util.Objects;
 import java.util.function.Consumer;
 
 import earcut4j.Earcut;
+import io.github.astrarre.itemview.v0.api.Serializable;
+import io.github.astrarre.itemview.v0.api.Serializer;
+import io.github.astrarre.itemview.v0.api.nbt.NBTType;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.rendering.internal.mixin.BufferBuilderAccess;
 import io.github.astrarre.rendering.internal.util.MathUtil;
 import io.github.astrarre.rendering.v0.api.Transformation;
@@ -17,13 +20,14 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.Vector4f;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-public final class Polygon {
+public final class Polygon implements Serializable {
+	public static final Serializer<Polygon> SERIALIZER = Serializer.of(Polygon::new);
+
 	public static final float EPSILON = .0001f;
 	public static final Polygon EMPTY = new Polygon.Builder(3).addVertex(0, 0).addVertex(0, EPSILON).addVertex(EPSILON, 0).build();
 	private final float[] vertices;
@@ -55,6 +59,16 @@ public final class Polygon {
 		this.offset = offset;
 		this.length = length;
 		this.vertices = vertices;
+	}
+
+	private Polygon(NBTagView tag, String key) {
+		IntList list = tag.get(key, NBTType.INT_ARRAY);
+		this.offset = 0;
+		float[] vertices = this.vertices = new float[list.size()];
+		for (int i = 0; i < vertices.length; i++) {
+			vertices[i] = Float.intBitsToFloat(list.getInt(i));
+		}
+		this.length = vertices.length;
 	}
 
 
@@ -208,13 +222,22 @@ public final class Polygon {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append('[');
-		for (int i = 0; i < this.length; i += 3) {
+		for (int i = 0; i < this.length; i += 2) {
 			builder.append('\n').append('\t').append('[').append(String.format("%3.3f", this.vertices[i])).append(',')
-					.append(String.format("%3.3f", this.vertices[i + 1])).append(',').append(String.format("%3.3f", this.vertices[i + 2]))
+					.append(String.format("%3.3f", this.vertices[i + 1]))
 					.append(']');
 		}
 		builder.append(']');
 		return builder.toString();
+	}
+
+	@Override
+	public void save(NBTagView.Builder tag, String key) {
+		IntList list = new IntArrayList();
+		for (int i = 0; i < this.length; i++) {
+			list.add(Float.floatToIntBits(this.vertices[i + this.offset]));
+		}
+		tag.put(key, NBTType.INT_ARRAY, list);
 	}
 
 	public interface PointWalker {
@@ -292,6 +315,8 @@ public final class Polygon {
 			for (int i = 0; i < triangles.size(); i++) {
 				consumer.accept(buffer.vertex(this.getX(i), this.getY(i), 0));
 			}
+			this.cachedBuffer = buffer;
+			return buffer;
 		}
 		return builder;
 	}

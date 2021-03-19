@@ -1,8 +1,10 @@
 package io.github.astrarre.networking.v0.api.properties;
 
+import io.github.astrarre.itemview.v0.api.Serializer;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
+import io.github.astrarre.itemview.v0.fabric.FabricSerializers;
 import io.github.astrarre.networking.v0.api.ModPacketHandler;
 import io.github.astrarre.networking.v0.api.SyncedProperty;
-import io.github.astrarre.networking.v0.api.serializer.ToPacketSerializer;
 import io.github.astrarre.util.v0.api.Id;
 
 import net.minecraft.block.entity.BlockEntity;
@@ -19,17 +21,17 @@ public class BlockEntitySyncedProperty<T> extends SyncedProperty<T> {
 	public static final Id BLOCK_ENTITY_SYNC = Id.create("astrarre-networking-v0", "block_entity_sync");
 
 	static {
-		ModPacketHandler.INSTANCE.registerSynchronizedClient(BLOCK_ENTITY_SYNC, (id, buf) -> {
-			RegistryKey<World> key = RegistryKey.of(Registry.DIMENSION, buf.readId().to());
-			BlockPos pos = new BlockPos(buf.readInt(), buf.readInt(), buf.readInt());
-			int syncId = buf.readInt();
+		ModPacketHandler.INSTANCE.registerSynchronizedClient(BLOCK_ENTITY_SYNC, (id, tag) -> {
+			RegistryKey<World> key = RegistryKey.of(Registry.DIMENSION, Serializer.ID.read(tag, "world").to());
+			BlockPos pos = FabricSerializers.BLOCK_POS.read(tag, "pos");
+			int syncId = tag.getInt("syncId");
 			ClientWorld world = MinecraftClient.getInstance().world;
 			if (world != null && world.getRegistryKey() == key) {
 				BlockEntity e = world.getBlockEntity(pos);
 				if (e != null) {
 					SyncedProperty<?> property = ((BlockEntityPropertyAccess) e).getProperty(syncId);
 					if (property != null) {
-						property.onSync(property.serializer.read(buf));
+						property.onSync(tag, "value");
 					}
 				}
 			}
@@ -39,7 +41,7 @@ public class BlockEntitySyncedProperty<T> extends SyncedProperty<T> {
 	public final BlockEntity entity;
 	public final int id;
 
-	public BlockEntitySyncedProperty(ToPacketSerializer<T> serializer, BlockEntity entity, int id) {
+	public BlockEntitySyncedProperty(Serializer<T> serializer, BlockEntity entity, int id) {
 		super(serializer);
 		this.entity = entity;
 		this.id = id;
@@ -49,17 +51,17 @@ public class BlockEntitySyncedProperty<T> extends SyncedProperty<T> {
 	protected void synchronize(T value) {
 		World world = this.entity.getWorld();
 		if (world != null && !world.isClient) {
+			NBTagView.Builder tag = NBTagView.builder();
+			Serializer.ID.save(tag, "world", Id.of(world.getRegistryKey().getValue()));
+			tag.putInt("syncId", this.id);
+			NBTagView.Builder sub = NBTagView.builder();
+			this.serializer.save(sub, "value", value);
 			ServerChunkManager manager = (ServerChunkManager) world.getChunkManager();
-			manager.threadedAnvilChunkStorage.getPlayersWatchingChunk(new ChunkPos(this.entity.getPos()), false)
-					.forEach(s -> ModPacketHandler.INSTANCE.sendToClient(s, BLOCK_ENTITY_SYNC, output -> {
-						output.writeId(Id.of(world.getRegistryKey().getValue()));
-						BlockPos pos = this.entity.getPos();
-						output.writeInt(pos.getX());
-						output.writeInt(pos.getY());
-						output.writeInt(pos.getZ());
-						output.writeInt(this.id);
-						this.serializer.write(output, value);
-					}));
+			manager.threadedAnvilChunkStorage.getPlayersWatchingChunk(new ChunkPos(this.entity.getPos()), false).forEach(s -> {
+				NBTagView.Builder builder = tag.build().toBuilder();
+				FabricSerializers.BLOCK_POS.save(tag, "pos", this.entity.getPos());
+				ModPacketHandler.INSTANCE.sendToClient(s, BLOCK_ENTITY_SYNC, builder);
+			});
 		}
 	}
 }

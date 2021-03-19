@@ -2,8 +2,7 @@ package io.github.astrarre.gui.v0.api.base.panel;
 
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
-import io.github.astrarre.networking.v0.api.io.Input;
-import io.github.astrarre.networking.v0.api.io.Output;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
 import io.github.astrarre.util.v0.api.Id;
@@ -17,49 +16,33 @@ import net.fabricmc.api.Environment;
 public class ACenteringPanel extends APanel {
 	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "centering_panel"), ACenteringPanel::new);
 
-	@Environment(EnvType.CLIENT)
-	protected Transformation original;
 	public final int width, height;
 
 	public ACenteringPanel(int width, int height) {
 		super(ENTRY);
 		this.width = width;
 		this.height = height;
-		this.setBoundsProtected(Polygon.rectangle(width, height));
+		this.setBounds(Polygon.rectangle(width, height));
 	}
 
 	@Environment(EnvType.CLIENT)
-	private ACenteringPanel(Input input) {
+	private ACenteringPanel(NBTagView input) {
 		super(ENTRY, input);
-		this.original = this.getTransformation();
-		this.width = input.readInt();
-		this.height = input.readInt();
+		this.width = input.getInt("width");
+		this.height = input.getInt("height");
 	}
 
 	@Override
 	protected void onAdded(RootContainer container) {
 		super.onAdded(container);
-		container.addResizeListener((width, height) -> this.setTransformationProtected(Transformation.translate(width/2f - this.width/2f, height/2f - this.height/2f, 0).combine(this.original)));
+		container.addResizeListener((width, height) -> this.setTransformation(Transformation.translate(width/2f - this.width/2f, height/2f - this.height/2f, 0)));
 	}
 
 	@Override
-	@Environment(EnvType.CLIENT)
-	public ACenteringPanel setTransformation(Transformation transformation) {
-		this.original = transformation;
-		super.setTransformationProtected(transformation);
-		return this;
-	}
-
-	@Override
-	public void write0(RootContainer container, Output output) {
+	public void write0(RootContainer container, NBTagView.Builder output) {
 		super.write0(container, output);
-		output.writeInt(this.width);
-		output.writeInt(this.height);
-	}
-
-	@Override
-	public void setBounds(Polygon polygon) {
-		throw new UnsupportedOperationException();
+		output.putInt("width", this.width);
+		output.putInt("height", this.height);
 	}
 
 	public static void init() {}

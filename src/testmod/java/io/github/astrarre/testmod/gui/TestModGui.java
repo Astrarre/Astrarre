@@ -6,20 +6,20 @@ import io.github.astrarre.gui.v0.api.base.panel.ACenteringPanel;
 import io.github.astrarre.gui.v0.api.base.panel.APanel;
 import io.github.astrarre.gui.v0.api.base.statik.ADarkenedBackground;
 import io.github.astrarre.gui.v0.api.base.widgets.ScrollBar;
-import io.github.astrarre.gui.v0.api.base.widgets.list.VerticalListWidget;
 import io.github.astrarre.gui.v0.fabric.adapter.slot.PlayerSlot;
 import io.github.astrarre.gui.v0.fabric.adapter.slot.Slot;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
 import io.github.astrarre.rendering.v0.api.Transformation;
 
 import net.minecraft.server.network.ServerPlayerEntity;
+
 public class TestModGui {
 
-	public static TestDrawable open(ServerPlayerEntity entity) {
-		return RootContainer.open((NetworkMember) entity, container -> open(entity, container));
+	public static void open(ServerPlayerEntity entity) {
+		RootContainer.open((NetworkMember) entity, container -> open(entity, container));
 	}
 
-	protected static TestDrawable open(ServerPlayerEntity entity, RootContainer container) {
+	protected static Void open(ServerPlayerEntity entity, RootContainer container) {
 		// the content panel is the panel of the entire screen. It's origin is at [0, 0] (the top left of the screen)
 		APanel contentPanel = container.getContentPanel();
 		// we want our gui to be in the middle of the screen, so

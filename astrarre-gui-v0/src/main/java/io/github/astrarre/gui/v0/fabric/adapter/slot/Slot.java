@@ -9,13 +9,9 @@ import io.github.astrarre.gui.v0.api.Drawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.access.Interactable;
-import io.github.astrarre.networking.v0.api.io.Input;
-import io.github.astrarre.networking.v0.api.io.Output;
-import io.github.astrarre.networking.v0.fabric.FabricData;
-import io.github.astrarre.rendering.internal.MatrixGraphics;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.rendering.v0.api.Transformation;
-import io.github.astrarre.rendering.v0.api.graphics.DelegateGraphics;
 import io.github.astrarre.rendering.v0.api.textures.Texture;
 import io.github.astrarre.rendering.v0.api.util.Close;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
@@ -48,26 +44,26 @@ public abstract class Slot extends Drawable implements Interactable {
 	}
 
 	@Environment(EnvType.CLIENT)
-	protected Slot(DrawableRegistry.Entry id, Input input) {
+	protected Slot(DrawableRegistry.Entry id, NBTagView input) {
 		super(id);
 		this.inventory = this.readInventoryData(input);
-		this.index = input.readInt();
-		this.overrideClient = input.readInt();
+		this.index = input.getInt("index");
+		this.overrideClient = input.getInt("overrideClient");
 		this.setBounds(SQUARE_16x16);
 	}
 
 	/**
 	 * write any data required to find the corresponding inventory on the other side (client)
 	 */
-	protected abstract void writeInventoryData(Output output, Inventory inventory);
+	protected abstract void writeInventoryData(NBTagView.Builder output, Inventory inventory);
 	@Environment(EnvType.CLIENT)
-	protected abstract Inventory readInventoryData(Input input);
+	protected abstract Inventory readInventoryData(NBTagView input);
 
 	@Override
-	protected void write0(RootContainer container, Output output) {
+	protected void write0(RootContainer container, NBTagView.Builder output) {
 		this.writeInventoryData(output, this.inventory);
-		output.writeInt(this.index);
-		output.writeInt(this.minecraftSlots.get(container).id);
+		output.putInt("index", this.index);
+		output.putInt("overrideClient", this.minecraftSlots.get(container).id);
 	}
 
 	@Override

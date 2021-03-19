@@ -1,7 +1,6 @@
 package io.github.astrarre.gui.internal.vanilla;
 
 import io.github.astrarre.gui.internal.AstrarreInitializer;
-import io.github.astrarre.networking.v0.api.io.Input;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.screen.ScreenHandler;

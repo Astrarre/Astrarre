@@ -1,8 +1,6 @@
 package io.github.astrarre.networking.v0.api.network;
 
-import java.util.function.Consumer;
-
-import io.github.astrarre.networking.v0.api.io.Output;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.util.v0.api.Id;
 
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -15,7 +13,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
  * todo in Astrarre make ServerPlayerEntity implement NetworkMember
  */
 public interface NetworkMember {
-	void send(Id id, Consumer<Output> output);
+	void send(Id id, NBTagView output);
 
 	default ServerPlayerEntity to() {
 		return (ServerPlayerEntity) this;

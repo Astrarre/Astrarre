@@ -1,10 +1,10 @@
 package io.github.astrarre.gui.v0.api.base.borders;
 
+import io.github.astrarre.gui.v0.api.DelegateDrawable;
 import io.github.astrarre.gui.v0.api.Drawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
-import io.github.astrarre.gui.v0.api.DelegateDrawable;
-import io.github.astrarre.networking.v0.api.io.Input;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.util.v0.api.Id;
 
@@ -21,7 +21,7 @@ public final class ASimpleBorder extends DelegateDrawable {
 	}
 
 	@Environment(EnvType.CLIENT)
-	protected ASimpleBorder(Input input) {
+	protected ASimpleBorder(NBTagView input) {
 		super(ENTRY, input);
 	}
 

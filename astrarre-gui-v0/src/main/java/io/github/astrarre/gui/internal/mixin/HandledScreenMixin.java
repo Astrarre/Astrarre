@@ -1,13 +1,13 @@
 package io.github.astrarre.gui.internal.mixin;
 
 
+import io.github.astrarre.gui.internal.PanelElement;
 import io.github.astrarre.gui.internal.RootContainerInternal;
 import io.github.astrarre.gui.internal.access.ExtraSlotAccess;
 import io.github.astrarre.gui.internal.access.ScreenRootAccess;
 import io.github.astrarre.gui.internal.containers.ScreenHandlerContainer;
-import io.github.astrarre.gui.internal.PanelElement;
 import io.github.astrarre.gui.v0.api.RootContainer;
-import io.github.astrarre.networking.v0.api.io.Input;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -22,6 +22,7 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 
@@ -112,7 +113,7 @@ public abstract class HandledScreenMixin extends ScreenMixin {
 	@Shadow @Nullable protected Slot focusedSlot;
 
 	@Override
-	public void readRoot(Input input) {
+	public void readRoot(PacketByteBuf buf) {
 		throw new UnsupportedOperationException();
 	}
 }

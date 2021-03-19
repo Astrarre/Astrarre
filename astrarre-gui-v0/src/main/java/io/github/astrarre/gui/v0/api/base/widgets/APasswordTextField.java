@@ -3,7 +3,7 @@ package io.github.astrarre.gui.v0.api.base.widgets;
 import com.google.common.hash.Hasher;
 import com.google.common.hash.Hashing;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
-import io.github.astrarre.networking.v0.api.io.Input;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.util.v0.api.Id;
 
 import net.fabricmc.api.EnvType;
@@ -20,7 +20,7 @@ public class APasswordTextField extends ATextFieldWidget {
 	}
 
 	@Environment(EnvType.CLIENT)
-	private APasswordTextField(Input input) {
+	private APasswordTextField(NBTagView input) {
 		super(ENTRY, input);
 	}
 
@@ -28,7 +28,7 @@ public class APasswordTextField extends ATextFieldWidget {
 		super(id, width, height);
 	}
 
-	protected APasswordTextField(DrawableRegistry.Entry id, Input input) {
+	protected APasswordTextField(DrawableRegistry.Entry id, NBTagView input) {
 		super(id, input);
 	}
 

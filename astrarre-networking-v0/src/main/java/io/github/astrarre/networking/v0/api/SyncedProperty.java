@@ -4,17 +4,18 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import io.github.astrarre.networking.v0.api.serializer.ToPacketSerializer;
+import io.github.astrarre.itemview.v0.api.Serializer;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 
 /**
  * a wrapper for a property that can be synced to the client or server
  */
 public abstract class SyncedProperty<T> {
 	protected final Map<Behavior, Consumer<T>> listeners = new EnumMap<>(Behavior.class);
-	public final ToPacketSerializer<T> serializer;
+	public final Serializer<T> serializer;
 	protected T value;
 
-	public SyncedProperty(ToPacketSerializer<T> serializer) {
+	public SyncedProperty(Serializer<T> serializer) {
 		this.serializer = serializer;
 	}
 
@@ -30,13 +31,13 @@ public abstract class SyncedProperty<T> {
 
 	protected abstract void synchronize(T value);
 
-	/**
-	 * @deprecated internal
-	 */
-	@Deprecated
 	public void onSync(Object value) {
 		this.value = (T) value;
 		this.listeners.getOrDefault(Behavior.FIRE_DEST, b -> {}).accept((T) value);
+	}
+
+	public void onSync(NBTagView tag, String key) {
+		this.onSync(this.serializer.read(tag, key));
 	}
 
 	public T get() {

@@ -8,7 +8,7 @@ public class TestModPreLaunchTesting implements PreLaunchEntrypoint {
 	@Override
 	public void onPreLaunch() {
 		NBTagView builder = NBTagView.builder()
-				.set("hello", 0)
+				.putInt("hello", 0)
 				.build();
 		System.out.println(builder);
 	}

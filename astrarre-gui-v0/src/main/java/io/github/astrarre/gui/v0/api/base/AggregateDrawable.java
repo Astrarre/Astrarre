@@ -10,10 +10,11 @@ import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.access.Container;
 import io.github.astrarre.gui.v0.api.access.Interactable;
-import io.github.astrarre.networking.v0.api.io.Input;
-import io.github.astrarre.networking.v0.api.io.Output;
+import io.github.astrarre.itemview.v0.api.nbt.NBTType;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.IntLists;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -38,14 +39,10 @@ public abstract class AggregateDrawable extends Drawable implements Interactable
 	}
 
 	@Environment (EnvType.CLIENT)
-	protected AggregateDrawable(DrawableRegistry.Entry id, Input input) {
+	protected AggregateDrawable(DrawableRegistry.Entry id, NBTagView input) {
 		super(id);
-		int drawables = input.readInt();
-		this.drawables = new ArrayList<>(drawables);
-		IntList list = this.pendingDrawables = new IntArrayList(drawables);
-		for (int i = 0; i < drawables; i++) {
-			list.add(input.readInt());
-		}
+		this.pendingDrawables = new IntArrayList(input.get("drawables", NBTType.INT_ARRAY, IntLists.EMPTY_LIST));
+		this.drawables = new ArrayList<>(this.pendingDrawables.size());
 	}
 
 	/**
@@ -59,7 +56,7 @@ public abstract class AggregateDrawable extends Drawable implements Interactable
 				root.addRoot(drawable);
 			}
 			if (this.onAdd(drawable)) {
-				this.sendToClients(ADD_DRAWABLE, output -> output.writeInt(drawable.getSyncId()));
+				this.sendToClients(ADD_DRAWABLE, NBTagView.builder().putInt("syncId", drawable.getSyncId()));
 			}
 		}
 	}
@@ -70,7 +67,7 @@ public abstract class AggregateDrawable extends Drawable implements Interactable
 	 */
 	public void remove(Drawable drawable) {
 		if(!this.isClient() && this.onRemove(drawable)) {
-			this.sendToClients(REMOVE_DRAWABLE, output -> output.writeInt(drawable.getSyncId()));
+			this.sendToClients(REMOVE_DRAWABLE, NBTagView.builder().putInt("syncId", drawable.getSyncId()));
 		}
 	}
 
@@ -105,7 +102,6 @@ public abstract class AggregateDrawable extends Drawable implements Interactable
 				root.addRoot(drawable);
 			}
 			if (this.onAdd(drawable)) {
-				this.drawables.add(0, drawable);
 				this.onDrawablesChange();
 			}
 		}
@@ -119,18 +115,23 @@ public abstract class AggregateDrawable extends Drawable implements Interactable
 	}
 
 	@Override
-	protected void write0(RootContainer container, Output output) {
-		output.writeInt(this.drawables.size());
+	protected void write0(RootContainer container, NBTagView.Builder output) {
+		IntList list = new IntArrayList();
 		for (Drawable drawable : this.drawables) {
-			output.writeInt(drawable.getSyncId());
+			list.add(drawable.getSyncId());
 		}
+
+		if(this.pendingDrawables != null) {
+			list.addAll(this.pendingDrawables);
+		}
+		output.put("drawables", NBTType.INT_ARRAY, list);
 	}
 
 	@Override
-	protected void receiveFromServer(RootContainer container, int channel, Input input) {
+	protected void receiveFromServer(RootContainer container, int channel, NBTagView input) {
 		super.receiveFromServer(container, channel, input);
 		if (channel == ADD_DRAWABLE) {
-			int id = input.readInt();
+			int id = input.getInt("syncId");
 			Drawable drawable = container.forId(id);
 			if (drawable != null && this.onSync(drawable)) {
 				this.drawables.add(0, drawable);
@@ -139,7 +140,7 @@ public abstract class AggregateDrawable extends Drawable implements Interactable
 				LOGGER.warn("No component found for id " + id);
 			}
 		} else if(channel == REMOVE_DRAWABLE) {
-			int id = input.readInt();
+			int id = input.getInt("syncId");
 			Drawable drawable = container.forId(id);
 			if (drawable != null && this.onSyncRemove(drawable)) {
 				this.drawables.remove(drawable);
