@@ -85,16 +85,12 @@ public interface Graphics2d {
 	 */
 	void drawSprite(SpriteInfo sprite);
 
-	/**
-	 * draws a cutout of the sprite at [0, 0] with width `width` and height `height`
-	 */
-	void drawSpriteCutout(SpriteInfo sprite, int offX, int offY, int width, int height);
 
 	/**
 	 * Crops the texture from (x1, y1) -> (x1 + width, y1 + height) and draws it along the xy plane
 	 * @param texture the texture to draw
 	 */
-	void drawTexture(Texture texture, int x1, int y1, int width, int height);
+	void drawTexture(Texture texture, float x1, float y1, float width, float height);
 
 	default void drawTexture(TexturePart part) {
 		this.drawTexture(part.texture, part.offX, part.offY, part.width, part.height);

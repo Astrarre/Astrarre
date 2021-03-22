@@ -72,7 +72,7 @@ public class DelegateGraphics implements Graphics3d {
 	}
 
 	@Override
-	public void drawTexture(Texture texture, int x1, int y1, int width, int height) {
+	public void drawTexture(Texture texture, float x1, float y1, float width, float height) {
 		this.delegate.drawTexture(texture, x1, y1, width, height);
 	}
 

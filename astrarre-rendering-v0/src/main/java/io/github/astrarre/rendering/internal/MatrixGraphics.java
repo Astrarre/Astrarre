@@ -13,7 +13,6 @@ import io.github.astrarre.rendering.v0.api.textures.Texture;
 import io.github.astrarre.rendering.v0.api.util.Close;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
 import io.github.astrarre.rendering.v0.edge.Stencil;
-import io.github.astrarre.util.v0.api.Validate;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.MinecraftClient;
@@ -38,12 +37,11 @@ import net.fabricmc.api.Environment;
 @Environment (EnvType.CLIENT)
 public class MatrixGraphics implements Graphics3d {
 	private static final Stencil STENCIL = Stencil.newInstance();
+	private final TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
 	public MatrixStack matrices;
 	private TextRenderer textRenderer;
 	private ItemRenderer itemRenderer;
-
 	private SetupTeardown stage;
-	private final TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
 
 	public MatrixGraphics(MatrixStack matrices) {
 		this.matrices = matrices;
@@ -120,21 +118,72 @@ public class MatrixGraphics implements Graphics3d {
 						sprite);
 	}
 
+
 	@Override
-	public void drawSpriteCutout(SpriteInfo sprite, int offX, int offY, int width, int height) {
+	public void drawTexture(Texture texture, float x1, float y1, float width, float height) {
 		this.pushStage(null);
-		Sprite spriteMc = (Sprite) sprite;
-		MatrixGraphicsUtil.drawTexturedQuad(this.matrices.peek().getModel(), 0, width, 0, height, 0,
-						spriteMc.getMinU() + offX, spriteMc.getMinU() + offX + width, spriteMc.getMinV() + offX, spriteMc.getMinV() + offX + height);
+		this.textureManager.bindTexture(texture.getIdentifier());
+		int textureWidth = texture.getWidth();
+		int textureHeight = texture.getHeight();
+		Matrix4f matrix = this.matrices.peek().getModel();
+		BufferBuilder buf = Tessellator.getInstance().getBuffer();
+		buf.begin(7, VertexFormats.POSITION_TEXTURE);
+		buf.vertex(matrix, 0f, height, 0f).texture((x1 + 0.00F) / textureWidth, (y1 + height) / textureHeight).next();
+		buf.vertex(matrix, width, height, 0f).texture((x1 + width) / textureWidth, (y1 + height) / textureHeight).next();
+		buf.vertex(matrix, width, 0f, 0.f).texture((x1 + width) / textureWidth, (y1 + 0.000F) / textureHeight).next();
+		buf.vertex(matrix, 0f, 0f, 0.f).texture((x1 + 0.00F) / textureWidth, (y1 + 0.000F) / textureHeight).next();
+		buf.end();
+		BufferRenderer.draw(buf);
 	}
 
 	@Override
-	public void drawTexture(Texture texture, int x1, int y1, int width, int height) {
-		Validate.positive(width, "Width cannot be negative!");
-		Validate.positive(height, "Height cannot be negative!");
+	public void fillGradient(float x, float y, float width, float height, int startColor, int endColor) {
+		this.pushStage(SetupTeardown.FILL);
+		float x2 = x + width, y2 = y + height;
+		MatrixGraphicsUtil.fillGradient(this.matrices, 0, 0, 0, 0, y2, 0, x2, y2, 0, x2, 0, 0, startColor, endColor);
+	}
+
+	@Override
+	public Close applyTransformation(Transformation transformation) {
+		this.matrices.push();
+		transformation.apply(this.matrices);
+		return () -> this.matrices.pop();
+	}
+
+	@Override
+	public void flush() {
 		this.pushStage(null);
-		this.textureManager.bindTexture(texture.getIdentifier());
-		DrawableHelper.drawTexture(this.matrices, 0, 0, x1, y1, width, height, texture.getWidth(), texture.getHeight());
+	}
+
+	@Override
+	public Stencil stencil() {
+		return STENCIL;
+	}
+
+	/**
+	 * this serves as a way to avoid setting up and tearing down the same logic over and over again. For example if you call fillGradient 4 times
+	 * in a
+	 * row, it wont enable and disable blend 4 times in a row
+	 */
+	private void pushStage(@Nullable SetupTeardown stage) {
+		while (this.stage != stage) {
+			if (this.stage == null) {
+				stage.setup();
+				this.stage = stage;
+				break;
+			}
+
+			this.stage.teardown();
+			this.stage = this.stage.extendsFrom;
+		}
+	}
+
+	public TextRenderer getTextRenderer() {
+		TextRenderer textRenderer = this.textRenderer;
+		if (textRenderer == null) {
+			textRenderer = this.textRenderer = MinecraftClient.getInstance().textRenderer;
+		}
+		return textRenderer;
 	}
 
 	@Override
@@ -163,31 +212,6 @@ public class MatrixGraphics implements Graphics3d {
 		RenderSystem.popMatrix();
 	}
 
-	public ItemRenderer getItemRenderer() {
-		ItemRenderer itemRenderer = this.itemRenderer;
-		if (itemRenderer == null) {
-			itemRenderer = this.itemRenderer = MinecraftClient.getInstance().getItemRenderer();
-		}
-		return itemRenderer;
-	}
-
-	@Override
-	public Close applyTransformation(Transformation transformation) {
-		this.matrices.push();
-		transformation.apply(this.matrices);
-		return () -> this.matrices.pop();
-	}
-
-	@Override
-	public void flush() {
-		this.pushStage(null);
-	}
-
-	@Override
-	public Stencil stencil() {
-		return STENCIL;
-	}
-
 	@Override
 	public void drawLine(float x1, float y1, float z1, float x2, float y2, float z2, int color) {
 		this.pushStage(SetupTeardown.FILL);
@@ -205,42 +229,28 @@ public class MatrixGraphics implements Graphics3d {
 	}
 
 	@Override
-	public void fillRect(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4, int color) {
+	public void fillRect(float x1,
+			float y1,
+			float z1,
+			float x2,
+			float y2,
+			float z2,
+			float x3,
+			float y3,
+			float z3,
+			float x4,
+			float y4,
+			float z4,
+			int color) {
 		this.pushStage(SetupTeardown.FILL);
 		MatrixGraphicsUtil.fill(this.matrices.peek().getModel(), x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4, color);
 	}
 
-	@Override
-	public void fillGradient(float x, float y, float width, float height, int startColor, int endColor) {
-		this.pushStage(SetupTeardown.FILL);
-		float x2 = x + width, y2 = y + height;
-		MatrixGraphicsUtil.fillGradient(this.matrices, 0, 0, 0, 0, y2, 0, x2, y2, 0, x2, 0, 0, startColor, endColor);
-	}
-
-	/**
-	 * this serves as a way to avoid setting up and tearing down the same logic over and over again. For example if you call fillGradient 4 times
-	 * in a
-	 * row, it wont enable and disable blend 4 times in a row
-	 */
-	private void pushStage(@Nullable SetupTeardown stage) {
-		while (this.stage != stage) {
-			if (this.stage == null) {
-				stage.setup();
-				this.stage = stage;
-				break;
-			}
-
-			this.stage.teardown();
-			this.stage = this.stage.extendsFrom;
+	public ItemRenderer getItemRenderer() {
+		ItemRenderer itemRenderer = this.itemRenderer;
+		if (itemRenderer == null) {
+			itemRenderer = this.itemRenderer = MinecraftClient.getInstance().getItemRenderer();
 		}
-	}
-
-
-	public TextRenderer getTextRenderer() {
-		TextRenderer textRenderer = this.textRenderer;
-		if (textRenderer == null) {
-			textRenderer = this.textRenderer = MinecraftClient.getInstance().textRenderer;
-		}
-		return textRenderer;
+		return itemRenderer;
 	}
 }
