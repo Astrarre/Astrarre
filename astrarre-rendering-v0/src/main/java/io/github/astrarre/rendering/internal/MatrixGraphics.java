@@ -121,6 +121,14 @@ public class MatrixGraphics implements Graphics3d {
 	}
 
 	@Override
+	public void drawSpriteCutout(SpriteInfo sprite, int offX, int offY, int width, int height) {
+		this.pushStage(null);
+		Sprite spriteMc = (Sprite) sprite;
+		MatrixGraphicsUtil.drawTexturedQuad(this.matrices.peek().getModel(), 0, width, 0, height, 0,
+						spriteMc.getMinU() + offX, spriteMc.getMinU() + offX + width, spriteMc.getMinV() + offX, spriteMc.getMinV() + offX + height);
+	}
+
+	@Override
 	public void drawTexture(Texture texture, int x1, int y1, int width, int height) {
 		Validate.positive(width, "Width cannot be negative!");
 		Validate.positive(height, "Height cannot be negative!");

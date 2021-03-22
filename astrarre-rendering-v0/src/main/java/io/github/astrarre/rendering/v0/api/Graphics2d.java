@@ -86,6 +86,11 @@ public interface Graphics2d {
 	void drawSprite(SpriteInfo sprite);
 
 	/**
+	 * draws a cutout of the sprite at [0, 0] with width `width` and height `height`
+	 */
+	void drawSpriteCutout(SpriteInfo sprite, int offX, int offY, int width, int height);
+
+	/**
 	 * Crops the texture from (x1, y1) -> (x1 + width, y1 + height) and draws it along the xy plane
 	 * @param texture the texture to draw
 	 */
