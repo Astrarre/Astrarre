@@ -30,10 +30,10 @@ public abstract class Slot extends Drawable implements Interactable {
 	private final Inventory inventory;
 	private final int index;
 	protected Map<RootContainer, MinecraftSlot> minecraftSlots = new WeakHashMap<>();
-	private boolean highlighted;
+	protected boolean highlighted;
 
 	@Environment(EnvType.CLIENT) private int overrideClient = -1;
-	@Environment (EnvType.CLIENT) private boolean render;
+	@Environment (EnvType.CLIENT) protected boolean render;
 	@Environment (EnvType.CLIENT) private ItemStack override;
 
 	protected Slot(DrawableRegistry.Entry id, Inventory inventory, int index) {

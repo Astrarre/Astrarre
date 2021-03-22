@@ -12,6 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 public interface FabricSerializers {
@@ -38,5 +39,9 @@ public interface FabricSerializers {
 						out.putTag(key, FabricViews.view(tag));
 					}
 				});
+	}
+
+	static <T> Serializer<T> of(Registry<T> registry) {
+		return Serializer.of((tag, s) -> registry.get(IDENTIFIER.read(tag, s)), (tag, s, t) -> IDENTIFIER.save(tag, s, registry.getId(t)));
 	}
 }

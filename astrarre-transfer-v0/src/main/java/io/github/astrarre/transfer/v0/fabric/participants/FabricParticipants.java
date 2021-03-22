@@ -10,6 +10,8 @@ import io.github.astrarre.access.v0.api.FunctionAccess;
 import io.github.astrarre.access.v0.api.func.AccessFunction;
 import io.github.astrarre.access.v0.fabric.WorldAccess;
 import io.github.astrarre.access.v0.fabric.func.WorldFunction;
+import io.github.astrarre.itemview.v0.api.Serializer;
+import io.github.astrarre.itemview.v0.fabric.FabricSerializers;
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import io.github.astrarre.transfer.internal.NUtil;
 import io.github.astrarre.transfer.internal.SlotParticipant;
@@ -37,12 +39,15 @@ import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 /**
  * get your inventories from {@link HopperBlockEntity#getInventoryAt(World, BlockPos)}
  */
 public final class FabricParticipants {
+	public static final Serializer<ObjectVolume<Fluid>> FLUID_OBJECT_VOLUME_SERIALIZER = ObjectVolume.serializer(Fluids.EMPTY, FabricSerializers.of(Registry.FLUID));
+	public static final Serializer<FixedObjectVolume<Fluid>> FLUID_FIXED_OBJECT_VOLUME_SERIALIZER = FixedObjectVolume.fixedSerializer(Fluids.EMPTY, FabricSerializers.of(Registry.FLUID));
 	public static final WorldAccess<Participant<ItemKey>> ITEM_WORLD = new WorldAccess<>(Participants.EMPTY.cast());
 	public static final WorldAccess<Participant<Fluid>> FLUID_WORLD = new WorldAccess<>(Participants.EMPTY.cast());
 

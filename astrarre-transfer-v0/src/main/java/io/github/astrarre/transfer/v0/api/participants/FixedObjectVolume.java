@@ -1,6 +1,10 @@
 package io.github.astrarre.transfer.v0.api.participants;
 
+import io.github.astrarre.itemview.v0.api.Serializer;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
+import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
+import io.github.astrarre.transfer.v0.fabric.participants.FabricParticipants;
 import io.github.astrarre.transfer.v0.fabric.participants.item.ItemSlotParticipant;
 
 /**
@@ -8,7 +12,25 @@ import io.github.astrarre.transfer.v0.fabric.participants.item.ItemSlotParticipa
  * @see ItemSlotParticipant
  */
 public class FixedObjectVolume<T> extends ObjectVolume<T> {
+	public static final Serializer<FixedObjectVolume<ItemKey>> ITEM_KEY_SERIALIZER = fixedSerializer(ItemKey.EMPTY, ItemKey.SERIALIZER);
 	protected int max;
+
+	/**
+	 * @see FabricParticipants#FLUID_FIXED_OBJECT_VOLUME_SERIALIZER
+	 */
+	public static <T> Serializer<FixedObjectVolume<T>> fixedSerializer(T empty, Serializer<T> typeSerializer) {
+		return Serializer.of((tag, s) -> {
+			NBTagView volume = tag.getTag(s);
+			int quantity = volume.getInt("quantity");
+			int max = volume.getInt("max");
+			T object = typeSerializer.read(volume, "object");
+			return new FixedObjectVolume<>(empty, object, quantity, max);
+		}, (tag, s, t) -> {
+			NBTagView.Builder volume = NBTagView.builder().putInt(s, t.quantity.get(Transaction.GLOBAL)).putInt(s, t.getMax(Transaction.GLOBAL));
+			typeSerializer.save(volume, "object", t.type.get(Transaction.GLOBAL));
+			tag.putTag(s, volume);
+		});
+	}
 
 	/**
 	 * @param empty the 'empty' version of the object (eg. Fluid#EMPTY)

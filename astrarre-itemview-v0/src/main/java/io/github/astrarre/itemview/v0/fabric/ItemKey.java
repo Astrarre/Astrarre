@@ -1,6 +1,7 @@
 package io.github.astrarre.itemview.v0.fabric;
 
 import io.github.astrarre.itemview.internal.TaggedItemImpl;
+import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 
 import net.minecraft.item.Item;
@@ -12,6 +13,32 @@ import net.minecraft.nbt.CompoundTag;
  * an Item and it's NBT data (guaranteed immutable)
  */
 public interface ItemKey {
+	Serializer<ItemKey> SERIALIZER = new Serializer<ItemKey>() {
+		@Override
+		public ItemKey read(NBTagView input, String key) {
+			return of(FabricSerializers.ITEM_STACK.read(input, key));
+		}
+
+		@Override
+		public void save(NBTagView.Builder output, String key, ItemKey instance) {
+			FabricSerializers.ITEM_STACK.save(output, key, instance.createItemStack(1));
+		}
+	};
+
+	static ItemKey of(ItemStack stack) {
+		if (stack.isEmpty()) {
+			return EMPTY;
+		} else if (stack.hasTag()) {
+			return new TaggedItemImpl(stack.getItem(), stack.getTag());
+		} else {
+			return of(stack.getItem());
+		}
+	}
+
+	static ItemKey of(Item item) {
+		return (ItemKey) item;
+	}
+
 	ItemKey EMPTY = new TaggedItemImpl(Items.AIR, NBTagView.EMPTY);
 
 	// todo cache ItemKey with versioning for mutable array tags
@@ -52,19 +79,5 @@ public interface ItemKey {
 		}
 
 		return new TaggedItemImpl(this.getItem(), n);
-	}
-
-	static ItemKey of(ItemStack stack) {
-		if (stack.isEmpty()) {
-			return EMPTY;
-		} else if (stack.hasTag()) {
-			return new TaggedItemImpl(stack.getItem(), stack.getTag());
-		} else {
-			return of(stack.getItem());
-		}
-	}
-
-	static ItemKey of(Item item) {
-		return (ItemKey) item;
 	}
 }

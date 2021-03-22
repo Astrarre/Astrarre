@@ -1,20 +1,45 @@
 package io.github.astrarre.transfer.v0.fabric.participants.item;
 
+import io.github.astrarre.itemview.v0.api.Serializer;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
+import io.github.astrarre.itemview.v0.fabric.FabricSerializers;
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import io.github.astrarre.transfer.v0.api.participants.FixedObjectVolume;
+import io.github.astrarre.transfer.v0.fabric.participants.FabricParticipants;
+
+import net.minecraft.item.ItemStack;
 
 /**
- * A FixedObjectVolume for TaggedItem (it uses the Item's max stack size).
+ * A FixedObjectVolume for ItemKey (it uses the Item's max stack size).
  * If initialized with a custom max size, it will take the min of the size of the stack and the passed size
  */
 public class ItemSlotParticipant extends FixedObjectVolume<ItemKey> {
+	public static final Serializer<ItemSlotParticipant> ITEM_KEY_SERIALIZER = Serializer.of((tag, s) -> {
+		NBTagView volume = tag.getTag(s);
+		int max = volume.getInt("max");
+		ItemStack object = FabricSerializers.ITEM_STACK.read(volume, "object");
+		return new ItemSlotParticipant(object, max);
+	}, (tag, s, t) -> {
+		NBTagView.Builder volume = NBTagView.builder().putInt(s, t.getMax(Transaction.GLOBAL));
+		FabricSerializers.ITEM_STACK.save(volume, "object", t.type.get(Transaction.GLOBAL).createItemStack(t.quantity.get(Transaction.GLOBAL)));
+		tag.putTag(s, volume);
+	});
+
 	public ItemSlotParticipant() {
 		this(64);
 	}
 
 	public ItemSlotParticipant(int max) {
 		this(ItemKey.EMPTY, 0, max);
+	}
+
+	public ItemSlotParticipant(ItemStack stack) {
+		this(ItemKey.of(stack), stack.getCount());
+	}
+
+	public ItemSlotParticipant(ItemStack stack, int max) {
+		this(ItemKey.of(stack), stack.getCount(), max);
 	}
 
 	public ItemSlotParticipant(ItemKey key, int quantity) {

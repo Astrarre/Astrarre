@@ -37,7 +37,7 @@ public class TransferInternalAstrarre implements ModInitializer {
 
 	private static Inventory getInvAt(World world, BlockPos pos) {
 		try {
-			return (Inventory) METHOD.invoke(world, pos);
+			return (Inventory) METHOD.invoke(world, pos.getX() + .5D, pos.getY() + .5D, pos.getZ() + .5D);
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw Validate.rethrow(e);
 		}

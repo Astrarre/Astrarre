@@ -1,17 +1,39 @@
 package io.github.astrarre.transfer.v0.api.participants;
 
+import io.github.astrarre.itemview.v0.api.Serializer;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
+import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import io.github.astrarre.transfer.v0.api.Insertable;
 import io.github.astrarre.transfer.v0.api.Participant;
 import io.github.astrarre.transfer.v0.api.transaction.Key;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import io.github.astrarre.transfer.v0.api.transaction.keys.ObjectKeyImpl;
 import io.github.astrarre.transfer.v0.api.transaction.keys.generated.IntKeyImpl;
+import io.github.astrarre.transfer.v0.fabric.participants.FabricParticipants;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * a volume with unlimited* (int_max) storage capacity
  */
 public class ObjectVolume<T> implements Participant<T> {
+	public static final Serializer<ObjectVolume<ItemKey>> ITEM_KEY_SERIALIZER = serializer(ItemKey.EMPTY, ItemKey.SERIALIZER);
+
+	/**
+	 * @see FabricParticipants#FLUID_OBJECT_VOLUME_SERIALIZER
+	 */
+	public static <T> Serializer<ObjectVolume<T>> serializer(T empty, Serializer<T> typeSerializer) {
+		return Serializer.of((tag, s) -> {
+			NBTagView volume = tag.getTag(s);
+			int quantity = volume.getInt("quantity");
+			T object = typeSerializer.read(volume, "object");
+			return new ObjectVolume<>(empty, object, quantity);
+		}, (tag, s, t) -> {
+			NBTagView.Builder volume = NBTagView.builder().putInt(s, t.quantity.get(Transaction.GLOBAL));
+			typeSerializer.save(volume, "object", t.type.get(Transaction.GLOBAL));
+			tag.putTag(s, volume);
+		});
+	}
+
 	protected final T empty;
 	protected final Key.Object<T> type;
 	protected final Key.Int quantity;
