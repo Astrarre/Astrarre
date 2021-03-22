@@ -102,4 +102,16 @@ public class MatrixGraphicsUtil {
 		bufferBuilder.vertex(matrix, x3, y3, z3).color(endR, endG, endB, endA).next();
 		bufferBuilder.vertex(matrix, x4, y4, z4).color(endR, endG, endB, endA).next();
 	}
+
+	public static void drawTexturedQuad(Matrix4f matrices, float x0, float x1, float y0, float y1, float z, float u0, float u1, float v0, float v1) {
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		bufferBuilder.begin(7, VertexFormats.POSITION_TEXTURE);
+		bufferBuilder.vertex(matrices, x0, y1, z).texture(u0, v1).next();
+		bufferBuilder.vertex(matrices, x1, y1, z).texture(u1, v1).next();
+		bufferBuilder.vertex(matrices, x1, y0, z).texture(u1, v0).next();
+		bufferBuilder.vertex(matrices, x0, y0, z).texture(u0, v0).next();
+		bufferBuilder.end();
+		RenderSystem.enableAlphaTest();
+		BufferRenderer.draw(bufferBuilder);
+	}
 }

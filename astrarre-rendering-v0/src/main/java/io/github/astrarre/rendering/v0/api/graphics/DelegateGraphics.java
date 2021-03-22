@@ -72,6 +72,11 @@ public class DelegateGraphics implements Graphics3d {
 	}
 
 	@Override
+	public void drawSpriteCutout(SpriteInfo sprite, float offX, float offY, float width, float height) {
+		this.delegate.drawSpriteCutout(sprite, offX, offY, width, height);
+	}
+
+	@Override
 	public void drawTexture(Texture texture, float x1, float y1, float width, float height) {
 		this.delegate.drawTexture(texture, x1, y1, width, height);
 	}

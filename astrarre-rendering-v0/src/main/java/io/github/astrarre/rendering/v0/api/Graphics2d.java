@@ -85,6 +85,7 @@ public interface Graphics2d {
 	 */
 	void drawSprite(SpriteInfo sprite);
 
+	void drawSpriteCutout(SpriteInfo sprite, float offX, float offY, float width, float height);
 
 	/**
 	 * Crops the texture from (x1, y1) -> (x1 + width, y1 + height) and draws it along the xy plane

@@ -113,11 +113,23 @@ public class MatrixGraphics implements Graphics3d {
 	public void drawSprite(SpriteInfo info) {
 		this.pushStage(null);
 		Sprite sprite = (Sprite) info;
+		this.textureManager.bindTexture(sprite.getAtlas().getId());
 		DrawableHelper
 				.drawSprite(this.matrices, 0, 0, 0, (int) (sprite.getMaxU() - sprite.getMinU()), (int) (sprite.getMaxV() - sprite.getMinV()),
 						sprite);
 	}
 
+	@Override
+	public void drawSpriteCutout(SpriteInfo info, float offX, float offY, float width, float height) {
+		this.pushStage(null);
+		Sprite sprite = (Sprite) info;
+		this.textureManager.bindTexture(sprite.getAtlas().getId());
+		float minX = sprite.getMinU() + offX, minY = sprite.getMinV() + offY;
+		MatrixGraphicsUtil.drawTexturedQuad(this.matrices.peek().getModel(),
+				0, width,
+				0, height,
+				0, minX, minX + width, minY, minY + height);
+	}
 
 	@Override
 	public void drawTexture(Texture texture, float x1, float y1, float width, float height) {
