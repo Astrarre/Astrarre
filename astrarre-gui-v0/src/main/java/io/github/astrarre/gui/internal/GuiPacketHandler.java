@@ -1,7 +1,7 @@
 package io.github.astrarre.gui.internal;
 
 import io.github.astrarre.gui.internal.access.ScreenRootAccess;
-import io.github.astrarre.gui.v0.api.Drawable;
+import io.github.astrarre.gui.v0.api.ADrawable;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.networking.v0.api.ModPacketHandler;
@@ -24,7 +24,7 @@ public class GuiPacketHandler {
 			RootContainer.Type type = RootContainer.TYPE_SERIALIZER.read(buf, "type");
 			RootContainerInternal internal = get(type);
 			if (internal != null) {
-				Drawable drawable = internal.getSerializer().read(buf, "drawable");
+				ADrawable drawable = internal.getSerializer().read(buf, "drawable");
 				internal.addSynced(drawable);
 				((DrawableInternal) drawable).onAdded(internal);
 			}
@@ -45,7 +45,7 @@ public class GuiPacketHandler {
 			RootContainer.Type type = RootContainer.TYPE_SERIALIZER.read(buf, "type");
 			RootContainerInternal internal = get(type);
 			if (internal != null) {
-				Drawable drawable = internal.forId(buf.getInt("syncId"));
+				ADrawable drawable = internal.forId(buf.getInt("syncId"));
 				if (drawable != null) {
 					((DrawableInternal) drawable).receiveFromServer(internal, channel, buf);
 				}
@@ -63,7 +63,7 @@ public class GuiPacketHandler {
 				ScreenHandler handler = ((ServerPlayerEntity) member).currentScreenHandler;
 				RootContainerInternal internal = ((ScreenRootAccess) handler).getRoot();
 				if (internal != null) {
-					Drawable drawable = internal.forId(syncId);
+					ADrawable drawable = internal.forId(syncId);
 					if (drawable != null) {
 						((DrawableInternal) drawable).receiveFromClient(internal, member, channel, buf);
 					}
@@ -109,7 +109,7 @@ public class GuiPacketHandler {
 				NBTagView.builder().putInt("channel", channel).putInt("syncId", id).putTag("payload", tag).putInt("type", root.getType().ordinal()));
 	}
 
-	public static void addDrawable(RootContainer container, NetworkMember member, Drawable drawable) {
+	public static void addDrawable(RootContainer container, NetworkMember member, ADrawable drawable) {
 		NBTagView.Builder builder = NBTagView.builder().putInt("type", container.getType().ordinal());
 		container.getSerializer().save(builder, "drawable", drawable);
 		member.send(ADD_DRAWABLE, builder);

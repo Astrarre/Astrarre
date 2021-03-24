@@ -3,8 +3,8 @@ package io.github.astrarre.gui.v0.api.base.widgets;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.github.astrarre.gui.v0.api.ADrawable;
 import io.github.astrarre.gui.v0.api.AstrarreIcons;
-import io.github.astrarre.gui.v0.api.Drawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.access.Interactable;
@@ -13,7 +13,7 @@ import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
-import io.github.astrarre.rendering.v0.api.textures.TexturePart;
+import io.github.astrarre.rendering.v0.api.textures.Sprite;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
 import io.github.astrarre.util.v0.api.Id;
 import org.jetbrains.annotations.Nullable;
@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-public class AButton extends Drawable implements Interactable {
+public class AButton extends ADrawable implements Interactable {
 	public static final Data MEDIUM = new Data(
 			AstrarreIcons.MEDIUM_BUTTON_ACTIVE,
 			AstrarreIcons.MEDIUM_BUTTON_HIGHLIGHTED,
@@ -48,18 +48,18 @@ public class AButton extends Drawable implements Interactable {
 		this.setBounds(Polygon.rectangle(this.width(), this.height()));
 	}
 
+	protected AButton(DrawableRegistry.Entry entry, NBTagView input) {
+		super(entry);
+		this.part = SERIALIZER.read(input, "part");
+		this.disabled = input.getBool("disabled");
+	}
+
 	public float width() {
 		return this.part.active.width;
 	}
 
 	public float height() {
 		return this.part.active.height;
-	}
-
-	protected AButton(DrawableRegistry.Entry entry, NBTagView input) {
-		super(entry);
-		this.part = SERIALIZER.read(input, "part");
-		this.disabled = input.getBool("disabled");
 	}
 
 	/**
@@ -120,7 +120,7 @@ public class AButton extends Drawable implements Interactable {
 			this.drawPressed(container, graphics, tickDelta);
 			graphics.fillRect(this.width(), this.height(), 0xaa000000);
 		} else {
-			graphics.drawTexture(this.part.disabled);
+			graphics.drawSprite(this.part.disabled);
 		}
 	}
 
@@ -129,7 +129,7 @@ public class AButton extends Drawable implements Interactable {
 			this.drawActive(container, graphics, tickDelta);
 			graphics.fillRect(this.width(), this.height(), 0xaa000000);
 		} else {
-			graphics.drawTexture(this.part.pressed);
+			graphics.drawSprite(this.part.pressed);
 		}
 	}
 
@@ -138,12 +138,12 @@ public class AButton extends Drawable implements Interactable {
 			this.drawActive(container, graphics, tickDelta);
 			graphics.fillRect(this.width(), this.height(), 0xaaffffff);
 		} else {
-			graphics.drawTexture(this.part.highlighted);
+			graphics.drawSprite(this.part.highlighted);
 		}
 	}
 
 	protected void drawActive(RootContainer container, Graphics3d graphics, float tickDelta) {
-		graphics.drawTexture(this.part.active);
+		graphics.drawSprite(this.part.active);
 	}
 
 	@Override
@@ -197,14 +197,14 @@ public class AButton extends Drawable implements Interactable {
 
 	public static final Serializer<Data> SERIALIZER = Serializer.of(Data::new);
 	public final static class Data implements Serializable {
-		public final TexturePart active;
-		@Nullable public final TexturePart highlighted, disabled, pressed;
+		public final Sprite.Sized active;
+		@Nullable public final Sprite.Sized highlighted, disabled, pressed;
 
 		public Data() {
 			this(null, null, null, null);
 		}
 
-		public Data(TexturePart active, @Nullable TexturePart highlighted, @Nullable TexturePart pressed, @Nullable TexturePart disabled) {
+		public Data(Sprite.Sized active, @Nullable Sprite.Sized highlighted, @Nullable Sprite.Sized pressed, @Nullable Sprite.Sized disabled) {
 			this.active = active;
 			this.highlighted = highlighted;
 			this.pressed = pressed;
@@ -214,31 +214,31 @@ public class AButton extends Drawable implements Interactable {
 		protected Data(NBTagView tag, String s) {
 			NBTagView tagView = tag.getTag(s);
 			if(tagView.get("highlighted") != null) {
-				this.highlighted = TexturePart.SERIALIZER.read(tagView, "highlighted");
+				this.highlighted = Sprite.SIZED_SER.read(tagView, "highlighted");
 			} else this.highlighted = null;
 			if(tagView.get("pressed") != null) {
-				this.pressed = TexturePart.SERIALIZER.read(tagView, "pressed");
+				this.pressed = Sprite.SIZED_SER.read(tagView, "pressed");
 			} else this.pressed = null;
 			if(tagView.get("disabled") != null) {
-				this.disabled = TexturePart.SERIALIZER.read(tagView, "disabled");
+				this.disabled = Sprite.SIZED_SER.read(tagView, "disabled");
 			} else this.disabled = null;
 
-			this.active = TexturePart.SERIALIZER.read(tagView, "active");
+			this.active = Sprite.SIZED_SER.read(tagView, "active");
 		}
 
-		public Data withActive(TexturePart part) {
+		public Data withActive(Sprite.Sized part) {
 			return new Data(part, this.highlighted, this.pressed, this.disabled);
 		}
 
-		public Data withHighlighted(@Nullable TexturePart part) {
+		public Data withHighlighted(@Nullable Sprite.Sized part) {
 			return new Data(this.active, part, this.pressed, this.disabled);
 		}
 
-		public Data withPressed(TexturePart part) {
+		public Data withPressed(Sprite.Sized part) {
 			return new Data(this.active, this.highlighted, part, this.disabled);
 		}
 
-		public Data withDisabled(TexturePart part) {
+		public Data withDisabled(Sprite.Sized part) {
 			return new Data(this.active, this.highlighted, this.pressed, part);
 		}
 
@@ -246,16 +246,16 @@ public class AButton extends Drawable implements Interactable {
 		public void save(NBTagView.Builder tag, String key) {
 			NBTagView.Builder builder = NBTagView.builder();
 			if(this.highlighted != null) {
-				TexturePart.SERIALIZER.save(builder, "highlighted", this.highlighted);
+				Sprite.SIZED_SER.save(builder, "highlighted", this.highlighted);
 			}
 			if(this.disabled != null) {
-				TexturePart.SERIALIZER.save(builder, "disabled", this.disabled);
+				Sprite.SIZED_SER.save(builder, "disabled", this.disabled);
 			}
 			if(this.pressed != null) {
-				TexturePart.SERIALIZER.save(builder, "pressed", this.pressed);
+				Sprite.SIZED_SER.save(builder, "pressed", this.pressed);
 			}
 
-			TexturePart.SERIALIZER.save(builder, "active", this.active);
+			Sprite.SIZED_SER.save(builder, "active", this.active);
 			tag.putTag(key, builder);
 		}
 	}

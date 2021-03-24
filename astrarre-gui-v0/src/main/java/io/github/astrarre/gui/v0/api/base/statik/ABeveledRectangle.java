@@ -1,6 +1,6 @@
 package io.github.astrarre.gui.v0.api.base.statik;
 
-import io.github.astrarre.gui.v0.api.Drawable;
+import io.github.astrarre.gui.v0.api.ADrawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
@@ -11,7 +11,7 @@ import io.github.astrarre.util.v0.api.Id;
 /**
  * the standard inventory background. If you want it to resize with the drawable
  */
-public final class ABeveledRectangle extends Drawable {
+public final class ABeveledRectangle extends ADrawable {
 	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "beveled_rectangle"),
 			ABeveledRectangle::new);
 
@@ -20,7 +20,7 @@ public final class ABeveledRectangle extends Drawable {
 	/**
 	 * captures the width and height of the panel
 	 */
-	public ABeveledRectangle(Drawable panel) {
+	public ABeveledRectangle(ADrawable panel) {
 		super(ENTRY);
 		Polygon enclosing = panel.getBounds().getEnclosing();
 		this.setBounds(enclosing);

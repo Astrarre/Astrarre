@@ -3,12 +3,9 @@ package io.github.astrarre.rendering.v0.api.graphics;
 import java.util.List;
 
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
-import io.github.astrarre.rendering.v0.api.Graphics2d;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.rendering.v0.api.Transformation;
-import io.github.astrarre.rendering.v0.api.textures.SpriteInfo;
-import io.github.astrarre.rendering.v0.api.textures.Texture;
-import io.github.astrarre.rendering.v0.api.textures.TexturePart;
+import io.github.astrarre.rendering.v0.api.textures.Sprite;
 import io.github.astrarre.rendering.v0.api.util.Close;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
 import io.github.astrarre.rendering.v0.edge.Stencil;
@@ -66,25 +63,6 @@ public class DelegateGraphics implements Graphics3d {
 		this.delegate.drawTooltip(stack);
 	}
 
-	@Override
-	public void drawSprite(SpriteInfo sprite) {
-		this.delegate.drawSprite(sprite);
-	}
-
-	@Override
-	public void drawSpriteCutout(SpriteInfo sprite, float offX, float offY, float width, float height) {
-		this.delegate.drawSpriteCutout(sprite, offX, offY, width, height);
-	}
-
-	@Override
-	public void drawTexture(Texture texture, float x1, float y1, float width, float height) {
-		this.delegate.drawTexture(texture, x1, y1, width, height);
-	}
-
-	@Override
-	public void drawTexture(TexturePart part) {
-		this.delegate.drawTexture(part);
-	}
 
 	@Override
 	public void fillRect(float x, float y, float width, float height, int color) {
@@ -166,5 +144,15 @@ public class DelegateGraphics implements Graphics3d {
 	@Override
 	public void fillPolygon(Polygon polygon, int color) {
 		this.delegate.fillPolygon(polygon, color);
+	}
+
+	@Override
+	public void drawSprite(Sprite sprite, float width, float height) {
+		this.delegate.drawSprite(sprite, width, height);
+	}
+
+	@Override
+	public void drawSprite(Sprite.Sized sized) {
+		this.delegate.drawSprite(sized.sprite, sized.width, sized.height);
 	}
 }

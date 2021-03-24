@@ -17,21 +17,21 @@ import net.minecraft.util.math.Matrix4f;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-public class DelegateDrawable extends Drawable implements Interactable, Container {
+public class ADelegateDrawable extends ADrawable implements Interactable, Container {
 	private final int id;
-	private Drawable delegate;
+	private ADrawable delegate;
 
 	/**
 	 * the delegate is automatically added to any RootContainers this delegate is added to
 	 */
-	protected DelegateDrawable(DrawableRegistry.Entry id, Drawable delegate) {
+	protected ADelegateDrawable(DrawableRegistry.Entry id, ADrawable delegate) {
 		super(id);
 		this.delegate = delegate;
 		this.id = delegate.getSyncId();
 	}
 
 	@Environment (EnvType.CLIENT)
-	protected DelegateDrawable(DrawableRegistry.Entry id, NBTagView input) {
+	protected ADelegateDrawable(DrawableRegistry.Entry id, NBTagView input) {
 		super(id);
 		this.id = input.getInt("syncId");
 	}
@@ -41,7 +41,7 @@ public class DelegateDrawable extends Drawable implements Interactable, Containe
 		this.getDelegate().render0(container, graphics, tickDelta);
 	}
 
-	protected Drawable getDelegate() {
+	protected ADrawable getDelegate() {
 		if (this.delegate == null) {
 			this.delegate = this.roots.get(0).forId(this.id);
 		}
@@ -89,7 +89,7 @@ public class DelegateDrawable extends Drawable implements Interactable, Containe
 	}
 
 	@Override
-	public Drawable setTransformation(Transformation transformation) {
+	public ADrawable setTransformation(Transformation transformation) {
 		if(this.delegate != null) {
 			this.delegate.setTransformation(transformation);
 		}
@@ -226,7 +226,7 @@ public class DelegateDrawable extends Drawable implements Interactable, Containe
 	}
 
 	@Override
-	public <T extends Drawable & Interactable> @Nullable T drawableAt(RootContainer container, double x, double y) {
+	public <T extends ADrawable & Interactable> @Nullable T drawableAt(RootContainer container, double x, double y) {
 		if (this.delegate instanceof Container) {
 			return ((Container) this.delegate).drawableAt(container, x, y);
 		} else if (this.delegate instanceof Interactable && ((Interactable) this.delegate).isHovering(container, x, y)) {
@@ -237,7 +237,7 @@ public class DelegateDrawable extends Drawable implements Interactable, Containe
 
 	@NotNull
 	@Override
-	public Iterator<Drawable> iterator() {
+	public Iterator<ADrawable> iterator() {
 		return Iterators.singletonIterator(this.delegate);
 	}
 }

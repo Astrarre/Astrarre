@@ -5,9 +5,10 @@ import io.github.astrarre.gui.v0.api.base.borders.ABeveledBorder;
 import io.github.astrarre.gui.v0.api.base.panel.ACenteringPanel;
 import io.github.astrarre.gui.v0.api.base.panel.APanel;
 import io.github.astrarre.gui.v0.api.base.statik.ADarkenedBackground;
+import io.github.astrarre.gui.v0.api.base.widgets.AButton;
 import io.github.astrarre.gui.v0.api.base.widgets.ScrollBar;
-import io.github.astrarre.gui.v0.fabric.adapter.slot.PlayerSlot;
-import io.github.astrarre.gui.v0.fabric.adapter.slot.Slot;
+import io.github.astrarre.gui.v0.fabric.adapter.slot.APlayerSlot;
+import io.github.astrarre.gui.v0.fabric.adapter.slot.ASlot;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
 import io.github.astrarre.rendering.v0.api.Transformation;
 
@@ -31,20 +32,21 @@ public class TestModGui {
 
 		for(int inventoryRow = 0; inventoryRow < 3; ++inventoryRow) {
 			for(int inventoryColumn = 0; inventoryColumn < 9; ++inventoryColumn) {
-				Slot slot = new PlayerSlot(entity.inventory, inventoryColumn + inventoryRow * 9 + 9);
+				ASlot slot = new APlayerSlot(entity.inventory, inventoryColumn + inventoryRow * 9 + 9);
 				slot.setTransformation(Transformation.translate(6 + inventoryColumn * 18, 82 + inventoryRow * 18, 0));
 				center.add(slot);
 			}
 		}
 
 		for(int hotbarIndex = 0; hotbarIndex < 9; ++hotbarIndex) {
-			Slot slot = new PlayerSlot(entity.inventory, hotbarIndex);
+			ASlot slot = new APlayerSlot(entity.inventory, hotbarIndex);
 			slot.setTransformation(Transformation.translate(6 + hotbarIndex * 18, 140, 0));
 			center.add(slot);
 		}
 
 		ScrollBar scrollBar = new ScrollBar(60, 10);
 		center.add(scrollBar);
+		center.add(new AButton(AButton.MEDIUM).setTransformation(Transformation.translate(20, 10, 0)));
 
 		//TestDrawable testDrawable = new TestDrawable();
 		//center.add(new SimpleBorder(testDrawable).setTransformation(Transformation.translate(10, 10, 0)));

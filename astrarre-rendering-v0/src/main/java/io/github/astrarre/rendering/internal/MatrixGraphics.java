@@ -8,8 +8,7 @@ import io.github.astrarre.rendering.internal.util.MatrixGraphicsUtil;
 import io.github.astrarre.rendering.internal.util.SetupTeardown;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.rendering.v0.api.Transformation;
-import io.github.astrarre.rendering.v0.api.textures.SpriteInfo;
-import io.github.astrarre.rendering.v0.api.textures.Texture;
+import io.github.astrarre.rendering.v0.api.textures.Sprite;
 import io.github.astrarre.rendering.v0.api.util.Close;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
 import io.github.astrarre.rendering.v0.edge.Stencil;
@@ -17,13 +16,11 @@ import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.item.ItemRenderer;
-import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
@@ -110,42 +107,25 @@ public class MatrixGraphics implements Graphics3d {
 	}
 
 	@Override
-	public void drawSprite(SpriteInfo info) {
+	public void drawSprite(Sprite sprite, float width, float height) {
 		this.pushStage(null);
-		Sprite sprite = (Sprite) info;
-		this.textureManager.bindTexture(sprite.getAtlas().getId());
-		DrawableHelper
-				.drawSprite(this.matrices, 0, 0, 0, (int) (sprite.getMaxU() - sprite.getMinU()), (int) (sprite.getMaxV() - sprite.getMinV()),
-						sprite);
+		this.textureManager.bindTexture(sprite.textureId().to());
+		MatrixGraphicsUtil.drawTexturedQuad(
+				this.matrices.peek().getModel(),
+				0,
+				width,
+				0,
+				height,
+				0,
+				sprite.offsetX(),
+				sprite.offsetX() + sprite.width(),
+				sprite.offsetY(),
+				sprite.offsetY() + sprite.height());
 	}
 
 	@Override
-	public void drawSpriteCutout(SpriteInfo info, float offX, float offY, float width, float height) {
-		this.pushStage(null);
-		Sprite sprite = (Sprite) info;
-		this.textureManager.bindTexture(sprite.getAtlas().getId());
-		float minX = sprite.getMinU() + offX, minY = sprite.getMinV() + offY;
-		MatrixGraphicsUtil.drawTexturedQuad(this.matrices.peek().getModel(),
-				0, width,
-				0, height,
-				0, minX, minX + width, minY, minY + height);
-	}
-
-	@Override
-	public void drawTexture(Texture texture, float x1, float y1, float width, float height) {
-		this.pushStage(null);
-		this.textureManager.bindTexture(texture.getIdentifier());
-		int textureWidth = texture.getWidth();
-		int textureHeight = texture.getHeight();
-		Matrix4f matrix = this.matrices.peek().getModel();
-		BufferBuilder buf = Tessellator.getInstance().getBuffer();
-		buf.begin(7, VertexFormats.POSITION_TEXTURE);
-		buf.vertex(matrix, 0f, height, 0f).texture((x1 + 0.00F) / textureWidth, (y1 + height) / textureHeight).next();
-		buf.vertex(matrix, width, height, 0f).texture((x1 + width) / textureWidth, (y1 + height) / textureHeight).next();
-		buf.vertex(matrix, width, 0f, 0.f).texture((x1 + width) / textureWidth, (y1 + 0.000F) / textureHeight).next();
-		buf.vertex(matrix, 0f, 0f, 0.f).texture((x1 + 0.00F) / textureWidth, (y1 + 0.000F) / textureHeight).next();
-		buf.end();
-		BufferRenderer.draw(buf);
+	public void drawSprite(Sprite.Sized sized) {
+		this.drawSprite(sized.sprite, sized.width, sized.height);
 	}
 
 	@Override
@@ -211,16 +191,14 @@ public class MatrixGraphics implements Graphics3d {
 
 	@Override
 	public void drawItem(ItemStack stack) {
-		//this.renderGuiItemModel(itemStack, x, y, this.getHeldItemModel(itemStack, (World)null, entity))
+		//this.renderGuiItemModel(itemStack, x, y, this.getHeldItemModel(itemStack, (World)null, entity)) 1.17 stuff
 		this.pushStage(null);
 		this.getItemRenderer().zOffset = 0;
 		RenderSystem.pushMatrix();
 		RenderSystem.multMatrix(this.matrices.peek().getModel());
-		RenderSystem.translatef(0, 0, -150);
+		RenderSystem.translatef(0, 0, -140);
 		this.getItemRenderer().renderInGui(stack, 1, 1);
-		RenderSystem.pushMatrix();
 		this.getItemRenderer().renderGuiItemOverlay(this.getTextRenderer(), stack, 1, 1);
-		RenderSystem.popMatrix();
 		RenderSystem.popMatrix();
 	}
 

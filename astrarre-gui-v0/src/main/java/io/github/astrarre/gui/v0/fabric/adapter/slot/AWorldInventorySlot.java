@@ -20,27 +20,27 @@ import net.fabricmc.api.Environment;
 /**
  * a slot who's inventory is retrieved from HopperBlockEntity#getInventoryAt
  */
-public class WorldInventorySlot extends Slot {
-	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "world_slot"), WorldInventorySlot::new);
+public class AWorldInventorySlot extends ASlot {
+	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "world_slot"), AWorldInventorySlot::new);
 	private World world;
 	private BlockPos pos;
-	protected WorldInventorySlot(World world, BlockPos pos, int index) {
+	protected AWorldInventorySlot(World world, BlockPos pos, int index) {
 		this(ENTRY, world, pos, index);
 	}
 
-	protected WorldInventorySlot(DrawableRegistry.Entry id, World world, BlockPos pos, int index) {
+	protected AWorldInventorySlot(DrawableRegistry.Entry id, World world, BlockPos pos, int index) {
 		super(id, HopperBlockEntity.getInventoryAt(world, pos), index);
 		this.world = world;
 		this.pos = pos;
 	}
 
 	@Environment(EnvType.CLIENT)
-	private WorldInventorySlot(NBTagView input) {
+	private AWorldInventorySlot(NBTagView input) {
 		this(ENTRY, input);
 	}
 
 	@Environment(EnvType.CLIENT)
-	protected WorldInventorySlot(DrawableRegistry.Entry id, NBTagView input) {
+	protected AWorldInventorySlot(DrawableRegistry.Entry id, NBTagView input) {
 		super(id, input);
 	}
 

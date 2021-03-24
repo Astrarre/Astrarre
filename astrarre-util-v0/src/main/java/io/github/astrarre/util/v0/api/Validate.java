@@ -1,16 +1,26 @@
 package io.github.astrarre.util.v0.api;
 
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import org.jetbrains.annotations.Nullable;
 
+import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.launch.common.FabricLauncherBase;
 
 public class Validate {
 	public static final FabricLoader LOADER = FabricLoader.getInstance();
 	public static final boolean IS_DEV = (FabricLauncherBase.getLauncher() == null || LOADER.isDevelopmentEnvironment()) && !Boolean.getBoolean("astrarre-disable-debug");
+	public static final boolean IS_CLIENT = FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
 	public static void void_(Object object) {}
+
+	public static <T> T ifClient(Supplier<T> supplier) {
+		if(IS_CLIENT) {
+			supplier.get();
+		}
+		return null;
+	}
 
 	/**
 	 * @throws T rethrows {@code throwable}

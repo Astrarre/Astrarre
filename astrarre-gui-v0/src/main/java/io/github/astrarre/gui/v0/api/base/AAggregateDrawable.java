@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.google.common.collect.Iterables;
-import io.github.astrarre.gui.v0.api.Drawable;
+import io.github.astrarre.gui.v0.api.ADrawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.access.Container;
@@ -25,21 +25,21 @@ import net.minecraft.client.util.math.Vector4f;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-public abstract class AggregateDrawable extends Drawable implements Interactable, Container {
+public abstract class AAggregateDrawable extends ADrawable implements Interactable, Container {
 	private static final Logger LOGGER = LogManager.getLogger("ListWidget");
 	private static final int ADD_DRAWABLE = 0, REMOVE_DRAWABLE = 1;
-	protected final List<Drawable> drawables;
+	protected final List<ADrawable> drawables;
 	protected IntList pendingDrawables;
 	protected int focusIndex;
 	protected Interactable focused, hovered;
 
-	protected AggregateDrawable(DrawableRegistry.Entry id) {
+	protected AAggregateDrawable(DrawableRegistry.Entry id) {
 		super(id);
 		this.drawables = new ArrayList<>();
 	}
 
 	@Environment (EnvType.CLIENT)
-	protected AggregateDrawable(DrawableRegistry.Entry id, NBTagView input) {
+	protected AAggregateDrawable(DrawableRegistry.Entry id, NBTagView input) {
 		super(id);
 		this.pendingDrawables = new IntArrayList(input.get("drawables", NBTType.INT_ARRAY, IntLists.EMPTY_LIST));
 		this.drawables = new ArrayList<>(this.pendingDrawables.size());
@@ -48,9 +48,9 @@ public abstract class AggregateDrawable extends Drawable implements Interactable
 	/**
 	 * If called on the client, the method is ignored. This method also automatically adds the drawable to each of this panel's roots
 	 *
-	 * @see #addClient(Drawable)
+	 * @see #addClient(ADrawable)
 	 */
-	public void add(Drawable drawable) {
+	public void add(ADrawable drawable) {
 		if (!this.isClient()) {
 			for (RootContainer root : this.roots) {
 				root.addRoot(drawable);
@@ -63,9 +63,9 @@ public abstract class AggregateDrawable extends Drawable implements Interactable
 
 	/**
 	 * If called on the client, the method is ignored. This method does <b>NOT</b> automatically remove the drawable from the panel's roots because the same drawable may be used in multiple places
-	 * @see #removeClient(Drawable)
+	 * @see #removeClient(ADrawable)
 	 */
-	public void remove(Drawable drawable) {
+	public void remove(ADrawable drawable) {
 		if(!this.isClient() && this.onRemove(drawable)) {
 			this.sendToClients(REMOVE_DRAWABLE, NBTagView.builder().putInt("syncId", drawable.getSyncId()));
 		}
@@ -73,30 +73,30 @@ public abstract class AggregateDrawable extends Drawable implements Interactable
 
 	protected void onDrawablesChange() {}
 
-	protected boolean onRemove(Drawable drawable) {
+	protected boolean onRemove(ADrawable drawable) {
 		this.drawables.remove(drawable);
 		this.onDrawablesChange();
 		return true;
 	}
 
-	protected boolean onAdd(Drawable drawable) {
+	protected boolean onAdd(ADrawable drawable) {
 		this.drawables.add(0, drawable);
 		this.onDrawablesChange();
 		return true;
 	}
 
-	protected boolean onSync(Drawable drawable) {
+	protected boolean onSync(ADrawable drawable) {
 		return true;
 	}
 
-	protected boolean onSyncRemove(Drawable drawable) {
+	protected boolean onSyncRemove(ADrawable drawable) {
 		return true;
 	}
 
 	/**
 	 * does not sync to the server, if the method is called on the server it is ignored
 	 */
-	public void addClient(Drawable drawable) {
+	public void addClient(ADrawable drawable) {
 		if (this.isClient()) {
 			for (RootContainer root : this.roots) {
 				root.addRoot(drawable);
@@ -107,7 +107,7 @@ public abstract class AggregateDrawable extends Drawable implements Interactable
 		}
 	}
 
-	public void removeClient(Drawable drawable) {
+	public void removeClient(ADrawable drawable) {
 		if(this.isClient() && this.onRemove(drawable)) {
 			this.drawables.remove(drawable);
 			this.onDrawablesChange();
@@ -117,7 +117,7 @@ public abstract class AggregateDrawable extends Drawable implements Interactable
 	@Override
 	protected void write0(RootContainer container, NBTagView.Builder output) {
 		IntList list = new IntArrayList();
-		for (Drawable drawable : this.drawables) {
+		for (ADrawable drawable : this.drawables) {
 			list.add(drawable.getSyncId());
 		}
 
@@ -132,7 +132,7 @@ public abstract class AggregateDrawable extends Drawable implements Interactable
 		super.receiveFromServer(container, channel, input);
 		if (channel == ADD_DRAWABLE) {
 			int id = input.getInt("syncId");
-			Drawable drawable = container.forId(id);
+			ADrawable drawable = container.forId(id);
 			if (drawable != null && this.onSync(drawable)) {
 				this.drawables.add(0, drawable);
 				this.onDrawablesChange();
@@ -141,7 +141,7 @@ public abstract class AggregateDrawable extends Drawable implements Interactable
 			}
 		} else if(channel == REMOVE_DRAWABLE) {
 			int id = input.getInt("syncId");
-			Drawable drawable = container.forId(id);
+			ADrawable drawable = container.forId(id);
 			if (drawable != null && this.onSyncRemove(drawable)) {
 				this.drawables.remove(drawable);
 				this.onDrawablesChange();
@@ -156,7 +156,7 @@ public abstract class AggregateDrawable extends Drawable implements Interactable
 		super.onAdded(container);
 		if (this.pendingDrawables != null) {
 			for (int i = this.pendingDrawables.size() - 1; i >= 0; i--) {
-				Drawable drawable = container.forId(this.pendingDrawables.getInt(i));
+				ADrawable drawable = container.forId(this.pendingDrawables.getInt(i));
 				if (drawable != null && this.onSync(drawable)) {
 					this.pendingDrawables.removeInt(i);
 					this.drawables.add(drawable);
@@ -173,7 +173,7 @@ public abstract class AggregateDrawable extends Drawable implements Interactable
 	public void mouseMoved(RootContainer container, double mouseX, double mouseY) {
 		Vector4f v3f = new Vector4f(0, 0, 0, 0);
 		for (Interactable interactable : this.interactables()) {
-			Drawable drawable = (Drawable) interactable;
+			ADrawable drawable = (ADrawable) interactable;
 			transformation(interactable, v3f, mouseX, mouseY);
 			if (drawable.getBounds().isInside(v3f.getX(), v3f.getY())) {
 				interactable.mouseMoved(container, v3f.getX(), v3f.getY());
@@ -192,7 +192,7 @@ public abstract class AggregateDrawable extends Drawable implements Interactable
 
 	private static void transformation(Interactable interactable, Vector4f vector4f, double x, double y) {
 		vector4f.set((float) x, (float) y, 1, 1);
-		vector4f.transform(((Drawable) interactable).getInvertedMatrix());
+		vector4f.transform(((ADrawable) interactable).getInvertedMatrix());
 	}
 
 	@Override
@@ -200,7 +200,7 @@ public abstract class AggregateDrawable extends Drawable implements Interactable
 	public boolean mouseClicked(RootContainer container, double mouseX, double mouseY, int button) {
 		Vector4f v3f = new Vector4f(0, 0, 0, 1);
 		for (Interactable interactable : this.interactables()) {
-			Drawable drawable = (Drawable) interactable;
+			ADrawable drawable = (ADrawable) interactable;
 			transformation(interactable, v3f, mouseX, mouseY);
 			if (drawable.getBounds().isInside(v3f.getX(), v3f.getY()) && interactable.mouseClicked(container, v3f.getX(), v3f.getY(), button)) {
 				return true;
@@ -214,7 +214,7 @@ public abstract class AggregateDrawable extends Drawable implements Interactable
 	public boolean mouseReleased(RootContainer container, double mouseX, double mouseY, int button) {
 		Vector4f v3f = new Vector4f(0, 0, 0, 1);
 		for (Interactable interactable : this.interactables()) {
-			Drawable drawable = (Drawable) interactable;
+			ADrawable drawable = (ADrawable) interactable;
 			transformation(interactable, v3f, mouseX, mouseY);
 			if (drawable.getBounds().isInside(v3f.getX(), v3f.getY()) && interactable.mouseReleased(container, v3f.getX(), v3f.getY(), button)) {
 				return true;
@@ -231,7 +231,7 @@ public abstract class AggregateDrawable extends Drawable implements Interactable
 			transformation(interactable, v3f, mouseX, mouseY);
 			float mX = v3f.getX(), mY = v3f.getY();
 			transformation(interactable, v3f, deltaX, deltaY);
-			if (((Drawable) interactable).getBounds().isInside(mX, mY) && interactable
+			if (((ADrawable) interactable).getBounds().isInside(mX, mY) && interactable
 					                                                              .mouseDragged(container, mX, mY, button, v3f.getX(), v3f.getY())) {
 				return true;
 			}
@@ -244,7 +244,7 @@ public abstract class AggregateDrawable extends Drawable implements Interactable
 	public boolean mouseScrolled(RootContainer container, double mouseX, double mouseY, double amount) {
 		Vector4f v3f = new Vector4f(0, 0, 0, 1);
 		for (Interactable interactable : this.interactables()) {
-			Drawable drawable = (Drawable) interactable;
+			ADrawable drawable = (ADrawable) interactable;
 			transformation(interactable, v3f, mouseX, mouseY);
 			if (drawable.getBounds().isInside(v3f.getX(), v3f.getY()) && interactable.mouseScrolled(container, v3f.getX(), v3f.getY(), amount)) {
 				return true;
@@ -287,14 +287,14 @@ public abstract class AggregateDrawable extends Drawable implements Interactable
 			return true;
 		}
 
-		List<Drawable> toDraw = this.drawables;
+		List<ADrawable> toDraw = this.drawables;
 		for (int i = 0; i < toDraw.size(); i++) {
 			int index = (i + this.focusIndex) % toDraw.size();
 			if (!forward) {
 				index = (toDraw.size() - 1) - index;
 			}
 
-			Drawable drawable = toDraw.get(i);
+			ADrawable drawable = toDraw.get(i);
 			if (drawable instanceof Interactable) {
 				Interactable interactable = (Interactable) drawable;
 				if (interactable.canFocus(container) || interactable.handleFocusCycle(container, forward)) {
@@ -311,7 +311,7 @@ public abstract class AggregateDrawable extends Drawable implements Interactable
 	public boolean isHovering(RootContainer container, double mouseX, double mouseY) {
 		Vector4f v3f = new Vector4f(0, 0, 0, 1);
 		for (Interactable interactable : this.interactables()) {
-			Drawable drawable = (Drawable) interactable;
+			ADrawable drawable = (ADrawable) interactable;
 			transformation(interactable, v3f, mouseX, mouseY);
 			if (drawable.getBounds().isInside(v3f.getX(), v3f.getY()) && interactable.isHovering(container, v3f.getX(), v3f.getY())) {
 				return true;
@@ -336,11 +336,11 @@ public abstract class AggregateDrawable extends Drawable implements Interactable
 	}
 
 	@Override
-	public <T extends Drawable & Interactable> T drawableAt(RootContainer container, double x, double y) {
+	public <T extends ADrawable & Interactable> T drawableAt(RootContainer container, double x, double y) {
 		Vector4f v3f = new Vector4f(0, 0, 0, 1);
 		for (Interactable interactable : this.interactables()) {
 			transformation(interactable, v3f, x, y);
-			if (((Drawable) interactable).getBounds().isInside(v3f.getX(), v3f.getY())) {
+			if (((ADrawable) interactable).getBounds().isInside(v3f.getX(), v3f.getY())) {
 				if (interactable instanceof Container) {
 					return ((Container) interactable).drawableAt(container, v3f.getX(), v3f.getY());
 				} else if (interactable.isHovering(container, v3f.getX(), v3f.getY())) {
@@ -353,7 +353,7 @@ public abstract class AggregateDrawable extends Drawable implements Interactable
 	}
 
 	/**
-	 * @see RootContainer#setFocus(Drawable)
+	 * @see RootContainer#setFocus(ADrawable)
 	 * @deprecated internal
 	 */
 	@Deprecated
@@ -377,7 +377,7 @@ public abstract class AggregateDrawable extends Drawable implements Interactable
 
 	@NotNull
 	@Override
-	public Iterator<Drawable> iterator() {
+	public Iterator<ADrawable> iterator() {
 		return this.drawables.iterator();
 	}
 }

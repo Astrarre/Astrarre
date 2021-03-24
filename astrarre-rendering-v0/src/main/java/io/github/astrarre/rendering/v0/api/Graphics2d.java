@@ -2,13 +2,10 @@ package io.github.astrarre.rendering.v0.api;
 
 import java.util.List;
 
-import io.github.astrarre.rendering.v0.api.textures.SpriteInfo;
-import io.github.astrarre.rendering.v0.api.textures.Texture;
-import io.github.astrarre.rendering.v0.api.textures.TexturePart;
+import io.github.astrarre.rendering.v0.api.textures.Sprite;
 import io.github.astrarre.rendering.v0.api.util.Close;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
 import io.github.astrarre.rendering.v0.edge.Stencil;
-import it.unimi.dsi.fastutil.ints.IntList;
 import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.client.MinecraftClient;
@@ -82,20 +79,11 @@ public interface Graphics2d {
 
 	/**
 	 * draws a sprite along the xy plane
+	 * @param width how big to draw the sprite
 	 */
-	void drawSprite(SpriteInfo sprite);
+	void drawSprite(Sprite sprite, float width, float height);
 
-	void drawSpriteCutout(SpriteInfo sprite, float offX, float offY, float width, float height);
-
-	/**
-	 * Crops the texture from (x1, y1) -> (x1 + width, y1 + height) and draws it along the xy plane
-	 * @param texture the texture to draw
-	 */
-	void drawTexture(Texture texture, float x1, float y1, float width, float height);
-
-	default void drawTexture(TexturePart part) {
-		this.drawTexture(part.texture, part.offX, part.offY, part.width, part.height);
-	}
+	void drawSprite(Sprite.Sized sized);
 
 	void drawLine(float x1, float y1, float x2, float y2, int color);
 

@@ -102,13 +102,13 @@ public interface RootContainer {
 	 *
 	 * @see APanel adding components will automatically register it
 	 */
-	void addRoot(Drawable drawable);
+	void addRoot(ADrawable drawable);
 
 	/**
 	 * This should only be called once all references that this container may have to the drawable have also been removed.
 	 * For example if the same drawable is in the content panel, and inside a list inside that content panel, both have to be removed before this should be called
 	 */
-	void removeRoot(Drawable drawable);
+	void removeRoot(ADrawable drawable);
 
 	/**
 	 * The result will be null if on the clientside
@@ -118,7 +118,7 @@ public interface RootContainer {
 	NetworkMember getViewer();
 
 	@Environment(EnvType.CLIENT)
-	<T extends Drawable & Interactable> void setFocus(T drawable);
+	<T extends ADrawable & Interactable> void setFocus(T drawable);
 
 	/**
 	 * @return true if the user is dragging their mouse (in hud/server this is always false)
@@ -129,8 +129,7 @@ public interface RootContainer {
 	 * @return the drawable for the given sync id (or null)
 	 * @throws IllegalStateException if called while the container is reading it's contents
 	 */
-	@Nullable
-	Drawable forId(int id);
+	@Nullable ADrawable forId(int id);
 
 	int getTick();
 
@@ -145,5 +144,5 @@ public interface RootContainer {
 	@Environment(EnvType.CLIENT)
 	void addResizeListener(OnResize resize);
 
-	Serializer<Drawable> getSerializer();
+	Serializer<ADrawable> getSerializer();
 }

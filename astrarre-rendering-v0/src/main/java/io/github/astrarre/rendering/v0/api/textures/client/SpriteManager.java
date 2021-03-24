@@ -1,4 +1,4 @@
-package io.github.astrarre.rendering.v0.api;
+package io.github.astrarre.rendering.v0.api.textures.client;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,33 +7,21 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import io.github.astrarre.rendering.internal.textures.AstrarreSpriteManager;
-import io.github.astrarre.rendering.v0.api.textures.SpriteInfo;
+import io.github.astrarre.rendering.internal.textures.SpriteAtlasManagerManager;
 import io.github.astrarre.util.v0.api.Id;
-import io.github.astrarre.util.v0.api.Validate;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.resource.ReloadableResourceManager;
 import net.minecraft.util.Identifier;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
+/**
+ * make your own sprite atlas
+ */
 @Environment (EnvType.CLIENT)
 public interface SpriteManager {
-	SpriteManager POTION_EFFECTS = Validate.instanceOf(MinecraftClient.getInstance().getStatusEffectSpriteManager(),
-			SpriteManager.class,
-			"SpriteManager was loaded too early!");
-	SpriteManager PAINTINGS = Validate.instanceOf(MinecraftClient.getInstance().getPaintingManager(),
-			SpriteManager.class,
-			"SpriteManager was loaded too early!");
-	SpriteManager BLOCKS = Validate.instanceOf(MinecraftClient.getInstance().getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE),
-			SpriteManager.class,
-			"SpriteManager was loaded too early!");
-	SpriteManager PARTICLES = Validate.instanceOf(MinecraftClient.getInstance().getSpriteAtlas(SpriteAtlasTexture.PARTICLE_ATLAS_TEXTURE),
-			SpriteManager.class,
-			"SpriteManager was loaded too early!");
-
 	static Builder create(String modid, String path) {
 		return new Builder(modid, path);
 	}
@@ -46,14 +34,17 @@ public interface SpriteManager {
 				new Identifier(modid, "textures/atlas/" + path + "s.png"),
 				path,
 				(Supplier) valid);
-		((ReloadableResourceManager) MinecraftClient.getInstance().getResourceManager()).registerListener(manager);
+		MinecraftClient client = MinecraftClient.getInstance();
+		((ReloadableResourceManager) client.getResourceManager()).registerListener(manager);
+		SpriteAtlasManagerManager.register(manager);
 		return (SpriteManager) manager;
 	}
 
-	void forEach(Consumer<SpriteInfo> consumer);
+	void forEach(Consumer<ManagedSprite> consumer);
 
-	SpriteInfo getSprite(Id sprite);
+	ManagedSprite getSprite(Id sprite);
 
+	@Environment (EnvType.CLIENT)
 	class Builder {
 		private final String modid;
 		private final String path;

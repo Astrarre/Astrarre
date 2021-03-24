@@ -1,7 +1,7 @@
 package io.github.astrarre.gui.v0.api.base.borders;
 
-import io.github.astrarre.gui.v0.api.DelegateDrawable;
-import io.github.astrarre.gui.v0.api.Drawable;
+import io.github.astrarre.gui.v0.api.ADelegateDrawable;
+import io.github.astrarre.gui.v0.api.ADrawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
@@ -14,9 +14,9 @@ import net.fabricmc.api.Environment;
 /**
  * makes a black line around the bounds of the delegate drawable
  */
-public final class ASimpleBorder extends DelegateDrawable {
+public final class ASimpleBorder extends ADelegateDrawable {
 	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "simple_border"), ASimpleBorder::new);
-	public ASimpleBorder(Drawable delegate) {
+	public ASimpleBorder(ADrawable delegate) {
 		super(ENTRY, delegate);
 	}
 

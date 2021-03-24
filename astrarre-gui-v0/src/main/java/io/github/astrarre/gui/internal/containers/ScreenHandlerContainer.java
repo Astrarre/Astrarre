@@ -9,9 +9,8 @@ import io.github.astrarre.gui.internal.access.ResizeListenerAccess;
 import io.github.astrarre.gui.internal.access.ScreenRootAccess;
 import io.github.astrarre.gui.internal.access.SlotAddAccess;
 import io.github.astrarre.gui.internal.mixin.ScreenHandlerAccess;
-import io.github.astrarre.gui.v0.api.Drawable;
+import io.github.astrarre.gui.v0.api.ADrawable;
 import io.github.astrarre.gui.v0.api.access.Interactable;
-import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
 import io.github.astrarre.util.v0.fabric.MinecraftServers;
 
@@ -82,7 +81,7 @@ public class ScreenHandlerContainer extends RootContainerInternal implements Slo
 	}
 
 	@Override
-	public <T extends Drawable & Interactable> void setFocus(T drawable) {
+	public <T extends ADrawable & Interactable> void setFocus(T drawable) {
 		super.setFocus(drawable);
 		((ScreenRootAccess) this.screen).astrarre_focusPanel();
 	}

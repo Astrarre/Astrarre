@@ -7,7 +7,7 @@ import java.util.function.Function;
 
 import io.github.astrarre.gui.internal.properties.ClientSyncedProperty;
 import io.github.astrarre.gui.internal.properties.DefaultProperty;
-import io.github.astrarre.gui.v0.api.Drawable;
+import io.github.astrarre.gui.v0.api.ADrawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.itemview.v0.api.Serializer;
@@ -18,7 +18,7 @@ import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
 import io.github.astrarre.util.v0.api.Id;
 
-public class DrawableSerializer implements Serializer<Drawable> {
+public class DrawableSerializer implements Serializer<ADrawable> {
 	protected final RootContainer container;
 
 	public DrawableSerializer(RootContainer container) {
@@ -26,15 +26,15 @@ public class DrawableSerializer implements Serializer<Drawable> {
 	}
 
 	@Override
-	public Drawable read(NBTagView input, String key) {
+	public ADrawable read(NBTagView input, String key) {
 		Id id = Serializer.ID.read(input, "registryId");
-		Function<NBTagView, Drawable> function = DrawableRegistry.forId(id);
+		Function<NBTagView, ADrawable> function = DrawableRegistry.forId(id);
 		if (function == null) {
 			throw new IllegalStateException("No serialized for id: " + id);
 		} else {
 			int syncId = input.getInt("syncId");
 			DrawableInternal.IS_CLIENT.set(true);
-			Drawable drawable = function.apply(input.getTag("serialized", NBTagView.EMPTY));
+			ADrawable drawable = function.apply(input.getTag("serialized", NBTagView.EMPTY));
 			DrawableInternal.IS_CLIENT.set(false);
 			((DrawableInternal) drawable).id = syncId;
 
@@ -52,7 +52,7 @@ public class DrawableSerializer implements Serializer<Drawable> {
 	}
 
 	@Override
-	public void save(NBTagView.Builder output, String key, Drawable instance) {
+	public void save(NBTagView.Builder output, String key, ADrawable instance) {
 		if (instance.registryId == null) {
 			throw new IllegalStateException("Tried to serialize client-only component!");
 		}

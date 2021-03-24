@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-import io.github.astrarre.gui.v0.api.Drawable;
+import io.github.astrarre.gui.v0.api.ADrawable;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.access.Interactable;
 import io.github.astrarre.gui.v0.api.access.Tickable;
@@ -25,11 +25,11 @@ public abstract class RootContainerInternal implements RootContainer {
 	static final AtomicInteger ID = new AtomicInteger(), CLIENT_ID = new AtomicInteger(Integer.MIN_VALUE);
 	protected final List<Tickable> tickables = new ArrayList<>();
 	protected final APanel panel;
-	private final Object2IntOpenHashMap<Drawable> componentRegistry = new Object2IntOpenHashMap<>();
-	private final Int2ObjectOpenHashMap<Drawable> reversedRegistry = new Int2ObjectOpenHashMap<>();
+	private final Object2IntOpenHashMap<ADrawable> componentRegistry = new Object2IntOpenHashMap<>();
+	private final Int2ObjectOpenHashMap<ADrawable> reversedRegistry = new Int2ObjectOpenHashMap<>();
 	int tick;
 	private boolean reading;
-	private final Serializer<Drawable> serializer = new DrawableSerializer(this);
+	private final Serializer<ADrawable> serializer = new DrawableSerializer(this);
 
 	protected RootContainerInternal() {
 		this.addRoot(this.panel = new APanel());
@@ -44,13 +44,13 @@ public abstract class RootContainerInternal implements RootContainer {
 		toRun.accept(this);
 		int size = input.readInt();
 		for (int i = 0; i < size; i++) {
-			Drawable drawable = this.getSerializer().read(FabricViews.view(input.readCompoundTag()), "drawable");
+			ADrawable drawable = this.getSerializer().read(FabricViews.view(input.readCompoundTag()), "drawable");
 			this.addSynced(drawable);
 		}
 		int panelId = input.readInt();
 		this.reading = false;
 		this.panel = (APanel) this.forId(panelId);
-		for (Drawable value : this.reversedRegistry.values()) {
+		for (ADrawable value : this.reversedRegistry.values()) {
 			((DrawableInternal) value).onAdded(this);
 		}
 	}
@@ -61,7 +61,7 @@ public abstract class RootContainerInternal implements RootContainer {
 	@Deprecated
 	public void write(PacketByteBuf output) {
 		output.writeInt(this.componentRegistry.size());
-		for (Drawable drawable : this.componentRegistry.keySet()) {
+		for (ADrawable drawable : this.componentRegistry.keySet()) {
 			NBTagView.Builder builder = NBTagView.builder();
 			this.getSerializer().save(builder, "drawable", drawable);
 			output.writeCompoundTag(builder.toTag());
@@ -69,7 +69,7 @@ public abstract class RootContainerInternal implements RootContainer {
 		output.writeInt(this.panel.getSyncId());
 	}
 
-	void addSynced(Drawable drawable) {
+	void addSynced(ADrawable drawable) {
 		if (drawable instanceof Tickable) {
 			this.tickables.add((Tickable) drawable);
 		}
@@ -86,7 +86,7 @@ public abstract class RootContainerInternal implements RootContainer {
 	}
 
 	@Override
-	public void addRoot(Drawable drawable) {
+	public void addRoot(ADrawable drawable) {
 		if (!drawable.roots.isEmpty()) {
 			if (drawable.isClient() != this.isClient()) {
 				if (drawable.isClient()) {
@@ -128,7 +128,7 @@ public abstract class RootContainerInternal implements RootContainer {
 	}
 
 	@Override
-	public void removeRoot(Drawable drawable) {
+	public void removeRoot(ADrawable drawable) {
 		if(drawable == null) return;
 
 		int id = drawable.getSyncId();
@@ -148,13 +148,13 @@ public abstract class RootContainerInternal implements RootContainer {
 	}
 
 	@Override
-	public <T extends Drawable & Interactable> void setFocus(T drawable) {
+	public <T extends ADrawable & Interactable> void setFocus(T drawable) {
 		this.panel.setFocused(this, drawable, -1);
 	}
 
 	@Override
 	@Nullable
-	public Drawable forId(int id) {
+	public ADrawable forId(int id) {
 		if (this.reading) {
 			throw new IllegalStateException(
 					"cannot check root container for id while it is being read (store the ids inside some internal buffer and query when you need " + "to)");
@@ -168,9 +168,9 @@ public abstract class RootContainerInternal implements RootContainer {
 	}
 
 	public void onClose() {
-		ObjectIterator<Drawable> iterator = this.componentRegistry.keySet().iterator();
+		ObjectIterator<ADrawable> iterator = this.componentRegistry.keySet().iterator();
 		while (iterator.hasNext()) {
-			Drawable drawable = iterator.next();
+			ADrawable drawable = iterator.next();
 			drawable.remove(this);
 			((DrawableInternal) drawable).rootsInternal.remove(this);
 			iterator.remove();
@@ -182,7 +182,7 @@ public abstract class RootContainerInternal implements RootContainer {
 	}
 
 	@Override
-	public Serializer<Drawable> getSerializer() {
+	public Serializer<ADrawable> getSerializer() {
 		return this.serializer;
 	}
 }

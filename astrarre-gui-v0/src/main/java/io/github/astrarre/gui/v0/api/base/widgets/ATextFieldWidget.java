@@ -4,7 +4,7 @@ import java.nio.charset.StandardCharsets;
 
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
-import io.github.astrarre.gui.v0.fabric.adapter.AbstractButtonAdapter;
+import io.github.astrarre.gui.v0.fabric.adapter.AAbstractButtonAdapter;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
@@ -12,11 +12,12 @@ import io.github.astrarre.util.v0.api.Id;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-public class ATextFieldWidget extends AbstractButtonAdapter<net.minecraft.client.gui.widget.TextFieldWidget> {
+public class ATextFieldWidget extends AAbstractButtonAdapter<TextFieldWidget> {
 	public static final int UPDATE_TEXT = 1;
 	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "text_field"), ATextFieldWidget::new);
 	// only exists on the server

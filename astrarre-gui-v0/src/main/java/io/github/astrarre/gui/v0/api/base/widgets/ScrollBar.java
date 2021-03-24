@@ -1,21 +1,21 @@
 package io.github.astrarre.gui.v0.api.base.widgets;
 
-import io.github.astrarre.gui.v0.api.Drawable;
+import io.github.astrarre.gui.v0.api.ADrawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.access.Tickable;
-import io.github.astrarre.gui.v0.api.base.AggregateDrawable;
+import io.github.astrarre.gui.v0.api.base.AAggregateDrawable;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
 import io.github.astrarre.util.v0.api.Id;
 
-public class ScrollBar extends AggregateDrawable implements Tickable {
+public class ScrollBar extends AAggregateDrawable implements Tickable {
 	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.registerForward(Id.create("astrarre-gui-v0", "scroll_bar"), ScrollBar::new);
 	public final float width, height;
 	protected AButton scrollBar, up, down;
-	public float fraction = 2, scrollPercent;
+	protected float fraction = 2, scrollPercent;
 
 	/**
 	 * @param height the literal height of the component
@@ -70,7 +70,7 @@ public class ScrollBar extends AggregateDrawable implements Tickable {
 
 	@Override
 	protected void render0(RootContainer container, Graphics3d graphics, float tickDelta) {
-		for (Drawable drawable : this.drawables) {
+		for (ADrawable drawable : this.drawables) {
 			drawable.render(container, graphics, tickDelta);
 		}
 	}
@@ -147,4 +147,23 @@ public class ScrollBar extends AggregateDrawable implements Tickable {
 	}
 
 	public static void init() {}
+
+	public float getScrollPercent() {
+		return this.scrollPercent;
+	}
+
+	public ScrollBar setScrollPercent(float scrollPercent) {
+		this.scrollPercent = scrollPercent;
+		return this;
+	}
+
+	public float getFraction() {
+		return this.fraction;
+	}
+
+	public ScrollBar setFraction(float fraction) {
+		this.fraction = fraction;
+		this.scrollBar.setBounds(Polygon.rectangle(this.scrollBar.width(), this.scrollBar.height()));
+		return this;
+	}
 }

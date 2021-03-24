@@ -7,19 +7,19 @@ import io.github.astrarre.rendering.v0.api.util.Polygon;
 
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 
-public abstract class AbstractButtonAdapter<T extends AbstractButtonWidget> extends ElementAdapter<T> {
+public abstract class AAbstractButtonAdapter<T extends AbstractButtonWidget> extends AElementAdapter<T> {
 	public static final int LOCK = 0;
 	protected boolean enabled = true;
 	private final int width, height;
 
-	public AbstractButtonAdapter(DrawableRegistry.Entry id, int width, int height) {
+	public AAbstractButtonAdapter(DrawableRegistry.Entry id, int width, int height) {
 		super(id);
 		this.width = width;
 		this.height = height;
 		this.setBounds(Polygon.rectangle(width, height));
 	}
 
-	protected AbstractButtonAdapter(DrawableRegistry.Entry id, NBTagView input) {
+	protected AAbstractButtonAdapter(DrawableRegistry.Entry id, NBTagView input) {
 		this(id, input.getInt("width"), input.getInt("height"));
 		this.enabled = input.getBool("enabled");
 	}

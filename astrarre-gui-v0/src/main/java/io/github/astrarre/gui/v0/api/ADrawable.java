@@ -1,13 +1,11 @@
 package io.github.astrarre.gui.v0.api;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
 import io.github.astrarre.gui.internal.DrawableInternal;
-import io.github.astrarre.gui.internal.DrawableSerializer;
 import io.github.astrarre.gui.internal.GuiPacketHandler;
 import io.github.astrarre.gui.internal.properties.ClientSyncedProperty;
 import io.github.astrarre.gui.internal.properties.DefaultProperty;
@@ -15,7 +13,6 @@ import io.github.astrarre.gui.internal.properties.ServerSyncedProperty;
 import io.github.astrarre.gui.v0.api.event.DrawableChange;
 import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
-import io.github.astrarre.networking.v0.api.ModPacketHandler;
 import io.github.astrarre.networking.v0.api.SyncedProperty;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
@@ -28,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.util.math.Matrix4f;
 
-public abstract class Drawable extends DrawableInternal {
+public abstract class ADrawable extends DrawableInternal {
 	public static final int BOUNDS_CHANGE = -1;
 	public static final int TRANSFORM_CHANGE = -2;
 	public static final int PROPERTY_SYNC = -3;
@@ -45,7 +42,7 @@ public abstract class Drawable extends DrawableInternal {
 	Matrix4f invertedMatrix;
 	Polygon bounds = Polygon.EMPTY;
 
-	public Drawable(DrawableRegistry.@Nullable Entry id) {
+	public ADrawable(DrawableRegistry.@Nullable Entry id) {
 		this.registryId = id;
 	}
 
@@ -156,10 +153,10 @@ public abstract class Drawable extends DrawableInternal {
 		SyncedProperty<T> property;
 		if (this.isClient()) {
 			property = new ServerSyncedProperty<>(serializer, this, this.properties.size());
-			property.setRaw(defaultValue);
 		} else {
 			property = new DefaultProperty<>(serializer);
 		}
+		property.setRaw(defaultValue);
 
 		this.properties.add(property);
 		return property;
@@ -174,10 +171,10 @@ public abstract class Drawable extends DrawableInternal {
 		SyncedProperty<T> property;
 		if (!this.isClient()) {
 			property = new ClientSyncedProperty<>(serializer, this, this.properties.size());
-			property.setRaw(defaultValue);
 		} else {
 			property = new DefaultProperty<>(serializer);
 		}
+		property.setRaw(defaultValue);
 
 		this.properties.add(property);
 		return property;
@@ -232,7 +229,7 @@ public abstract class Drawable extends DrawableInternal {
 		return this.transformation;
 	}
 
-	public Drawable setTransformation(Transformation transformation) {
+	public ADrawable setTransformation(Transformation transformation) {
 		Transformation old = this.transformation;
 		this.transformation = transformation;
 		this.invertedMatrix = null;

@@ -1,14 +1,13 @@
 package io.github.astrarre.gui.v0.fabric.adapter;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import io.github.astrarre.gui.v0.api.Drawable;
+import io.github.astrarre.gui.v0.api.ADrawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.access.Interactable;
 import io.github.astrarre.rendering.internal.MatrixGraphics;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.rendering.v0.api.graphics.DelegateGraphics;
-import io.github.astrarre.rendering.v0.api.util.Polygon;
 
 import net.minecraft.client.gui.screen.TickableElement;
 import net.minecraft.client.util.math.MatrixStack;
@@ -16,7 +15,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-public abstract class DrawableAdapter<T extends net.minecraft.client.gui.Drawable> extends Drawable implements Interactable {
+public abstract class ADrawableAdapter<T extends net.minecraft.client.gui.Drawable> extends ADrawable implements Interactable {
 	@Environment (EnvType.CLIENT) protected T drawable;
 
 	private int mx = 1_000_000, my = 1_000_000;
@@ -25,7 +24,7 @@ public abstract class DrawableAdapter<T extends net.minecraft.client.gui.Drawabl
 	/**
 	 * the drawable must be centered at 0, 0
 	 */
-	public DrawableAdapter(DrawableRegistry.Entry id) {
+	public ADrawableAdapter(DrawableRegistry.Entry id) {
 		super(id);
 	}
 

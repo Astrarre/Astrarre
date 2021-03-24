@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import io.github.astrarre.gui.v0.api.ADrawable;
 import io.github.astrarre.gui.v0.api.AstrarreIcons;
-import io.github.astrarre.gui.v0.api.Drawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.access.Interactable;
@@ -21,7 +21,7 @@ import net.minecraft.text.Text;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-public class AInfo extends Drawable implements Interactable {
+public class AInfo extends ADrawable implements Interactable {
 	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.registerForward(Id.create("astrarre-gui-v0", "info_widget"), AInfo::new);
 	public final SyncedProperty<Boolean> isEnabled = this.createClientSyncedProperty(Serializer.BOOLEAN, true);
 	public final List<Text> tooltip;
@@ -50,13 +50,13 @@ public class AInfo extends Drawable implements Interactable {
 	@Override
 	protected void render0(RootContainer container, Graphics3d graphics, float tickDelta) {
 		if(this.isEnabled.get()) {
-			graphics.drawTexture(AstrarreIcons.INFO);
+			graphics.drawSprite(AstrarreIcons.INFO);
 			if(this.isHover) {
 				graphics.drawTooltip(this.tooltip);
 				graphics.fillGradient(7, 7, 0x80ffffff, 0x80ffffff);
 			}
 		} else {
-			graphics.drawTexture(AstrarreIcons.INFO_DARK);
+			graphics.drawSprite(AstrarreIcons.INFO_DARK);
 		}
 	}
 

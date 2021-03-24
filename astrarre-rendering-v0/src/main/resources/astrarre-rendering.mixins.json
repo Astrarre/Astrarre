@@ -11,5 +11,11 @@
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "mixins": [
+    "BakedModelManagerAccess",
+    "SpriteAtlasHolderAccess",
+    "SpriteAtlasManagerAccess",
+    "SpriteAtlasManagerMixin"
+  ]
 }

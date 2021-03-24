@@ -6,8 +6,8 @@ import io.github.astrarre.gui.v0.api.RootContainer;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
 
-public abstract class ElementAdapter<T extends Drawable & Element> extends DrawableAdapter<T> {
-	public ElementAdapter(DrawableRegistry.Entry id) {
+public abstract class AElementAdapter<T extends Drawable & Element> extends ADrawableAdapter<T> {
+	public AElementAdapter(DrawableRegistry.Entry id) {
 		super(id);
 	}
 

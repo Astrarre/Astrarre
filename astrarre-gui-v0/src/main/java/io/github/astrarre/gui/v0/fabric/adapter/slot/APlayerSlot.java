@@ -13,19 +13,19 @@ import net.minecraft.inventory.Inventory;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-public final class PlayerSlot extends Slot {
-	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "player_slot"), PlayerSlot::new);
+public final class APlayerSlot extends ASlot {
+	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "player_slot"), APlayerSlot::new);
 
 	@Environment(EnvType.CLIENT)
-	private PlayerSlot(NBTagView input) {
+	private APlayerSlot(NBTagView input) {
 		super(ENTRY, input);
 	}
 
-	public PlayerSlot(PlayerInventory inventory, int index) {
+	public APlayerSlot(PlayerInventory inventory, int index) {
 		super(ENTRY, inventory, index);
 	}
 
-	public PlayerSlot(NetworkMember member, int index) {
+	public APlayerSlot(NetworkMember member, int index) {
 		super(ENTRY, member.to().inventory, index);
 	}
 

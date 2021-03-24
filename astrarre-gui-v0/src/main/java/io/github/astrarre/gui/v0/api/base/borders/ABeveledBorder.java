@@ -1,7 +1,7 @@
 package io.github.astrarre.gui.v0.api.base.borders;
 
-import io.github.astrarre.gui.v0.api.DelegateDrawable;
-import io.github.astrarre.gui.v0.api.Drawable;
+import io.github.astrarre.gui.v0.api.ADelegateDrawable;
+import io.github.astrarre.gui.v0.api.ADrawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.base.statik.ABeveledRectangle;
@@ -15,12 +15,12 @@ import io.github.astrarre.util.v0.api.Id;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-public final class ABeveledBorder extends DelegateDrawable {
+public final class ABeveledBorder extends ADelegateDrawable {
 	public static final Transformation TRANSLATE_N2_N2_0 = Transformation.translate(-4, -4, 0);
 	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "beveled_border"),
 			ABeveledBorder::new);
 
-	public ABeveledBorder(Drawable delegate) {
+	public ABeveledBorder(ADrawable delegate) {
 		super(ENTRY, delegate);
 	}
 

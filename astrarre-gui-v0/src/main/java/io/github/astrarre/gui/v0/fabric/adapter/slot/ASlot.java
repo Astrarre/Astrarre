@@ -5,16 +5,17 @@ import java.util.WeakHashMap;
 
 import io.github.astrarre.gui.internal.access.ExtraSlotAccess;
 import io.github.astrarre.gui.internal.access.SlotAddAccess;
-import io.github.astrarre.gui.v0.api.Drawable;
+import io.github.astrarre.gui.v0.api.ADrawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.access.Interactable;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.rendering.v0.api.Transformation;
-import io.github.astrarre.rendering.v0.api.textures.Texture;
+import io.github.astrarre.rendering.v0.api.textures.Sprite;
 import io.github.astrarre.rendering.v0.api.util.Close;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
+import io.github.astrarre.util.v0.api.Id;
 import io.github.astrarre.util.v0.api.Validate;
 
 import net.minecraft.inventory.Inventory;
@@ -23,9 +24,11 @@ import net.minecraft.item.ItemStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-public abstract class Slot extends Drawable implements Interactable {
+public abstract class ASlot extends ADrawable implements Interactable {
 	public static final Polygon SQUARE_16x16 = new Polygon.Builder(4).addVertex(0, 0).addVertex(0, 18).addVertex(18, 18).addVertex(18, 0).build();
-	private static final Texture INVENTORY_TEXTURE = new Texture("minecraft", "textures/gui/container/furnace.png", 256, 256);
+	public static final Sprite.Sized SLOT = Sprite.of(Id.create("minecraft", "textures/gui/container/furnace.png"))
+			.cutout(55/256f, 16/256f, 18/256f, 18/256f)
+			.sized(18, 18);
 	private static final Transformation TRANSFORMATION = Transformation.translate(1, 1, 0);
 	private final Inventory inventory;
 	private final int index;
@@ -36,7 +39,7 @@ public abstract class Slot extends Drawable implements Interactable {
 	@Environment (EnvType.CLIENT) protected boolean render;
 	@Environment (EnvType.CLIENT) private ItemStack override;
 
-	protected Slot(DrawableRegistry.Entry id, Inventory inventory, int index) {
+	protected ASlot(DrawableRegistry.Entry id, Inventory inventory, int index) {
 		super(id);
 		this.inventory = inventory;
 		this.index = index;
@@ -44,7 +47,7 @@ public abstract class Slot extends Drawable implements Interactable {
 	}
 
 	@Environment(EnvType.CLIENT)
-	protected Slot(DrawableRegistry.Entry id, NBTagView input) {
+	protected ASlot(DrawableRegistry.Entry id, NBTagView input) {
 		super(id);
 		this.inventory = this.readInventoryData(input);
 		this.index = input.getInt("index");
@@ -93,7 +96,7 @@ public abstract class Slot extends Drawable implements Interactable {
 	}
 
 	protected void renderBackground(Graphics3d graphics, float tickDelta) {
-		graphics.drawTexture(INVENTORY_TEXTURE, 55, 16, 18, 18);
+		graphics.drawSprite(SLOT);
 	}
 
 	protected void renderGradient(Graphics3d graphics, float tickDelta) {
@@ -120,29 +123,29 @@ public abstract class Slot extends Drawable implements Interactable {
 		public final RootContainer container;
 
 		public MinecraftSlot(RootContainer container) {
-			super(Slot.this.inventory, Slot.this.index, 0, 0);
+			super(ASlot.this.inventory, ASlot.this.index, 0, 0);
 			this.container = container;
 		}
 
 		@Override
 		public boolean astrarre_isPointOverSlot(double x, double y) {
 			Object o = this.container.getContentPanel().drawableAt(this.container, x, y);
-			return o == Slot.this;
+			return o == ASlot.this;
 		}
 
 		@Override
 		public void setHighlighted(boolean highlighted) {
-			Slot.this.highlighted = highlighted;
+			ASlot.this.highlighted = highlighted;
 		}
 
 		@Override
 		public void setRender(boolean render) {
-			Slot.this.render = render;
+			ASlot.this.render = render;
 		}
 
 		@Override
 		public void setOverride(ItemStack stack) {
-			Slot.this.override = stack;
+			ASlot.this.override = stack;
 		}
 
 		@Override
@@ -152,7 +155,7 @@ public abstract class Slot extends Drawable implements Interactable {
 
 		@Override
 		public boolean canInsert(ItemStack stack) {
-			return this.inventory.isValid(Slot.this.index, stack);
+			return this.inventory.isValid(ASlot.this.index, stack);
 		}
 	}
 }
