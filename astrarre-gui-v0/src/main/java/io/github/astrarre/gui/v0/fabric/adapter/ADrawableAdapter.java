@@ -5,7 +5,7 @@ import io.github.astrarre.gui.v0.api.ADrawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.access.Interactable;
-import io.github.astrarre.rendering.internal.MatrixGraphics;
+import io.github.astrarre.rendering.v0.fabric.MatrixGraphics;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.rendering.v0.api.graphics.DelegateGraphics;
 

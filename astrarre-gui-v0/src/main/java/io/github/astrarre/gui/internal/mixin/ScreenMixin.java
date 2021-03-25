@@ -9,7 +9,7 @@ import io.github.astrarre.gui.internal.access.ResizeListenerAccess;
 import io.github.astrarre.gui.internal.access.ScreenRootAccess;
 import io.github.astrarre.gui.internal.containers.ScreenRootContainer;
 import io.github.astrarre.gui.v0.api.RootContainer;
-import io.github.astrarre.rendering.internal.MatrixGraphics;
+import io.github.astrarre.rendering.v0.fabric.MatrixGraphics;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;

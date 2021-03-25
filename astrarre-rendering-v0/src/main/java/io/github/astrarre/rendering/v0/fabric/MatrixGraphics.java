@@ -1,9 +1,10 @@
-package io.github.astrarre.rendering.internal;
+package io.github.astrarre.rendering.v0.fabric;
 
 import java.util.List;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
+import io.github.astrarre.rendering.internal.DummyScreen;
 import io.github.astrarre.rendering.internal.util.MatrixGraphicsUtil;
 import io.github.astrarre.rendering.internal.util.SetupTeardown;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
