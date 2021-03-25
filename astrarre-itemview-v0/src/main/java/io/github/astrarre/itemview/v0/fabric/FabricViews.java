@@ -2,6 +2,7 @@ package io.github.astrarre.itemview.v0.fabric;
 
 import java.util.List;
 
+import com.google.gson.internal.Primitives;
 import io.github.astrarre.itemview.internal.access.AbstractListTagAccess;
 import io.github.astrarre.itemview.internal.access.ImmutableAccess;
 import io.github.astrarre.itemview.v0.api.Serializer;
@@ -89,10 +90,11 @@ public class FabricViews {
 			throw new IllegalArgumentException("unknown tag type " + tag + "(" + tag.getClass() + ")");
 		}
 
-		if (type == null || type.getClassType().isInstance(ret)) {
+
+		if (type == null || Primitives.wrap(type.getClassType()).isInstance(ret)) {
 			return (T) ret;
 		} else {
-			throw new ClassCastException(tag.getClass() + " != " + type.getClassType());
+			throw new ClassCastException((ret == null ? null : ret.getClass()) + " != " + type.getClassType());
 		}
 	}
 

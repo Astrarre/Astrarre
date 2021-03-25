@@ -63,7 +63,7 @@ public class AProgressBar extends ADrawable {
 			g3d.drawSprite(this.full.get().cutout(0, 0, progress, 1));
 			break;
 		case UP:
-			try (Close c = g3d.applyTransformation(Transformation.translate(0, (1 - progress) * this.full.get().height, 0))) {
+			try (Close ignored = g3d.applyTransformation(Transformation.translate(0, (1 - progress) * this.full.get().height, 0))) {
 				g3d.drawSprite(this.full.get().cutout(0, 1 - progress, 1, progress));
 			}
 			break;
@@ -71,7 +71,7 @@ public class AProgressBar extends ADrawable {
 			g3d.drawSprite(this.full.get().cutout(0, 0, 1, progress));
 			break;
 		case LEFT:
-			try (Close c = g3d.applyTransformation(Transformation.translate((1 - progress) * this.full.get().height, 0, 0))) {
+			try (Close ignored = g3d.applyTransformation(Transformation.translate((1 - progress) * this.full.get().height, 0, 0))) {
 				g3d.drawSprite(this.full.get().cutout(1 - progress, 0, progress, 1));
 			}
 			break;
