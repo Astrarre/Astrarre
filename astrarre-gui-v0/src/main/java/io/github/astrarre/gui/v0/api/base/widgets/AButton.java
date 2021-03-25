@@ -11,6 +11,7 @@ import io.github.astrarre.gui.v0.api.access.Interactable;
 import io.github.astrarre.itemview.v0.api.Serializable;
 import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
+import io.github.astrarre.itemview.v0.api.nbt.NbtValue;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.rendering.v0.api.textures.Sprite;
@@ -50,7 +51,7 @@ public class AButton extends ADrawable implements Interactable {
 
 	protected AButton(DrawableRegistry.Entry entry, NBTagView input) {
 		super(entry);
-		this.part = SERIALIZER.read(input, "part");
+		this.part = SERIALIZER.read(input.getValue("part"));
 		this.disabled = input.getBool("disabled");
 	}
 
@@ -87,7 +88,7 @@ public class AButton extends ADrawable implements Interactable {
 	@Override
 	protected void write0(RootContainer container, NBTagView.Builder output) {
 		if(this.part != null) {
-			this.part.save(output, "part");
+			output.put("part", this.part);
 		}
 		output.putBool("disabled", this.disabled);
 	}
@@ -211,19 +212,19 @@ public class AButton extends ADrawable implements Interactable {
 			this.disabled = disabled;
 		}
 
-		protected Data(NBTagView tag, String s) {
-			NBTagView tagView = tag.getTag(s);
-			if(tagView.get("highlighted") != null) {
-				this.highlighted = Sprite.SIZED_SER.read(tagView, "highlighted");
+		protected Data(NbtValue value) {
+			NBTagView tag = value.asTag();
+			if(tag.get("highlighted") != null) {
+				this.highlighted = Sprite.SIZED_SER.read(tag.getValue("highlighted"));
 			} else this.highlighted = null;
-			if(tagView.get("pressed") != null) {
-				this.pressed = Sprite.SIZED_SER.read(tagView, "pressed");
+			if(tag.get("pressed") != null) {
+				this.pressed = Sprite.SIZED_SER.read(tag.getValue("pressed"));
 			} else this.pressed = null;
-			if(tagView.get("disabled") != null) {
-				this.disabled = Sprite.SIZED_SER.read(tagView, "disabled");
+			if(tag.get("disabled") != null) {
+				this.disabled = Sprite.SIZED_SER.read(tag.getValue("disabled"));
 			} else this.disabled = null;
 
-			this.active = Sprite.SIZED_SER.read(tagView, "active");
+			this.active = Sprite.SIZED_SER.read(tag.getValue("active"));
 		}
 
 		public Data withActive(Sprite.Sized part) {
@@ -243,20 +244,20 @@ public class AButton extends ADrawable implements Interactable {
 		}
 
 		@Override
-		public void save(NBTagView.Builder tag, String key) {
+		public NbtValue save() {
 			NBTagView.Builder builder = NBTagView.builder();
 			if(this.highlighted != null) {
-				Sprite.SIZED_SER.save(builder, "highlighted", this.highlighted);
+				builder.put("highlighted", this.highlighted);
 			}
 			if(this.disabled != null) {
-				Sprite.SIZED_SER.save(builder, "disabled", this.disabled);
+				builder.put("disabled", this.disabled);
 			}
 			if(this.pressed != null) {
-				Sprite.SIZED_SER.save(builder, "pressed", this.pressed);
+				builder.put("pressed", this.pressed);
 			}
 
-			Sprite.SIZED_SER.save(builder, "active", this.active);
-			tag.putTag(key, builder);
+			builder.put("active", this.active);
+			return builder;
 		}
 	}
 }

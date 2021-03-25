@@ -3,17 +3,21 @@ package io.github.astrarre.rendering.internal.textures;
 import io.github.astrarre.itemview.v0.api.Serializable;
 import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
+import io.github.astrarre.itemview.v0.api.nbt.NbtValue;
 import io.github.astrarre.rendering.v0.api.textures.Sprite;
 import io.github.astrarre.util.v0.api.Id;
 
 public class SpritePath implements Sprite, Serializable {
 	public static final int ID = 1;
 	public static final int PART_ID = 2;
-	public static final Serializer<Sprite> SERIALIZER = Serializer.of((view, s) -> {
-		NBTagView tag = view.getTag(s);
+	public static final Serializer<Sprite> SERIALIZER = Serializer.of((view) -> {
+		NBTagView tag = view.asTag();
 		return Sprite.of(Serializer.ID.read(tag, "atlasId"), Serializer.ID.read(tag, "textureId"));
 	});
-	public static final Serializer<Sprite> PART = Serializer.of((view, s) -> SERIALIZER.read(view, s).cutout(view.getFloat("offX"), view.getFloat("offY"), view.getFloat("width"), view.getFloat("height")));
+	public static final Serializer<Sprite> PART = Serializer.of((tag) -> {
+		NBTagView view = tag.asTag();
+		return SERIALIZER.read(view).cutout(view.getFloat("offX"), view.getFloat("offY"), view.getFloat("width"), view.getFloat("height"));
+	});
 	public final Id atlasId, textureId;
 
 	public SpritePath(Id atlasId, Id textureId) {
@@ -52,12 +56,12 @@ public class SpritePath implements Sprite, Serializable {
 	}
 
 	@Override
-	public void save(NBTagView.Builder tag, String key) {
+	public NbtValue save() {
 		NBTagView.Builder builder = NBTagView.builder();
 		Serializer.ID.save(builder, "atlasId", this.atlasId);
 		Serializer.ID.save(builder, "textureId", this.textureId);
 		builder.putInt("id", ID);
-		tag.putTag(key, builder);
+		return builder;
 	}
 
 	public class Part extends Cutout {
@@ -73,7 +77,7 @@ public class SpritePath implements Sprite, Serializable {
 		}
 
 		@Override
-		public void save(NBTagView.Builder tag, String key) {
+		public NbtValue save() {
 			NBTagView.Builder builder = NBTagView.builder()
 					                            .putFloat("offX", this.offX)
 					                            .putFloat("offY", this.offY)
@@ -82,7 +86,7 @@ public class SpritePath implements Sprite, Serializable {
 					.putInt("id", PART_ID);
 			Serializer.ID.save(builder, "atlasId", SpritePath.this.atlasId);
 			Serializer.ID.save(builder, "textureId", SpritePath.this.textureId);
-			tag.putTag(key, builder);
+			return builder;
 		}
 	}
 }

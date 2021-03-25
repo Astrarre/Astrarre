@@ -7,6 +7,7 @@ import io.github.astrarre.itemview.v0.api.Serializable;
 import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.itemview.v0.api.nbt.NBTType;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
+import io.github.astrarre.itemview.v0.api.nbt.NbtValue;
 import io.github.astrarre.rendering.internal.mixin.BufferBuilderAccess;
 import io.github.astrarre.rendering.internal.util.MathUtil;
 import io.github.astrarre.rendering.v0.api.Transformation;
@@ -61,8 +62,8 @@ public final class Polygon implements Serializable {
 		this.vertices = vertices;
 	}
 
-	private Polygon(NBTagView tag, String key) {
-		IntList list = tag.get(key, NBTType.INT_ARRAY);
+	private Polygon(NbtValue value) {
+		IntList list = value.asIntList();
 		this.offset = 0;
 		float[] vertices = this.vertices = new float[list.size()];
 		for (int i = 0; i < vertices.length; i++) {
@@ -232,12 +233,12 @@ public final class Polygon implements Serializable {
 	}
 
 	@Override
-	public void save(NBTagView.Builder tag, String key) {
+	public NbtValue save() {
 		IntList list = new IntArrayList();
 		for (int i = 0; i < this.length; i++) {
 			list.add(Float.floatToIntBits(this.vertices[i + this.offset]));
 		}
-		tag.put(key, NBTType.INT_ARRAY, list);
+		return NbtValue.of(NBTType.INT_ARRAY, list);
 	}
 
 	public interface PointWalker {

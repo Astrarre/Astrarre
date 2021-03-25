@@ -3,7 +3,11 @@ package io.github.astrarre.rendering.v0.api;
 
 import io.github.astrarre.itemview.v0.api.Serializable;
 import io.github.astrarre.itemview.v0.api.Serializer;
+import io.github.astrarre.itemview.v0.api.nbt.NBTType;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
+import io.github.astrarre.itemview.v0.api.nbt.NbtValue;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
@@ -46,17 +50,32 @@ public final class Transformation implements Serializable {
 		this.scaleZ = scaleZ;
 	}
 
-	protected Transformation(NBTagView tag, String key) {
-		NBTagView data = tag.getTag(key);
-		this.roll = data.getFloat("roll");
-		this.pitch = data.getFloat("pitch");
-		this.yaw = data.getFloat("yaw");
-		this.offX = data.getFloat("offX");
-		this.offY = data.getFloat("offY");
-		this.offZ = data.getFloat("offZ");
-		this.scaleX = data.getFloat("scaleX");
-		this.scaleY = data.getFloat("scaleY");
-		this.scaleZ = data.getFloat("scaleZ");
+	protected Transformation(NbtValue value) {
+		IntList list = value.asIntList();
+		this.roll = Float.intBitsToFloat(list.getInt(0));
+		this.pitch = Float.intBitsToFloat(list.getInt(1));
+		this.yaw = Float.intBitsToFloat(list.getInt(2));
+		this.offX = Float.intBitsToFloat(list.getInt(3));
+		this.offY = Float.intBitsToFloat(list.getInt(4));
+		this.offZ = Float.intBitsToFloat(list.getInt(5));
+		this.scaleX = Float.intBitsToFloat(list.getInt(6));
+		this.scaleY = Float.intBitsToFloat(list.getInt(7));
+		this.scaleZ = Float.intBitsToFloat(list.getInt(8));
+	}
+
+	@Override
+	public NbtValue save() {
+		IntList list = new IntArrayList();
+		list.add(Float.floatToIntBits(this.roll));
+		list.add(Float.floatToIntBits(this.pitch));
+		list.add(Float.floatToIntBits(this.yaw));
+		list.add(Float.floatToIntBits(this.offX));
+		list.add(Float.floatToIntBits(this.offY));
+		list.add(Float.floatToIntBits(this.offZ));
+		list.add(Float.floatToIntBits(this.scaleX));
+		list.add(Float.floatToIntBits(this.scaleY));
+		list.add(Float.floatToIntBits(this.scaleZ));
+		return NbtValue.of(NBTType.INT_ARRAY, list);
 	}
 
 	/**
@@ -204,11 +223,4 @@ public final class Transformation implements Serializable {
 		return Float.compare(that.scaleZ, this.scaleZ) == 0;
 	}
 
-	@Override
-	public void save(NBTagView.Builder tag, String key) {
-		NBTagView.Builder builder = NBTagView.builder().putFloat("roll", this.roll).putFloat("pitch", this.pitch).putFloat("yaw", this.yaw)
-				                            .putFloat("offX", this.offX).putFloat("offY", this.offY).putFloat("offZ", this.offZ)
-				                            .putFloat("scaleX", this.scaleX).putFloat("scaleY", this.scaleY).putFloat("scaleZ", this.scaleZ);
-		tag.putTag(key, builder);
-	}
 }

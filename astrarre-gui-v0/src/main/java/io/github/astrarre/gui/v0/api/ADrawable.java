@@ -197,7 +197,7 @@ public abstract class ADrawable extends DrawableInternal {
 			listener.onBoundsChange(this, old, polygon);
 		}
 		NBTagView.Builder builder = NBTagView.builder();
-		polygon.save(builder, "polygon");
+		builder.put("polygon", polygon);
 		this.sendToClients(BOUNDS_CHANGE, builder);
 	}
 
@@ -237,7 +237,7 @@ public abstract class ADrawable extends DrawableInternal {
 			listener.onTransformationChange(this, old, transformation);
 		}
 		NBTagView.Builder tag = NBTagView.builder();
-		transformation.save(tag, "transformation");
+		tag.put("transformation", transformation);
 		this.sendToClients(TRANSFORM_CHANGE, tag);
 		return this;
 	}

@@ -13,17 +13,7 @@ import net.minecraft.nbt.CompoundTag;
  * an Item and it's NBT data (guaranteed immutable)
  */
 public interface ItemKey {
-	Serializer<ItemKey> SERIALIZER = new Serializer<ItemKey>() {
-		@Override
-		public ItemKey read(NBTagView input, String key) {
-			return of(FabricSerializers.ITEM_STACK.read(input, key));
-		}
-
-		@Override
-		public void save(NBTagView.Builder output, String key, ItemKey instance) {
-			FabricSerializers.ITEM_STACK.save(output, key, instance.createItemStack(1));
-		}
-	};
+	Serializer<ItemKey> SERIALIZER = Serializer.of(input -> of(FabricSerializers.ITEM_STACK.read(input)), (instance) -> FabricSerializers.ITEM_STACK.save(instance.createItemStack(1)));
 
 	static ItemKey of(ItemStack stack) {
 		if (stack.isEmpty()) {

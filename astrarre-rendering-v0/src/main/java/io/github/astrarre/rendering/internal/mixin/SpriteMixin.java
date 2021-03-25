@@ -2,6 +2,7 @@ package io.github.astrarre.rendering.internal.mixin;
 
 import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
+import io.github.astrarre.itemview.v0.api.nbt.NbtValue;
 import io.github.astrarre.rendering.internal.textures.SpritePath;
 import io.github.astrarre.rendering.v0.api.textures.client.ManagedSprite;
 import io.github.astrarre.util.v0.api.Id;
@@ -52,12 +53,12 @@ public abstract class SpriteMixin implements ManagedSprite {
 	}
 
 	@Override
-	public void save(NBTagView.Builder tag, String key) {
+	public NbtValue save() {
 		NBTagView.Builder builder = NBTagView.builder();
 		Serializer.ID.save(builder, "atlasId", Id.of(this.getAtlas().getId()));
 		Serializer.ID.save(builder, "textureId", Id.of(this.info.getId()));
 		builder.putInt("id", SpritePath.ID);
-		tag.putTag(key, builder);
+		return builder;
 	}
 
 	@Override

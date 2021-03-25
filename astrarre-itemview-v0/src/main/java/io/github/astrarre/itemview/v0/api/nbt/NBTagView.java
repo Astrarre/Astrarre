@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import io.github.astrarre.itemview.v0.api.Serializable;
+import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.itemview.v0.fabric.FabricViews;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,12 +18,14 @@ import net.minecraft.nbt.CompoundTag;
  * @see FabricViews
  */
 @NotNull
-public interface NBTagView extends Iterable<String> {
+public interface NBTagView extends Iterable<String>, NbtValue {
 	NBTagView EMPTY = (NBTagView) new CompoundTag();
 
 	static Builder builder() {
 		return (Builder) new CompoundTag();
 	}
+
+	NbtValue getValue(String path);
 
 	/**
 	 * equivalent to
@@ -280,14 +284,21 @@ public interface NBTagView extends Iterable<String> {
 		default Builder putTag(String key, NBTagView n) {
 			return this.put(key, NBTType.TAG, n);
 		}
-
 		default Builder putString(String key, String s) {
 			return this.put(key, NBTType.STRING, s);
 		}
-
 		<T> Builder put(String path, NBTType<T> type, T object);
+		default <T> Builder put(String path, Serializer<T> type, T object) {
+			return this.putValue(path, type.save(object));
+		}
+
+		default <T> Builder put(String path, Serializable serializable) {
+			return this.putValue(path, serializable.save());
+		}
+
+		Builder putValue(String path, NbtValue value);
 
 		NBTagView build();
-
 	}
+
 }

@@ -5,6 +5,7 @@
   "mixins": [
     "item.ItemMixin",
     "nbt.CompoundTagMixin",
+    "nbt.TagMixin_NBTagView_Value",
     "nbt.list.ByteArrayTagMixin",
     "nbt.list.IntArrayTagMixin",
     "nbt.list.ListTagMixin",

@@ -23,7 +23,7 @@ import net.fabricmc.api.Environment;
 
 public class AInfo extends ADrawable implements Interactable {
 	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.registerForward(Id.create("astrarre-gui-v0", "info_widget"), AInfo::new);
-	public final SyncedProperty<Boolean> isEnabled = this.createClientSyncedProperty(Serializer.BOOLEAN, true);
+	public final SyncedProperty<Boolean> isEnabled = this.createClientSyncedProperty(NBTType.BOOL, true);
 	public final List<Text> tooltip;
 
 	@Environment(EnvType.CLIENT)

@@ -2,6 +2,7 @@ package io.github.astrarre.rendering.internal.textures;
 
 import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
+import io.github.astrarre.itemview.v0.api.nbt.NbtValue;
 import io.github.astrarre.rendering.v0.api.textures.Sprite;
 import io.github.astrarre.util.v0.api.Id;
 
@@ -9,7 +10,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.TextureManager;
 
 public class TexturePath implements Sprite {
-	public static final Serializer<TexturePath> SERIALIZER = Serializer.of((tag, s) -> new TexturePath(Serializer.ID.read(tag.getTag(s), "texture")));
+	public static final Serializer<TexturePath> SERIALIZER = Serializer.of((tag) -> new TexturePath(Serializer.ID.read(tag.asTag(), "texture")));
 	public static final int ID = 3;
 	public static final TextureManager MANAGER = MinecraftClient.getInstance().getTextureManager();
 	public final Id texture;
@@ -44,9 +45,9 @@ public class TexturePath implements Sprite {
 	}
 
 	@Override
-	public void save(NBTagView.Builder tag, String key) {
+	public NbtValue save() {
 		NBTagView.Builder builder = NBTagView.builder();
 		Serializer.ID.save(builder, "texture", this.texture);
-		builder.putInt("id", ID);
+		return builder;
 	}
 }

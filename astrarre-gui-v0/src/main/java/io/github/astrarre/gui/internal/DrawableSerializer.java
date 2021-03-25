@@ -13,6 +13,7 @@ import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.itemview.v0.api.nbt.NBTType;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
+import io.github.astrarre.itemview.v0.api.nbt.NbtValue;
 import io.github.astrarre.networking.v0.api.SyncedProperty;
 import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
@@ -26,7 +27,8 @@ public class DrawableSerializer implements Serializer<ADrawable> {
 	}
 
 	@Override
-	public ADrawable read(NBTagView input, String key) {
+	public ADrawable read(NbtValue value) {
+		NBTagView input = value.asTag();
 		Id id = Serializer.ID.read(input, "registryId");
 		Function<NBTagView, ADrawable> function = DrawableRegistry.forId(id);
 		if (function == null) {
@@ -52,12 +54,13 @@ public class DrawableSerializer implements Serializer<ADrawable> {
 	}
 
 	@Override
-	public void save(NBTagView.Builder output, String key, ADrawable instance) {
+	public NbtValue save(ADrawable instance) {
 		if (instance.registryId == null) {
 			throw new IllegalStateException("Tried to serialize client-only component!");
 		}
 
-		Serializer.ID.save(output, "registryId", instance.registryId.id);
+		NBTagView.Builder output = NBTagView.builder();
+		output.put("registryId", Serializer.ID, instance.registryId.id);
 		output.putInt("syncId", instance.getSyncId());
 		NBTagView.Builder serialized = NBTagView.builder();
 		((DrawableInternal) instance).write0(this.container, serialized);
@@ -69,12 +72,13 @@ public class DrawableSerializer implements Serializer<ADrawable> {
 			if (value instanceof ClientSyncedProperty) {
 				NBTagView.Builder tag = NBTagView.builder();
 				tag.putInt("propertyId", ((ClientSyncedProperty<?>) value).id);
-				value.serializer.save(tag, "value", value.get());
+				tag.put("value", value.serializer, value.get());
 				list.add(tag);
 			}
 		}
 		output.put("property", NBTType.listOf(NBTType.TAG), list);
-		Polygon.SERIALIZER.save(output, "bounds", instance.getBounds());
-		Transformation.SERIALIZER.save(output, "transformation", instance.getTransformation());
+		output.put("bounds", Polygon.SERIALIZER, instance.getBounds());
+		output.put("transformation", Transformation.SERIALIZER, instance.getTransformation());
+		return output;
 	}
 }

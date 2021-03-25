@@ -1,10 +1,11 @@
 package io.github.astrarre.itemview.v0.fabric;
 
 import java.util.Objects;
-import java.util.Optional;
 
 import io.github.astrarre.itemview.v0.api.Serializer;
+import io.github.astrarre.itemview.v0.api.nbt.NBTType;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
+import io.github.astrarre.itemview.v0.api.nbt.NbtValue;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -16,32 +17,29 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 public interface FabricSerializers {
-	Serializer<ItemStack> ITEM_STACK = Serializer.of((tag, s) -> ItemStack.fromTag(tag.getTag(s).toTag()), (output, s, stack) -> {
+	Serializer<ItemStack> ITEM_STACK = Serializer.of(tag -> ItemStack.fromTag(tag.asTag().toTag()), (stack) -> {
 		CompoundTag tag = new CompoundTag();
 		stack.toTag(tag);
-		output.putTag(s, FabricViews.view(tag));
+		return FabricViews.view(tag);
 	});
-	Serializer<Identifier> IDENTIFIER = Serializer.of((tag, s) -> new Identifier(tag.getString(s)), (tag, s, identifier) -> tag.putString(s, identifier.toString()));
-	Serializer<BlockPos> BLOCK_POS = Serializer.of((tag, s) -> {
-		NBTagView view = tag.getTag(s);
+	Serializer<Identifier> IDENTIFIER = Serializer.of(tag -> new Identifier(tag.asString()),
+			identifier -> NbtValue.of(NBTType.STRING, identifier.toString()));
+	Serializer<BlockPos> BLOCK_POS = Serializer.of((tag) -> {
+		NBTagView view = tag.asTag();
 		return new BlockPos(view.getInt("x"), view.getInt("y"), view.getInt("z"));
-	}, (tag, s, pos) -> tag.putTag(s, NBTagView.builder().putInt("x", pos.getX()).putInt("y", pos.getY()).putInt("z", pos.getZ())));
+	}, (pos) -> NBTagView.builder().putInt("x", pos.getX()).putInt("y", pos.getY()).putInt("z", pos.getZ()));
 
 
-
-	static Serializer<Optional<Entity>> entity(World world) {
-		return Serializer.of(
-				(s, t) -> EntityType.getEntityFromTag(Objects.requireNonNull(s.getTag(t).toTag(), "no entry found!"), world),
-				(out, key, entity) -> {
-					if (entity.isPresent()) {
-						CompoundTag tag = new CompoundTag();
-						entity.get().saveToTag(tag);
-						out.putTag(key, FabricViews.view(tag));
-					}
-				});
+	static Serializer<Entity> entity(World world) {
+		return Serializer.of((s) -> EntityType.getEntityFromTag(Objects.requireNonNull(s.asTag().toTag(), "no entry found!"), world)
+				                            .orElseThrow(NullPointerException::new), (entity) -> {
+			CompoundTag tag = new CompoundTag();
+			entity.saveToTag(tag);
+			return FabricViews.view(tag);
+		});
 	}
 
 	static <T> Serializer<T> of(Registry<T> registry) {
-		return Serializer.of((tag, s) -> registry.get(IDENTIFIER.read(tag, s)), (tag, s, t) -> IDENTIFIER.save(tag, s, registry.getId(t)));
+		return Serializer.of((tag) -> registry.get(IDENTIFIER.read(tag)), (t) -> IDENTIFIER.save(registry.getId(t)));
 	}
 }

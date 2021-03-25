@@ -15,15 +15,15 @@ import net.minecraft.item.ItemStack;
  * If initialized with a custom max size, it will take the min of the size of the stack and the passed size
  */
 public class ItemSlotParticipant extends FixedObjectVolume<ItemKey> {
-	public static final Serializer<ItemSlotParticipant> ITEM_KEY_SERIALIZER = Serializer.of((tag, s) -> {
-		NBTagView volume = tag.getTag(s);
+	public static final Serializer<ItemSlotParticipant> ITEM_KEY_SERIALIZER = Serializer.of((tag) -> {
+		NBTagView volume = tag.asTag();
 		int max = volume.getInt("max");
 		ItemStack object = FabricSerializers.ITEM_STACK.read(volume, "object");
 		return new ItemSlotParticipant(object, max);
-	}, (tag, s, t) -> {
-		NBTagView.Builder volume = NBTagView.builder().putInt(s, t.getMax(Transaction.GLOBAL));
+	}, t -> {
+		NBTagView.Builder volume = NBTagView.builder().putInt("max", t.getMax(Transaction.GLOBAL));
 		FabricSerializers.ITEM_STACK.save(volume, "object", t.type.get(Transaction.GLOBAL).createItemStack(t.quantity.get(Transaction.GLOBAL)));
-		tag.putTag(s, volume);
+		return volume;
 	});
 
 	public ItemSlotParticipant() {

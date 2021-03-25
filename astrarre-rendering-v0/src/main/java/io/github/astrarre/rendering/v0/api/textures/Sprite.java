@@ -16,25 +16,26 @@ import net.minecraft.client.MinecraftClient;
  * A sprite is an image or animated image do <b>NOT</b> implement this interface
  */
 public interface Sprite extends Serializable {
-	Serializer<Sprite> SERIALIZER = Serializer.of((tag, s) -> {
-		NBTagView view = tag.getTag(s);
+	Serializer<Sprite> SERIALIZER = Serializer.of(tag -> {
+		NBTagView view = tag.asTag();
 		switch (view.getInt("id")) {
 		case SpritePath.ID:
-			return SpritePath.SERIALIZER.read(tag, s);
+			return SpritePath.SERIALIZER.read(tag);
 		case SpritePath.PART_ID:
-			return SpritePath.PART.read(tag, s);
+			return SpritePath.PART.read(tag);
 		case TexturePath.ID:
-			return TexturePath.SERIALIZER.read(tag, s);
+			return TexturePath.SERIALIZER.read(tag);
 		case Cutout.ID:
-			return Cutout.SERIALIZER.read(tag, s);
+			return Cutout.SERIALIZER.read(tag);
 		default:
 			throw new UnsupportedOperationException("unknown sprite type");
 		}
 	});
-	Serializer<Sized> SIZED_SER = Serializer.of((view, s) -> {
-		NBTagView tag = view.getTag(s);
+	Serializer<Sized> SIZED_SER = Serializer.of((view) -> {
+		NBTagView tag = view.asTag();
 		return new Sized(SERIALIZER.read(tag, "sprite"), tag.getFloat("width"), tag.getFloat("height"));
 	});
+
 	/**
 	 * @return an atlas managed sprite. When called on the server, it creates a serverside representation
 	 */
@@ -110,12 +111,10 @@ public interface Sprite extends Serializable {
 		}
 
 		@Override
-		public void save(NBTagView.Builder tag, String key) {
-			NBTagView.Builder view = NBTagView.builder()
-					.putFloat("width", this.width)
-					.putFloat("height", this.height);
-			SERIALIZER.save(view, "sprite", this.sprite);
-			tag.putTag(key, view);
+		public NBTagView save() {
+			NBTagView.Builder view = NBTagView.builder().putFloat("width", this.width).putFloat("height", this.height);
+			view.put("sprite", Sprite.SERIALIZER, this.sprite);
+			return view;
 		}
 	}
 }

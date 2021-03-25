@@ -9,6 +9,7 @@ import io.github.astrarre.itemview.internal.util.ImmutableIterable;
 import io.github.astrarre.itemview.internal.util.NBTagUnmodifiableMap;
 import io.github.astrarre.itemview.v0.api.nbt.NBTType;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
+import io.github.astrarre.itemview.v0.api.nbt.NbtValue;
 import io.github.astrarre.itemview.v0.fabric.FabricViews;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -137,6 +138,18 @@ public abstract class CompoundTagMixin implements ImmutableAccess, NBTagView.Bui
 	}
 
 	@Override
+	public NbtValue getValue(String path) {
+		return (NbtValue) this.shadow$get(path);
+	}
+
+	@Override
+	public Builder putValue(String path, NbtValue value) {
+		this.put(path, (Tag) value);
+		return this;
+	}
+
+	@Override
+	@Intrinsic
 	public Object get(String key) {
 		return FabricViews.view(this.shadow$get(key), NBTType.ANY);
 	}

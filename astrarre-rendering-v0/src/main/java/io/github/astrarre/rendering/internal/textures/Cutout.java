@@ -2,12 +2,13 @@ package io.github.astrarre.rendering.internal.textures;
 
 import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
+import io.github.astrarre.itemview.v0.api.nbt.NbtValue;
 import io.github.astrarre.rendering.v0.api.textures.Sprite;
 import io.github.astrarre.util.v0.api.Id;
 
 public class Cutout implements Sprite {
-	public static final Serializer<Cutout> SERIALIZER = Serializer.of((view, s) -> {
-		NBTagView tag = view.getTag(s);
+	public static final Serializer<Cutout> SERIALIZER = Serializer.of((v) -> {
+		NBTagView tag = v.asTag();
 		return new Cutout(Serializer.ID.read(tag, "textureId"),
 				tag.getFloat("offX"),
 				tag.getFloat("offY"),
@@ -53,10 +54,11 @@ public class Cutout implements Sprite {
 	}
 
 	@Override
-	public void save(NBTagView.Builder tag, String key) {
+	public NbtValue save() {
 		NBTagView.Builder builder = NBTagView.builder().putFloat("offX", this.offX).putFloat("offY", this.offY).putFloat("width", this.width)
 				                            .putFloat("height", this.height);
+
 		Serializer.ID.save(builder, "textureId", this.sprite);
-		tag.putTag(key, builder);
+		return builder;
 	}
 }

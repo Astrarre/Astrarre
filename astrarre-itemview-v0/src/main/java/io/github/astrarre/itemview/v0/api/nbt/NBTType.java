@@ -2,16 +2,20 @@ package io.github.astrarre.itemview.v0.api.nbt;
 
 import java.util.List;
 
+import io.github.astrarre.itemview.v0.api.Serializer;
+import io.github.astrarre.itemview.v0.fabric.FabricViews;
 import it.unimi.dsi.fastutil.bytes.ByteList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.longs.LongList;
 import org.jetbrains.annotations.Nullable;
 
+import net.minecraft.nbt.Tag;
+
 @SuppressWarnings ({
 		"unchecked",
 		"rawtypes"
 })
-public final class NBTType<T> {
+public final class NBTType<T> implements Serializer<T> {
 	public static final NBTType<Object> ANY = new NBTType<>(Object.class, 0, -1);
 	public static final NBTType<List<Object>> ANY_LIST = NBTType.listOf(NBTType.ANY);
 
@@ -106,5 +110,15 @@ public final class NBTType<T> {
 	@Nullable
 	public NBTType<?> getComponent() {
 		return this.component;
+	}
+
+	@Override
+	public T read(NbtValue value) {
+		return FabricViews.view((Tag) value, this);
+	}
+
+	@Override
+	public NbtValue save(T instance) {
+		return (NbtValue) FabricViews.from(instance);
 	}
 }

@@ -96,6 +96,7 @@ public class FabricViews {
 		}
 	}
 
+
 	public static Tag from(Object object) {
 		if(object instanceof Boolean) {
 			return ByteTag.of((Boolean)object);

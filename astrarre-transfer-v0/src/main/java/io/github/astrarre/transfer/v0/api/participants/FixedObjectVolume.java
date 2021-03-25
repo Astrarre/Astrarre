@@ -19,16 +19,16 @@ public class FixedObjectVolume<T> extends ObjectVolume<T> {
 	 * @see FabricParticipants#FLUID_FIXED_OBJECT_VOLUME_SERIALIZER
 	 */
 	public static <T> Serializer<FixedObjectVolume<T>> fixedSerializer(T empty, Serializer<T> typeSerializer) {
-		return Serializer.of((tag, s) -> {
-			NBTagView volume = tag.getTag(s);
+		return Serializer.of((tag) -> {
+			NBTagView volume = tag.asTag();
 			int quantity = volume.getInt("quantity");
 			int max = volume.getInt("max");
 			T object = typeSerializer.read(volume, "object");
 			return new FixedObjectVolume<>(empty, object, quantity, max);
-		}, (tag, s, t) -> {
-			NBTagView.Builder volume = NBTagView.builder().putInt(s, t.quantity.get(Transaction.GLOBAL)).putInt(s, t.getMax(Transaction.GLOBAL));
+		}, t -> {
+			NBTagView.Builder volume = NBTagView.builder().putInt("quantity", t.quantity.get(Transaction.GLOBAL)).putInt("max", t.getMax(Transaction.GLOBAL));
 			typeSerializer.save(volume, "object", t.type.get(Transaction.GLOBAL));
-			tag.putTag(s, volume);
+			return volume;
 		});
 	}
 
