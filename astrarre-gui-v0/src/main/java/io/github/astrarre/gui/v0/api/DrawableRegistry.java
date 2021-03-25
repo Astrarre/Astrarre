@@ -15,6 +15,7 @@ import io.github.astrarre.gui.v0.api.base.statik.ADarkenedBackground;
 import io.github.astrarre.gui.v0.api.base.widgets.AButton;
 import io.github.astrarre.gui.v0.api.base.widgets.AInfo;
 import io.github.astrarre.gui.v0.api.base.widgets.APasswordTextField;
+import io.github.astrarre.gui.v0.api.base.widgets.AProgressBar;
 import io.github.astrarre.gui.v0.api.base.widgets.ATextFieldWidget;
 import io.github.astrarre.gui.v0.api.base.widgets.ScrollBar;
 import io.github.astrarre.gui.v0.fabric.adapter.slot.APlayerSlot;
@@ -74,6 +75,7 @@ public class DrawableRegistry {
 		APlayerSlot.init();
 		AWorldInventorySlot.init();
 		ScrollBar.init();
+		AProgressBar.init();
 	}
 
 	@Nullable

@@ -1,12 +1,12 @@
 package io.github.astrarre.testmod.gui;
 
+import io.github.astrarre.gui.v0.api.AstrarreIcons;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.base.borders.ABeveledBorder;
 import io.github.astrarre.gui.v0.api.base.panel.ACenteringPanel;
 import io.github.astrarre.gui.v0.api.base.panel.APanel;
 import io.github.astrarre.gui.v0.api.base.statik.ADarkenedBackground;
-import io.github.astrarre.gui.v0.api.base.widgets.AButton;
-import io.github.astrarre.gui.v0.api.base.widgets.ScrollBar;
+import io.github.astrarre.gui.v0.api.base.widgets.AProgressBar;
 import io.github.astrarre.gui.v0.fabric.adapter.slot.APlayerSlot;
 import io.github.astrarre.gui.v0.fabric.adapter.slot.ASlot;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
@@ -16,11 +16,11 @@ import net.minecraft.server.network.ServerPlayerEntity;
 
 public class TestModGui {
 
-	public static void open(ServerPlayerEntity entity) {
-		RootContainer.open((NetworkMember) entity, container -> open(entity, container));
+	public static AProgressBar open(ServerPlayerEntity entity) {
+		return RootContainer.open((NetworkMember) entity, container -> open(entity, container));
 	}
 
-	protected static Void open(ServerPlayerEntity entity, RootContainer container) {
+	protected static AProgressBar open(ServerPlayerEntity entity, RootContainer container) {
 		// the content panel is the panel of the entire screen. It's origin is at [0, 0] (the top left of the screen)
 		APanel contentPanel = container.getContentPanel();
 		// we want our gui to be in the middle of the screen, so
@@ -44,15 +44,16 @@ public class TestModGui {
 			center.add(slot);
 		}
 
-		ScrollBar scrollBar = new ScrollBar(60, 10);
-		center.add(scrollBar);
-		center.add(new AButton(AButton.MEDIUM).setTransformation(Transformation.translate(20, 10, 0)));
-
+		AProgressBar bar1 = new AProgressBar(AstrarreIcons.FURNACE_PROGRESS_BAR_FULL, AstrarreIcons.FURNACE_PROGRESS_BAR_EMPTY, AProgressBar.Direction.RIGHT);
+		bar1.progress.set(.5f);
+		AProgressBar bar2 = new AProgressBar(AstrarreIcons.FURNACE_FLAME_ON, AstrarreIcons.FURNACE_FLAME_OFF, AProgressBar.Direction.UP);
+		center.add(bar1);
+		center.add(bar2.setTransformation(Transformation.translate(30, 0, 0)));
 		//TestDrawable testDrawable = new TestDrawable();
 		//center.add(new SimpleBorder(testDrawable).setTransformation(Transformation.translate(10, 10, 0)));
 		// here, we create a beveled rectangle. 'Bevel' is an outline, this component is basically just a grey rectangle with a special border (the same one minecraft guis use)
 		// we use the shortcut constructor to tell the beveled rectangle to fill up the entire centering panel
 
-		return null;
+		return bar2;
 	}
 }

@@ -80,7 +80,7 @@ public final class NBTType<T> {
 	 */
 	@Deprecated
 	public boolean internalTypeEquals(int type) {
-		return this.internalType == -1 || this.internalType == type;
+		return this.internalType == -1 || this.internalType == type || type == 0;
 	}
 
 	@Nullable

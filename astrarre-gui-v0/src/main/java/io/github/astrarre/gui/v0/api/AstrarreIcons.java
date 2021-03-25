@@ -34,6 +34,23 @@ public class AstrarreIcons {
 	 */
 	public static final Sprite.Sized X = icon(23, 0, 8, 8);
 
+	/**
+	 * the 'off' flame furnace texture (14x14)
+	 */
+	public static final Sprite.Sized FURNACE_FLAME_OFF = icon(30, 14, 14, 14);
+	/**
+	 * the 'on' flame furnace texture (14x14)
+	 */
+	public static final Sprite.Sized FURNACE_FLAME_ON = icon(30, 28, 14, 14);
+	/**
+	 * the background texture of the progress bar in the furnace (transparent background)
+	 */
+	public static final Sprite.Sized FURNACE_PROGRESS_BAR_EMPTY = icon(58, 0, 22, 16);
+	/**
+	 * the 'filled' progress bar texture in the furnace (transparent background)
+	 */
+	public static final Sprite.Sized FURNACE_PROGRESS_BAR_FULL = icon(58, 16, 22, 16);
+
 	// -- medium button --
 	// the active, highlighted, disabled and pressed textures of a 20x20 button
 	public static final Sprite.Sized MEDIUM_BUTTON_ACTIVE = icon(0, 14, 20, 20);

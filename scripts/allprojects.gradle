@@ -74,5 +74,15 @@ allprojects {
                 }
             }
         }
+
+        repositories {
+            maven {
+                url project.hasProperty('maven_url') ? project.property('maven_url') : ""
+                credentials {
+                    username project.hasProperty('maven_username') ? project.property('maven_username') : ""
+                    password project.hasProperty('maven_password') ? project.property('maven_password') : ""
+                }
+            }
+        }
     }
 }

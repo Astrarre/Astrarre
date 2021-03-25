@@ -99,6 +99,16 @@ public interface Sprite extends Serializable {
 			return new Sized(this.sprite, this.width * scaleX, this.height * scaleY);
 		}
 
+		/**
+		 * @param offsetX all normalized coordinates [0-1]
+		 * @param offsetY [0-1]
+		 * @param width [0-1]
+		 * @param height [0-1]
+		 */
+		public Sized cutout(float offsetX, float offsetY, float width, float height) {
+			return this.sprite.cutout(offsetX, offsetY, width, height).sized(width * this.width, height * this.height);
+		}
+
 		@Override
 		public void save(NBTagView.Builder tag, String key) {
 			NBTagView.Builder view = NBTagView.builder()

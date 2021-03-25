@@ -38,7 +38,7 @@ public class DrawableSerializer implements Serializer<ADrawable> {
 			DrawableInternal.IS_CLIENT.set(false);
 			((DrawableInternal) drawable).id = syncId;
 
-			for (NBTagView tag : input.get("properties", NBTType.listOf(NBTType.TAG), Collections.emptyList())) {
+			for (NBTagView tag : input.get("property", NBTType.listOf(NBTType.TAG), Collections.emptyList())) {
 				SyncedProperty<?> property = drawable.forId(tag.getInt("propertyId"));
 				if (property instanceof DefaultProperty) {
 					property.onSync(tag, "value");
@@ -69,7 +69,8 @@ public class DrawableSerializer implements Serializer<ADrawable> {
 			if (value instanceof ClientSyncedProperty) {
 				NBTagView.Builder tag = NBTagView.builder();
 				tag.putInt("propertyId", ((ClientSyncedProperty<?>) value).id);
-				value.serializer.save(output, "value", value.get());
+				value.serializer.save(tag, "value", value.get());
+				list.add(tag);
 			}
 		}
 		output.put("property", NBTType.listOf(NBTType.TAG), list);
