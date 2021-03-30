@@ -31,29 +31,26 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 /**
- * Slots are 18x18 by default
- * todo gui editor/maker
- * todo split Graphics
+ * Slots are 18x18 by default todo gui editor/maker todo split Graphics
+ *
  * @see ABlockEntityInventorySlot
  * @see APlayerSlot
  */
 public abstract class ASlot extends ADrawable implements Interactable {
 	public static final Polygon SQUARE_16x16 = new Polygon.Builder(4).addVertex(0, 0).addVertex(0, 18).addVertex(18, 18).addVertex(18, 0).build();
 	public static final Sprite.Sized SLOT = Sprite.of(Id.create("minecraft", "textures/gui/container/furnace.png"))
-			.cutout(55/256f, 16/256f, 18/256f, 18/256f)
-			.sized(18, 18);
+			                                        .cutout(55 / 256f, 16 / 256f, 18 / 256f, 18 / 256f).sized(18, 18);
 	private static final Transformation TRANSFORMATION = Transformation.translate(1, 1, 0);
-	protected Inventory inventory;
 	private final int index;
+	protected Inventory inventory;
 	protected Map<RootContainer, MinecraftSlot> minecraftSlots = new WeakHashMap<>();
 	protected Map<RootContainer, IntList> targetSlotIds = new WeakHashMap<>();
 	protected IntList temp;
 	protected boolean highlighted;
-
-	@Environment(EnvType.CLIENT) private int overrideClient = -1;
 	@Environment (EnvType.CLIENT) protected boolean render;
+	@Environment (EnvType.CLIENT) protected IntList slotIds;
+	@Environment (EnvType.CLIENT) private int overrideClient = -1;
 	@Environment (EnvType.CLIENT) private ItemStack override;
-	@Environment(EnvType.CLIENT) protected IntList slotIds;
 
 	protected ASlot(DrawableRegistry.Entry id, Inventory inventory, int index) {
 		super(id);
@@ -62,38 +59,20 @@ public abstract class ASlot extends ADrawable implements Interactable {
 		this.setBounds(SQUARE_16x16);
 	}
 
-	@Environment(EnvType.CLIENT)
+	@Environment (EnvType.CLIENT)
 	protected ASlot(DrawableRegistry.Entry id, NBTagView input) {
 		super(id);
 		this.inventory = this.readInventoryData(input);
 		this.index = input.getInt("index");
 		this.overrideClient = input.getInt("overrideClient");
-		this.temp = input.get("targetSlotIds", NBTType.INT_ARRAY);
+		if (input.hasKey("targetSlotIds")) {
+			this.temp = input.get("targetSlotIds", NBTType.INT_ARRAY);
+		}
 		this.setBounds(SQUARE_16x16);
 	}
 
-	/**
-	 * write any data required to find the corresponding inventory on the other side (client)
-	 */
-	protected abstract void writeInventoryData(NBTagView.Builder output, Inventory inventory);
-	@Environment(EnvType.CLIENT)
+	@Environment (EnvType.CLIENT)
 	protected abstract Inventory readInventoryData(NBTagView input);
-
-	@Override
-	protected void write0(RootContainer container, NBTagView.Builder output) {
-		this.writeInventoryData(output, this.inventory);
-		output.putInt("index", this.index);
-		output.putInt("overrideClient", this.minecraftSlots.get(container).id);
-		output.put("targetSlotIds", NBTType.INT_ARRAY, this.targetSlotIds.get(container));
-	}
-
-	/**
-	 * todo add shift click compat with non-standard GUIs
-	 * when this slot is shift-clicked this method is called
-	 */
-	public void link(RootContainer container, ASlot slot) {
-		this.targetSlotIds.computeIfAbsent(container, a -> new IntArrayList()).add(slot.getSyncId());
-	}
 
 	public void linkAll(RootContainer container, Iterable<ASlot> slots) {
 		for (ASlot slot : slots) {
@@ -101,30 +80,11 @@ public abstract class ASlot extends ADrawable implements Interactable {
 		}
 	}
 
-	@Override
-	protected void onAdded(RootContainer container) {
-		super.onAdded(container);
-		Validate.isTrue(container instanceof SlotAddAccess, "cannot add slot to non-handled screens!");
-		MinecraftSlot slot = new MinecraftSlot(container);
-		this.minecraftSlots.put(container, slot);
-		if(this.isClient()) {
-			if(this.overrideClient != -1) {
-				slot.override = this.overrideClient;
-				slot.id = this.overrideClient;
-			}
-		}
-
-		if(this.temp != null) {
-			IntArrayList list = new IntArrayList();
-			for (int i = 0; i < this.temp.size(); i++) {
-				int val = this.temp.getInt(i);
-				ASlot target = (ASlot) container.forId(val);
-				list.add(target.getSyncId());
-			}
-			this.temp = null;
-			this.targetSlotIds.put(container, list);
-		}
-		((SlotAddAccess) container).addSlot(slot);
+	/**
+	 * todo add shift click compat with non-standard GUIs when this slot is shift-clicked this method is called
+	 */
+	public void link(RootContainer container, ASlot slot) {
+		this.targetSlotIds.computeIfAbsent(container, a -> new IntArrayList()).add(slot.getSyncId());
 	}
 
 	@Override
@@ -138,8 +98,53 @@ public abstract class ASlot extends ADrawable implements Interactable {
 		}
 	}
 
+	@Override
+	protected void write0(RootContainer container, NBTagView.Builder output) {
+		this.writeInventoryData(output, this.inventory);
+		output.putInt("index", this.index);
+		output.putInt("overrideClient", this.minecraftSlots.get(container).id);
+		if (this.targetSlotIds != null) {
+			output.put("targetSlotIds", NBTType.INT_ARRAY, this.targetSlotIds.get(container));
+		}
+	}
+
+	/**
+	 * write any data required to find the corresponding inventory on the other side (client)
+	 */
+	protected abstract void writeInventoryData(NBTagView.Builder output, Inventory inventory);
+
+	@Override
+	protected void onAdded(RootContainer container) {
+		super.onAdded(container);
+		Validate.isTrue(container instanceof SlotAddAccess, "cannot add slot to non-handled screens!");
+		MinecraftSlot slot = new MinecraftSlot(container);
+		this.minecraftSlots.put(container, slot);
+		if (this.isClient()) {
+			if (this.overrideClient != -1) {
+				slot.override = this.overrideClient;
+				slot.id = this.overrideClient;
+			}
+		}
+
+		if (this.temp != null) {
+			IntArrayList list = new IntArrayList();
+			for (int i = 0; i < this.temp.size(); i++) {
+				int val = this.temp.getInt(i);
+				ASlot target = (ASlot) container.forId(val);
+				list.add(target.getSyncId());
+			}
+			this.temp = null;
+			this.targetSlotIds.put(container, list);
+		}
+		((SlotAddAccess) container).addSlot(slot);
+	}
+
 	protected void renderBackground(Graphics3d graphics, float tickDelta) {
 		graphics.drawSprite(SLOT);
+	}
+
+	public ItemStack getStack() {
+		return this.inventory.getStack(this.index);
 	}
 
 	protected void renderGradient(Graphics3d graphics, float tickDelta) {
@@ -148,38 +153,37 @@ public abstract class ASlot extends ADrawable implements Interactable {
 		}
 	}
 
-	public ItemStack getStack() {
-		return this.inventory.getStack(this.index);
-	}
-
 	public void setStack(ItemStack stack) {
 		this.inventory.setStack(this.index, stack);
 	}
 
 	/**
 	 * Transfers the contents of this slot into wherever you want to move the items
+	 *
 	 * @return the itemstack that was transfered
 	 */
-	@Environment(EnvType.CLIENT)
+	@Environment (EnvType.CLIENT)
 	public ItemStack quickTransferStack(RootContainer container) {
-		if(this.slotIds == null) {
+		if (this.slotIds == null) {
 			this.slotIds = new IntArrayList();
 			for (int integer : this.targetSlotIds.get(container)) {
-				this.slotIds.add(((ASlot)container.forId(integer)).minecraftSlots.get(container).id);
+				this.slotIds.add(((ASlot) container.forId(integer)).minecraftSlots.get(container).id);
 			}
 		}
 		IntList ids = this.slotIds;
-		if(this.getStack().isEmpty()) return ItemStack.EMPTY;
+		if (this.getStack().isEmpty()) {
+			return ItemStack.EMPTY;
+		}
 		ItemStack stack = this.getStack();
 		boolean failure = false;
 		for (int i = 0; i < ids.size(); i++) {
 			int slot = ids.getInt(i);
-			ScreenHandler handler = ((ScreenHandlerContainer)container).handler;
-			if(((ScreenHandlerAccess)handler).callInsertItem(stack, slot, slot+1, false)) {
+			ScreenHandler handler = ((ScreenHandlerContainer) container).handler;
+			if (((ScreenHandlerAccess) handler).callInsertItem(stack, slot, slot + 1, false)) {
 				failure = true;
 			}
 		}
-		if(!failure) {
+		if (!failure) {
 			return ItemStack.EMPTY;
 		}
 
@@ -192,8 +196,8 @@ public abstract class ASlot extends ADrawable implements Interactable {
 	}
 
 	private class MinecraftSlot extends net.minecraft.screen.slot.Slot implements ExtraSlotAccess {
-		public int override = -1;
 		public final RootContainer container;
+		public int override = -1;
 
 		public MinecraftSlot(RootContainer container) {
 			super(ASlot.this.inventory, ASlot.this.index, 0, 0);

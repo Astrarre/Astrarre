@@ -22,6 +22,8 @@ import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 
 /**
  * a single file can choose between multiple recipes this file will load recipes. Keep in mind a that this does not check if 2 recipes will conflict in parsing
+ *
+ * recipes would go in 'data/modid/mcrf/path/*' eg. 'data/test/mcrf/test_machine/defaults.mcrf'
  */
 public class RecipeFile implements SimpleSynchronousResourceReloadListener {
 	private final List<RecipeImpl> recipes = new ArrayList<>();

@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import com.google.common.collect.Iterables;
 import io.github.astrarre.itemview.v0.api.Serializable;
 import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.itemview.v0.fabric.FabricViews;
@@ -270,6 +271,10 @@ public interface NBTagView extends Iterable<String>, NbtValue {
 
 	default Builder toBuilder() {
 		return (Builder) this.copyTag();
+	}
+
+	default boolean hasKey(String ids) {
+		return Iterables.contains(this, ids);
 	}
 
 	interface Builder extends NBTagView {
