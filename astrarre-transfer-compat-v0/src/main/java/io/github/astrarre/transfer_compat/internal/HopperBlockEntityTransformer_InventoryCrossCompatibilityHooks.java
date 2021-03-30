@@ -5,7 +5,7 @@ import java.util.function.Supplier;
 
 import io.github.astrarre.access.v0.fabric.func.WorldFunction;
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
-import io.github.astrarre.transfer.internal.inventory.CombinedSidedInventory;
+import io.github.astrarre.transfer.v0.fabric.inventory.CombinedSidedInventory;
 import io.github.astrarre.transfer.v0.api.Participant;
 import io.github.astrarre.transfer.v0.api.Participants;
 import io.github.astrarre.transfer.v0.fabric.participants.FabricParticipants;
@@ -32,6 +32,8 @@ public class HopperBlockEntityTransformer_InventoryCrossCompatibilityHooks {
 	}
 
 	public static Inventory get(BlockPos posM, World worldM, BlockState stateM, BlockEntity entityM) {
+		if(entityM instanceof Inventory) return (Inventory) entityM;
+
 		WorldFunction<Participant<ItemKey>> function = FUNCTION.get();
 		Participant up = function.get(Direction.UP, stateM, worldM, posM, entityM),
 				down = function.get(Direction.DOWN, stateM, worldM, posM, entityM),

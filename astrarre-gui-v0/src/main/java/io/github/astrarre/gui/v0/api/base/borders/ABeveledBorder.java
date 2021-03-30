@@ -16,7 +16,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 public final class ABeveledBorder extends ADelegateDrawable {
-	public static final Transformation TRANSLATE_N2_N2_0 = Transformation.translate(-4, -4, 0);
+	public static final Transformation TRANSLATE_N2_N2_0 = Transformation.translate(-5, -4, 0);
 	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "beveled_border"),
 			ABeveledBorder::new);
 
@@ -33,7 +33,7 @@ public final class ABeveledBorder extends ADelegateDrawable {
 	protected void render0(RootContainer container, Graphics3d graphics, float tickDelta) {
 		Polygon polygon = this.getDelegate().getBounds().getEnclosing();
 		Close close = graphics.applyTransformation(TRANSLATE_N2_N2_0);
-		ABeveledRectangle.drawBevel(graphics, polygon.getX(2) + 8, polygon.getY(2) + 8);
+		ABeveledRectangle.drawBevel(graphics, polygon.getX(2) + 10, polygon.getY(2) + 9);
 		close.close();
 		super.render0(container, graphics, tickDelta);
 	}

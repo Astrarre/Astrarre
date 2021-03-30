@@ -36,7 +36,6 @@ public abstract class ScreenHandlerMixin implements ScreenRootAccess {
 		return this.internal;
 	}
 
-
 	@Inject(method = "addSlot", at = @At("HEAD"), cancellable = true)
 	public void addSlot(Slot slot, CallbackInfoReturnable<Slot> cir) {
 		if (slot instanceof ExtraSlotAccess && ((ExtraSlotAccess) slot).idOverride() != -1) {

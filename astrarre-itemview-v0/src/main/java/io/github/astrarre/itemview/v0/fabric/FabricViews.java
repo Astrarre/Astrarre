@@ -137,8 +137,6 @@ public class FabricViews {
 		throw new UnsupportedOperationException(object + "");
 	}
 
-	// todo from methods
-
 	public static <T> List<T> immutableView(ListTag tag, NBTType<T> componentType) {
 		return view(tag.copy(), componentType);
 	}

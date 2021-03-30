@@ -1,11 +1,15 @@
 package io.github.astrarre.testmod.gui;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.github.astrarre.gui.v0.api.AstrarreIcons;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.base.borders.ABeveledBorder;
 import io.github.astrarre.gui.v0.api.base.panel.ACenteringPanel;
 import io.github.astrarre.gui.v0.api.base.panel.APanel;
 import io.github.astrarre.gui.v0.api.base.statik.ADarkenedBackground;
+import io.github.astrarre.gui.v0.api.base.widgets.AButton;
 import io.github.astrarre.gui.v0.api.base.widgets.AProgressBar;
 import io.github.astrarre.gui.v0.fabric.adapter.slot.APlayerSlot;
 import io.github.astrarre.gui.v0.fabric.adapter.slot.ASlot;
@@ -30,11 +34,13 @@ public class TestModGui {
 		contentPanel.add(new ADarkenedBackground());
 		contentPanel.add(new ABeveledBorder(center));
 
+		List<ASlot> hotbar = new ArrayList<>();
 		for(int inventoryRow = 0; inventoryRow < 3; ++inventoryRow) {
 			for(int inventoryColumn = 0; inventoryColumn < 9; ++inventoryColumn) {
 				ASlot slot = new APlayerSlot(entity.inventory, inventoryColumn + inventoryRow * 9 + 9);
 				slot.setTransformation(Transformation.translate(6 + inventoryColumn * 18, 82 + inventoryRow * 18, 0));
 				center.add(slot);
+				hotbar.add(slot);
 			}
 		}
 
@@ -42,6 +48,10 @@ public class TestModGui {
 			ASlot slot = new APlayerSlot(entity.inventory, hotbarIndex);
 			slot.setTransformation(Transformation.translate(6 + hotbarIndex * 18, 140, 0));
 			center.add(slot);
+			slot.linkAll(container, hotbar);
+			for (ASlot hotbarSlot : hotbar) {
+				hotbarSlot.link(container, slot);
+			}
 		}
 
 		AProgressBar bar1 = new AProgressBar(AstrarreIcons.FURNACE_PROGRESS_BAR_FULL, AstrarreIcons.FURNACE_PROGRESS_BAR_EMPTY, AProgressBar.Direction.RIGHT);
@@ -49,6 +59,7 @@ public class TestModGui {
 		AProgressBar bar2 = new AProgressBar(AstrarreIcons.FURNACE_FLAME_ON, AstrarreIcons.FURNACE_FLAME_OFF, AProgressBar.Direction.UP);
 		center.add(bar1);
 		center.add(bar2.setTransformation(Transformation.translate(30, 0, 0)));
+		center.add(new AButton(AButton.MEDIUM).setTransformation(Transformation.translate(30, 30, 0)));
 		//TestDrawable testDrawable = new TestDrawable();
 		//center.add(new SimpleBorder(testDrawable).setTransformation(Transformation.translate(10, 10, 0)));
 		// here, we create a beveled rectangle. 'Bevel' is an outline, this component is basically just a grey rectangle with a special border (the same one minecraft guis use)

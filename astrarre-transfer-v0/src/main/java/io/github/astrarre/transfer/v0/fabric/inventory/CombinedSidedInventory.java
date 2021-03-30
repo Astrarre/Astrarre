@@ -1,21 +1,16 @@
-package io.github.astrarre.transfer.internal.inventory;
+package io.github.astrarre.transfer.v0.fabric.inventory;
 
-import java.util.Arrays;
-import java.util.Random;
 import java.util.Set;
 import java.util.function.Predicate;
 
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.Bootstrap;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.registry.Registry;
 
 public final class CombinedSidedInventory implements SidedInventory {
 	private static final int[] EMPTY = {};
@@ -269,40 +264,5 @@ public final class CombinedSidedInventory implements SidedInventory {
 			this.source = source;
 			this.slot = slot;
 		}
-	}
-
-	/**
-	 * tests sided inventory
-	 */
-	public static void main(String[] args) {
-		Bootstrap.initialize();
-
-		SimpleInventory first = new SimpleInventory(3) {
-			@Override
-			public boolean isValid(int slot, ItemStack stack) {
-				return false;
-			}
-		}, second = new SimpleInventory(10);
-
-		SidedInventory combined = new CombinedSidedInventory(first,
-				EmptyInventory.INSTANCE,
-				second,
-				EmptyInventory.INSTANCE,
-				EmptyInventory.INSTANCE,
-				EmptyInventory.INSTANCE);
-
-		Random random = new Random();
-		for (Direction value : Direction.values()) {
-			int[] slots = combined.getAvailableSlots(value);
-			for (int slot : slots) {
-				ItemStack stack = new ItemStack(Registry.ITEM.getRandom(random), random.nextInt(3));
-				if (combined.isValid(slot, stack)) {
-					combined.setStack(slot, stack);
-				}
-			}
-			System.out.println(value + ":" + Arrays.toString(slots));
-		}
-
-		System.out.println(combined);
 	}
 }

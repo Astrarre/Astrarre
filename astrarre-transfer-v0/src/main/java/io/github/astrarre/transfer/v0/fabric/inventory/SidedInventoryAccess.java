@@ -1,4 +1,6 @@
-package io.github.astrarre.transfer.internal.inventory;
+package io.github.astrarre.transfer.v0.fabric.inventory;
+
+import io.github.astrarre.transfer.v0.fabric.inventory.FilteringInventory;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;

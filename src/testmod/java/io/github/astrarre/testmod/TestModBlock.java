@@ -7,7 +7,7 @@ import io.github.astrarre.recipes.v0.api.recipe.Result;
 import io.github.astrarre.recipes.v0.api.util.Val;
 import io.github.astrarre.recipes.v0.fabric.ingredient.FabricIngredients;
 import io.github.astrarre.recipes.v0.fabric.output.FabricOutputs;
-import io.github.astrarre.transfer.internal.inventory.InventoryDelegate;
+import io.github.astrarre.transfer.v0.fabric.inventory.InventoryDelegate;
 import io.github.astrarre.util.v0.api.Id;
 import org.jetbrains.annotations.Nullable;
 
@@ -75,7 +75,7 @@ public class TestModBlock extends Block implements BlockEntityProvider {
 		}
 
 		@Override
-		public Inventory getDelegate() {
+		public Inventory getInventoryDelegate() {
 			return this.inventory;
 		}
 	}

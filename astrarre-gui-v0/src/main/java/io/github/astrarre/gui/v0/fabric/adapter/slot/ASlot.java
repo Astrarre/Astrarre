@@ -5,10 +5,13 @@ import java.util.WeakHashMap;
 
 import io.github.astrarre.gui.internal.access.ExtraSlotAccess;
 import io.github.astrarre.gui.internal.access.SlotAddAccess;
+import io.github.astrarre.gui.internal.containers.ScreenHandlerContainer;
+import io.github.astrarre.gui.internal.mixin.ScreenHandlerAccess;
 import io.github.astrarre.gui.v0.api.ADrawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.access.Interactable;
+import io.github.astrarre.itemview.v0.api.nbt.NBTType;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.rendering.v0.api.Transformation;
@@ -17,27 +20,40 @@ import io.github.astrarre.rendering.v0.api.util.Close;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
 import io.github.astrarre.util.v0.api.Id;
 import io.github.astrarre.util.v0.api.Validate;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.ScreenHandler;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
+/**
+ * Slots are 18x18 by default
+ * todo gui editor/maker
+ * todo split Graphics
+ * @see ABlockEntityInventorySlot
+ * @see APlayerSlot
+ */
 public abstract class ASlot extends ADrawable implements Interactable {
 	public static final Polygon SQUARE_16x16 = new Polygon.Builder(4).addVertex(0, 0).addVertex(0, 18).addVertex(18, 18).addVertex(18, 0).build();
 	public static final Sprite.Sized SLOT = Sprite.of(Id.create("minecraft", "textures/gui/container/furnace.png"))
 			.cutout(55/256f, 16/256f, 18/256f, 18/256f)
 			.sized(18, 18);
 	private static final Transformation TRANSFORMATION = Transformation.translate(1, 1, 0);
-	private final Inventory inventory;
+	protected Inventory inventory;
 	private final int index;
 	protected Map<RootContainer, MinecraftSlot> minecraftSlots = new WeakHashMap<>();
+	protected Map<RootContainer, IntList> targetSlotIds = new WeakHashMap<>();
+	protected IntList temp;
 	protected boolean highlighted;
 
 	@Environment(EnvType.CLIENT) private int overrideClient = -1;
 	@Environment (EnvType.CLIENT) protected boolean render;
 	@Environment (EnvType.CLIENT) private ItemStack override;
+	@Environment(EnvType.CLIENT) protected IntList slotIds;
 
 	protected ASlot(DrawableRegistry.Entry id, Inventory inventory, int index) {
 		super(id);
@@ -52,6 +68,7 @@ public abstract class ASlot extends ADrawable implements Interactable {
 		this.inventory = this.readInventoryData(input);
 		this.index = input.getInt("index");
 		this.overrideClient = input.getInt("overrideClient");
+		this.temp = input.get("targetSlotIds", NBTType.INT_ARRAY);
 		this.setBounds(SQUARE_16x16);
 	}
 
@@ -67,6 +84,21 @@ public abstract class ASlot extends ADrawable implements Interactable {
 		this.writeInventoryData(output, this.inventory);
 		output.putInt("index", this.index);
 		output.putInt("overrideClient", this.minecraftSlots.get(container).id);
+		output.put("targetSlotIds", NBTType.INT_ARRAY, this.targetSlotIds.get(container));
+	}
+
+	/**
+	 * todo add shift click compat with non-standard GUIs
+	 * when this slot is shift-clicked this method is called
+	 */
+	public void link(RootContainer container, ASlot slot) {
+		this.targetSlotIds.computeIfAbsent(container, a -> new IntArrayList()).add(slot.getSyncId());
+	}
+
+	public void linkAll(RootContainer container, Iterable<ASlot> slots) {
+		for (ASlot slot : slots) {
+			this.link(container, slot);
+		}
 	}
 
 	@Override
@@ -80,6 +112,17 @@ public abstract class ASlot extends ADrawable implements Interactable {
 				slot.override = this.overrideClient;
 				slot.id = this.overrideClient;
 			}
+		}
+
+		if(this.temp != null) {
+			IntArrayList list = new IntArrayList();
+			for (int i = 0; i < this.temp.size(); i++) {
+				int val = this.temp.getInt(i);
+				ASlot target = (ASlot) container.forId(val);
+				list.add(target.getSyncId());
+			}
+			this.temp = null;
+			this.targetSlotIds.put(container, list);
 		}
 		((SlotAddAccess) container).addSlot(slot);
 	}
@@ -111,6 +154,36 @@ public abstract class ASlot extends ADrawable implements Interactable {
 
 	public void setStack(ItemStack stack) {
 		this.inventory.setStack(this.index, stack);
+	}
+
+	/**
+	 * Transfers the contents of this slot into wherever you want to move the items
+	 * @return the itemstack that was transfered
+	 */
+	@Environment(EnvType.CLIENT)
+	public ItemStack quickTransferStack(RootContainer container) {
+		if(this.slotIds == null) {
+			this.slotIds = new IntArrayList();
+			for (int integer : this.targetSlotIds.get(container)) {
+				this.slotIds.add(((ASlot)container.forId(integer)).minecraftSlots.get(container).id);
+			}
+		}
+		IntList ids = this.slotIds;
+		if(this.getStack().isEmpty()) return ItemStack.EMPTY;
+		ItemStack stack = this.getStack();
+		boolean failure = false;
+		for (int i = 0; i < ids.size(); i++) {
+			int slot = ids.getInt(i);
+			ScreenHandler handler = ((ScreenHandlerContainer)container).handler;
+			if(((ScreenHandlerAccess)handler).callInsertItem(stack, slot, slot+1, false)) {
+				failure = true;
+			}
+		}
+		if(!failure) {
+			return ItemStack.EMPTY;
+		}
+
+		return stack.copy();
 	}
 
 	@Override
@@ -151,6 +224,11 @@ public abstract class ASlot extends ADrawable implements Interactable {
 		@Override
 		public int idOverride() {
 			return this.override;
+		}
+
+		@Override
+		public ItemStack transferSlot(RootContainer container) {
+			return ASlot.this.quickTransferStack(container);
 		}
 
 		@Override

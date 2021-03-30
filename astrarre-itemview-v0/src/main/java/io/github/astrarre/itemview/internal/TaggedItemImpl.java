@@ -38,8 +38,13 @@ public class TaggedItemImpl implements ItemKey {
 
 	@Override
 	public int getMaxStackSize() {
-		// todo CompoundTag aware max count
-		return this.getItem().getMaxCount();
+		if(this.nbtTag.isEmpty()) {
+			return this.getItem().getMaxCount();
+		} else {
+			ItemStack stack = new ItemStack(this.getItem());
+			stack.setTag(this.nbtTag.copyTag());
+			return stack.getMaxCount();
+		}
 	}
 
 	@Override

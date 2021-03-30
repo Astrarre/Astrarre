@@ -1,6 +1,7 @@
 package io.github.astrarre.gui.v0.api.base.widgets;
 
 import io.github.astrarre.gui.v0.api.ADrawable;
+import io.github.astrarre.gui.v0.api.AstrarreIcons;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.itemview.v0.api.Serializer;
@@ -11,6 +12,7 @@ import io.github.astrarre.rendering.v0.api.Graphics3d;
 import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.rendering.v0.api.textures.Sprite;
 import io.github.astrarre.rendering.v0.api.util.Close;
+import io.github.astrarre.rendering.v0.api.util.Polygon;
 import io.github.astrarre.util.v0.api.Id;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,6 +27,11 @@ public class AProgressBar extends ADrawable {
 			Sprite.SIZED_SER,
 			null), background = this.createClientSyncedProperty(Sprite.SIZED_SER, null);
 	public final Direction direction;
+
+	/**
+	 * @see AstrarreIcons#FURNACE_PROGRESS_BAR_FULL
+	 * @param direction the direction the progress bar should go in
+	 */
 	public AProgressBar(Sprite.Sized bar, Sprite.Sized background, Direction direction) {
 		this(ENTRY, bar, background, direction);
 	}
@@ -34,6 +41,7 @@ public class AProgressBar extends ADrawable {
 		this.full.set(bar);
 		this.background.set(background);
 		this.direction = direction;
+		this.setBounds(Polygon.rectangle(bar.width, bar.height));
 	}
 
 	protected AProgressBar(DrawableRegistry.Entry id, NBTagView v) {

@@ -15,10 +15,10 @@ import io.github.astrarre.itemview.v0.fabric.FabricSerializers;
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import io.github.astrarre.transfer.internal.NUtil;
 import io.github.astrarre.transfer.internal.SlotParticipant;
-import io.github.astrarre.transfer.internal.inventory.CombinedSidedInventory;
-import io.github.astrarre.transfer.internal.inventory.EmptyInventory;
-import io.github.astrarre.transfer.internal.inventory.SidedInventoryAccess;
-import io.github.astrarre.transfer.internal.participantInventory.AggregateParticipantInventory;
+import io.github.astrarre.transfer.internal.compat.ProperPlayerInventory;
+import io.github.astrarre.transfer.v0.fabric.inventory.CombinedSidedInventory;
+import io.github.astrarre.transfer.v0.fabric.inventory.EmptyInventory;
+import io.github.astrarre.transfer.v0.fabric.inventory.SidedInventoryAccess;
 import io.github.astrarre.transfer.internal.participantInventory.ParticipantInventory;
 import io.github.astrarre.transfer.v0.api.Insertable;
 import io.github.astrarre.transfer.v0.api.Participant;
@@ -26,12 +26,13 @@ import io.github.astrarre.transfer.v0.api.Participants;
 import io.github.astrarre.transfer.v0.api.participants.AggregateParticipant;
 import io.github.astrarre.transfer.v0.api.participants.FixedObjectVolume;
 import io.github.astrarre.transfer.v0.api.participants.ObjectVolume;
-import io.github.astrarre.transfer.v0.fabric.participants.item.ItemSlotParticipant;
+import io.github.astrarre.transfer.v0.api.item.ItemSlotParticipant;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.HopperBlockEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.Inventory;
@@ -71,12 +72,6 @@ public final class FabricParticipants {
 		ITEM_WORLD.addWorldProviderFunctions();
 		FLUID_WORLD.addWorldProviderFunctions();
 		TO_INVENTORY.addProviderFunction();
-		TO_INVENTORY.andThen(participant -> {
-			if (participant instanceof AggregateParticipant) {
-				return new AggregateParticipantInventory((AggregateParticipant<ItemKey>) participant);
-			}
-			return null;
-		});
 
 		// todo voiding and creative sink
 		TO_INVENTORY.forInstance(Participants.EMPTY.cast(), participant -> EmptyInventory.INSTANCE);
@@ -88,12 +83,12 @@ public final class FabricParticipants {
 				return ((ParticipantInventory) inventory).participant;
 			}
 
-			if (inventory instanceof SidedInventory) {
-				inventory = new SidedInventoryAccess((SidedInventory) inventory, direction);
+			if(inventory instanceof PlayerInventory) {
+				inventory = new ProperPlayerInventory((PlayerInventory) inventory);
 			}
 
-			if(inventory instanceof AggregateParticipantInventory) {
-				return ((AggregateParticipantInventory) inventory).participant;
+			if (inventory instanceof SidedInventory) {
+				inventory = new SidedInventoryAccess((SidedInventory) inventory, direction);
 			}
 
 			Participant<ItemKey>[] list = new Participant[inventory.size()];
@@ -103,6 +98,20 @@ public final class FabricParticipants {
 			// todo inventory aggregate participant to avoid wrapping and re-wrapping inventory
 			// also we need some kind of caching thing tbh
 			return new AggregateParticipant<>(list);
+		});
+
+		FILTERS.addProviderFunction();
+		FILTERS.dependsOn(Participants.AGGREGATE_WRAPPERS_INSERTABLE, function -> insertable -> {
+			Collection<Insertable<ItemKey>> wrapped = Participants.unwrapInternal((AccessFunction) function, insertable);
+			if (wrapped == null) {
+				return Collections.emptySet();
+			}
+
+			Set<Item> combined = null;
+			for (Insertable<ItemKey> delegate : wrapped) {
+				combined = NUtil.addAll(combined, FILTERS.get().apply(delegate));
+			}
+			return combined;
 		});
 	}
 
@@ -138,22 +147,6 @@ public final class FabricParticipants {
 
 	public static SidedInventory create(Inventory bottom, Inventory top, Inventory north, Inventory south, Inventory west, Inventory east) {
 		return new CombinedSidedInventory(bottom, top, north, south, west, east);
-	}
-
-	static {
-		FILTERS.addProviderFunction();
-		FILTERS.dependsOn(Participants.AGGREGATE_WRAPPERS_INSERTABLE, function -> insertable -> {
-			Collection<Insertable<ItemKey>> wrapped = Participants.unwrapInternal((AccessFunction) function, insertable);
-			if (wrapped == null) {
-				return Collections.emptySet();
-			}
-
-			Set<Item> combined = null;
-			for (Insertable<ItemKey> delegate : wrapped) {
-				combined = NUtil.addAll(combined, FILTERS.get().apply(delegate));
-			}
-			return combined;
-		});
 	}
 
 	public static SidedInventory getSidedInventoryAt(WorldFunction<Participant<ItemKey>> function,

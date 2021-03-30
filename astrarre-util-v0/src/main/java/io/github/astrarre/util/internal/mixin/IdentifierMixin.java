@@ -12,7 +12,7 @@ public abstract class IdentifierMixin implements Id {
 	@Shadow public abstract String getPath();
 
 	@Override
-	public String id() {
+	public String mod() {
 		return this.getNamespace();
 	}
 

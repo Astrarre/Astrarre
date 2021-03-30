@@ -1,6 +1,7 @@
 package io.github.astrarre.transfer.v0.api.transaction;
 
-// todo some way of de-duplicating containers
+
+import io.github.astrarre.util.v0.api.Validate;
 
 /**
  * a 'serialized world state' more documentation on the concept can be seen
@@ -12,6 +13,7 @@ public final class Transaction implements AutoCloseable {
 	public static final Transaction GLOBAL = null;
 
 	private static final ThreadLocal<Transaction> ACTIVE = new ThreadLocal<>();
+	private final Throwable debug;
 	private final Transaction parent;
 	private final int nest;
 	private final boolean intent;
@@ -21,6 +23,7 @@ public final class Transaction implements AutoCloseable {
 	private Transaction() {
 		this(true);
 	}
+
 	private Transaction(boolean intent) {
 		this.intent = intent;
 		this.parent = ACTIVE.get();
@@ -30,6 +33,11 @@ public final class Transaction implements AutoCloseable {
 			this.nest = this.parent.nest + 1;
 		}
 		ACTIVE.set(this);
+		if(Validate.IS_DEV) {
+			this.debug = new Throwable();
+		} else {
+			this.debug = null;
+		}
 	}
 
 	/**
@@ -123,7 +131,18 @@ public final class Transaction implements AutoCloseable {
 	 */
 	public void validateThread(String err) {
 		if (ACTIVE.get() != this) {
+			if(this.debug != null) {
+				TransactionInitialization debugException = new TransactionInitialization();
+				debugException.setStackTrace(this.debug.getStackTrace());
+				throw new IllegalStateException(err, debugException);
+			}
 			throw new IllegalStateException(err);
+		}
+	}
+
+	private static final class TransactionInitialization extends Throwable {
+		public TransactionInitialization() {
+			super("Transaction initialization stacktrace");
 		}
 	}
 }

@@ -28,7 +28,7 @@ public interface Id {
 		return create(str.substring(0, i), str.substring(i + 1));
 	}
 
-	String id();
+	String mod();
 	String path();
 
 	default Identifier to() {

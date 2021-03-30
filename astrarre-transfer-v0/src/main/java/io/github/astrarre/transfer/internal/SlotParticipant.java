@@ -1,7 +1,7 @@
 package io.github.astrarre.transfer.internal;
 
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
-import io.github.astrarre.transfer.internal.inventory.FilteringInventory;
+import io.github.astrarre.transfer.v0.fabric.inventory.FilteringInventory;
 import io.github.astrarre.transfer.v0.api.Insertable;
 import io.github.astrarre.transfer.v0.api.Participant;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;

@@ -5,7 +5,7 @@ import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import io.github.astrarre.transfer.v0.fabric.participants.FabricParticipants;
-import io.github.astrarre.transfer.v0.fabric.participants.item.ItemSlotParticipant;
+import io.github.astrarre.transfer.v0.api.item.ItemSlotParticipant;
 
 /**
  * an object volume that has a maximum quantity.

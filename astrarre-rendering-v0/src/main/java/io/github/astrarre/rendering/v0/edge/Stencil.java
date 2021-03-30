@@ -15,81 +15,111 @@ public class Stencil {
 	private static final int MAX_STENCIL = 255;
 	private int stencilStart = 0;
 
-	Stencil() {}
+	private static final Type[] TYPES = Type.values();
+	public enum Type {
+		TRACING {
+			@Override
+			protected void open(int stencilId) {
+				PASSTHROUGH.open(stencilId);
+				RenderSystem.colorMask(false, false, false, false);
+				RenderSystem.depthMask(false);
+			}
 
-	/**
-	 * A tracing stencil is a stencil that does not actually draw to the screen, it just creates a stencil For example, if you want to draw an
-	 * silhouette of an item, you would 1) start a tracing stencil 2) draw the item 3) call drawTracingStencil 4) fill a black area 5) end the
-	 * stencil
-	 * starts a new stencil but blocks drawing to the screen
-	 */
-	public int startTracingStencil() {
-		int stencilId = this.startPassthroughStencil();
-		RenderSystem.colorMask(false, false, false, false);
-		RenderSystem.depthMask(false);
-		return stencilId;
+			@Override
+			protected void draw(int stencilId) {
+				RenderSystem.colorMask(true, true, true, true);
+				RenderSystem.depthMask(true);
+				PASSTHROUGH.draw(stencilId);
+			}
+		},
+		PASSTHROUGH {
+			@Override
+			protected void open(int stencilId) {
+				RenderSystem.stencilFunc(GL11.GL_NEVER, stencilId, 0xFF);
+				RenderSystem.stencilOp(GL11.GL_REPLACE, GL11.GL_KEEP, GL11.GL_KEEP);
+				RenderSystem.stencilMask(0xFF);
+			}
+
+			@Override
+			protected void draw(int stencilId) {
+				RenderSystem.stencilMask(0x00);
+				RenderSystem.stencilFunc(GL11.GL_EQUAL, stencilId, 0xFF);
+			}
+		},
+		TRACING_INVERTED {
+			@Override
+			protected void open(int stencilId) {
+				TRACING.open(stencilId);
+			}
+
+			@Override
+			protected void draw(int stencilId) {
+				RenderSystem.colorMask(true, true, true, true);
+				RenderSystem.depthMask(true);
+				PASSTHROUGH_INVERTED.draw(stencilId);
+			}
+		},
+		PASSTHROUGH_INVERTED {
+			@Override
+			protected void open(int stencilId) {
+				PASSTHROUGH.open(stencilId);
+			}
+
+			@Override
+			protected void draw(int stencilId) {
+				RenderSystem.stencilMask(0x00);
+				RenderSystem.stencilFunc(GL11.GL_NOTEQUAL, stencilId, 0xFF);
+			}
+		};
+
+		protected abstract void open(int stencilId);
+		protected abstract void draw(int stencilId);
 	}
+
+	Stencil() {}
 
 	/**
 	 * a passthrough stencil creates the stencil like normal, but it also draws to the screen
 	 *
 	 * @return a stencil id
 	 */
-	public int startPassthroughStencil() {
+	public int startStencil(Stencil.Type type) {
 		int stencilId = ++this.stencilStart;
 		if (stencilId > MAX_STENCIL) {
 			throw new IllegalStateException("cannot make more nested stencils than " + MAX_STENCIL);
 		}
 		if (stencilId == 1) {
+			GL11.glClearStencil(0);
+			GL11.glClear(GL11.GL_STENCIL_BUFFER_BIT);
 			GL11.glEnable(GL11.GL_STENCIL_TEST);
 		}
-		RenderSystem.stencilFunc(GL11.GL_NEVER, stencilId, 0xFF);
-		RenderSystem.stencilOp(GL11.GL_REPLACE, GL11.GL_KEEP, GL11.GL_KEEP);
-		RenderSystem.stencilMask(0xFF);
-		return stencilId;
+		type.open(stencilId);
+		return stencilId | type.ordinal() << 8;
 	}
 
 	/**
-	 * draw the desired object on the stencil.
+	 * draw whatever you want to draw over the stencil. Like an IRL stencil, you can paint whatever you want with no regards for the stencil underneath,
+	 * and once the stencil is "taken away" you are left with a perfectly bounded shape
 	 */
-	public void drawTracingStencil(int stencilId) {
-		RenderSystem.colorMask(true, true, true, true);
-		RenderSystem.depthMask(true);
-		this.drawPassthroughStencil(stencilId);
+	public void fill(int stencilId) {
+		int type = stencilId >>> 8;
+		TYPES[type].draw(stencilId & 0xff);
 	}
 
-	public void drawInvertedTracingStencil(int stencilId) {
-		RenderSystem.colorMask(true, true, true, true);
-		RenderSystem.depthMask(true);
-		this.drawInvertedPassthroughStencil(stencilId);
-	}
-
-	/**
-	 * draw the desired object on the stencil
-	 */
-	public void drawPassthroughStencil(int stencilId) {
-		RenderSystem.stencilMask(0x00);
-		RenderSystem.stencilFunc(GL11.GL_EQUAL, stencilId, 0xFF);
-	}
-
-	public void drawInvertedPassthroughStencil(int stencilId) {
-		RenderSystem.stencilMask(0x00);
-		RenderSystem.stencilFunc(GL11.GL_NOTEQUAL, stencilId, 0xFF);
-	}
 
 	/**
 	 * end the stencil
 	 */
 	public void endStencil(int stencilId) {
-		if (this.stencilStart != stencilId) {
+		int id = stencilId & 0xff;
+		if (this.stencilStart != id) {
 			throw new IllegalStateException("Tried to end stencil before parents were ended");
 		}
 		this.stencilStart--;
-		if (stencilId == 1) {
+		if (id == 1) {
 			GL11.glDisable(GL11.GL_STENCIL_TEST);
 		}
 	}
-
 
 	/**
 	 * @deprecated internal

@@ -62,6 +62,10 @@ public interface Sprite extends Serializable {
 		return new Cutout(this.textureId(), fox, foy, fw, fh);
 	}
 
+	default Sprite.Sized cutoutSized(float offsetX, float offsetY, float width, float height, float totalWidth, float totalHeight) {
+		return this.cutout(offsetX / totalWidth, offsetY / totalHeight, width / totalWidth, height / totalHeight).sized(width, height);
+	}
+
 	/**
 	 * the offsetX/offsetY is not necessarily in pixels
 	 */
@@ -108,6 +112,10 @@ public interface Sprite extends Serializable {
 		 */
 		public Sized cutout(float offsetX, float offsetY, float width, float height) {
 			return this.sprite.cutout(offsetX, offsetY, width, height).sized(width * this.width, height * this.height);
+		}
+
+		public Sized cutToSize(float width, float height) {
+			return this.cutout(0, 0, width / this.width, height / this.height);
 		}
 
 		@Override

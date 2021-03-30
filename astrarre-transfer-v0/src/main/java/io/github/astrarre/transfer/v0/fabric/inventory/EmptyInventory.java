@@ -1,4 +1,4 @@
-package io.github.astrarre.transfer.internal.inventory;
+package io.github.astrarre.transfer.v0.fabric.inventory;
 
 import java.util.Set;
 

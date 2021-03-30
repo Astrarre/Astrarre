@@ -1,7 +1,6 @@
 package io.github.astrarre.rendering.internal;
 
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
@@ -21,7 +20,6 @@ public final class DummyScreen extends Screen {
 	public static final DummyScreen INSTANCE = new DummyScreen();
 	private DummyScreen() {
 		super(new LiteralText("astrarre dummy screen"));
-		this.init(MinecraftClient.getInstance(), MIN_WIDTH, MIN_HEIGHT);
 	}
 
 	@Override

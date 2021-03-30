@@ -44,7 +44,7 @@ public class ObjectVolume<T> implements Participant<T> {
 
 	public ObjectVolume(T empty, T object, int quantity) {
 		this.empty = empty;
-		if (object == this.empty && quantity != 0) {
+		if (object == empty && quantity != 0) {
 			throw new IllegalArgumentException("cannot have " + quantity + " units of EMPTY!");
 		} else if (quantity < 0) {
 			throw new IllegalArgumentException("Cannot have negative units of " + object);
@@ -79,9 +79,7 @@ public class ObjectVolume<T> implements Participant<T> {
 			}
 
 			int current = this.quantity.get(transaction);
-
 			quantity = Math.min(Integer.MAX_VALUE - current, quantity);
-
 			this.quantity.set(transaction, current + quantity);
 			return quantity;
 		}
@@ -109,6 +107,7 @@ public class ObjectVolume<T> implements Participant<T> {
 			int oldLevel = this.quantity.get(transaction);
 			int toExtract = Math.min(oldLevel, quantity);
 			int newLevel = oldLevel - toExtract;
+			this.quantity.set(transaction, newLevel);
 			if (newLevel == 0) {
 				this.type.set(transaction, this.empty);
 			}

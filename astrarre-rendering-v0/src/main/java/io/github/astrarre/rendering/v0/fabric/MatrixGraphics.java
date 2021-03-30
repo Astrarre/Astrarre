@@ -19,7 +19,9 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.OutlineVertexConsumerProvider;
 import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.texture.TextureManager;
@@ -57,6 +59,7 @@ public class MatrixGraphics implements Graphics3d {
 		} else {
 			this.getTextRenderer().draw(this.matrices, text, 0, 0, color);
 		}
+		RenderSystem.enableDepthTest();
 	}
 
 	@Override
@@ -67,6 +70,7 @@ public class MatrixGraphics implements Graphics3d {
 		} else {
 			this.getTextRenderer().draw(this.matrices, text, 0, 0, color);
 		}
+		RenderSystem.enableDepthTest();
 	}
 
 	@Override
@@ -77,34 +81,39 @@ public class MatrixGraphics implements Graphics3d {
 		} else {
 			this.getTextRenderer().draw(this.matrices, text, 0, 0, color);
 		}
+		RenderSystem.enableDepthTest();
 	}
 
 	@Override
 	public void drawTooltip(List<Text> text) {
 		this.pushStage(null);
 		DummyScreen.INSTANCE.renderTooltip(this.matrices, text, 0, 0);
+		RenderSystem.enableDepthTest();
 	}
 
 	@Override
 	public void drawOrderedTooltip(List<OrderedText> text) {
 		this.pushStage(null);
 		DummyScreen.INSTANCE.renderOrderedTooltip(this.matrices, text, 0, 0);
+		RenderSystem.enableDepthTest();
 	}
 
 	@Override
 	public void drawTooltip(ItemStack stack) {
 		this.pushStage(null);
 		DummyScreen.INSTANCE.renderTooltip(this.matrices, stack, 0, 0);
+		RenderSystem.enableDepthTest();
 	}
 
 	@Override
 	public void fillPolygon(Polygon polygon, int color) {
 		this.pushStage(SetupTeardown.FILL);
-		int a = color >> 24 & 255;
-		int r = color >> 16 & 255;
-		int g = color >> 8 & 255;
+		int a = (color >> 24) & 255;
+		int r = (color >> 16) & 255;
+		int g = (color >> 8) & 255;
 		int b = color & 255;
-		polygon.triangleBuffer(VertexFormats.POSITION_COLOR, consumer -> consumer.color(a, r, g, b), color | Polygon.COLOR);
+		BufferBuilder builder = polygon.triangleBuffer(this.matrices, VertexFormats.POSITION_COLOR, consumer -> consumer.color(a, r, g, b));
+		BufferRenderer.draw(builder);
 	}
 
 	@Override
@@ -188,6 +197,7 @@ public class MatrixGraphics implements Graphics3d {
 		RenderSystem.translatef(0, 0, -150);
 		this.getItemRenderer().renderInGui(stack.createItemStack(1), 1, 1);
 		RenderSystem.popMatrix();
+		RenderSystem.enableDepthTest();
 	}
 
 	@Override
@@ -201,6 +211,7 @@ public class MatrixGraphics implements Graphics3d {
 		this.getItemRenderer().renderInGui(stack, 1, 1);
 		this.getItemRenderer().renderGuiItemOverlay(this.getTextRenderer(), stack, 1, 1);
 		RenderSystem.popMatrix();
+		RenderSystem.enableDepthTest();
 	}
 
 	@Override

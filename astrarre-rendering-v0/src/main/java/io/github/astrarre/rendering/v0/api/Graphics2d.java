@@ -44,6 +44,10 @@ public interface Graphics2d {
 		return MinecraftClient.getInstance().textRenderer.getWidth(text);
 	}
 
+	static List<OrderedText> wrap(Text text, int width) {
+		return MinecraftClient.getInstance().textRenderer.wrapLines(text, width);
+	}
+
 	/**
 	 * Draws a line from a starting position to a specified length. (Drawn along the X axis)
 	 * @param color {@link Graphics2d#getARGB(int, int, int)}
@@ -75,6 +79,10 @@ public interface Graphics2d {
 		}
 	}
 
+	/**
+	 * @deprecated until I fix it
+	 */
+	@Deprecated
 	void fillPolygon(Polygon polygon, int color);
 
 	/**

@@ -10,7 +10,6 @@ public interface RecipePart<V, I> {
 	// if any one of them fails, they abort the transaction
 	//      if the output suceedes, you commit the transaction
 	//      if the output is never called then there is problem
-	// todo debug mode for transactions, record stacktrace
 
 	ValueParser<V> parser();
 

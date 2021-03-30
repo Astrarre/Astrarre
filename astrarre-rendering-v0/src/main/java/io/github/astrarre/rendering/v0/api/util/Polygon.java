@@ -1,14 +1,12 @@
 package io.github.astrarre.rendering.v0.api.util;
 
-import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 
 import earcut4j.Earcut;
 import io.github.astrarre.itemview.v0.api.Serializable;
 import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.itemview.v0.api.nbt.NBTType;
-import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.itemview.v0.api.nbt.NbtValue;
-import io.github.astrarre.rendering.internal.mixin.BufferBuilderAccess;
 import io.github.astrarre.rendering.internal.util.MathUtil;
 import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.util.v0.api.Validate;
@@ -19,8 +17,10 @@ import it.unimi.dsi.fastutil.ints.IntLists;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.Vector4f;
 
 import net.fabricmc.api.EnvType;
@@ -34,7 +34,6 @@ public final class Polygon implements Serializable {
 	private final float[] vertices;
 	private final int offset, length;
 	private IntList triangulation;
-	@Environment (EnvType.CLIENT) private BufferBuilder cachedBuffer;
 	private Polygon enclosing;
 
 	private Polygon(float[] vertices) {
@@ -72,6 +71,18 @@ public final class Polygon implements Serializable {
 		this.length = vertices.length;
 	}
 
+	/**
+	 * @return a new regular polygon centered at [0, 0] for the given radii
+	 */
+	public static Polygon regular(int vertices, float radii) {
+		Polygon.Builder builder = new Builder(vertices);
+		for (int i = 0; i < vertices; i++) {
+			double angle = 2 * Math.PI * i / vertices;
+			double x = radii * Math.cos(angle), y = radii * Math.sin(angle);
+			builder.addVertex((float) x, (float) y);
+		}
+		return builder.build();
+	}
 
 	public int indexOf(float px, float py) {
 		for (int i = 0; i < this.vertices(); i++) {
@@ -80,6 +91,22 @@ public final class Polygon implements Serializable {
 			}
 		}
 		return -1;
+	}
+
+	public boolean isInside(float px, float py) {
+		int count = 0;
+		int vertices = this.vertices();
+		for (int i = 0; i < vertices; i++) {
+			int next = (i + 1) % vertices;
+			float x = this.getX(i), y = this.getY(i), nx = this.getX(next), ny = this.getY(next);
+			if (MathUtil.linesIntersect(x, y, nx, ny, px, py, 1_000_000, py)) {
+				if (Math.abs(MathUtil.rot(x, y, px, py, nx, ny)) < EPSILON) {
+					return MathUtil.onSegment(x, y, px, py, nx, ny);
+				}
+				count++;
+			}
+		}
+		return (count % 2 == 1); // Same as (count%2 == 1)
 	}
 
 	public int vertices() {
@@ -98,22 +125,6 @@ public final class Polygon implements Serializable {
 		int index = (this.offset + vertex * 2) + offset;
 		Validate.lessThan(index, this.length, index + " out of bounds!");
 		return this.vertices[index];
-	}
-
-	public boolean isInside(float px, float py) {
-		int count = 0;
-		int vertices = this.vertices();
-		for (int i = 0; i < vertices; i++) {
-			int next = (i + 1) % vertices;
-			float x = this.getX(i), y = this.getY(i), nx = this.getX(next), ny = this.getY(next);
-			if (MathUtil.linesIntersect(x, y, nx, ny, px, py, 1_000_000, py)) {
-				if (Math.abs(MathUtil.rot(x, y, px, py, nx, ny)) < EPSILON) {
-					return MathUtil.onSegment(x, y, px, py, nx, ny);
-				}
-				count++;
-			}
-		}
-		return (count % 2 == 1); // Same as (count%2 == 1)
 	}
 
 	public Polygon getEnclosing() {
@@ -145,33 +156,9 @@ public final class Polygon implements Serializable {
 				width,
 				0
 		};
-		return new Polygon(buf);
-	}
-
-	/**
-	 * @return a new regular polygon centered at [0, 0] for the given radii
-	 */
-	public static Polygon regular(int vertices, float radii) {
-		Polygon.Builder builder = new Builder(vertices);
-		for (int i = 0; i < vertices; i++) {
-			double angle = 2 * Math.PI * i / vertices;
-			double x = radii * Math.cos(angle), y = radii * Math.sin(angle);
-			builder.addVertex((float)x, (float)y);
-		}
-		return builder.build();
-	}
-
-	/**
-	 * @return a list of 3 vertex indices of the triangles that compose this polygon
-	 */
-	public IntList triangulate() {
-		IntList triangulation = this.triangulation;
-		if (triangulation == null) {
-			IntList list = Earcut.earcut(this.vertices, this.offset, this.length, null, 2);
-			((IntArrayList) list).trim();
-			return this.triangulation = IntLists.unmodifiable(list);
-		}
-		return triangulation;
+		Polygon polygon = new Polygon(buf);
+		polygon.enclosing = polygon;
+		return polygon;
 	}
 
 	public Builder toBuilder() {
@@ -204,14 +191,14 @@ public final class Polygon implements Serializable {
 		}
 
 		Polygon polygon = (Polygon) o;
-		if(polygon.vertices() != this.vertices()) {
+		if (polygon.vertices() != this.vertices()) {
 			return false;
 		}
 
 		int startIndex = polygon.indexOf(this.getX(0), this.getY(0));
 		int vertices = this.vertices();
 		for (int i = 0; i < vertices; i++) {
-			if(this.getX(i) != polygon.getX((startIndex + i) % vertices) || this.getY(i) != polygon.getY((startIndex + i) % vertices)) {
+			if (this.getX(i) != polygon.getX((startIndex + i) % vertices) || this.getY(i) != polygon.getY((startIndex + i) % vertices)) {
 				return false;
 			}
 		}
@@ -225,8 +212,7 @@ public final class Polygon implements Serializable {
 		builder.append('[');
 		for (int i = 0; i < this.length; i += 2) {
 			builder.append('\n').append('\t').append('[').append(String.format("%3.3f", this.vertices[i])).append(',')
-					.append(String.format("%3.3f", this.vertices[i + 1]))
-					.append(']');
+					.append(String.format("%3.3f", this.vertices[i + 1])).append(']');
 		}
 		builder.append(']');
 		return builder.toString();
@@ -239,6 +225,36 @@ public final class Polygon implements Serializable {
 			list.add(Float.floatToIntBits(this.vertices[i + this.offset]));
 		}
 		return NbtValue.of(NBTType.INT_ARRAY, list);
+	}
+
+	/**
+	 * @deprecated internal
+	 */
+	@Deprecated
+	@Environment (EnvType.CLIENT)
+	public BufferBuilder triangleBuffer(MatrixStack stack, VertexFormat format, UnaryOperator<VertexConsumer> consumer) {
+		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
+		buffer.begin(GL11.GL_TRIANGLES, format);
+		IntList triangles = this.triangulate();
+		for (int i = triangles.size() - 1; i >= 0; i--) {
+			int vertex = triangles.getInt(i);
+			consumer.apply(buffer.vertex(stack.peek().getModel(), this.getX(vertex), this.getY(vertex), 0)).next();
+		}
+		buffer.end();
+		return buffer;
+	}
+
+	/**
+	 * @return a list of 3 vertex indices of the triangles that compose this polygon
+	 */
+	public IntList triangulate() {
+		IntList triangulation = this.triangulation;
+		if (triangulation == null) {
+			IntList list = Earcut.earcut(this.vertices, this.offset, this.length, null, 2);
+			((IntArrayList) list).trim();
+			return this.triangulation = IntLists.unmodifiable(list);
+		}
+		return triangulation;
 	}
 
 	public interface PointWalker {
@@ -291,34 +307,5 @@ public final class Polygon implements Serializable {
 			this.list = null;
 			return polygon;
 		}
-	}
-
-	public static final long COLOR = 0L << 32;
-	public static final long TEXTURE = 1L << 32;
-
-	public static int packId(int type, int id) {
-		return type | id;
-	}
-
-	private long id;
-	/**
-	 * @deprecated internal
-	 */
-	@Deprecated
-	@Environment(EnvType.CLIENT)
-	public BufferBuilder triangleBuffer(VertexFormat format, Consumer<VertexConsumer> consumer, long id) {
-		BufferBuilder builder = this.cachedBuffer;
-		if(builder == null || ((BufferBuilderAccess)builder).getFormat() != format || this.id != id) {
-			this.id = id;
-			BufferBuilder buffer = new BufferBuilder((this.length * 3) / 2);
-			buffer.begin(GL11.GL_TRIANGLES, format);
-			IntList triangles = this.triangulate();
-			for (int i = 0; i < triangles.size(); i++) {
-				consumer.accept(buffer.vertex(this.getX(i), this.getY(i), 0));
-			}
-			this.cachedBuffer = buffer;
-			return buffer;
-		}
-		return builder;
 	}
 }

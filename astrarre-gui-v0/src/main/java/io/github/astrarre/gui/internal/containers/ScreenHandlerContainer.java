@@ -25,7 +25,7 @@ import net.fabricmc.api.Environment;
 public class ScreenHandlerContainer extends RootContainerInternal implements SlotAddAccess {
 	@Environment (EnvType.CLIENT) public HandledScreen<?> screen;
 	@Environment (EnvType.CLIENT) public List<OnResize> resizeList;
-	private ScreenHandler handler;
+	public ScreenHandler handler;
 	private boolean isClient;
 
 	public ScreenHandlerContainer(ScreenHandler handler) {

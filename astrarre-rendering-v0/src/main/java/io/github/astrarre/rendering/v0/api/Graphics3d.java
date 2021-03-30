@@ -12,6 +12,7 @@ import net.minecraft.item.ItemStack;
 public interface Graphics3d extends Graphics2d {
 	void drawItem(ItemKey stack);
 
+	// todo ModelTransform$Mode transformations for stack
 	void drawItem(ItemStack stack);
 
 	void drawLine(float x1, float y1, float z1, float x2, float y2, float z2, int color);
@@ -20,8 +21,6 @@ public interface Graphics3d extends Graphics2d {
 	default void drawLine(float x1, float y1, float x2, float y2, int color) {
 		this.drawLine(x1, y1, 0, x2, y2, 0, color);
 	}
-
-	// todo drawPolygon
 
 	@Override
 	default void fillRect(float x, float y, float width, float height, int color) {

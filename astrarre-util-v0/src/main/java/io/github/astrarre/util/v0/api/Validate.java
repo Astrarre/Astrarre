@@ -11,7 +11,20 @@ import net.fabricmc.loader.launch.common.FabricLauncherBase;
 
 public class Validate {
 	public static final FabricLoader LOADER = FabricLoader.getInstance();
-	public static final boolean IS_DEV = (FabricLauncherBase.getLauncher() == null || LOADER.isDevelopmentEnvironment()) && !Boolean.getBoolean("astrarre-disable-debug");
+	public static final boolean IS_DEV;
+	static {
+		boolean isDev = (FabricLauncherBase.getLauncher() == null || LOADER.isDevelopmentEnvironment());
+		if(Boolean.getBoolean("astrarre-disable-debug")) {
+			isDev = false;
+		}
+
+		if(Boolean.getBoolean("astrarre-enable-debug")) {
+			isDev = true;
+		}
+
+		IS_DEV = isDev;
+	}
+
 	public static final boolean IS_CLIENT = FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
 	public static void void_(Object object) {}
 

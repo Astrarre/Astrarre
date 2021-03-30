@@ -5,9 +5,9 @@
   "mixins": [
     "HandledScreenMixin",
     "MinecraftClientMixin",
+    "ScreenHandlerAccess",
     "ScreenHandlerMixin",
-    "ScreenMixin",
-    "ScreenHandlerAccess"
+    "ScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

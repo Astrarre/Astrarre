@@ -3,9 +3,10 @@ package io.github.astrarre.transfer.internal.participantInventory;
 import java.util.Set;
 
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
-import io.github.astrarre.transfer.internal.inventory.FilteringInventory;
+import io.github.astrarre.transfer.v0.fabric.inventory.FilteringInventory;
 import io.github.astrarre.transfer.internal.access.ItemStackAccess;
 import io.github.astrarre.transfer.v0.api.Participant;
+import io.github.astrarre.transfer.v0.api.item.ItemSlotParticipant;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,7 +35,7 @@ public class ParticipantInventory implements Inventory, FilteringInventory {
 	private static final int BUFFER_INSERTION_SLOT = 1;
 	private static int counter = 0;
 	public final Participant<ItemKey> participant;
-	private final InternalItemSlotParticipant slot = new InternalItemSlotParticipant();
+	private final ItemSlotParticipant slot = new ItemSlotParticipant();
 
 	public ParticipantInventory(Participant<ItemKey> participant) {this.participant = participant;}
 
@@ -55,11 +56,7 @@ public class ParticipantInventory implements Inventory, FilteringInventory {
 			try (Transaction transaction = Transaction.create(false)) {
 				this.participant.extract(transaction, this.slot);
 				// mutations need to be reflected in the participant
-				final int oldCount = this.slot.getQuantity(transaction);
-				final ItemKey item = this.slot.getType(transaction);
-				ItemStack stack = item.createItemStack(oldCount);
-				this.watchStack(item, stack);
-				return stack;
+				return this.slot.getStack(transaction);
 			}
 		} else {
 			// 'buffer insertion slot'
@@ -71,13 +68,13 @@ public class ParticipantInventory implements Inventory, FilteringInventory {
 	public ItemStack removeStack(int slot, int amount) {
 		this.test(slot);
 		if (slot == BUFFER_EXTRACTION_SLOT) {
-			int max = this.slot.getMax(null);
-			this.slot.setMax(amount);
+			int max = this.slot.max;
+			this.slot.max = amount;
 			this.participant.extract(null, this.slot);
-			ItemStack stack = this.slot.getItemStack(null);
+			ItemStack stack = this.slot.type.get(null);
 			this.slot.clear(null);
 			// reset max
-			this.slot.setMax(max);
+			this.slot.max = max;
 			return stack;
 		}
 		return ItemStack.EMPTY;

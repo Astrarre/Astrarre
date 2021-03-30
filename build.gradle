@@ -20,7 +20,9 @@ apply from: 'scripts/allprojects.gradle'
 static def fapi(Project proj) {
     proj.configure(proj) {
         dependencies {
-            modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+            modImplementation("net.fabricmc.fabric-api:fabric-api:${fabric_version}") {
+                exclude module: 'fabric-loader'
+            }
         }
     }
 }

@@ -330,8 +330,13 @@ public abstract class AAggregateDrawable extends ADrawable implements Interactab
 		this.hovered = interactable;
 		if (interactable != null) {
 			Vector4f v3f = new Vector4f(0, 0, 0, 1);
-			transformation(interactable, v3f, mouseX, mouseY);
-			interactable.mouseHover(container, v3f.getX(), v3f.getY());
+			for (Interactable i2 : this.interactables()) {
+				ADrawable drawable = (ADrawable) i2;
+				transformation(i2, v3f, mouseX, mouseY);
+				if (drawable.getBounds().isInside(v3f.getX(), v3f.getY()) && i2.isHovering(container, v3f.getX(), v3f.getY())) {
+					i2.mouseHover(container, v3f.getX(), v3f.getY());
+				}
+			}
 		}
 	}
 
@@ -342,8 +347,12 @@ public abstract class AAggregateDrawable extends ADrawable implements Interactab
 			transformation(interactable, v3f, x, y);
 			if (((ADrawable) interactable).getBounds().isInside(v3f.getX(), v3f.getY())) {
 				if (interactable instanceof Container) {
-					return ((Container) interactable).drawableAt(container, v3f.getX(), v3f.getY());
-				} else if (interactable.isHovering(container, v3f.getX(), v3f.getY())) {
+					T t = ((Container) interactable).drawableAt(container, v3f.getX(), v3f.getY());
+					if(t != null) {
+						return t;
+					}
+				}
+				if (interactable.isHovering(container, v3f.getX(), v3f.getY())) {
  					return (T) interactable;
 				}
 			}

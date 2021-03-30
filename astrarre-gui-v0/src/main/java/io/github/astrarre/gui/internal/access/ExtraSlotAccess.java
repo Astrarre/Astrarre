@@ -1,5 +1,7 @@
 package io.github.astrarre.gui.internal.access;
 
+import io.github.astrarre.gui.v0.api.RootContainer;
+
 import net.minecraft.item.ItemStack;
 
 public interface ExtraSlotAccess {
@@ -12,4 +14,6 @@ public interface ExtraSlotAccess {
 	void setOverride(ItemStack stack);
 
 	int idOverride();
+
+	ItemStack transferSlot(RootContainer container);
 }
