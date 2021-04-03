@@ -23,6 +23,7 @@ import io.github.astrarre.util.v0.api.Id;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Matrix4f;
 
 public abstract class ADrawable extends DrawableInternal {
@@ -61,7 +62,14 @@ public abstract class ADrawable extends DrawableInternal {
 	 * called when the drawable is removed
 	 */
 	@ApiStatus.OverrideOnly
-	public void remove(RootContainer container) {
+	public void onRemoved(RootContainer container) {
+	}
+
+	/**
+	 * if any component returns false, the gui is closed
+	 */
+	public boolean isValid(RootContainer container, PlayerEntity entity) {
+		return true;
 	}
 
 	/**

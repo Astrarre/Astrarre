@@ -26,6 +26,7 @@ import io.github.astrarre.util.v0.api.Validate;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
@@ -99,6 +100,11 @@ public abstract class ASlot extends ADrawable implements Interactable {
 				this.renderGradient(graphics, tickDelta);
 			}
 		}
+	}
+
+	@Override
+	public boolean isValid(RootContainer container, PlayerEntity entity) {
+		return this.inventory.canPlayerUse(entity);
 	}
 
 	@Override

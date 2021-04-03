@@ -25,8 +25,8 @@ public abstract class RootContainerInternal implements RootContainer {
 	static final AtomicInteger ID = new AtomicInteger(), CLIENT_ID = new AtomicInteger(Integer.MIN_VALUE);
 	protected final List<Tickable> tickables = new ArrayList<>();
 	protected final APanel panel;
-	private final Object2IntOpenHashMap<ADrawable> componentRegistry = new Object2IntOpenHashMap<>();
-	private final Int2ObjectOpenHashMap<ADrawable> reversedRegistry = new Int2ObjectOpenHashMap<>();
+	public final Object2IntOpenHashMap<ADrawable> componentRegistry = new Object2IntOpenHashMap<>();
+	public final Int2ObjectOpenHashMap<ADrawable> reversedRegistry = new Int2ObjectOpenHashMap<>();
 	int tick;
 	private boolean reading;
 	private final Serializer<ADrawable> serializer = new DrawableSerializer(this);
@@ -137,7 +137,7 @@ public abstract class RootContainerInternal implements RootContainer {
 		if(drawable instanceof Tickable) {
 			this.tickables.remove(drawable);
 		}
-		drawable.remove(this);
+		drawable.onRemoved(this);
 		((DrawableInternal) drawable).rootsInternal.remove(this);
 		if (!this.isClient()) {
 			NetworkMember member = this.getViewer();
@@ -172,7 +172,7 @@ public abstract class RootContainerInternal implements RootContainer {
 		ObjectIterator<ADrawable> iterator = this.componentRegistry.keySet().iterator();
 		while (iterator.hasNext()) {
 			ADrawable drawable = iterator.next();
-			drawable.remove(this);
+			drawable.onRemoved(this);
 			((DrawableInternal) drawable).rootsInternal.remove(this);
 			iterator.remove();
 		}

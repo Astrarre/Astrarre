@@ -54,9 +54,9 @@ public class ADelegateDrawable extends ADrawable implements Interactable, Contai
 	}
 
 	@Override
-	public void remove(RootContainer container) {
-		super.remove(container);
-		this.getDelegate().remove(container);
+	public void onRemoved(RootContainer container) {
+		super.onRemoved(container);
+		this.getDelegate().onRemoved(container);
 	}
 
 	@Override
