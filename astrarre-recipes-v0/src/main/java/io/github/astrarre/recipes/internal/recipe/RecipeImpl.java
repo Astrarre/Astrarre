@@ -49,6 +49,7 @@ public class RecipeImpl
 	@Override
 	public Result applyGeneric(Object... inputs) {
 		int maxIndex = -1;
+		List<?> objects = null;
 		outer:
 		for (List<?> parameters : this.values) {
 			if(parameters.size() != inputs.length) {
@@ -62,20 +63,23 @@ public class RecipeImpl
 				if(!part.test(input, val)) {
 					if(i > maxIndex) {
 						maxIndex = i;
+						objects = parameters;
 					}
 					continue outer;
 				}
 			}
+
+			objects = parameters;
 
 			for (int i = 0; i < this.parts.size(); i++) {
 				RecipePart part = this.parts.get(i);
 				part.apply(inputs[i], parameters.get(i));
 			}
 
-			return new Result(false, -1);
+			return new Result(false, -1, objects);
 		}
 
-		return new Result(true, maxIndex);
+		return new Result(true, maxIndex, objects);
 	}
 
 	@Override

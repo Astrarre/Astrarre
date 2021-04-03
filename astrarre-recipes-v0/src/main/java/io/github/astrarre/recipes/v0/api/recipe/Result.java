@@ -1,12 +1,20 @@
 package io.github.astrarre.recipes.v0.api.recipe;
 
+import java.util.List;
+
+import io.github.astrarre.recipes.v0.api.RecipePart;
+import org.jetbrains.annotations.Nullable;
+
 public final class Result {
 	private final boolean failed;
 	private final int failedIndex;
+	@Nullable
+	private final List<?> parts;
 
-	public Result(boolean failed, int index) {
+	public Result(boolean failed, int index, @Nullable List<?> parts) {
 		this.failed = failed;
 		this.failedIndex = index;
+		this.parts = parts;
 	}
 
 	/**
@@ -25,5 +33,14 @@ public final class Result {
 	 */
 	public int getFailedIndex() {
 		return this.failedIndex;
+	}
+
+	/**
+	 * @return the input value for the 'most complete' recipe
+	 */
+	@Nullable
+	<V> V getInput(RecipePart<V, ?> parser, int index) {
+		if(this.parts == null) return null;
+		return (V) this.parts.get(index);
 	}
 }

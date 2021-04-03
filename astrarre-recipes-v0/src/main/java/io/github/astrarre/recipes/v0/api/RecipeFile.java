@@ -76,5 +76,9 @@ public class RecipeFile implements SimpleSynchronousResourceReloadListener {
 				Validate.rethrow(e);
 			}
 		}
+
+		for (RecipeImpl recipe : this.recipes) {
+			recipe.onReload();
+		}
 	}
 }
