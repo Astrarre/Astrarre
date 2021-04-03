@@ -1,7 +1,10 @@
 package io.github.astrarre.gui.v0.fabric.adapter.slot;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.stream.Collectors;
 
 import io.github.astrarre.gui.internal.access.ExtraSlotAccess;
 import io.github.astrarre.gui.internal.access.SlotAddAccess;
@@ -44,7 +47,7 @@ public abstract class ASlot extends ADrawable implements Interactable {
 	private final int index;
 	protected Inventory inventory;
 	protected Map<RootContainer, MinecraftSlot> minecraftSlots = new WeakHashMap<>();
-	protected Map<RootContainer, IntList> targetSlotIds = new WeakHashMap<>();
+	protected Map<RootContainer, List<ASlot>> targetSlotIds = new WeakHashMap<>();
 	protected IntList temp;
 	protected boolean highlighted;
 	@Environment (EnvType.CLIENT) protected boolean render;
@@ -84,7 +87,7 @@ public abstract class ASlot extends ADrawable implements Interactable {
 	 * todo add shift click compat with non-standard GUIs when this slot is shift-clicked this method is called
 	 */
 	public void link(RootContainer container, ASlot slot) {
-		this.targetSlotIds.computeIfAbsent(container, a -> new IntArrayList()).add(slot.getSyncId());
+		this.targetSlotIds.computeIfAbsent(container, a -> new ArrayList<>()).add(slot);
 	}
 
 	@Override
@@ -103,8 +106,8 @@ public abstract class ASlot extends ADrawable implements Interactable {
 		this.writeInventoryData(output, this.inventory);
 		output.putInt("index", this.index);
 		output.putInt("overrideClient", this.minecraftSlots.get(container).id);
-		if (this.targetSlotIds != null) {
-			output.put("targetSlotIds", NBTType.INT_ARRAY, this.targetSlotIds.get(container));
+		if (this.targetSlotIds.containsKey(container)) {
+			output.put("targetSlotIds", NBTType.INT_ARRAY, this.targetSlotIds.get(container).stream().map(ADrawable::getSyncId).collect(Collectors.toCollection(IntArrayList::new)));
 		}
 	}
 
@@ -127,11 +130,11 @@ public abstract class ASlot extends ADrawable implements Interactable {
 		}
 
 		if (this.temp != null) {
-			IntArrayList list = new IntArrayList();
+			List<ASlot> list = new ArrayList<>();
 			for (int i = 0; i < this.temp.size(); i++) {
 				int val = this.temp.getInt(i);
 				ASlot target = (ASlot) container.forId(val);
-				list.add(target.getSyncId());
+				list.add(target);
 			}
 			this.temp = null;
 			this.targetSlotIds.put(container, list);
@@ -166,8 +169,8 @@ public abstract class ASlot extends ADrawable implements Interactable {
 	public ItemStack quickTransferStack(RootContainer container) {
 		if (this.slotIds == null) {
 			this.slotIds = new IntArrayList();
-			for (int integer : this.targetSlotIds.get(container)) {
-				this.slotIds.add(((ASlot) container.forId(integer)).minecraftSlots.get(container).id);
+			for (ASlot slot : this.targetSlotIds.get(container)) {
+				this.slotIds.add(slot.minecraftSlots.get(container).id);
 			}
 		}
 		IntList ids = this.slotIds;

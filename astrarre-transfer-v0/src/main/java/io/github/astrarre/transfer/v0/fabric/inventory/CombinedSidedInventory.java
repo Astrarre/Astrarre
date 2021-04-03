@@ -102,7 +102,7 @@ public final class CombinedSidedInventory implements SidedInventory {
 			return ((FilteringInventory) access.inventory).canExtract(access.slot, stack);
 		}
 
-		return false;
+		return true;
 	}
 
 	private SlotAccess get(int slot) {

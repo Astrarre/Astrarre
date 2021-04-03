@@ -35,10 +35,10 @@ public class ItemMatcher {
 			validItem = true;
 		}
 
-		if(validItem) {
+		if(validItem && this.nbt != null) {
 			return this.nbt.equals(stack.getTag());
 		} else {
-			return false;
+			return validItem;
 		}
 	}
 

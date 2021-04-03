@@ -167,6 +167,7 @@ public abstract class RootContainerInternal implements RootContainer {
 		return this.tick;
 	}
 
+	protected final List<Runnable> closeListeners = new ArrayList<>();
 	public void onClose() {
 		ObjectIterator<ADrawable> iterator = this.componentRegistry.keySet().iterator();
 		while (iterator.hasNext()) {
@@ -175,6 +176,15 @@ public abstract class RootContainerInternal implements RootContainer {
 			((DrawableInternal) drawable).rootsInternal.remove(this);
 			iterator.remove();
 		}
+		for (Runnable listener : this.closeListeners) {
+			listener.run();
+		}
+		this.closeListeners.clear();
+	}
+
+	@Override
+	public void addCloseListener(Runnable onClose) {
+		this.closeListeners.add(onClose);
 	}
 
 	void tickComponents() {

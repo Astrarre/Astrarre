@@ -17,7 +17,7 @@ public class ItemIngredientInput implements RecipePart<ItemIngredient, Inventory
 
 	@Override
 	public boolean test(Inventory inp, ItemIngredient val) {
-		return Inventories.remove(inp, stack -> val.matcher.matches(ItemKey.of(stack)), val.amount, true) == val.amount;
+		return Inventories.remove(inp, stack -> val.matcher.matches(ItemKey.of(stack)), val.amount, true) >= val.amount;
 	}
 
 	@Override

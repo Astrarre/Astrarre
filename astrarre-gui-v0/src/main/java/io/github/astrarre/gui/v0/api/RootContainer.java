@@ -133,6 +133,8 @@ public interface RootContainer {
 
 	int getTick();
 
+	void addCloseListener(Runnable onClose);
+
 	interface OnResize {
 		void resize(int width, int height);
 	}
