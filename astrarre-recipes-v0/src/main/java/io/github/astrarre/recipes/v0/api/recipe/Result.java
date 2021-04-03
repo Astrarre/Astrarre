@@ -39,7 +39,7 @@ public final class Result {
 	 * @return the input value for the 'most complete' recipe
 	 */
 	@Nullable
-	<V> V getInput(RecipePart<V, ?> parser, int index) {
+	public <V> V getInput(RecipePart<V, ?> parser, int index) {
 		if(this.parts == null) return null;
 		return (V) this.parts.get(index);
 	}

@@ -1,5 +1,7 @@
-package io.github.astrarre.recipes.v0.api.util;
+package io.github.astrarre.util.v0.api;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Val<V> {
@@ -36,6 +38,7 @@ public class Val<V> {
 	}
 	
 	protected V val;
+	protected List<Listener<V>> listeners;
 
 	public Val(V val) {
 		this.val = val;
@@ -49,7 +52,32 @@ public class Val<V> {
 	}
 
 	public void set(V val) {
-		this.val = val;
+		V old = this.val;
+		if(val != old) {
+			this.val = val;
+			List<Listener<V>> list = this.listeners;
+			if (list != null) {
+				for (Listener<V> consumer : list) {
+					consumer.onChange(old, val);
+				}
+			}
+		}
+	}
+
+	public interface Listener<V> {
+		void onChange(V old, V current);
+	}
+
+	/**
+	 * add a new listener that is called when the method changes. This does not influence the hashcode or equals method
+	 */
+	public Val<V> addListener(Listener<V> listener) {
+		List<Listener<V>> list = this.listeners;
+		if(list == null) {
+			this.listeners = list = new ArrayList<>(1);
+		}
+		list.add(listener);
+		return this;
 	}
 
 	public V getVal() {
@@ -57,7 +85,7 @@ public class Val<V> {
 	}
 
 	public Val<V> setVal(V val) {
-		this.val = val;
+		this.set(val);
 		return this;
 	}
 

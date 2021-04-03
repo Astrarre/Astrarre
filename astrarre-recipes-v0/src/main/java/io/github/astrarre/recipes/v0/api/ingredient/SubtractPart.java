@@ -1,7 +1,7 @@
 package io.github.astrarre.recipes.v0.api.ingredient;
 
 import io.github.astrarre.recipes.v0.api.RecipePart;
-import io.github.astrarre.recipes.v0.api.util.Val;
+import io.github.astrarre.util.v0.api.Val;
 import io.github.astrarre.recipes.v0.api.value.ValueParser;
 
 public abstract class SubtractPart<V extends Comparable<V>> implements RecipePart<V, Val<V>> {

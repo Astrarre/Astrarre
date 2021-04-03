@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.github.astrarre.recipes.v0.api.RecipePart;
-import io.github.astrarre.recipes.v0.api.util.Either;
+import io.github.astrarre.util.v0.api.Either;
 import io.github.astrarre.recipes.v0.api.util.PeekableReader;
 import io.github.astrarre.recipes.v0.api.value.ValueParser;
 import org.apache.logging.log4j.LogManager;

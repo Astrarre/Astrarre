@@ -1,7 +1,7 @@
 package io.github.astrarre.recipes.v0.api.value;
 
 import io.github.astrarre.recipes.internal.mixin.IdentifierAccess;
-import io.github.astrarre.recipes.v0.api.util.Either;
+import io.github.astrarre.util.v0.api.Either;
 import io.github.astrarre.recipes.v0.api.util.PeekableReader;
 import io.github.astrarre.util.v0.api.Id;
 

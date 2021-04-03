@@ -1,4 +1,4 @@
-package io.github.astrarre.recipes.v0.api.util;
+package io.github.astrarre.util.v0.api;
 
 import java.util.Objects;
 

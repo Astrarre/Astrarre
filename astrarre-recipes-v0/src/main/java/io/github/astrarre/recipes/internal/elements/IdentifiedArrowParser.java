@@ -1,17 +1,18 @@
 package io.github.astrarre.recipes.internal.elements;
 
-import io.github.astrarre.recipes.v0.api.util.Either;
+import io.github.astrarre.util.v0.api.Either;
 import io.github.astrarre.recipes.v0.api.util.PeekableReader;
 import io.github.astrarre.recipes.v0.api.value.ValueParser;
 import io.github.astrarre.util.v0.api.Id;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.util.Unit;
 
-public final class ArrowParser implements ValueParser<Unit> {
+public final class IdentifiedArrowParser implements ValueParser<Unit> {
 	private static final char[] ARROW_START = "--[".toCharArray(), ARROW_END = "]->".toCharArray();
 
 	private final Id identifier;
-	public ArrowParser(Id identifier) {
+	public IdentifiedArrowParser(Id identifier) {
 		this.identifier = identifier;
 	}
 
@@ -39,7 +40,7 @@ public final class ArrowParser implements ValueParser<Unit> {
 		}
 	}
 
-	private static boolean isEqual(char[] inp, char[] b, int off, int len) {
+	public static boolean isEqual(char[] inp, char[] b, int off, int len) {
 		if(inp.length != len) {
 			return false;
 		}

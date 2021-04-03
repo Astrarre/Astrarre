@@ -1,7 +1,7 @@
 package io.github.astrarre.recipes.v0.fabric.value;
 
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
-import io.github.astrarre.recipes.v0.api.util.Either;
+import io.github.astrarre.util.v0.api.Either;
 import io.github.astrarre.recipes.v0.api.util.PeekableReader;
 import io.github.astrarre.recipes.v0.api.value.ValueParser;
 import io.github.astrarre.util.v0.api.Id;

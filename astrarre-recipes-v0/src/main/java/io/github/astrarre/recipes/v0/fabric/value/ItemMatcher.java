@@ -10,7 +10,7 @@ import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import io.github.astrarre.recipes.internal.mixin.SetTagAccess;
 import io.github.astrarre.recipes.internal.mixin.TagDelegateAccess;
 import io.github.astrarre.recipes.internal.mixin.TagWrapperAccess;
-import io.github.astrarre.recipes.v0.api.util.Either;
+import io.github.astrarre.util.v0.api.Either;
 import io.github.astrarre.recipes.v0.api.util.PeekableReader;
 import io.github.astrarre.recipes.v0.api.value.ValueParser;
 import org.jetbrains.annotations.Nullable;

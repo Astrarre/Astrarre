@@ -4,7 +4,7 @@ import io.github.astrarre.recipes.v0.api.RecipeFile;
 import io.github.astrarre.recipes.v0.api.ingredient.Ingredients;
 import io.github.astrarre.recipes.v0.api.recipe.Recipe;
 import io.github.astrarre.recipes.v0.api.recipe.Result;
-import io.github.astrarre.recipes.v0.api.util.Val;
+import io.github.astrarre.util.v0.api.Val;
 import io.github.astrarre.recipes.v0.fabric.ingredient.FabricIngredients;
 import io.github.astrarre.recipes.v0.fabric.output.FabricOutputs;
 import io.github.astrarre.transfer.v0.fabric.inventory.InventoryDelegate;
