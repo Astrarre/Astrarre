@@ -20,6 +20,7 @@ allprojects {
         maven { url 'https://dl.bintray.com/astrarre/maven' }
         maven { url 'https://jitpack.io' }
         maven { url 'https://maven.legacyfabric.net/' }
+        maven { url "https://maven.shedaniel.me/" }
     }
 
     sourceSets {
@@ -43,6 +44,7 @@ allprojects {
         testmodImplementation('com.github.astei:lazydfu:0.1.1') {
             exclude module: 'fabric-loader'
         }
+
     }
 
     processResources {

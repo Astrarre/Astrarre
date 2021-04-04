@@ -22,6 +22,9 @@
   "entrypoints": {
     "main": [
       "io.github.astrarre.gui.internal.AstrarreInitializer"
+    ],
+    "rei_plugins": [
+      "io.github.astrarre.gui.internal.rei.AstrarreGUIREIPlugin"
     ]
   }
 }

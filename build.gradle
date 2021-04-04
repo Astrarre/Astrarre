@@ -29,6 +29,7 @@ static def fapi(Project proj) {
 
 dependencies {
     dependsOn(project, subprojects)
+    testmodRuntime "me.shedaniel:RoughlyEnoughItems:5.11.188"
 }
 
 fapi(project)

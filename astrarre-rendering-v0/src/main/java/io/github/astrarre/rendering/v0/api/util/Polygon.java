@@ -130,7 +130,7 @@ public final class Polygon implements Serializable {
 	public Polygon getEnclosing() {
 		Polygon enclosing = this.enclosing;
 		if (enclosing == null) {
-			float maxX = 0, maxY = 0;
+			float maxX = 0, maxY = 0, minY = Float.MAX_VALUE, minX = Float.MAX_VALUE;
 			for (int i = 0; i < this.vertices(); i++) {
 				float x = this.getX(i), y = this.getY(i);
 				if (x > maxX) {
@@ -139,22 +139,32 @@ public final class Polygon implements Serializable {
 				if (y > maxY) {
 					maxY = y;
 				}
+				if(x < minX) {
+					minX = x;
+				}
+				if(y < minY) {
+					minY = y;
+				}
 			}
-			return this.enclosing = Polygon.rectangle(maxX, maxY);
+			return this.enclosing = Polygon.rectangle(minX, minY, maxX, maxY);
 		}
 		return enclosing;
 	}
 
 	public static Polygon rectangle(float width, float height) {
+		return rectangle(0, 0, width, height);
+	}
+
+	public static Polygon rectangle(float minX, float minY, float maxX, float maxY) {
 		float[] buf = {
-				0,
-				0,
-				0,
-				height,
-				width,
-				height,
-				width,
-				0
+				minX,
+				minY,
+				minX,
+				maxY,
+				maxX,
+				maxY,
+				maxX,
+				minY
 		};
 		Polygon polygon = new Polygon(buf);
 		polygon.enclosing = polygon;
