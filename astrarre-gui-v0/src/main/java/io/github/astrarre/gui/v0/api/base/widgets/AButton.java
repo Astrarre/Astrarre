@@ -88,7 +88,7 @@ public class AButton extends ADrawable implements Interactable {
 	@Override
 	protected void write0(RootContainer container, NBTagView.Builder output) {
 		if(this.part != null) {
-			output.put("part", this.part);
+			output.putSerializable("part", this.part);
 		}
 		output.putBool("disabled", this.disabled);
 	}
@@ -247,16 +247,16 @@ public class AButton extends ADrawable implements Interactable {
 		public NbtValue save() {
 			NBTagView.Builder builder = NBTagView.builder();
 			if(this.highlighted != null) {
-				builder.put("highlighted", this.highlighted);
+				builder.putSerializable("highlighted", this.highlighted);
 			}
 			if(this.disabled != null) {
-				builder.put("disabled", this.disabled);
+				builder.putSerializable("disabled", this.disabled);
 			}
 			if(this.pressed != null) {
-				builder.put("pressed", this.pressed);
+				builder.putSerializable("pressed", this.pressed);
 			}
 
-			builder.put("active", this.active);
+			builder.putSerializable("active", this.active);
 			return builder;
 		}
 	}

@@ -44,7 +44,6 @@ allprojects {
         testmodImplementation('com.github.astei:lazydfu:0.1.1') {
             exclude module: 'fabric-loader'
         }
-
     }
 
     processResources {
