@@ -183,7 +183,6 @@ public enum Participants implements Participant<Object> {
 	@Nullable
 	public static <T> Collection<T> unwrapInternal(AccessFunction<T, Collection<T>> func, T instance) {
 		Collection<T> starting = func.apply(instance);
-		System.out.println(starting);
 		if (starting == null) {
 			return null;
 		} else {

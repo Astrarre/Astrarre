@@ -1,18 +1,22 @@
 package io.github.astrarre.recipes.v0.fabric.value;
 
+import java.util.function.Function;
+import java.util.function.Supplier;
+
 import io.github.astrarre.util.v0.api.Either;
 import io.github.astrarre.recipes.v0.api.util.PeekableReader;
 import io.github.astrarre.recipes.v0.api.value.ValueParser;
 import io.github.astrarre.util.v0.api.Id;
 
+import net.minecraft.tag.ServerTagManagerHolder;
 import net.minecraft.tag.Tag;
-import net.minecraft.tag.TagGroup;
+import net.minecraft.util.Identifier;
 
 public class TagParser<T> implements ValueParser<Tag<T>> {
-	protected final TagGroup<T> group;
+	protected final Function<Identifier, Tag<T>> tag;
 
-	public TagParser(TagGroup<T> group) {
-		this.group = group;
+	public TagParser(Function<Identifier, Tag<T>> tag) {
+		this.tag = tag;
 	}
 
 	@Override
@@ -20,7 +24,8 @@ public class TagParser<T> implements ValueParser<Tag<T>> {
 		if(reader.read() == '#') {
 			Either<Id, String> id = ValueParser.ID.parse(reader);
 			if(id.hasLeft()) {
-				return Either.ofLeft(this.group.getTag(id.getLeft().to()));
+				Tag<T> tag = this.tag.apply(id.getLeft().to());
+				return tag == null ? Either.ofRight("no tag for id " + id.getLeft()) : Either.ofLeft(tag);
 			}
 			return id.asLeft();
 		}

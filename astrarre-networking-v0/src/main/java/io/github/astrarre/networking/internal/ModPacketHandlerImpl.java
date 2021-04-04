@@ -126,7 +126,6 @@ public class ModPacketHandlerImpl implements ModPacketHandler {
 	}
 
 	private boolean fire(Id identifier, PacketByteBuf data, Iterable<ClientReceiver> listeners) {
-		System.out.println(identifier + " " + Iterables.toString(listeners));
 		boolean iter = false;
 		NBTagView view = null;
 		for (ClientReceiver receiver : listeners) {

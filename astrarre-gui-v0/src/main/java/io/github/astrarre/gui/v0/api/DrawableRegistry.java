@@ -9,15 +9,18 @@ import java.util.function.Supplier;
 import io.github.astrarre.gui.v0.api.base.borders.ABeveledBorder;
 import io.github.astrarre.gui.v0.api.base.borders.ASimpleBorder;
 import io.github.astrarre.gui.v0.api.base.panel.ACenteringPanel;
+import io.github.astrarre.gui.v0.api.base.panel.AGridPanel;
 import io.github.astrarre.gui.v0.api.base.panel.APanel;
 import io.github.astrarre.gui.v0.api.base.statik.ABeveledRectangle;
 import io.github.astrarre.gui.v0.api.base.statik.ADarkenedBackground;
 import io.github.astrarre.gui.v0.api.base.widgets.AButton;
 import io.github.astrarre.gui.v0.api.base.widgets.AInfo;
+import io.github.astrarre.gui.v0.api.base.widgets.ALabel;
 import io.github.astrarre.gui.v0.api.base.widgets.APasswordTextField;
 import io.github.astrarre.gui.v0.api.base.widgets.AProgressBar;
 import io.github.astrarre.gui.v0.api.base.widgets.ATextFieldWidget;
 import io.github.astrarre.gui.v0.api.base.widgets.ScrollBar;
+import io.github.astrarre.gui.v0.fabric.adapter.slot.ABlockEntityInventorySlot;
 import io.github.astrarre.gui.v0.fabric.adapter.slot.APlayerSlot;
 import io.github.astrarre.gui.v0.fabric.adapter.slot.AWorldInventorySlot;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
@@ -76,6 +79,9 @@ public class DrawableRegistry {
 		AWorldInventorySlot.init();
 		ScrollBar.init();
 		AProgressBar.init();
+		ALabel.init();
+		AGridPanel.init();
+		ABlockEntityInventorySlot.init();
 	}
 
 	@Nullable

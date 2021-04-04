@@ -71,13 +71,19 @@ public class Val<V> {
 	/**
 	 * add a new listener that is called when the method changes. This does not influence the hashcode or equals method
 	 */
-	public Val<V> addListener(Listener<V> listener) {
+	public Listener<V> addListener(Listener<V> listener) {
 		List<Listener<V>> list = this.listeners;
 		if(list == null) {
 			this.listeners = list = new ArrayList<>(1);
 		}
 		list.add(listener);
-		return this;
+		return listener;
+	}
+
+	public boolean removeListener(Listener<V> listener) {
+		List<Listener<V>> list = this.listeners;
+		if(list == null) return false;
+		return list.remove(listener);
 	}
 
 	public V getVal() {

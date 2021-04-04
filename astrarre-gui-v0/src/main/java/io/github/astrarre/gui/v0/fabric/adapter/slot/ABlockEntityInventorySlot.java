@@ -51,4 +51,6 @@ public class ABlockEntityInventorySlot<B extends BlockEntity & Inventory> extend
 	public BlockPos getPos() {
 		return this.entity == null ? super.getPos() : this.entity.getPos();
 	}
+
+	public static void init() {}
 }

@@ -11,6 +11,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
@@ -28,6 +29,7 @@ public interface FabricSerializers {
 		NBTagView view = tag.asTag();
 		return new BlockPos(view.getInt("x"), view.getInt("y"), view.getInt("z"));
 	}, (pos) -> NBTagView.builder().putInt("x", pos.getX()).putInt("y", pos.getY()).putInt("z", pos.getZ()));
+	Serializer<Text> TEXT = Serializer.of(value -> Text.Serializer.fromJson(value.asString()), text -> NbtValue.of(NBTType.STRING, Text.Serializer.toJson(text)));
 
 
 	static Serializer<Entity> entity(World world) {
