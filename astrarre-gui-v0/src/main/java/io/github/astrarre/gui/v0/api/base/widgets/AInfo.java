@@ -64,6 +64,7 @@ public class AInfo extends ADelegateDrawable implements Interactable {
 
 	@Override
 	protected void render0(RootContainer container, Graphics3d graphics, float tickDelta) {
+		super.render0(container, graphics, tickDelta);
 		if (this.isHover) {
 			graphics.drawOrderedTooltip(this.wrapped);
 		}
