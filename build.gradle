@@ -17,11 +17,19 @@ loom {
 
 apply from: 'scripts/allprojects.gradle'
 
-static def fapi(Project proj) {
+static def fapi(Project proj, String... modules) {
     proj.configure(proj) {
         dependencies {
-            modImplementation("net.fabricmc.fabric-api:fabric-api:${fabric_version}") {
-                exclude module: 'fabric-loader'
+            if(modules.length == 0) {
+                modImplementation("net.fabricmc.fabric-api:fabric-api:${fabric_version}") {
+                    exclude module: 'fabric-loader'
+                }
+            } else {
+                modules.each {
+                    include(modImplementation(fabricApi.module(it, fabric_version)) {
+                        exclude module: 'fabric-loader'
+                    })
+                }
             }
         }
     }

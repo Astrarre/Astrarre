@@ -14,14 +14,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerBlockEntityEvents;
-
 public final class BlockCache {
-	static {
-		ServerBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register((entity, world1) -> ((BlockEntityAccess)entity).astrarre_invalidate());
-		ServerBlockEntityEvents.BLOCK_ENTITY_LOAD.register((entity, world1) -> ((BlockEntityAccess)entity).astrarre_invalidate());
-	}
-
 	protected final BlockPos pos;
 	protected final World world;
 	protected BlockState state;

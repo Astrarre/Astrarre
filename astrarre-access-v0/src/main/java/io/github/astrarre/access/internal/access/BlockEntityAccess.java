@@ -6,6 +6,4 @@ import net.minecraft.block.entity.BlockEntity;
 
 public interface BlockEntityAccess {
 	void astrarre_addRemoveOrMoveListener(Consumer<BlockEntity> consumer);
-
-	void astrarre_invalidate();
 }

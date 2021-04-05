@@ -5,6 +5,5 @@ dependencies {
     include 'com.github.Astrarre:earcut4j:3.0.1'
 }
 
-fapi(project)
 dependsOn(project, 'astrarre-util-v0', 'astrarre-itemview-v0')
 

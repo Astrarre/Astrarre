@@ -31,13 +31,6 @@ public class BlockEntityMixin implements BlockEntityAccess {
 		}
 	}
 
-	@Override
-	public void astrarre_invalidate() {
-		if (this.astrarre_listener != null) {
-			this.astrarre_listener.accept((BlockEntity) (Object) this);
-			this.astrarre_listener = null;
-		}
-	}
 
 	@Inject (method = "setLocation", at = @At ("HEAD"))
 	public void onMove(World world, BlockPos pos, CallbackInfo ci) {
