@@ -15,3 +15,5 @@ dependencies {
     modImplementation 'io.github.astrarre:astrarre-fabric:0.0.0'
 }
 ```
+
+<!--lmao I have push access-->
