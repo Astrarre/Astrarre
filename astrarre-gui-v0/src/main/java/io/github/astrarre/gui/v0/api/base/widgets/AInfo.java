@@ -78,6 +78,7 @@ public class AInfo extends ADelegateDrawable implements Interactable {
 			texts.add(Text.Serializer.toJson(text));
 		}
 		output.put("tooltip", NBTType.listOf(NBTType.STRING), texts);
+		output.putInt("width", this.width);
 	}
 
 	@Override

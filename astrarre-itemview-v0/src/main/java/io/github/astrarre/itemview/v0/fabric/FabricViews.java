@@ -32,7 +32,6 @@ import net.minecraft.nbt.Tag;
 
 @SuppressWarnings ("ConstantConditions")
 public class FabricViews {
-
 	/**
 	 * @return an immutable compound tag view
 	 */

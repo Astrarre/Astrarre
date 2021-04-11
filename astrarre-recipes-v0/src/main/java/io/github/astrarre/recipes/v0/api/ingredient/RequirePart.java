@@ -16,7 +16,7 @@ public class RequirePart<V extends Comparable<V>> implements RecipePart<V, V> {
 
 	@Override
 	public boolean test(V inp, V val) {
-		return val.compareTo(inp) >= 0;
+		return inp.compareTo(val) >= 0;
 	}
 
 	@Override

@@ -101,7 +101,7 @@ public abstract class ADrawable extends DrawableInternal {
 			int id = input.getInt("propertyId");
 			SyncedProperty<?> property = this.properties.get(id);
 			if (property instanceof DefaultProperty) {
-				property.onSync(input.getTag("payload"), "value");
+				property.sync(input.getTag("payload").getValue("value"));
 			}
 		}
 	}
@@ -113,7 +113,7 @@ public abstract class ADrawable extends DrawableInternal {
 			int id = input.getInt("propertyId");
 			SyncedProperty<?> property = this.properties.get(id);
 			if (property instanceof DefaultProperty) {
-				property.onSync(input.getTag("payload"), "value");
+				property.sync(input.getTag("payload").getValue("value"));
 			}
 		}
 	}

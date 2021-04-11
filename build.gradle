@@ -37,7 +37,10 @@ static def fapi(Project proj, String... modules) {
 
 dependencies {
     dependsOn(project, subprojects)
-    testmodRuntime "me.shedaniel:RoughlyEnoughItems:5.11.188"
+    modRuntime("me.shedaniel:RoughlyEnoughItems:5.11.188") {
+        exclude module: 'fabric-api'
+        exclude module: 'fabric-loader'
+    }
 }
 
 fapi(project)

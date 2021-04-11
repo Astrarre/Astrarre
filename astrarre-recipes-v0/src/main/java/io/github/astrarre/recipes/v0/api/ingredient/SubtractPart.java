@@ -16,8 +16,8 @@ public abstract class SubtractPart<V extends Comparable<V>> implements RecipePar
 	}
 
 	@Override
-	public boolean test(Val<V> value, V val) {
-		return value.get().compareTo(val) >= 0;
+	public boolean test(Val<V> inp, V val) {
+		return inp.get().compareTo(val) >= 0;
 	}
 	
 	public final static class Double extends SubtractPart<java.lang.Double> {

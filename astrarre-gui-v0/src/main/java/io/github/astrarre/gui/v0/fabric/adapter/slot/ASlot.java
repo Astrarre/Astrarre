@@ -44,7 +44,7 @@ public abstract class ASlot extends ADrawable implements Interactable {
 	public static final Polygon SQUARE_16x16 = new Polygon.Builder(4).addVertex(0, 0).addVertex(0, 18).addVertex(18, 18).addVertex(18, 0).build();
 	public static final Sprite.Sized SLOT = Sprite.of(Id.create("minecraft", "textures/gui/container/furnace.png"))
 			                                        .cutout(55 / 256f, 16 / 256f, 18 / 256f, 18 / 256f).sized(18, 18);
-	private static final Transformation TRANSFORMATION = Transformation.translate(1, 1, 0);
+	private static final Transformation TRANSFORMATION = Transformation.translate(1, 1, 300);
 	private final int index;
 	protected Inventory inventory;
 	protected Map<RootContainer, MinecraftSlot> minecraftSlots = new WeakHashMap<>();

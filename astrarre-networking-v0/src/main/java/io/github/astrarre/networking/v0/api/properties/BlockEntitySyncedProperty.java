@@ -31,7 +31,7 @@ public class BlockEntitySyncedProperty<T> extends SyncedProperty<T> {
 				if (e != null) {
 					SyncedProperty<?> property = ((BlockEntityPropertyAccess) e).getProperty(syncId);
 					if (property != null) {
-						property.onSync(tag, "value");
+						property.sync(tag.getValue("value"));
 					}
 				}
 			}

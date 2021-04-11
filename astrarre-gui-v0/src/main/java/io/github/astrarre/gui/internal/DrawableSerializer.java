@@ -43,7 +43,7 @@ public class DrawableSerializer implements Serializer<ADrawable> {
 			for (NBTagView tag : input.get("property", NBTType.listOf(NBTType.TAG), Collections.emptyList())) {
 				SyncedProperty<?> property = drawable.forId(tag.getInt("propertyId"));
 				if (property instanceof DefaultProperty) {
-					property.onSync(tag, "value");
+					property.sync(tag.getValue("value"));
 				}
 			}
 
