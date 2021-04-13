@@ -98,6 +98,9 @@ public abstract class ASlot extends ADrawable implements Interactable {
 			graphics.drawItem(this.override == null ? this.getStack() : this.override);
 			if (this.highlighted) {
 				this.renderGradient(graphics, tickDelta);
+				if(!this.isTooltipHandled(container)) {
+					graphics.drawTooltipAutowrap(this.getStack());
+				}
 			}
 		}
 	}
@@ -164,6 +167,10 @@ public abstract class ASlot extends ADrawable implements Interactable {
 
 	public void setStack(ItemStack stack) {
 		this.inventory.setStack(this.index, stack);
+	}
+
+	public boolean isTooltipHandled(RootContainer container) {
+		return this.minecraftSlots.containsKey(container);
 	}
 
 	/**

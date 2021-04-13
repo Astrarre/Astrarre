@@ -1,6 +1,7 @@
 package io.github.astrarre.testmod;
 
 import io.github.astrarre.gui.v0.api.base.widgets.AProgressBar;
+import io.github.astrarre.testmod.gui.TestClientOnlyGui;
 import io.github.astrarre.testmod.gui.TestModGui;
 
 import net.minecraft.entity.player.PlayerEntity;
@@ -33,10 +34,17 @@ public class TestMod implements ModInitializer {
 		@Environment (EnvType.CLIENT)
 		public ActionResult useOnBlock(ItemUsageContext context) {
 			PlayerEntity entity = context.getPlayer();
-			if (!context.getWorld().isClient && entity != null) {
-				AProgressBar bar = TestModGui.open((ServerPlayerEntity) entity);
-				bar.progress.set(.4f);
-				//TestClientOnlyGui.clientOnly();
+			if(entity != null) {
+				try {
+					if (!context.getWorld().isClient) {
+						AProgressBar bar = TestModGui.open((ServerPlayerEntity) entity);
+						//bar.progress.set(.4f);
+					} else {
+						//TestClientOnlyGui.clientOnly();
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 			return ActionResult.CONSUME;
 		}

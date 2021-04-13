@@ -5,6 +5,7 @@
   "mixins": [
     "HandledScreenMixin",
     "MinecraftClientMixin",
+    "ScreenAccess",
     "ScreenHandlerAccess",
     "ScreenHandlerMixin",
     "ScreenMixin"

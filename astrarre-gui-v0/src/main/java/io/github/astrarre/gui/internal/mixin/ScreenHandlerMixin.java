@@ -68,5 +68,4 @@ public abstract class ScreenHandlerMixin implements ScreenRootAccess {
 			this.internal.onClose();
 		}
 	}
-
 }

@@ -13,7 +13,7 @@ import net.minecraft.inventory.Inventory;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-public final class APlayerSlot extends ASlot {
+public class APlayerSlot extends ASlot {
 	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "player_slot"), APlayerSlot::new);
 
 	@Environment(EnvType.CLIENT)

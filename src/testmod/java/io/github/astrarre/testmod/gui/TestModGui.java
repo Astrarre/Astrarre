@@ -5,6 +5,7 @@ import java.util.List;
 
 import io.github.astrarre.gui.v0.api.AstrarreIcons;
 import io.github.astrarre.gui.v0.api.RootContainer;
+import io.github.astrarre.gui.v0.api.access.Tickable;
 import io.github.astrarre.gui.v0.api.base.borders.ABeveledBorder;
 import io.github.astrarre.gui.v0.api.base.panel.ACenteringPanel;
 import io.github.astrarre.gui.v0.api.base.panel.APanel;
@@ -16,7 +17,11 @@ import io.github.astrarre.gui.v0.fabric.adapter.slot.ASlot;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
 import io.github.astrarre.rendering.v0.api.Transformation;
 
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.server.network.ServerPlayerEntity;
+
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 
 public class TestModGui {
 
@@ -45,7 +50,7 @@ public class TestModGui {
 		}
 
 		for(int hotbarIndex = 0; hotbarIndex < 9; ++hotbarIndex) {
-			ASlot slot = new APlayerSlot(entity.inventory, hotbarIndex);
+			ASlot slot = new Cursed(entity.inventory, hotbarIndex);
 			slot.setTransformation(Transformation.translate(6 + hotbarIndex * 18, 140, 0));
 			center.add(slot);
 			slot.linkAll(container, hotbar);
@@ -66,5 +71,24 @@ public class TestModGui {
 		// we use the shortcut constructor to tell the beveled rectangle to fill up the entire centering panel
 
 		return bar2;
+	}
+
+	public static final class Cursed extends APlayerSlot implements Tickable {
+		public Cursed(PlayerInventory inventory, int index) {
+			super(inventory, index);
+			ServerTickEvents.START_SERVER_TICK.register(server -> {
+				this.setTransformation(this.getTransformation().combine(Transformation.rotate(0, 0, 1)));
+			});
+		}
+
+		@Override
+		public boolean isTooltipHandled(RootContainer container) {
+			return false;
+		}
+
+		@Override
+		public void tick(RootContainer container) {
+
+		}
 	}
 }

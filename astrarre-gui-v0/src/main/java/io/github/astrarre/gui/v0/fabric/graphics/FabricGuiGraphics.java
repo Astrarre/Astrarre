@@ -4,52 +4,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import io.github.astrarre.gui.internal.mixin.ScreenAccess;
 import io.github.astrarre.gui.v0.api.graphics.GuiGraphics;
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
-import io.github.astrarre.rendering.internal.DummyScreen;
 import io.github.astrarre.rendering.v0.fabric.FabricGraphics3d;
 
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.util.math.Vector4f;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 
 public class FabricGuiGraphics extends FabricGraphics3d implements GuiGraphics {
-	public FabricGuiGraphics(MatrixStack matrices) {
+	public final Screen screen;
+
+	public FabricGuiGraphics(MatrixStack matrices, Screen screen) {
 		super(matrices);
-	}
-
-	@Override
-	public void drawTooltip(List<Text> text) {
-		this.pushStage(null);
-		DummyScreen.INSTANCE.renderTooltip(this.matrices, text, 0, 0);
-		RenderSystem.enableDepthTest();
-	}
-
-	@Override
-	public void drawOrderedTooltip(List<OrderedText> text) {
-		this.pushStage(null);
-		DummyScreen.INSTANCE.renderOrderedTooltip(this.matrices, text, 0, 0);
-		RenderSystem.enableDepthTest();
-	}
-
-	@Override
-	public void drawTooltip(ItemStack stack) {
-		this.pushStage(null);
-		DummyScreen.INSTANCE.renderTooltip(this.matrices, stack, 0, 0);
-		RenderSystem.enableDepthTest();
-	}
-
-	@Override
-	public void drawTooltip(ItemStack stack, int maxWidth) {
-		this.pushStage(null);
-		List<Text> texts = DummyScreen.INSTANCE.getTooltipFromItem(stack);
-		List<OrderedText> orderedTexts = new ArrayList<>();
-		for (Text text : texts) {
-			orderedTexts.addAll(GuiGraphics.wrap(text, maxWidth));
-		}
-		DummyScreen.INSTANCE.renderOrderedTooltip(this.matrices, orderedTexts, 0, 0);
-		RenderSystem.enableDepthTest();
+		this.screen = screen;
 	}
 
 	@Override
@@ -76,5 +50,66 @@ public class FabricGuiGraphics extends FabricGraphics3d implements GuiGraphics {
 		this.getItemRenderer().renderGuiItemOverlay(this.getTextRenderer(), stack, 1, 1);
 		RenderSystem.popMatrix();
 		RenderSystem.enableDepthTest();
+	}
+
+	@Override
+	public void drawTooltip(List<Text> text) {
+		this.pushStage(null);
+		this.screen.renderTooltip(this.matrices, text, 0, 0);
+		RenderSystem.enableDepthTest();
+	}
+
+	@Override
+	public void drawOrderedTooltip(List<OrderedText> text) {
+		this.pushStage(null);
+		this.screen.renderOrderedTooltip(this.matrices, text, 0, 0);
+		RenderSystem.enableDepthTest();
+	}
+
+	@Override
+	public void drawTooltip(ItemStack stack) {
+		this.pushStage(null);
+		((ScreenAccess) this.screen).callRenderTooltip(this.matrices, stack, 0, 0);
+		RenderSystem.enableDepthTest();
+	}
+
+	@Override
+	public void drawTooltip(ItemStack stack, int maxWidth) {
+		this.pushStage(null);
+		List<Text> texts = this.screen.getTooltipFromItem(stack);
+		List<OrderedText> orderedTexts = new ArrayList<>();
+		for (Text text : texts) {
+			orderedTexts.addAll(GuiGraphics.wrap(text, maxWidth));
+		}
+		this.screen.renderOrderedTooltip(this.matrices, orderedTexts, 0, 0);
+		RenderSystem.enableDepthTest();
+	}
+
+	@Override
+	public void drawTooltipAutowrap(ItemStack stack) {
+		Vector4f origin = new Vector4f(0, 0, 0, 1);
+		origin.transform(this.matrices.peek().getModel());
+		float x = origin.getX(), y = origin.getY();
+		origin.set(1, 0, 0, 1); // find direction of rotation + scaling stuff
+		origin.transform(this.matrices.peek().getModel());
+		float deltaX = origin.getX() - x, deltaY = origin.getY() - y;
+
+		Window window = MinecraftClient.getInstance().getWindow();
+		float width = window.getScaledWidth();
+		float height = window.getScaledHeight();
+		float t = (width - x) / deltaX; // parametric equation solved for T
+		float hitY = deltaY * t + y; // "max Y coordinate" for test
+		int toDrawWidth = 0;
+		float maxT;
+		if (hitY > height) {
+			// bounded by height, height is the maxY
+			maxT = (height - y) / deltaY;
+		} else {
+			// bounded by width
+			maxT = t;
+		}
+
+		toDrawWidth = (int) Math.ceil(deltaX * maxT);
+		this.drawTooltip(stack, toDrawWidth);
 	}
 }

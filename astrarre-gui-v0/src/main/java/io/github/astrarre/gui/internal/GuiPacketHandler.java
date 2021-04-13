@@ -47,7 +47,7 @@ public class GuiPacketHandler {
 			if (internal != null) {
 				ADrawable drawable = internal.forId(buf.getInt("syncId"));
 				if (drawable != null) {
-					((DrawableInternal) drawable).receiveFromServer(internal, channel, buf);
+					((DrawableInternal) drawable).receiveFromServer(internal, channel, buf.getTag("payload"));
 				}
 			}
 		});
@@ -65,7 +65,7 @@ public class GuiPacketHandler {
 				if (internal != null) {
 					ADrawable drawable = internal.forId(syncId);
 					if (drawable != null) {
-						((DrawableInternal) drawable).receiveFromClient(internal, member, channel, buf);
+						((DrawableInternal) drawable).receiveFromClient(internal, member, channel, buf.getTag("payload"));
 					}
 				}
 			}

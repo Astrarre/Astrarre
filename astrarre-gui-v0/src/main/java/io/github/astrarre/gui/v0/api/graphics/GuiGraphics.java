@@ -28,14 +28,22 @@ public interface GuiGraphics extends Graphics3d {
 	 */
 	void drawItem(ItemKey stack);
 	/**
-	 * draws an item with the given count onto the screen, the resulting image is roughly 16x16
+	 * draws an item with the given count onto the screen, the resulting image is roughly 16x16. It is slightly elevated in Z level
 	 */
 	void drawItem(ItemStack stack);
 
+	/**
+	 * tooltips are elevated
+	 */
 	void drawTooltip(List<Text> text);
 	void drawOrderedTooltip(List<OrderedText> text);
 	void drawTooltip(ItemStack stack);
 	void drawTooltip(ItemStack stack, int maxWidth);
+
+	/**
+	 * does it's best to wrap the tooltip of this itemstack within the bounds of the screen
+	 */
+	void drawTooltipAutowrap(ItemStack stack);
 
 	/**
 	 * draws a highlight over the given area (like slots do when you hover over them)
