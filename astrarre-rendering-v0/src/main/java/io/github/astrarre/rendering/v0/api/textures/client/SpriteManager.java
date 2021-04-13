@@ -29,6 +29,11 @@ public interface SpriteManager {
 	/**
 	 * this must be created in a client initializer
 	 */
+	@SuppressWarnings ({
+			"ConstantConditions",
+			"unchecked",
+			"rawtypes"
+	})
 	static SpriteManager create(String modid, String path, Supplier<Stream<Id>> valid) {
 		AstrarreSpriteManager manager = new AstrarreSpriteManager(MinecraftClient.getInstance().getTextureManager(),
 				new Identifier(modid, "textures/atlas/" + path + "s.png"),

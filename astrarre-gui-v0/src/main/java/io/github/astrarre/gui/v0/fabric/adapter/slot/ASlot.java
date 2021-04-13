@@ -157,8 +157,8 @@ public abstract class ASlot extends ADrawable implements Interactable {
 	}
 
 	protected void renderGradient(GuiGraphics graphics, float tickDelta) {
-		try (Close close = graphics.applyTransformation(TRANSFORMATION)) {
-			graphics.fillGradient(16, 16, 0x80ffffff, 0x80ffffff);
+		try(Close c = graphics.translate(1, 1)) {
+			graphics.highlightRectangle(16, 16);
 		}
 	}
 

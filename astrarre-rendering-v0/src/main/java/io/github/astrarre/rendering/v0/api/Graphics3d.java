@@ -1,5 +1,7 @@
 package io.github.astrarre.rendering.v0.api;
 
+import io.github.astrarre.rendering.v0.api.util.Close;
+
 /**
  * Graphics3d, confusingly this is also used for GUIs because they can have layers and things can overlap
  * for GUIs, the Z axis is normal to the screen (pointing out at you) so to "roll" you actually "yaw"
@@ -30,4 +32,8 @@ public interface Graphics3d extends Graphics2d {
 	 * fill a rectangle in 3d space. The points must be coplanar and in counter clockwise order
 	 */
 	void fillRect(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4, int color);
+
+	default Close translate(float x, float y, float z) {
+		return this.applyTransformation(Transformation.translate(x, y, z));
+	}
 }

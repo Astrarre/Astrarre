@@ -22,9 +22,9 @@ public final class Transformation implements Serializable {
 	public static final Serializer<Transformation> SERIALIZER = Serializer.of(Transformation::new);
 
 	public static final Transformation EMPTY = Transformation.translate(0, 0, 0);
-	public final float roll, pitch, yaw;
-	public final float offX, offY, offZ;
-	public final float scaleX, scaleY, scaleZ;
+	private final float roll, pitch, yaw;
+	private final float offX, offY, offZ;
+	private final float scaleX, scaleY, scaleZ;
 	private Matrix4f modelMatrixTransform;
 	/**
 	 * @see MatrixStack#scale(float, float, float)
@@ -223,4 +223,39 @@ public final class Transformation implements Serializable {
 		return Float.compare(that.scaleZ, this.scaleZ) == 0;
 	}
 
+	public float getRoll() {
+		return this.roll;
+	}
+
+	public float getPitch() {
+		return this.pitch;
+	}
+
+	public float getYaw() {
+		return this.yaw;
+	}
+
+	public float getOffX() {
+		return this.offX;
+	}
+
+	public float getOffY() {
+		return this.offY;
+	}
+
+	public float getOffZ() {
+		return this.offZ;
+	}
+
+	public float getScaleX() {
+		return this.scaleX;
+	}
+
+	public float getScaleY() {
+		return this.scaleY;
+	}
+
+	public float getScaleZ() {
+		return this.scaleZ;
+	}
 }

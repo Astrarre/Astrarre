@@ -24,7 +24,7 @@ import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Matrix4f;
 
-public class FabricGraphics2d implements Graphics2d {
+public class FabricGraphics2d implements Graphics2d, FabricGraphics {
 	private static final Stencil STENCIL = Stencil.newInstance();
 	// todo custom buffer builder
 	private final TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
@@ -183,5 +183,10 @@ public class FabricGraphics2d implements Graphics2d {
 			itemRenderer = this.itemRenderer = MinecraftClient.getInstance().getItemRenderer();
 		}
 		return itemRenderer;
+	}
+
+	@Override
+	public MatrixStack getTransformationMatrix() {
+		return this.matrices;
 	}
 }

@@ -1,4 +1,4 @@
-version '0.0.0'
+version '1.0.0'
 
 dependencies {
     implementation 'com.github.Astrarre:earcut4j:3.0.1'

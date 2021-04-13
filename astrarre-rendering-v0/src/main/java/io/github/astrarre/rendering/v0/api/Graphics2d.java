@@ -118,6 +118,10 @@ public interface Graphics2d {
 	 */
 	Close applyTransformation(Transformation transformation);
 
+	default Close translate(float x, float y) {
+		return this.applyTransformation(Transformation.translate(x, y, 0));
+	}
+
 	void flush();
 
 	/**
