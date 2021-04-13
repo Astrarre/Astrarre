@@ -6,7 +6,7 @@ import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.access.Tickable;
 import io.github.astrarre.gui.v0.api.base.AAggregateDrawable;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
-import io.github.astrarre.rendering.v0.api.Graphics3d;
+import io.github.astrarre.gui.v0.api.graphics.GuiGraphics;
 import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
 import io.github.astrarre.util.v0.api.Id;
@@ -69,7 +69,7 @@ public class ScrollBar extends AAggregateDrawable implements Tickable {
 	}
 
 	@Override
-	protected void render0(RootContainer container, Graphics3d graphics, float tickDelta) {
+	protected void render0(RootContainer container, GuiGraphics graphics, float tickDelta) {
 		for (ADrawable drawable : this.drawables) {
 			drawable.render(container, graphics, tickDelta);
 		}
@@ -94,13 +94,13 @@ public class ScrollBar extends AAggregateDrawable implements Tickable {
 		}
 
 		@Override
-		protected void drawPressed(RootContainer container, Graphics3d graphics, float tickDelta) {
+		protected void drawPressed(RootContainer container, GuiGraphics graphics, float tickDelta) {
 			graphics.fillRect(this.width(), this.height(), 0xffaaaaaa);
 			graphics.drawRect(0, 0, this.width(), this.height(), 0xff000000);
 		}
 
 		@Override
-		protected void drawActive(RootContainer container, Graphics3d graphics, float tickDelta) {
+		protected void drawActive(RootContainer container, GuiGraphics graphics, float tickDelta) {
 			graphics.fillRect(this.width(), this.height(), 0xffcccccc);
 			graphics.drawRect(0, 0, this.width(), this.height(), 0xff000000);
 		}

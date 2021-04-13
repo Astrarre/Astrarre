@@ -13,7 +13,7 @@ import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.itemview.v0.api.nbt.NbtValue;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
-import io.github.astrarre.rendering.v0.api.Graphics3d;
+import io.github.astrarre.gui.v0.api.graphics.GuiGraphics;
 import io.github.astrarre.rendering.v0.api.textures.Sprite;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
 import io.github.astrarre.util.v0.api.Id;
@@ -73,7 +73,7 @@ public class AButton extends ADrawable implements Interactable {
 	public static void init() {}
 
 	@Override
-	protected void render0(RootContainer container, Graphics3d graphics, float tickDelta) {
+	protected void render0(RootContainer container, GuiGraphics graphics, float tickDelta) {
 		if (this.disabled) {
 			this.drawDisabled(container, graphics, tickDelta);
 		} else if (this.pressed) {
@@ -116,7 +116,7 @@ public class AButton extends ADrawable implements Interactable {
 		this.onPress.forEach(Runnable::run);
 	}
 
-	protected void drawDisabled(RootContainer container, Graphics3d graphics, float tickDelta) {
+	protected void drawDisabled(RootContainer container, GuiGraphics graphics, float tickDelta) {
 		if (this.part == null || this.part.disabled == null) {
 			this.drawPressed(container, graphics, tickDelta);
 			graphics.fillRect(this.width(), this.height(), 0xaa000000);
@@ -125,7 +125,7 @@ public class AButton extends ADrawable implements Interactable {
 		}
 	}
 
-	protected void drawPressed(RootContainer container, Graphics3d graphics, float tickDelta) {
+	protected void drawPressed(RootContainer container, GuiGraphics graphics, float tickDelta) {
 		if (this.part == null || this.part.pressed == null) {
 			this.drawActive(container, graphics, tickDelta);
 			graphics.fillRect(this.width(), this.height(), 0xaa000000);
@@ -134,7 +134,7 @@ public class AButton extends ADrawable implements Interactable {
 		}
 	}
 
-	protected void drawHighlighted(RootContainer container, Graphics3d graphics, float tickDelta) {
+	protected void drawHighlighted(RootContainer container, GuiGraphics graphics, float tickDelta) {
 		if (this.part == null || this.part.highlighted == null) {
 			this.drawActive(container, graphics, tickDelta);
 			graphics.fillRect(this.width(), this.height(), 0xaaffffff);
@@ -143,7 +143,7 @@ public class AButton extends ADrawable implements Interactable {
 		}
 	}
 
-	protected void drawActive(RootContainer container, Graphics3d graphics, float tickDelta) {
+	protected void drawActive(RootContainer container, GuiGraphics graphics, float tickDelta) {
 		graphics.drawSprite(this.part.active);
 	}
 

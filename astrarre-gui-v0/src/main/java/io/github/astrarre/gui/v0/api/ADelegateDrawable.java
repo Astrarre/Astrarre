@@ -6,7 +6,7 @@ import com.google.common.collect.Iterators;
 import io.github.astrarre.gui.v0.api.access.Container;
 import io.github.astrarre.gui.v0.api.access.Interactable;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
-import io.github.astrarre.rendering.v0.api.Graphics3d;
+import io.github.astrarre.gui.v0.api.graphics.GuiGraphics;
 import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +37,7 @@ public class ADelegateDrawable extends ADrawable implements Interactable, Contai
 	}
 
 	@Override
-	protected void render0(RootContainer container, Graphics3d graphics, float tickDelta) {
+	protected void render0(RootContainer container, GuiGraphics graphics, float tickDelta) {
 		this.getDelegate().render0(container, graphics, tickDelta);
 	}
 

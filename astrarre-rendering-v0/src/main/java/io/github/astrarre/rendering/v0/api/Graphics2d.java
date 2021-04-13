@@ -62,12 +62,6 @@ public interface Graphics2d {
 
 	void drawText(OrderedText text, int color, boolean shadow);
 
-	void drawTooltip(List<Text> text);
-
-	void drawOrderedTooltip(List<OrderedText> text);
-
-	void drawTooltip(ItemStack stack);
-
 	default void tracePolygon(Polygon polygon, int color) {
 		int lastVertex = polygon.vertices() - 1;
 		float lastX = polygon.getX(lastVertex), lastY = polygon.getY(lastVertex);

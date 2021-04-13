@@ -4,7 +4,7 @@ import io.github.astrarre.gui.v0.api.ADrawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
-import io.github.astrarre.rendering.v0.api.Graphics3d;
+import io.github.astrarre.gui.v0.api.graphics.GuiGraphics;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
 import io.github.astrarre.util.v0.api.Id;
 
@@ -44,7 +44,7 @@ public final class ABeveledRectangle extends ADrawable {
 	}
 
 	@Override
-	protected void render0(RootContainer container, Graphics3d graphics, float tickDelta) {
+	protected void render0(RootContainer container, GuiGraphics graphics, float tickDelta) {
 		drawBevel(graphics, this.width, this.height);
 	}
 
@@ -54,7 +54,7 @@ public final class ABeveledRectangle extends ADrawable {
 		output.putFloat("height", this.height);
 	}
 
-	public static void drawBevel(Graphics3d graphics, float width, float height) {
+	public static void drawBevel(GuiGraphics graphics, float width, float height) {
 		// the background part
 		graphics.fillRect(2, 2, width - 5, height - 5, 0xffc6c6c6);
 		// the top shiny part

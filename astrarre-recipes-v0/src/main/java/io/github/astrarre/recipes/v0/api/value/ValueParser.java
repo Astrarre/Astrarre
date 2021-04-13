@@ -37,5 +37,4 @@ public interface ValueParser<V> {
 	 * @return the information of this ingredient, or an error message
 	 */
 	Either<V, String> parse(PeekableReader reader);
-
 }

@@ -6,7 +6,7 @@ import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.base.statik.ABeveledRectangle;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
-import io.github.astrarre.rendering.v0.api.Graphics3d;
+import io.github.astrarre.gui.v0.api.graphics.GuiGraphics;
 import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.rendering.v0.api.util.Close;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
@@ -30,7 +30,7 @@ public final class ABeveledBorder extends ADelegateDrawable {
 	}
 
 	@Override
-	protected void render0(RootContainer container, Graphics3d graphics, float tickDelta) {
+	protected void render0(RootContainer container, GuiGraphics graphics, float tickDelta) {
 		Polygon polygon = this.getDelegate().getBounds().getEnclosing();
 		Close close = graphics.applyTransformation(TRANSLATE_N2_N2_0);
 		ABeveledRectangle.drawBevel(graphics, polygon.getX(2) + 10, polygon.getY(2) + 9);

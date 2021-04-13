@@ -16,7 +16,7 @@ import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.access.Interactable;
 import io.github.astrarre.itemview.v0.api.nbt.NBTType;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
-import io.github.astrarre.rendering.v0.api.Graphics3d;
+import io.github.astrarre.gui.v0.api.graphics.GuiGraphics;
 import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.rendering.v0.api.textures.Sprite;
 import io.github.astrarre.rendering.v0.api.util.Close;
@@ -92,7 +92,7 @@ public abstract class ASlot extends ADrawable implements Interactable {
 	}
 
 	@Override
-	protected void render0(RootContainer container, Graphics3d graphics, float tickDelta) {
+	protected void render0(RootContainer container, GuiGraphics graphics, float tickDelta) {
 		this.renderBackground(graphics, tickDelta);
 		if (this.render) {
 			graphics.drawItem(this.override == null ? this.getStack() : this.override);
@@ -148,7 +148,7 @@ public abstract class ASlot extends ADrawable implements Interactable {
 		((SlotAddAccess) container).addSlot(slot);
 	}
 
-	protected void renderBackground(Graphics3d graphics, float tickDelta) {
+	protected void renderBackground(GuiGraphics graphics, float tickDelta) {
 		graphics.drawSprite(SLOT);
 	}
 
@@ -156,7 +156,7 @@ public abstract class ASlot extends ADrawable implements Interactable {
 		return this.inventory.getStack(this.index);
 	}
 
-	protected void renderGradient(Graphics3d graphics, float tickDelta) {
+	protected void renderGradient(GuiGraphics graphics, float tickDelta) {
 		try (Close close = graphics.applyTransformation(TRANSFORMATION)) {
 			graphics.fillGradient(16, 16, 0x80ffffff, 0x80ffffff);
 		}

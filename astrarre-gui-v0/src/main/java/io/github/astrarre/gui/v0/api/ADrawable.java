@@ -15,7 +15,7 @@ import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.networking.v0.api.SyncedProperty;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
-import io.github.astrarre.rendering.v0.api.Graphics3d;
+import io.github.astrarre.gui.v0.api.graphics.GuiGraphics;
 import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.rendering.v0.api.util.Close;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
@@ -50,7 +50,7 @@ public abstract class ADrawable extends DrawableInternal {
 	/**
 	 * render the component
 	 */
-	protected abstract void render0(RootContainer container, Graphics3d graphics, float tickDelta);
+	protected abstract void render0(RootContainer container, GuiGraphics graphics, float tickDelta);
 
 	/**
 	 * serialize the component
@@ -118,7 +118,7 @@ public abstract class ADrawable extends DrawableInternal {
 		}
 	}
 
-	public final void render(RootContainer container, Graphics3d graphics, float tickDelta) {
+	public final void render(RootContainer container, GuiGraphics graphics, float tickDelta) {
 		try (Close close = graphics.applyTransformation(this.getTransformation())) {
 			this.render0(container, graphics, tickDelta);
 		}

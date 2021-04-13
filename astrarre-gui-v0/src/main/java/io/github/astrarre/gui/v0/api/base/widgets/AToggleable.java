@@ -6,7 +6,7 @@ import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.itemview.v0.api.nbt.NBTType;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.networking.v0.api.SyncedProperty;
-import io.github.astrarre.rendering.v0.api.Graphics3d;
+import io.github.astrarre.gui.v0.api.graphics.GuiGraphics;
 import io.github.astrarre.rendering.v0.api.textures.Sprite;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
 import io.github.astrarre.util.v0.api.Id;
@@ -38,7 +38,7 @@ public final class AToggleable extends ADrawable {
 	}
 
 	@Override
-	protected void render0(RootContainer container, Graphics3d graphics, float tickDelta) {
+	protected void render0(RootContainer container, GuiGraphics graphics, float tickDelta) {
 		if(this.enabled.get()) {
 			graphics.drawSprite(this.on);
 		} else {

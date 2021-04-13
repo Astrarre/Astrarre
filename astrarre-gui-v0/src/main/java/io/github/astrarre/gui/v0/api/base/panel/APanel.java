@@ -5,7 +5,7 @@ import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.base.AAggregateDrawable;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
-import io.github.astrarre.rendering.v0.api.Graphics3d;
+import io.github.astrarre.gui.v0.api.graphics.GuiGraphics;
 import io.github.astrarre.util.v0.api.Id;
 
 import net.fabricmc.api.EnvType;
@@ -35,7 +35,7 @@ public class APanel extends AAggregateDrawable {
 	public static void init() {}
 
 	@Override
-	protected void render0(RootContainer container, Graphics3d graphics, float tickDelta) {
+	protected void render0(RootContainer container, GuiGraphics graphics, float tickDelta) {
 		for (ADrawable drawable : this.drawables) {
 			drawable.render(container, graphics, tickDelta);
 		}

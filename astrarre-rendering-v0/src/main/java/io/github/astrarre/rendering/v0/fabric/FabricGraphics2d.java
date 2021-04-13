@@ -1,13 +1,9 @@
 package io.github.astrarre.rendering.v0.fabric;
 
-import java.util.List;
-
 import com.mojang.blaze3d.systems.RenderSystem;
-import io.github.astrarre.itemview.v0.fabric.ItemKey;
-import io.github.astrarre.rendering.internal.DummyScreen;
 import io.github.astrarre.rendering.internal.util.MatrixGraphicsUtil;
 import io.github.astrarre.rendering.internal.util.SetupTeardown;
-import io.github.astrarre.rendering.v0.api.Graphics3d;
+import io.github.astrarre.rendering.v0.api.Graphics2d;
 import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.rendering.v0.api.textures.Sprite;
 import io.github.astrarre.rendering.v0.api.util.Close;
@@ -19,36 +15,26 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.OutlineVertexConsumerProvider;
 import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemStack;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Matrix4f;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-
-@Environment (EnvType.CLIENT)
-public class MatrixGraphics implements Graphics3d {
+public class FabricGraphics2d implements Graphics2d {
 	private static final Stencil STENCIL = Stencil.newInstance();
+	// todo custom buffer builder
 	private final TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
-	public MatrixStack matrices;
+	public final MatrixStack matrices;
 	private TextRenderer textRenderer;
 	private ItemRenderer itemRenderer;
 	private SetupTeardown stage;
 
-	public MatrixGraphics(MatrixStack matrices) {
+	public FabricGraphics2d(MatrixStack matrices) {
 		this.matrices = matrices;
-	}
-
-	public MatrixStack getMatrices() {
-		return this.matrices;
 	}
 
 	@Override
@@ -84,26 +70,7 @@ public class MatrixGraphics implements Graphics3d {
 		RenderSystem.enableDepthTest();
 	}
 
-	@Override
-	public void drawTooltip(List<Text> text) {
-		this.pushStage(null);
-		DummyScreen.INSTANCE.renderTooltip(this.matrices, text, 0, 0);
-		RenderSystem.enableDepthTest();
-	}
 
-	@Override
-	public void drawOrderedTooltip(List<OrderedText> text) {
-		this.pushStage(null);
-		DummyScreen.INSTANCE.renderOrderedTooltip(this.matrices, text, 0, 0);
-		RenderSystem.enableDepthTest();
-	}
-
-	@Override
-	public void drawTooltip(ItemStack stack) {
-		this.pushStage(null);
-		DummyScreen.INSTANCE.renderTooltip(this.matrices, stack, 0, 0);
-		RenderSystem.enableDepthTest();
-	}
 
 	@Override
 	public void fillPolygon(Polygon polygon, int color) {
@@ -139,6 +106,28 @@ public class MatrixGraphics implements Graphics3d {
 	}
 
 	@Override
+	public void drawLine(float x1, float y1, float x2, float y2, int color) {
+		this.pushStage(SetupTeardown.FILL);
+		Matrix4f matrix = this.matrices.peek().getModel();
+		int a = color >> 24 & 255;
+		int r = color >> 16 & 255;
+		int g = color >> 8 & 255;
+		int b = color & 255;
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		bufferBuilder.begin(1, VertexFormats.POSITION_COLOR);
+		bufferBuilder.vertex(matrix, x1, y1, 0).color(r, g, b, a).next();
+		bufferBuilder.vertex(matrix, x2, y2, 0).color(r, g, b, a).next();
+		bufferBuilder.end();
+		BufferRenderer.draw(bufferBuilder);
+	}
+
+	@Override
+	public void fillRect(float x, float y, float width, float height, int color) {
+		this.pushStage(SetupTeardown.FILL);
+		MatrixGraphicsUtil.fill(this.matrices.peek().getModel(), x, y, 0, x, y + height, 0, x + width, y + height, 0, x + width, y, 0, color);
+	}
+
+	@Override
 	public void fillGradient(float x, float y, float width, float height, int startColor, int endColor) {
 		this.pushStage(SetupTeardown.FILL);
 		float x2 = x + width, y2 = y + height;
@@ -167,7 +156,7 @@ public class MatrixGraphics implements Graphics3d {
 	 * in a
 	 * row, it wont enable and disable blend 4 times in a row
 	 */
-	private void pushStage(@Nullable SetupTeardown stage) {
+	protected void pushStage(@Nullable SetupTeardown stage) {
 		while (this.stage != stage) {
 			if (this.stage == null) {
 				stage.setup();
@@ -186,66 +175,6 @@ public class MatrixGraphics implements Graphics3d {
 			textRenderer = this.textRenderer = MinecraftClient.getInstance().textRenderer;
 		}
 		return textRenderer;
-	}
-
-	@Override
-	public void drawItem(ItemKey stack) {
-		this.pushStage(null);
-		this.getItemRenderer().zOffset = 0;
-		RenderSystem.pushMatrix();
-		RenderSystem.multMatrix(this.matrices.peek().getModel());
-		RenderSystem.translatef(0, 0, -150);
-		this.getItemRenderer().renderInGui(stack.createItemStack(1), 1, 1);
-		RenderSystem.popMatrix();
-		RenderSystem.enableDepthTest();
-	}
-
-	@Override
-	public void drawItem(ItemStack stack) {
-		//this.renderGuiItemModel(itemStack, x, y, this.getHeldItemModel(itemStack, (World)null, entity)) 1.17 stuff
-		this.pushStage(null);
-		this.getItemRenderer().zOffset = 0;
-		RenderSystem.pushMatrix();
-		RenderSystem.multMatrix(this.matrices.peek().getModel());
-		RenderSystem.translatef(0, 0, -140);
-		this.getItemRenderer().renderInGui(stack, 1, 1);
-		this.getItemRenderer().renderGuiItemOverlay(this.getTextRenderer(), stack, 1, 1);
-		RenderSystem.popMatrix();
-		RenderSystem.enableDepthTest();
-	}
-
-	@Override
-	public void drawLine(float x1, float y1, float z1, float x2, float y2, float z2, int color) {
-		this.pushStage(SetupTeardown.FILL);
-		Matrix4f matrix = this.matrices.peek().getModel();
-		int a = color >> 24 & 255;
-		int r = color >> 16 & 255;
-		int g = color >> 8 & 255;
-		int b = color & 255;
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-		bufferBuilder.begin(1, VertexFormats.POSITION_COLOR);
-		bufferBuilder.vertex(matrix, x1, y1, x1).color(r, g, b, a).next();
-		bufferBuilder.vertex(matrix, x2, y2, z2).color(r, g, b, a).next();
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
-	}
-
-	@Override
-	public void fillRect(float x1,
-			float y1,
-			float z1,
-			float x2,
-			float y2,
-			float z2,
-			float x3,
-			float y3,
-			float z3,
-			float x4,
-			float y4,
-			float z4,
-			int color) {
-		this.pushStage(SetupTeardown.FILL);
-		MatrixGraphicsUtil.fill(this.matrices.peek().getModel(), x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4, color);
 	}
 
 	public ItemRenderer getItemRenderer() {

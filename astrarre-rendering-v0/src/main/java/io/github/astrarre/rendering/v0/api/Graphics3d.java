@@ -1,20 +1,10 @@
 package io.github.astrarre.rendering.v0.api;
 
-import io.github.astrarre.itemview.v0.fabric.ItemKey;
-import io.github.astrarre.rendering.v0.api.util.Close;
-
-import net.minecraft.item.ItemStack;
-
 /**
  * Graphics3d, confusingly this is also used for GUIs because they can have layers and things can overlap
  * for GUIs, the Z axis is normal to the screen (pointing out at you) so to "roll" you actually "yaw"
  */
 public interface Graphics3d extends Graphics2d {
-	void drawItem(ItemKey stack);
-
-	// todo ModelTransform$Mode transformations for stack
-	void drawItem(ItemStack stack);
-
 	void drawLine(float x1, float y1, float z1, float x2, float y2, float z2, int color);
 
 	@Override

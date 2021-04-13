@@ -6,15 +6,13 @@ import java.util.List;
 
 import io.github.astrarre.gui.v0.api.ADelegateDrawable;
 import io.github.astrarre.gui.v0.api.ADrawable;
-import io.github.astrarre.gui.v0.api.AstrarreIcons;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.access.Interactable;
 import io.github.astrarre.itemview.v0.api.nbt.NBTType;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.rendering.v0.api.Graphics2d;
-import io.github.astrarre.rendering.v0.api.Graphics3d;
-import io.github.astrarre.rendering.v0.api.util.Polygon;
+import io.github.astrarre.gui.v0.api.graphics.GuiGraphics;
 import io.github.astrarre.util.v0.api.Id;
 
 import net.minecraft.text.OrderedText;
@@ -63,7 +61,7 @@ public class AInfo extends ADelegateDrawable implements Interactable {
 	}
 
 	@Override
-	protected void render0(RootContainer container, Graphics3d graphics, float tickDelta) {
+	protected void render0(RootContainer container, GuiGraphics graphics, float tickDelta) {
 		super.render0(container, graphics, tickDelta);
 		if (this.isHover) {
 			graphics.drawOrderedTooltip(this.wrapped);

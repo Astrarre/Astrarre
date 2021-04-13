@@ -8,7 +8,7 @@ import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.itemview.v0.api.nbt.NBTType;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.networking.v0.api.SyncedProperty;
-import io.github.astrarre.rendering.v0.api.Graphics3d;
+import io.github.astrarre.gui.v0.api.graphics.GuiGraphics;
 import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.rendering.v0.api.textures.Sprite;
 import io.github.astrarre.rendering.v0.api.util.Close;
@@ -53,7 +53,7 @@ public class AProgressBar extends ADrawable {
 	}
 
 	@Override
-	protected void render0(RootContainer container, Graphics3d graphics, float tickDelta) {
+	protected void render0(RootContainer container, GuiGraphics graphics, float tickDelta) {
 		this.drawBackground(graphics);
 		float progress = this.progress.get();
 		if (progress > .01) {
@@ -61,11 +61,11 @@ public class AProgressBar extends ADrawable {
 		}
 	}
 
-	protected void drawBackground(Graphics3d g3d) {
+	protected void drawBackground(GuiGraphics g3d) {
 		g3d.drawSprite(this.background.get());
 	}
 
-	protected void drawProgress(Graphics3d g3d, float progress) {
+	protected void drawProgress(GuiGraphics g3d, float progress) {
 		switch (this.direction) {
 		case RIGHT:
 			g3d.drawSprite(this.full.get().cutout(0, 0, progress, 1));
