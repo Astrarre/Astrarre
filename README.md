@@ -1,7 +1,7 @@
 # Astrarre
-Astrarre API
+Astrarre API 
 
-See documentation on the wiki
+See documentation on the [wiki](https://github.com/Astrarre/Astrarre/wiki)
 
 ```gradle
 repositories {
