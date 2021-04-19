@@ -1,7 +1,6 @@
 package io.github.astrarre.transfer.v0.api.participants;
 
 import io.github.astrarre.access.v0.api.Access;
-import io.github.astrarre.access.v0.api.func.Returns;
 import io.github.astrarre.access.v0.api.provider.Provider;
 import io.github.astrarre.transfer.v0.api.Insertable;
 import io.github.astrarre.transfer.v0.api.Participant;

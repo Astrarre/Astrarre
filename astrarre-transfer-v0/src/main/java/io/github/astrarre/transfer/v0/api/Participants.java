@@ -7,19 +7,15 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 
 import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.access.v0.api.FunctionAccess;
-import io.github.astrarre.access.v0.api.func.AccessFunction;
-import io.github.astrarre.access.v0.fabric.WorldAccess;
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
-import io.github.astrarre.transfer.v0.api.participants.ExtractableParticipant;
-import io.github.astrarre.transfer.v0.api.participants.InsertableParticipant;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 
 public enum Participants implements Participant<Object> {
@@ -105,7 +101,7 @@ public enum Participants implements Participant<Object> {
 	 * unwraps a delegate recursively
 	 */
 	@NotNull
-	public static <T> Collection<T> unwrap(Access<AccessFunction<T, Collection<T>>> access, T instance) {
+	public static <T> Collection<T> unwrap(Access<Function<T, Collection<T>>> access, T instance) {
 		Collection<T> collection = unwrapInternal(access.get(), instance);
 		if (collection == null) {
 			return Collections.singleton(instance);
@@ -181,7 +177,7 @@ public enum Participants implements Participant<Object> {
 	 * @return null if the instance is not a wrapper
 	 */
 	@Nullable
-	public static <T> Collection<T> unwrapInternal(AccessFunction<T, Collection<T>> func, T instance) {
+	public static <T> Collection<T> unwrapInternal(Function<T, Collection<T>> func, T instance) {
 		Collection<T> starting = func.apply(instance);
 		if (starting == null) {
 			return null;

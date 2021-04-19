@@ -2,13 +2,17 @@ package io.github.astrarre.access.v0.fabric.func;
 
 import java.util.function.BinaryOperator;
 
-import io.github.astrarre.access.v0.api.func.Returns;
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
-import org.jetbrains.annotations.Nullable;
 
-public interface EntityFunction<T> extends Returns<T> {
+/**
+ *
+ * @param <T>
+ */
+public interface EntityFunction<T> {
 	// todo caching
 	T get(@Nullable Direction direction, Entity entity);
 

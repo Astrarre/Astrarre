@@ -13,9 +13,21 @@ import java.util.function.Supplier;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import io.github.astrarre.access.v0.api.func.IterFunc;
-import io.github.astrarre.access.v0.api.func.Returns;
+import io.github.astrarre.access.v0.fabric.EntityAccess;
+import io.github.astrarre.access.v0.fabric.WorldAccess;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * An access is essentially a list of functions, like an event handler. Like a function, it allows for any number of inputs and an output.
+ * To create an access you must have some way of combining all the listeners into one, so the output can be easily accessed.
+ * Access' can be circularly dependent on other Access'.
+ * @param <F> a function type
+ * @see BiFunctionAccess
+ * @see FunctionAccess
+ * @see EntityAccess
+ * @see WorldAccess
+ */
 public class Access<F> {
 	protected final IterFunc<F> combiner;
 	protected List<Object> delegates = new ArrayList<>();
@@ -30,20 +42,6 @@ public class Access<F> {
 		this.recompile();
 	}
 
-	protected void recompile() {
-		this.compiledFunction = this.combiner.combine(() -> Iterators.transform(this.delegates.iterator(), this::get));
-
-		if (this.listener != null) {
-			this.listener.accept(this);
-		}
-	}
-
-	protected F get(Object o) {
-		if (o instanceof Access.Func) {
-			return ((Func<?, F>) o).delegate;
-		}
-		return (F) o;
-	}
 
 	@NotNull
 	public F get() {
@@ -51,8 +49,10 @@ public class Access<F> {
 	}
 
 	/**
-	 * @return an invoker that contains all functions except those from the passed registry (the supplier should be called each time for it to be updated
+	 * Calling this function multiple times is ill-advised, you should store the Supplier somewhere
+	 * @return an invoker that contains all functions except those from the passed registries (the supplier should be called each time for it to be updated
 	 */
+	@Contract("_ -> new")
 	public Supplier<F> getExcluding(Collection<Access<?>> accesses) {
 		AtomicReference<F> reference = new AtomicReference<>();
 		this.addListener(a -> {
@@ -62,10 +62,23 @@ public class Access<F> {
 		return reference::get;
 	}
 
+	/**
+	 * adds a access dependency
+	 * @param access the function to depend on
+	 * @return this
+	 */
+	@Contract("_ -> this")
 	public Access<F> dependsOn(Access<F> access) {
 		return this.dependsOn(access, Function.identity());
 	}
 
+	/**
+	 * adds a access dependency
+	 * @param access the function to depend on
+	 * @param function a converter function to map the other access to this one
+	 * @return this
+	 */
+	@Contract("_,_ -> this")
 	public <E> Access<F> dependsOn(Access<E> access, Function<E, F> function) {
 		return this.dependsOn(access, function, true);
 	}
@@ -73,6 +86,7 @@ public class Access<F> {
 	/**
 	 * fired when a function is added to the access
 	 */
+	@Contract("_ -> this")
 	public Access<F> addListener(Consumer<Access<F>> listener) {
 		listener.accept(this);
 		if (this.listener == null) {
@@ -83,10 +97,21 @@ public class Access<F> {
 		return this;
 	}
 
+	/**
+	 * adds a access dependency, however it adds it to the front of this list, which means the function is called first
+	 * @param access the function to depend on
+	 * @param function a converter function to map the other access to this one
+	 * @return this
+	 */
+	@Contract("_,_ -> this")
 	public <E> Access<F> dependsOnBefore(Access<E> access, Function<E, F> function) {
 		return this.dependsOn(access, function, false);
 	}
 
+	/**
+	 * adds a function to this access, however it adds it to the front of this list, which means the function is called first
+	 */
+	@Contract("_ -> this")
 	public Access<F> before(F func) {
 		this.delegates.add(0, func);
 		this.recompile();
@@ -96,13 +121,14 @@ public class Access<F> {
 	/**
 	 * adds a function to this access, the later you register, the higher your priority
 	 */
+	@Contract("_ -> this")
 	public Access<F> andThen(F func) {
 		this.delegates.add(func);
 		this.recompile();
 		return this;
 	}
 
-	private <SilenceGenerics extends Returns<?>> Iterable<Object> getWithout(Collection<Access<?>> accesses) {
+	private <SilenceGenerics> Iterable<Object> getWithout(Collection<Access<?>> accesses) {
 		return Iterables.transform(Iterables.filter(this.delegates, o -> !(o instanceof Func && accesses.contains(((Func<?, ?>) o).dep))), delegate -> {
 			if(delegate instanceof Func) {
 				// our own delegate
@@ -181,5 +207,22 @@ public class Access<F> {
 			if(o instanceof Func) return (A)((Func<?, ?>) o).delegate;
 			return (A)o;
 		}));
+	}
+
+	/**
+	 * recombines the listeners into one function (should be called when the delegates list is updated)
+	 */
+	protected void recompile() {
+		this.compiledFunction = this.combiner.combine(() -> Iterators.transform(this.delegates.iterator(), this::get));
+		if (this.listener != null) {
+			this.listener.accept(this);
+		}
+	}
+
+	protected F get(Object o) {
+		if (o instanceof Access.Func) {
+			return ((Func<?, F>) o).delegate;
+		}
+		return (F) o;
 	}
 }

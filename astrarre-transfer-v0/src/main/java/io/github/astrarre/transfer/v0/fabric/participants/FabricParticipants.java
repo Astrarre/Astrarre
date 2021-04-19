@@ -4,10 +4,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Function;
 
 import io.github.astrarre.access.v0.api.BiFunctionAccess;
 import io.github.astrarre.access.v0.api.FunctionAccess;
-import io.github.astrarre.access.v0.api.func.AccessFunction;
 import io.github.astrarre.access.v0.fabric.WorldAccess;
 import io.github.astrarre.access.v0.fabric.func.WorldFunction;
 import io.github.astrarre.itemview.v0.api.Serializer;
@@ -102,7 +102,7 @@ public final class FabricParticipants {
 
 		FILTERS.addProviderFunction();
 		FILTERS.dependsOn(Participants.AGGREGATE_WRAPPERS_INSERTABLE, function -> insertable -> {
-			Collection<Insertable<ItemKey>> wrapped = Participants.unwrapInternal((AccessFunction) function, insertable);
+			Collection<Insertable<ItemKey>> wrapped = Participants.unwrapInternal((Function) function, insertable);
 			if (wrapped == null) {
 				return Collections.emptySet();
 			}

@@ -14,17 +14,20 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 
+/**
+ * cache a reference to a block & it's block entity, it automatically updates
+ */
 public final class BlockCache {
 	protected final BlockPos pos;
 	protected final World world;
 	protected BlockState state;
-	protected WeakReference<BlockEntity> reference;
+	protected WeakReference<BlockEntity> reference; // weak reference just in case
 
 	public static BlockCache getOrCreate(BlockPos pos, World world) {
 		WorldChunk chunk = world.getWorldChunk(pos);
 		return ((WorldChunkAccess)chunk).astrarre_getOrCreate(pos, ((world1, pos1) -> {
-			net.minecraft.block.BlockState state = chunk.getBlockState(pos1);
-			net.minecraft.block.entity.BlockEntity entity = null;
+			BlockState state = chunk.getBlockState(pos1);
+			BlockEntity entity = null;
 			if(state.getBlock().hasBlockEntity()) {
 				entity = chunk.getBlockEntity(pos1);
 			}
@@ -32,12 +35,12 @@ public final class BlockCache {
 		}));
 	}
 
-	private BlockCache(net.minecraft.world.World world, net.minecraft.util.math.BlockPos pos) {
+	private BlockCache(World world, BlockPos pos) {
 		this.pos = pos;
 		this.world = world;
 	}
 
-	private BlockCache(net.minecraft.world.World world, net.minecraft.util.math.BlockPos pos, net.minecraft.block.BlockState state, net.minecraft.block.entity.BlockEntity entity) {
+	private BlockCache(World world, BlockPos pos, BlockState state, BlockEntity entity) {
 		this(world, pos);
 		this.state = state;
 		if(entity != null) {

@@ -2,17 +2,15 @@ package io.github.astrarre.access.v0.api;
 
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 import com.google.common.collect.Iterators;
 import io.github.astrarre.access.internal.MapFilter;
-import io.github.astrarre.access.v0.api.func.AccessFunction;
 import io.github.astrarre.access.v0.api.func.IterFunc;
 import io.github.astrarre.access.v0.api.provider.Provider;
 
-public class FunctionAccess<A, B> extends Access<AccessFunction<A, B>> {
-	private final MapFilter<A, AccessFunction<A, B>, B> instanceFunctions;
-	private final MapFilter<Class<? extends A>, AccessFunction<A, B>, B> classFunctions;
+public class FunctionAccess<A, B> extends Access<Function<A, B>> {
+	private final MapFilter<A, Function<A, B>> instanceFunctions;
+	private final MapFilter<Class<? extends A>, Function<A, B>> classFunctions;
 	private boolean addedProviderFunction;
 
 	/**
@@ -20,7 +18,7 @@ public class FunctionAccess<A, B> extends Access<AccessFunction<A, B>> {
 	 */
 	public FunctionAccess() {
 		this(a -> val -> {
-			for (AccessFunction<A, B> function : a) {
+			for (Function<A, B> function : a) {
 				B ret = function.apply(val);
 				if (ret != null) {
 					return ret;
@@ -33,10 +31,10 @@ public class FunctionAccess<A, B> extends Access<AccessFunction<A, B>> {
 	/**
 	 * {@inheritDoc}
 	 */
-	public FunctionAccess(IterFunc<AccessFunction<A, B>> iterFunc) {
+	public FunctionAccess(IterFunc<Function<A, B>> iterFunc) {
 		super(iterFunc);
-		this.instanceFunctions = new MapFilter<>(iterFunc);
-		this.classFunctions = new MapFilter<>(iterFunc);
+		this.instanceFunctions = new MapFilter<>(iterFunc, true);
+		this.classFunctions = new MapFilter<>(iterFunc, true);
 	}
 
 	/**
@@ -70,7 +68,7 @@ public class FunctionAccess<A, B> extends Access<AccessFunction<A, B>> {
 	/**
 	 * filters the access function for only objects that are {@link Object#equals(Object)} to the passed object
 	 */
-	public FunctionAccess<A, B> forInstance(A a, AccessFunction<A, B> function) {
+	public FunctionAccess<A, B> forInstance(A a, Function<A, B> function) {
 		if (this.instanceFunctions.add(a, function)) {
 			this.andThen(val -> this.instanceFunctions.get(val).apply(val));
 		}
@@ -82,8 +80,8 @@ public class FunctionAccess<A, B> extends Access<AccessFunction<A, B>> {
 	 *
 	 * @param type the type
 	 */
-	public <C extends A> FunctionAccess<A, B> forClassExact(Class<C> type, AccessFunction<C, B> function) {
-		if (this.classFunctions.add(type, (AccessFunction<A, B>) function)) {
+	public <C extends A> FunctionAccess<A, B> forClassExact(Class<C> type, Function<C, B> function) {
+		if (this.classFunctions.add(type, (Function<A, B>) function)) {
 			this.andThen(val -> this.classFunctions.get((Class<? extends A>) val.getClass()).apply(val));
 		}
 		return this;

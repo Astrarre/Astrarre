@@ -2,15 +2,15 @@ package io.github.astrarre.access.v0.fabric.func;
 
 import java.util.function.BinaryOperator;
 
-import io.github.astrarre.access.v0.api.func.Returns;
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 
-public interface WorldFunction<T> extends Returns<T> {
+public interface WorldFunction<T> {
 	NoBlock<?> EMPTY = (direction, world, pos) -> null;
 	static <T> WorldFunction<T> empty() {
 		return (WorldFunction<T>) EMPTY;
