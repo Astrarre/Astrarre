@@ -29,12 +29,14 @@ public class FabricGraphics2d implements Graphics2d, FabricGraphics {
 	// todo custom buffer builder
 	private final TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
 	public final MatrixStack matrices;
+	protected final Close pop;
 	private TextRenderer textRenderer;
 	private ItemRenderer itemRenderer;
 	private SetupTeardown stage;
 
 	public FabricGraphics2d(MatrixStack matrices) {
 		this.matrices = matrices;
+		this.pop = this.matrices::pop;
 	}
 
 	@Override
@@ -69,7 +71,6 @@ public class FabricGraphics2d implements Graphics2d, FabricGraphics {
 		}
 		RenderSystem.enableDepthTest();
 	}
-
 
 
 	@Override
@@ -138,7 +139,7 @@ public class FabricGraphics2d implements Graphics2d, FabricGraphics {
 	public Close applyTransformation(Transformation transformation) {
 		this.matrices.push();
 		transformation.apply(this.matrices);
-		return () -> this.matrices.pop();
+		return this.pop;
 	}
 
 	@Override

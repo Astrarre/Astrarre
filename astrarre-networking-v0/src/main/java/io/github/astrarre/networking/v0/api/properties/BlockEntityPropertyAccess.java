@@ -5,7 +5,9 @@ import io.github.astrarre.networking.v0.api.SyncedProperty;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * implement this on a block entity class to create new syncable properties
+ * implement this on a block entity class to create new syncable properties.
+ *
+ * This is not completely implemented, values wont sync when the BE is loaded for the first time
  */
 public interface BlockEntityPropertyAccess {
 	default <T> SyncedProperty<T> newClientSyncedProperty(Serializer<T> serializer, int id) {

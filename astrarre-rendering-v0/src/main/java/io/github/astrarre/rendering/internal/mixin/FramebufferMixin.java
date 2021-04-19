@@ -11,7 +11,6 @@ import net.minecraft.client.gl.Framebuffer;
 
 @Mixin (Framebuffer.class)
 public class FramebufferMixin {
-
 	@ModifyArgs (method = "initFbo",
 			at = @At (value = "INVOKE",
 					target = "Lcom/mojang/blaze3d/platform/GlStateManager;texImage2D(IIIIIIIILjava/nio/IntBuffer;)V",

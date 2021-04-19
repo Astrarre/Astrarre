@@ -50,7 +50,7 @@ public class TestModGui {
 		}
 
 		for(int hotbarIndex = 0; hotbarIndex < 9; ++hotbarIndex) {
-			ASlot slot = new Cursed(entity.inventory, hotbarIndex);
+			ASlot slot = new APlayerSlot(entity.inventory, hotbarIndex);
 			slot.setTransformation(Transformation.translate(6 + hotbarIndex * 18, 140, 0));
 			center.add(slot);
 			slot.linkAll(container, hotbar);
@@ -73,22 +73,4 @@ public class TestModGui {
 		return bar2;
 	}
 
-	public static final class Cursed extends APlayerSlot implements Tickable {
-		public Cursed(PlayerInventory inventory, int index) {
-			super(inventory, index);
-			ServerTickEvents.START_SERVER_TICK.register(server -> {
-				this.setTransformation(this.getTransformation().combine(Transformation.rotate(0, 0, 1)));
-			});
-		}
-
-		@Override
-		public boolean isTooltipHandled(RootContainer container) {
-			return false;
-		}
-
-		@Override
-		public void tick(RootContainer container) {
-
-		}
-	}
 }

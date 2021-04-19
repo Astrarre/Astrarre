@@ -53,7 +53,7 @@ public class ModPacketHandlerImpl implements ModPacketHandler {
 	 * @param id the id of the packet to listen on (commonly known as the 'channel')
 	 */
 	@Override
-	public void registerClient(Id id, ClientReceiver receiver) {
+	public void registerAsyncClient(Id id, ClientReceiver receiver) {
 		this.asyncClientRegistry.put(id, receiver);
 	}
 
@@ -63,7 +63,7 @@ public class ModPacketHandlerImpl implements ModPacketHandler {
 	 * @param id the id of the packet to listen on (commonly known as the 'channel')
 	 */
 	@Override
-	public void registerServer(Id id, ServerReceiver receiver) {
+	public void registerAsyncServer(Id id, ServerReceiver receiver) {
 		this.asyncServerRegistry.put(id, receiver);
 	}
 

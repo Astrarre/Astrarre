@@ -87,6 +87,7 @@ public class FabricGuiGraphics extends FabricGraphics3d implements GuiGraphics {
 
 	@Override
 	public void drawTooltipAutowrap(ItemStack stack) {
+		// algorithm thing to wrap text even when the matrix stack is rotated
 		Vector4f origin = new Vector4f(0, 0, 0, 1);
 		origin.transform(this.matrices.peek().getModel());
 		float x = origin.getX(), y = origin.getY();
