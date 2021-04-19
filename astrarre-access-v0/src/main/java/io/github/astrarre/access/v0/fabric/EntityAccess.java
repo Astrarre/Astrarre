@@ -15,8 +15,8 @@ import net.minecraft.item.Item;
 import net.minecraft.util.Pair;
 
 public class EntityAccess<T> extends Access<EntityFunction<T>> {
-	private final MapFilter<EntityType<?>, EntityFunction<T>, T> entityTypes;
-	private final MapFilter<Pair<EquipmentSlot, Item>, EntityFunction<T>, T> equipmentFilters;
+	private final MapFilter<EntityType<?>, EntityFunction<T>> entityTypes;
+	private final MapFilter<Pair<EquipmentSlot, Item>, EntityFunction<T>> equipmentFilters;
 
 
 	/**
