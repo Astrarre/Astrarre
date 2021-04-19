@@ -17,11 +17,11 @@ import org.jetbrains.annotations.Nullable;
  * @see Provider
  * @see WorldAccess
  */
-public interface BlockEntityProvider<T> {
+public interface BlockEntityProvider {
 	/**
 	 * @param access the provider accessing this block
 	 * @return the instance, or null
 	 * @see Provider#get(Access)
 	 */
-	@Nullable T get(Access<WorldFunction<T>> access, Direction direction);
+	@Nullable Object get(Access<?> access, Direction direction);
 }

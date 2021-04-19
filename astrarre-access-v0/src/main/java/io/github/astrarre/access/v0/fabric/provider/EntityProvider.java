@@ -20,11 +20,11 @@ import org.jetbrains.annotations.Nullable;
  * @see Provider
  * @see EntityAccess
  */
-public interface EntityProvider<T> {
+public interface EntityProvider {
 	/**
 	 * @param access the provider accessing this block
 	 * @return the instance, or null
 	 * @see Provider#get(Access)
 	 */
-	@Nullable T get(Access<EntityFunction<T>> access, Direction direction);
+	@Nullable Object get(Access<?> access, Direction direction);
 }

@@ -22,12 +22,12 @@ import org.jetbrains.annotations.Nullable;
  * @see Provider
  * @see WorldAccess
  */
-public interface BlockProvider<T> {
+public interface BlockProvider {
 
 	/**
 	 * @param access the provider accessing this block
 	 * @return the instance, or null
 	 * @see Provider#get(Access)
 	 */
-	@Nullable T get(Access<WorldFunction<T>> access, Direction direction, BlockState state, World view, BlockPos pos);
+	@Nullable Object get(Access<?> access, Direction direction, BlockState state, World view, BlockPos pos);
 }

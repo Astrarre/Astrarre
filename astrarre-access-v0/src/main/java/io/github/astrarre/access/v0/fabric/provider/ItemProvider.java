@@ -11,11 +11,11 @@ import net.minecraft.util.math.Direction;
 /**
  * Use raw types if the same provider supports multiple `Access`es
  */
-public interface ItemProvider<T> {
+public interface ItemProvider {
 	/**
 	 * @param access the provider accessing this block
 	 * @return the instance, or null
 	 * @see Provider#get(Access)
 	 */
-	@Nullable T get(Access<ItemFunction<?, T>> access, Direction direction, ItemKey key, int count, Object container);
+	@Nullable Object get(Access<?> access, Direction direction, ItemKey key, int count, Object container);
 }
