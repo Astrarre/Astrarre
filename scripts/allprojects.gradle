@@ -28,6 +28,11 @@ allprojects {
             compileClasspath += sourceSets.main.compileClasspath
             runtimeClasspath += sourceSets.main.runtimeClasspath
         }
+
+        test {
+            compileClasspath += sourceSets.main.compileClasspath
+            runtimeClasspath += sourceSets.main.compileClasspath
+        }
     }
 
     jar {

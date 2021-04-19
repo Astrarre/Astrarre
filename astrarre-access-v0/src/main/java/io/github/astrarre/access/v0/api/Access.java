@@ -35,6 +35,7 @@ public class Access<F> {
 	protected F compiledFunction;
 
 	/**
+	 * @see Accesses
 	 * @param combiner andThen
 	 */
 	public Access(IterFunc<F> combiner) {

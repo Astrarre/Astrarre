@@ -11,9 +11,9 @@ import io.github.astrarre.itemview.v0.fabric.ItemKey;
 
 import net.minecraft.item.Item;
 
-public class ItemAccess<C, T> extends Access<ItemFunction<C, T>> {
-	private final MapFilter<Item, ItemFunction<C, T>> itemTypes;
-	private final MapFilter<ItemKey, ItemFunction<C, T>> itemKeyTypes;
+public class ItemAccess<T, C> extends Access<ItemFunction<T, C>> {
+	private final MapFilter<Item, ItemFunction<T, C>> itemTypes;
+	private final MapFilter<ItemKey, ItemFunction<T, C>> itemKeyTypes;
 	private boolean addedProviderFunction;
 
 	public ItemAccess() {
@@ -27,7 +27,7 @@ public class ItemAccess<C, T> extends Access<ItemFunction<C, T>> {
 	 */
 	public ItemAccess(T defaultValue) {
 		this(arr -> (direction, key, count, container) -> {
-			for (ItemFunction<C, T> function : arr) {
+			for (ItemFunction<T, C> function : arr) {
 				T value = function.get(direction, key, count, container);
 				if (value != null) {
 					return value;
@@ -37,13 +37,13 @@ public class ItemAccess<C, T> extends Access<ItemFunction<C, T>> {
 		});
 	}
 
-	public ItemAccess(IterFunc<ItemFunction<C, T>> combiner) {
+	public ItemAccess(IterFunc<ItemFunction<T, C>> combiner) {
 		super(combiner);
 		this.itemTypes = new MapFilter<>(combiner);
 		this.itemKeyTypes = new MapFilter<>(combiner);
 	}
 
-	public static <C, T> ItemAccess<C, T> newInstance(IterFunc<T> combiner) {
+	public static <T, C> ItemAccess<T, C> newInstance(IterFunc<T> combiner) {
 		return new ItemAccess<>((functions) -> (direction, key, count, container) -> combiner.combine(() -> Iterators.transform(functions.iterator(),
 				input -> input.get(direction, key, count, container))));
 	}
@@ -53,7 +53,7 @@ public class ItemAccess<C, T> extends Access<ItemFunction<C, T>> {
 	 *
 	 * (calling this multiple times will only register it once)
 	 */
-	public ItemAccess<C, T> addItemProviderFunctions() {
+	public ItemAccess<T, C> addItemProviderFunctions() {
 		if (this.addedProviderFunction) {
 			return this;
 		}
@@ -68,7 +68,7 @@ public class ItemAccess<C, T> extends Access<ItemFunction<C, T>> {
 		return this;
 	}
 
-	public ItemAccess<C, T> forItem(Item item, ItemFunction<C, T> function) {
+	public ItemAccess<T, C> forItem(Item item, ItemFunction<T, C> function) {
 		if (this.itemTypes.add(item, function)) {
 			this.andThen((direction, key, count, container) -> this.itemTypes.get(key.getItem()).get(direction, key, count, container));
 		}
@@ -78,7 +78,7 @@ public class ItemAccess<C, T> extends Access<ItemFunction<C, T>> {
 	/**
 	 * registers a filter for an item that exactly matches the ItemKey
 	 */
-	public ItemAccess<C, T> forItemKey(ItemKey item, ItemFunction<C, T> function) {
+	public ItemAccess<T, C> forItemKey(ItemKey item, ItemFunction<T, C> function) {
 		if (this.itemKeyTypes.add(item, function)) {
 			this.andThen((direction, itemKey, count, container) -> this.itemKeyTypes.get(itemKey).get(direction, itemKey, count, container));
 		}

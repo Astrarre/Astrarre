@@ -8,6 +8,8 @@ import java.util.function.Function;
 
 import io.github.astrarre.access.v0.api.BiFunctionAccess;
 import io.github.astrarre.access.v0.api.FunctionAccess;
+import io.github.astrarre.access.v0.fabric.EntityAccess;
+import io.github.astrarre.access.v0.fabric.ItemAccess;
 import io.github.astrarre.access.v0.fabric.WorldAccess;
 import io.github.astrarre.access.v0.fabric.func.WorldFunction;
 import io.github.astrarre.itemview.v0.api.Serializer;
@@ -51,6 +53,19 @@ public final class FabricParticipants {
 	public static final Serializer<FixedObjectVolume<Fluid>> FLUID_FIXED_OBJECT_VOLUME_SERIALIZER = FixedObjectVolume.fixedSerializer(Fluids.EMPTY, FabricSerializers.of(Registry.FLUID));
 	public static final WorldAccess<Participant<ItemKey>> ITEM_WORLD = new WorldAccess<>(Participants.EMPTY.cast());
 	public static final WorldAccess<Participant<Fluid>> FLUID_WORLD = new WorldAccess<>(Participants.EMPTY.cast());
+	public static final EntityAccess<Participant<ItemKey>> ITEM_ENTITY = new EntityAccess<>(Participants.EMPTY.cast());
+	public static final EntityAccess<Participant<Fluid>> FLUID_ENTITY = new EntityAccess<>(Participants.EMPTY.cast());
+
+	/**
+	 * interdependent with {@link #ITEM_INVENTORY}
+	 */
+	public static final ItemAccess<Participant<ItemKey>, Participant<ItemKey>> ITEM_ITEM = new ItemAccess<>(Participants.EMPTY.cast());
+	/**
+	 * interdependent with {@link #FLUID_INVENTORY}
+	 */
+	public static final ItemAccess<Participant<Fluid>, Participant<ItemKey>> FLUID_ITEM = new ItemAccess<>(Participants.EMPTY.cast());
+	public static final ItemAccess<Participant<ItemKey>, Inventory> ITEM_INVENTORY = new ItemAccess<>(Participants.EMPTY.cast());
+	public static final ItemAccess<Participant<Fluid>, Inventory> FLUID_INVENTORY = new ItemAccess<>(Participants.EMPTY.cast());
 
 	/**
 	 * if an insertable is looking for a limited set of items, this can help narrow it down
@@ -72,6 +87,18 @@ public final class FabricParticipants {
 		ITEM_WORLD.addWorldProviderFunctions();
 		FLUID_WORLD.addWorldProviderFunctions();
 		TO_INVENTORY.addProviderFunction();
+		ITEM_ENTITY.addEntityProviderFunction();
+		FLUID_ENTITY.addEntityProviderFunction();
+		ITEM_ITEM.addItemProviderFunctions();
+		FLUID_ITEM.addItemProviderFunctions();
+		ITEM_INVENTORY.addItemProviderFunctions();
+		FLUID_INVENTORY.addItemProviderFunctions();
+
+		ITEM_ITEM.dependsOn(ITEM_INVENTORY, function -> (direction, key, count, container) -> function.get(direction, key, count, TO_INVENTORY.get().apply(container)));
+		ITEM_INVENTORY.dependsOn(ITEM_ITEM, function -> (direction, key, count, container) -> function.get(direction, key, count, FROM_INVENTORY.get().apply(null, container)));
+
+		FLUID_ITEM.dependsOn(FLUID_INVENTORY, function -> (direction, key, count, container) -> function.get(direction, key, count, TO_INVENTORY.get().apply(container)));
+		FLUID_INVENTORY.dependsOn(FLUID_ITEM, function -> (direction, key, count, container) -> function.get(direction, key, count, FROM_INVENTORY.get().apply(null, container)));
 
 		// todo voiding and creative sink
 		TO_INVENTORY.forInstance(Participants.EMPTY.cast(), participant -> EmptyInventory.INSTANCE);
@@ -87,7 +114,7 @@ public final class FabricParticipants {
 				inventory = new ProperPlayerInventory((PlayerInventory) inventory);
 			}
 
-			if (inventory instanceof SidedInventory) {
+			if (inventory instanceof SidedInventory && direction != null) {
 				inventory = new SidedInventoryAccess((SidedInventory) inventory, direction);
 			}
 

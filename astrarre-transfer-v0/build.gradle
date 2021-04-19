@@ -1,6 +1,27 @@
 version '0.0.0'
 dependsOn(project, 'astrarre-itemview-v0', 'astrarre-util-v0', 'astrarre-access-v0')
 
+repositories {
+    maven {
+        name = "BuildCraft"
+        url = "https://mod-buildcraft.com/maven"
+    }
+    maven {
+        name = "dblsaiko"
+        url = "https://maven.dblsaiko.net/"
+    }
+}
+
+dependencies {
+    modCompileOnly("alexiil.mc.lib:libblockattributes-all:0.8.4") {
+        exclude module: 'fabric-loader'
+    }
+    modCompileOnly ("grondag:fluidity-mc116:0.16.204") { transitive = false }
+    modCompileOnly ("net.fabricmc.fabric-api:fabric-api:0.30.0+1.16") {
+        exclude module: 'fabric-loader'
+    }
+}
+
 sourceSets {
     generator {
     }

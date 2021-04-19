@@ -5,7 +5,7 @@ import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.util.math.Direction;
 
-public interface ItemFunction<C, T> {
+public interface ItemFunction<T, C> {
 	/**
 	 * @param direction the side to access the item from (only really makes sense for blocks)
 	 * @param key the current item at the time of access

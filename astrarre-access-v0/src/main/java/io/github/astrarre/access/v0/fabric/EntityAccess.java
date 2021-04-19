@@ -18,12 +18,15 @@ public class EntityAccess<T> extends Access<EntityFunction<T>> {
 	private final MapFilter<EntityType<?>, EntityFunction<T>> entityTypes;
 	private final MapFilter<Pair<EquipmentSlot, Item>, EntityFunction<T>> equipmentFilters;
 
+	public EntityAccess() {
+		this((T) null);
+	}
 
 	/**
 	 * docs for each of the constructors are the same from FunctionAccess
 	 * @see FunctionAccess
 	 */
-	public EntityAccess() {
+	public EntityAccess(T defaultValue) {
 		this((functions) -> (d, e) -> {
 			for (EntityFunction<T> function : functions) {
 				T val = function.get(d, e);
@@ -31,7 +34,7 @@ public class EntityAccess<T> extends Access<EntityFunction<T>> {
 					return val;
 				}
 			}
-			return null;
+			return defaultValue;
 		});
 	}
 

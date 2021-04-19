@@ -13,6 +13,11 @@
     "HalfOf2",
     "Astrarre"
   ],
+  "entrypoints": {
+    "main": [
+      "io.github.astrarre.transfer.internal.AstrarreTransferInitInternal"
+    ]
+  },
   "depends": {
     "fabricloader": ">=0.8.9"
   },
