@@ -11,10 +11,10 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Direction;
 
-public final class EmptyInventory implements SidedInventory {
+public class EmptyInventory implements SidedInventory {
 	public static final EmptyInventory INSTANCE = new EmptyInventory();
 
-	private EmptyInventory() {}
+	protected EmptyInventory() {}
 	@Override
 	public int[] getAvailableSlots(Direction side) {
 		return ArrayUtils.EMPTY_INT_ARRAY;

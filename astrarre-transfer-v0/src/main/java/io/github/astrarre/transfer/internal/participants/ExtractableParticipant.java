@@ -1,4 +1,4 @@
-package io.github.astrarre.transfer.v0.api.participants;
+package io.github.astrarre.transfer.internal.participants;
 
 import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.access.v0.api.provider.Provider;
@@ -7,6 +7,7 @@ import io.github.astrarre.transfer.v0.api.Insertable;
 import io.github.astrarre.transfer.v0.api.Participant;
 import io.github.astrarre.transfer.v0.api.Participants;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -26,12 +27,12 @@ public final class ExtractableParticipant<T> implements Participant<T>, Provider
 	}
 
 	@Override
-	public int extract(@Nullable Transaction transaction, T type, int quantity) {
+	public int extract(@Nullable Transaction transaction, @NotNull T type, int quantity) {
 		return this.extractable.extract(transaction, type, quantity);
 	}
 
 	@Override
-	public int insert(@Nullable Transaction transaction, T type, int quantity) {
+	public int insert(@Nullable Transaction transaction, @NotNull T type, int quantity) {
 		return 0;
 	}
 

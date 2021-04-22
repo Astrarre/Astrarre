@@ -54,6 +54,7 @@ public class TaggedItemImpl implements ItemKey {
 
 	@Override
 	public ItemStack createItemStack(int count) {
+		if(count == 0) return ItemStack.EMPTY;
 		ItemStack stack = new ItemStack(this.getItem(), count);
 		stack.setTag(this.getCompoundTag());
 		return stack;

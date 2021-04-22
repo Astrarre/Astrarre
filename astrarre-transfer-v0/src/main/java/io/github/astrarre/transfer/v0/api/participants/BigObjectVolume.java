@@ -7,6 +7,7 @@ import io.github.astrarre.transfer.v0.api.Participant;
 import io.github.astrarre.transfer.v0.api.transaction.Key;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import io.github.astrarre.transfer.v0.api.transaction.keys.ObjectKeyImpl;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class BigObjectVolume<T> implements Participant<T> {
@@ -44,7 +45,7 @@ public class BigObjectVolume<T> implements Participant<T> {
 	}
 
 	@Override
-	public int insert(@Nullable Transaction transaction, T type, int quantity) {
+	public int insert(@Nullable Transaction transaction, @NotNull T type, int quantity) {
 		if (quantity == 0) {
 			return 0;
 		}
@@ -74,7 +75,7 @@ public class BigObjectVolume<T> implements Participant<T> {
 	}
 
 	@Override
-	public int extract(@Nullable Transaction transaction, T type, int quantity) {
+	public int extract(@Nullable Transaction transaction, @NotNull T type, int quantity) {
 		if (quantity == 0) {
 			return 0;
 		}

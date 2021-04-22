@@ -1,10 +1,14 @@
 package io.github.astrarre.transfer.v0.fabric.inventory;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
+import org.apache.commons.lang3.ArrayUtils;
+import org.jetbrains.annotations.Nullable;
 
-public class VoidingInventory implements Inventory {
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.SidedInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.Direction;
+
+public class VoidingInventory implements SidedInventory {
 	public static final VoidingInventory INSTANCE = new VoidingInventory();
 	protected VoidingInventory() {
 	}
@@ -49,5 +53,20 @@ public class VoidingInventory implements Inventory {
 
 	@Override
 	public void clear() {
+	}
+
+	@Override
+	public int[] getAvailableSlots(Direction side) {
+		return ArrayUtils.EMPTY_INT_ARRAY;
+	}
+
+	@Override
+	public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
+		return true;
+	}
+
+	@Override
+	public boolean canExtract(int slot, ItemStack stack, Direction dir) {
+		return false;
 	}
 }

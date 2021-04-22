@@ -30,7 +30,7 @@ import net.minecraft.item.ItemStack;
  */
 public class ParticipantInventory implements Inventory, FilteringInventory {
 	// todo markDirty to validate NBT
-	private static final Logger LOGGER = LogManager.getLogger("ParticipantInventory");
+	public static final Logger LOGGER = LogManager.getLogger("Participant Inventory Compatibility");
 	private static final int BUFFER_EXTRACTION_SLOT = 0;
 	private static final int BUFFER_INSERTION_SLOT = 1;
 	private static int counter = 0;
@@ -131,7 +131,7 @@ public class ParticipantInventory implements Inventory, FilteringInventory {
 				if (abort) {
 					// duplicated items, reject the stack count change
 					commit.abort();
-					stack.setCount(oldCount);
+					i.setCount(oldCount);
 					if (counter % 10 == 0) {
 						LOGGER.warn(
 								"Denying ItemStack#setCount modification in an attempt to prevent duplication! (This warning is only logged every 10" +

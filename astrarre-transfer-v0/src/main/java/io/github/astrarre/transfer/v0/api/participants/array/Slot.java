@@ -4,6 +4,7 @@ import io.github.astrarre.transfer.internal.TransferInternal;
 import io.github.astrarre.transfer.v0.api.Insertable;
 import io.github.astrarre.transfer.v0.api.Participant;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -25,6 +26,11 @@ public interface Slot<T> extends Participant<T> {
 	 */
 	boolean set(@Nullable Transaction transaction, T key, int quantity);
 
+	@Override
+	default boolean isEmpty(@Nullable Transaction transaction) {
+		return this.getQuantity(transaction) == 0;
+	}
+
 	/**
 	 * extract an amount of the current key from the slot
 	 * @return the amount extracted
@@ -42,7 +48,7 @@ public interface Slot<T> extends Participant<T> {
 	 * @return the amount inserted
 	 */
 	@Override
-	default int insert(@Nullable Transaction transaction, T key, int quantity) {
+	default int insert(@Nullable Transaction transaction, @NotNull T key, int quantity) {
 		int result = (int) Math.min((long)this.getQuantity(transaction) + quantity, Integer.MAX_VALUE);
 		if(this.set(transaction, this.getKey(transaction), result)) {
 			return result - this.getQuantity(transaction);
@@ -61,7 +67,7 @@ public interface Slot<T> extends Participant<T> {
 	}
 
 	@Override
-	default int extract(@Nullable Transaction transaction, T type, int quantity) {
+	default int extract(@Nullable Transaction transaction, @NotNull T type, int quantity) {
 		if (type.equals(this.getKey(transaction))) {
 			return this.extract(transaction, quantity);
 		}

@@ -40,7 +40,6 @@ public class ParticipantItemExtractable implements ItemExtractable {
 					return Math.min(super.getMax(key), count);
 				}
 			};
-			// todo respect amount
 			this.participant.extract(transaction, new ItemFilterFilteringInsertable(filter, participant));
 			return participant.getStack(transaction);
 		}

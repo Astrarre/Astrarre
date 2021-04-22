@@ -6,6 +6,7 @@ import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import io.github.astrarre.transfer.v0.api.Insertable;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import io.github.astrarre.transfer.v0.api.transaction.keys.ObjectKeyImpl;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.item.ItemStack;
@@ -20,7 +21,7 @@ public class ItemInsertableInsertable implements Insertable<ItemKey> {
 	}
 
 	@Override
-	public int insert(@Nullable Transaction transaction, ItemKey type, int quantity) {
+	public int insert(@Nullable Transaction transaction, @NotNull ItemKey type, int quantity) {
 		ItemStack current = this.key.get(transaction);
 		if(current.isEmpty() || type.isEqual(current)) {
 			int combinedSize = Math.min(type.getMaxStackSize(), quantity + current.getCount());

@@ -9,6 +9,7 @@ import io.github.astrarre.transfer.v0.api.Participant;
 import io.github.astrarre.transfer.v0.api.transaction.Key;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import io.github.astrarre.transfer.v0.api.transaction.keys.ObjectKeyImpl;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.item.ItemStack;
@@ -51,7 +52,7 @@ public class ItemSlotParticipant implements Participant<ItemKey> {
 	}
 
 	@Override
-	public int insert(@Nullable Transaction transaction, ItemKey type, int quantity) {
+	public int insert(@Nullable Transaction transaction, @NotNull ItemKey type, int quantity) {
 		if (quantity == 0) {
 			return 0;
 		}
@@ -84,7 +85,7 @@ public class ItemSlotParticipant implements Participant<ItemKey> {
 	}
 
 	@Override
-	public int extract(@Nullable Transaction transaction, ItemKey type, int quantity) {
+	public int extract(@Nullable Transaction transaction, @NotNull ItemKey type, int quantity) {
 		if (quantity == 0) {
 			return 0;
 		}

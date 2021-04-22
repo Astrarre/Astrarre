@@ -10,6 +10,7 @@ import io.github.astrarre.transfer.v0.api.transaction.Key;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import io.github.astrarre.transfer.v0.api.transaction.keys.generated.IntKeyImpl;
 import io.github.astrarre.transfer.v0.fabric.participants.FabricParticipants;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.item.Item;
@@ -28,7 +29,7 @@ public class SetMatchingInsertable implements Insertable<ItemKey>, Provider {
 	}
 
 	@Override
-	public int insert(@Nullable Transaction transaction, ItemKey type, int quantity) {
+	public int insert(@Nullable Transaction transaction, @NotNull ItemKey type, int quantity) {
 		if (this.items.contains(type.getItem())) {
 			this.found.set(transaction, this.found.get(transaction) + quantity);
 			return quantity;
@@ -43,6 +44,6 @@ public class SetMatchingInsertable implements Insertable<ItemKey>, Provider {
 
 	@Override
 	public @Nullable Object get(Access<?> access) {
-		return access == FabricParticipants.FILTERS ? this.items : null;
+		return access == FabricParticipants.ITEM_FILTERS ? this.items : null;
 	}
 }

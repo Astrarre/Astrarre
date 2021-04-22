@@ -15,6 +15,7 @@ import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import io.github.astrarre.transfer.v0.api.transaction.keys.DiffKey;
 import io.github.astrarre.transfer.v0.api.transaction.keys.ObjectKeyImpl;
 import io.github.astrarre.util.v0.api.collection.ExposedDefaultList;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.block.entity.BlockEntityType;
@@ -65,7 +66,7 @@ public class ShulkerboxItemParticipant implements Participant<ItemKey> {
 	}
 
 	@Override
-	public int extract(@Nullable Transaction transaction, ItemKey type, int quantity) {
+	public int extract(@Nullable Transaction transaction, @NotNull ItemKey type, int quantity) {
 		if (ItemKey.EMPTY == type) {
 			return 0;
 		}
@@ -111,7 +112,7 @@ public class ShulkerboxItemParticipant implements Participant<ItemKey> {
 	}
 
 	@Override
-	public int insert(@Nullable Transaction transaction, ItemKey type, int quantity) {
+	public int insert(@Nullable Transaction transaction, @NotNull ItemKey type, int quantity) {
 		return this.operate(value -> {
 			int q = quantity;
 			List<ItemStack> stacks = this.key.get(value);

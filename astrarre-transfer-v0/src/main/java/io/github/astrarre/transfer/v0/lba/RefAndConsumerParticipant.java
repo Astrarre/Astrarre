@@ -5,15 +5,17 @@ import alexiil.mc.lib.attributes.misc.Reference;
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import io.github.astrarre.transfer.v0.api.Insertable;
 import io.github.astrarre.transfer.v0.api.Participant;
+import io.github.astrarre.transfer.v0.api.ReplacingParticipant;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import io.github.astrarre.transfer.v0.lba.adapters.ItemInsertableLimitedConsumer;
 import io.github.astrarre.transfer.v0.lba.item.ItemInsertableInsertable;
 import io.github.astrarre.transfer.v0.lba.keys.ReferenceKey;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.item.ItemStack;
 
-public class RefAndConsumerParticipant implements Participant<ItemKey> {
+public class RefAndConsumerParticipant implements ReplacingParticipant<ItemKey> {
 	protected final ReferenceKey<ItemStack> reference;
 	@Nullable protected final LimitedConsumer<ItemStack> overflow;
 	protected final Insertable<ItemKey> overflowInsertable;
@@ -31,6 +33,16 @@ public class RefAndConsumerParticipant implements Participant<ItemKey> {
 	}
 
 	@Override
+	public boolean replace(@Nullable Transaction transaction, ItemKey target, int targetAmount, ItemKey replacement, int replacementAmount) {
+		ItemStack stack = this.reference.get(transaction);
+		if(target.isEqual(targetAmount, stack)) {
+			this.reference.set(transaction, replacement.createItemStack(replacementAmount));
+			return true;
+		}
+		return false;
+	}
+
+	@Override
 	public void extract(@Nullable Transaction transaction, Insertable<ItemKey> insertable) {
 		ItemStack ref = this.reference.get(transaction);
 		int inserted = insertable.insert(transaction, ItemKey.of(ref), ref.getCount());
@@ -42,7 +54,7 @@ public class RefAndConsumerParticipant implements Participant<ItemKey> {
 	}
 
 	@Override
-	public int extract(@Nullable Transaction transaction, ItemKey type, int quantity) {
+	public int extract(@Nullable Transaction transaction, @NotNull ItemKey type, int quantity) {
 		ItemStack ref = this.reference.get(transaction);
 		if (type.isEqual(ref)) {
 			int toTake = Math.min(quantity, ref.getCount());
@@ -55,7 +67,7 @@ public class RefAndConsumerParticipant implements Participant<ItemKey> {
 	}
 
 	@Override
-	public int insert(@Nullable Transaction transaction, ItemKey type, int quantity) {
+	public int insert(@Nullable Transaction transaction, @NotNull ItemKey type, int quantity) {
 		if (this.stack.getItem() == type.getItem()) {
 			ItemStack reference = this.reference.get(transaction);
 			int toInsert = Math.min(reference.getMaxCount() - reference.getCount(), quantity);

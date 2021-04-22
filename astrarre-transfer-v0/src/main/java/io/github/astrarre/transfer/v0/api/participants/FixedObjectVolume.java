@@ -6,6 +6,7 @@ import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import io.github.astrarre.transfer.v0.fabric.participants.FabricParticipants;
 import io.github.astrarre.transfer.v0.api.item.ItemSlotParticipant;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * an object volume that has a maximum quantity.
@@ -47,7 +48,7 @@ public class FixedObjectVolume<T> extends ObjectVolume<T> {
 
 
 	@Override
-	public int insert(Transaction transaction, T type, int quantity) {
+	public int insert(Transaction transaction, @NotNull T type, int quantity) {
 		int currentCount = this.quantity.get(transaction);
 		return super.insert(transaction, type, Math.min(this.getMax(transaction) - currentCount, Math.min(this.getMaxStackSize(type) - currentCount, quantity)));
 	}

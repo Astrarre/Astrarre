@@ -11,6 +11,7 @@ import io.github.astrarre.transfer.v0.api.Extractable;
 import io.github.astrarre.transfer.v0.api.Insertable;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import io.github.astrarre.transfer.v0.fabric.participants.FabricParticipants;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ItemIngredientInput implements RecipePart<ItemIngredient, Extractable<ItemKey>> {
@@ -45,7 +46,7 @@ public class ItemIngredientInput implements RecipePart<ItemIngredient, Extractab
 		}
 
 		@Override
-		public int insert(@Nullable Transaction transaction, ItemKey type, int quantity) {
+		public int insert(@Nullable Transaction transaction, @NotNull ItemKey type, int quantity) {
 			if(this.ingredient.matcher.matches(type)) {
 				int toInsert = Math.min(this.ingredient.amount - this.count, quantity);
 				this.count += toInsert;
@@ -66,7 +67,7 @@ public class ItemIngredientInput implements RecipePart<ItemIngredient, Extractab
 
 		@Override
 		public @Nullable Object get(Access<?> access) {
-			return access == FabricParticipants.FILTERS ? this.ingredient.matcher.items() : null;
+			return access == FabricParticipants.ITEM_FILTERS ? this.ingredient.matcher.items() : null;
 		}
 	}
 }

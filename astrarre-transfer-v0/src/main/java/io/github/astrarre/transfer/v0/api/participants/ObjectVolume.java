@@ -10,6 +10,7 @@ import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import io.github.astrarre.transfer.v0.api.transaction.keys.ObjectKeyImpl;
 import io.github.astrarre.transfer.v0.api.transaction.keys.generated.IntKeyImpl;
 import io.github.astrarre.transfer.v0.fabric.participants.FabricParticipants;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -67,7 +68,7 @@ public class ObjectVolume<T> implements Participant<T> {
 	}
 
 	@Override
-	public int insert(@Nullable Transaction transaction, T type, int quantity) {
+	public int insert(@Nullable Transaction transaction, @NotNull T type, int quantity) {
 		if (quantity == 0) {
 			return 0;
 		}
@@ -98,7 +99,7 @@ public class ObjectVolume<T> implements Participant<T> {
 	}
 
 	@Override
-	public int extract(@Nullable Transaction transaction, T type, int quantity) {
+	public int extract(@Nullable Transaction transaction, @NotNull T type, int quantity) {
 		if (quantity == 0) {
 			return 0;
 		}

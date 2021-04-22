@@ -14,14 +14,14 @@ import net.minecraft.item.Item;
 import net.minecraft.tag.Tag;
 
 public class Tags {
-	public static Set<Item> get(Tag<Item> tag) {
-		Tag<Item> root = findRoot(tag);
+	public static <T> Set<T> get(Tag<T> tag) {
+		Tag<T> root = findRoot(tag);
 		if (root instanceof SetTagAccess) {
 			return ((SetTagAccess) root).getValueSet();
 		} else {
-			return new AbstractSet<Item>() {
+			return new AbstractSet<T>() {
 				@Override
-				public Iterator<Item> iterator() {
+				public Iterator<T> iterator() {
 					return root.values().iterator();
 				}
 

@@ -60,12 +60,12 @@ public class AggregateParticipant<T> implements Participant<T>, Iterable<Partici
 	}
 
 	@Override
-	public int extract(Transaction transaction, T type, int quantity) {
+	public int extract(Transaction transaction, @NotNull T type, int quantity) {
 		return this.act(transaction, type, quantity, true);
 	}
 
 	@Override
-	public int insert(Transaction transaction, T type, int quantity) {
+	public int insert(Transaction transaction, @NotNull T type, int quantity) {
 		return this.act(transaction, type, quantity, false);
 	}
 

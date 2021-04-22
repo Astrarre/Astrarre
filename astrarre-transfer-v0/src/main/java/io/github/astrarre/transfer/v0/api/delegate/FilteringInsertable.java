@@ -2,28 +2,37 @@ package io.github.astrarre.transfer.v0.api.delegate;
 
 import io.github.astrarre.transfer.v0.api.Insertable;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface FilteringInsertable<T> extends Insertable<T> {
-	boolean isValid(T object, int quantity);
+public class FilteringInsertable<T> implements Insertable<T> {
+	public final Filter<T> filter;
+	public final Insertable<T> delegate;
 
-	Insertable<T> delegate();
+	public FilteringInsertable(Filter<T> valid, Insertable<T> delegate) {
+		this.filter = valid;
+		this.delegate = delegate;
+	}
 
 	@Override
-	default int insert(@Nullable Transaction transaction, T type, int quantity) {
-		if(this.isValid(type, quantity)) {
-			return this.delegate().insert(transaction, type, quantity);
+	public int insert(@Nullable Transaction transaction, @NotNull T type, int quantity) {
+		if (this.filter.isValid(type, quantity)) {
+			return this.delegate.insert(transaction, type, quantity);
 		}
 		return 0;
 	}
 
 	@Override
-	default boolean isFull(@Nullable Transaction transaction) {
-		return this.delegate().isFull(transaction);
+	public boolean isFull(@Nullable Transaction transaction) {
+		return this.delegate.isFull(transaction);
 	}
 
 	@Override
-	default long getVersion() {
-		return this.delegate().getVersion();
+	public long getVersion() {
+		return this.delegate.getVersion();
+	}
+
+	public interface Filter<T> {
+		boolean isValid(T object, int quantity);
 	}
 }

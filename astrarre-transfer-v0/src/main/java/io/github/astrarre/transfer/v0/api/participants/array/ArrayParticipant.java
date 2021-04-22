@@ -6,6 +6,7 @@ import io.github.astrarre.transfer.v0.api.Insertable;
 import io.github.astrarre.transfer.v0.api.Participant;
 import io.github.astrarre.transfer.v0.api.ReplacingParticipant;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public interface ArrayParticipant<T> extends Participant<T> {
@@ -25,7 +26,7 @@ public interface ArrayParticipant<T> extends Participant<T> {
 	}
 
 	@Override
-	default int extract(@Nullable Transaction transaction, T type, int quantity) {
+	default int extract(@Nullable Transaction transaction, @NotNull T type, int quantity) {
 		int count = 0;
 		for (Slot<T> slot : this.getSlots()) {
 			int extracted = slot.extract(transaction, type, quantity);
@@ -39,7 +40,7 @@ public interface ArrayParticipant<T> extends Participant<T> {
 	}
 
 	@Override
-	default int insert(@Nullable Transaction transaction, T type, int quantity) {
+	default int insert(@Nullable Transaction transaction, @NotNull T type, int quantity) {
 		int count = 0;
 		for (Slot<T> slot : this.getSlots()) {
 			int inserted = slot.insert(transaction, type, quantity);
@@ -81,7 +82,7 @@ public interface ArrayParticipant<T> extends Participant<T> {
 			}
 
 			@Override
-			public int extract(@Nullable Transaction transaction, T type, int quantity) {
+			public int extract(@Nullable Transaction transaction, @NotNull T type, int quantity) {
 				int count = 0;
 				for (Slot<T> slot : ArrayParticipant.this.getSlots()) {
 					if(slot.equals(this.prioritySlot)) {
@@ -102,7 +103,7 @@ public interface ArrayParticipant<T> extends Participant<T> {
 			}
 
 			@Override
-			public int insert(@Nullable Transaction transaction, T type, int quantity) {
+			public int insert(@Nullable Transaction transaction, @NotNull T type, int quantity) {
 				int count = 0;
 				for (Slot<T> slot : ArrayParticipant.this.getSlots()) {
 					if(slot.equals(this.prioritySlot)) {

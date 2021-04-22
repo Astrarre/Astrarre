@@ -1,8 +1,12 @@
 package io.github.astrarre.transfer.v0.api;
 
-import io.github.astrarre.transfer.v0.api.participants.ExtractableParticipant;
+import io.github.astrarre.transfer.internal.participants.ExtractableParticipant;
 import io.github.astrarre.transfer.internal.TransferInternal;
+import io.github.astrarre.transfer.v0.api.delegate.FilteringInsertable;
+import io.github.astrarre.transfer.v0.api.participants.FixedObjectVolume;
+import io.github.astrarre.transfer.v0.api.participants.ObjectVolume;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -23,7 +27,17 @@ public interface Extractable<T> {
 	 * @param transaction the current transaction
 	 * @return the quantity actually extracted
 	 */
-	int extract(@Nullable Transaction transaction, T type, int quantity);
+	int extract(@Nullable Transaction transaction, @NotNull T type, int quantity);
+
+	interface Simple<T> extends Extractable<T> {
+		@Override
+		default int extract(@Nullable Transaction transaction, @NotNull T type, int quantity) {
+			ObjectVolume<T> volume = new FixedObjectVolume<>(null, quantity);
+			FilteringInsertable<T> filter = new FilteringInsertable<>((object, quantity1) -> object.equals(type), volume);
+			this.extract(transaction, filter);
+			return volume.getQuantity(transaction);
+		}
+	}
 
 	/**
 	 * @return if true, extract should return 0 else undefined

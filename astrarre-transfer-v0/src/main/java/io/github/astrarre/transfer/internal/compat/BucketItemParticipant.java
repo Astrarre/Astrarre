@@ -8,6 +8,7 @@ import io.github.astrarre.transfer.v0.api.Participant;
 import io.github.astrarre.transfer.v0.api.transaction.Key;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import io.github.astrarre.transfer.v0.api.transaction.keys.ObjectKeyImpl;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.fluid.Fluid;
@@ -41,12 +42,12 @@ public class BucketItemParticipant implements Participant<Fluid> {
 	}
 
 	@Override
-	public int extract(@Nullable Transaction transaction, Fluid type, int quantity) {
+	public int extract(@Nullable Transaction transaction, @NotNull Fluid type, int quantity) {
 		return 0;
 	}
 
 	@Override
-	public int insert(@Nullable Transaction transaction, Fluid type, int quantity) {
+	public int insert(@Nullable Transaction transaction, @NotNull Fluid type, int quantity) {
 		return 0;
 	}
 }

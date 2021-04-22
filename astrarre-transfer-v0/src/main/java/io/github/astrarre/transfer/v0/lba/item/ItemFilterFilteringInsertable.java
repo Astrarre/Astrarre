@@ -19,12 +19,13 @@ import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.item.Item;
 
-public class ItemFilterFilteringInsertable implements FilteringInsertable<ItemKey>, Provider {
+public class ItemFilterFilteringInsertable extends FilteringInsertable<ItemKey> implements Provider {
 	public final ItemFilter filter;
 	public final Set<Item> items;
 	public final Insertable<ItemKey> delegate;
 
 	public ItemFilterFilteringInsertable(ItemFilter filter, Insertable<ItemKey> delegate) {
+		super((object, quantity) -> filter.matches(object.createItemStack(quantity)), delegate);
 		this.filter = filter;
 		this.delegate = delegate;
 		if(filter instanceof ExactItemFilter) {
@@ -41,18 +42,8 @@ public class ItemFilterFilteringInsertable implements FilteringInsertable<ItemKe
 	}
 
 	@Override
-	public boolean isValid(ItemKey object, int quantity) {
-		return this.filter.matches(object.createItemStack(quantity));
-	}
-
-	@Override
-	public Insertable<ItemKey> delegate() {
-		return this.delegate;
-	}
-
-	@Override
 	public @Nullable Object get(Access<?> access) {
-		if(access == FabricParticipants.FILTERS) {
+		if(access == FabricParticipants.ITEM_FILTERS) {
 			return this.items;
 		}
 		return null;

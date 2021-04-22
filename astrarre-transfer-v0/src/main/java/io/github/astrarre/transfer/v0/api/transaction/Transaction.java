@@ -2,6 +2,7 @@ package io.github.astrarre.transfer.v0.api.transaction;
 
 
 import io.github.astrarre.util.v0.api.Validate;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * a 'serialized world state' more documentation on the concept can be seen
@@ -55,6 +56,14 @@ public final class Transaction implements AutoCloseable {
 	 */
 	public static Transaction create(boolean intent) {
 		return new Transaction(intent);
+	}
+
+	/**
+	 * @return the current transaction
+	 */
+	@Nullable
+	public static Transaction active() {
+		return ACTIVE.get();
 	}
 
 	/**

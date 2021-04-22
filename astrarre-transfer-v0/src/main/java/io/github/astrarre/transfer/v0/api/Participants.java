@@ -29,7 +29,7 @@ public enum Participants implements Participant<Object> {
 	 */
 	VOIDING(true, false) {
 		@Override
-		public int insert(Transaction transaction, Object type, int quantity) {
+		public int insert(Transaction transaction, @NotNull Object type, int quantity) {
 			return quantity;
 		}
 	},
@@ -39,7 +39,7 @@ public enum Participants implements Participant<Object> {
 	 */
 	CREATIVE(false, true) {
 		@Override
-		public int extract(Transaction transaction, Object type, int quantity) {
+		public int extract(Transaction transaction, @NotNull Object type, int quantity) {
 			return quantity;
 		}
 	},
@@ -49,12 +49,12 @@ public enum Participants implements Participant<Object> {
 	 */
 	CREATIVE_SINK(false, false) {
 		@Override
-		public int extract(Transaction transaction, Object type, int quantity) {
+		public int extract(Transaction transaction, @NotNull Object type, int quantity) {
 			return quantity;
 		}
 
 		@Override
-		public int insert(Transaction transaction, Object type, int quantity) {
+		public int insert(Transaction transaction, @NotNull Object type, int quantity) {
 			return quantity;
 		}
 	};
@@ -144,9 +144,9 @@ public enum Participants implements Participant<Object> {
 
 	// @formatter:off
 	@Override public void extract(Transaction transaction, Insertable<Object> insertable) {}
-	@Override public int extract(Transaction transaction, Object type, int quantity) {return 0;}
+	@Override public int extract(Transaction transaction, @NotNull Object type, int quantity) {return 0;}
 	@Override public boolean isEmpty(@Nullable Transaction transaction) { return this.empty; }
-	@Override public int insert(Transaction transaction, Object type, int quantity) {return 0;}
+	@Override public int insert(Transaction transaction, @NotNull Object type, int quantity) {return 0;}
 	@Override public boolean isFull(@Nullable Transaction transaction) { return this.full; }
 	@Override public long getVersion() { return 0; }
 	@Override

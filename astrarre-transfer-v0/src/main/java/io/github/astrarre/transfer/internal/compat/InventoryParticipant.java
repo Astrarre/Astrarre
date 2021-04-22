@@ -75,6 +75,11 @@ public class InventoryParticipant implements ArrayParticipant<ItemKey>, Provider
 		}
 
 		@Override
+		public boolean isFull(@Nullable Transaction transaction) {
+			return this.getQuantity(transaction) >= this.participant.array.get(transaction).get(this.index).getMaxCount();
+		}
+
+		@Override
 		public boolean equals(Object o) {
 			if (this == o) {
 				return true;

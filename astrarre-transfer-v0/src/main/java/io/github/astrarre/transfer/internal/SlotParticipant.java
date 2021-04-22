@@ -7,6 +7,7 @@ import io.github.astrarre.transfer.v0.api.Participant;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import io.github.astrarre.transfer.v0.api.transaction.keys.ObjectKeyImpl;
 import io.github.astrarre.transfer.v0.api.transaction.keys.generated.IntKeyImpl;
+import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
@@ -34,7 +35,7 @@ public class SlotParticipant implements Participant<ItemKey> {
 	}
 
 	@Override
-	public int extract(Transaction transaction, ItemKey type, int quantity) {
+	public int extract(Transaction transaction, @NotNull ItemKey type, int quantity) {
 		if (type != ItemKey.EMPTY && quantity != 0 && this.item.get(transaction).equals(type)) {
 			if(this.inventory instanceof FilteringInventory && !((FilteringInventory) this.inventory)
 					                                                 .canExtract(this.index, type.createItemStack(quantity))) {
@@ -54,7 +55,7 @@ public class SlotParticipant implements Participant<ItemKey> {
 	}
 
 	@Override
-	public int insert(Transaction transaction, ItemKey type, int quantity) {
+	public int insert(Transaction transaction, @NotNull ItemKey type, int quantity) {
 		if (type == ItemKey.EMPTY || quantity == 0) {
 			return 0;
 		}

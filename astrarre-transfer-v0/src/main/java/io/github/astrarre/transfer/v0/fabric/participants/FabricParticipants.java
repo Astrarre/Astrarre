@@ -17,9 +17,11 @@ import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.itemview.v0.fabric.FabricSerializers;
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import io.github.astrarre.transfer.internal.NUtil;
-import io.github.astrarre.transfer.internal.SlotParticipant;
 import io.github.astrarre.transfer.internal.compat.InventoryParticipant;
 import io.github.astrarre.transfer.internal.compat.ProperPlayerInventory;
+import io.github.astrarre.transfer.internal.participantInventory.ArrayParticipantInventory;
+import io.github.astrarre.transfer.v0.api.ReplacingParticipant;
+import io.github.astrarre.transfer.v0.api.participants.array.ArrayParticipant;
 import io.github.astrarre.transfer.v0.fabric.inventory.CombinedSidedInventory;
 import io.github.astrarre.transfer.v0.fabric.inventory.EmptyInventory;
 import io.github.astrarre.transfer.v0.fabric.inventory.SidedInventoryAccess;
@@ -27,12 +29,10 @@ import io.github.astrarre.transfer.internal.participantInventory.ParticipantInve
 import io.github.astrarre.transfer.v0.api.Insertable;
 import io.github.astrarre.transfer.v0.api.Participant;
 import io.github.astrarre.transfer.v0.api.Participants;
-import io.github.astrarre.transfer.v0.api.participants.AggregateParticipant;
 import io.github.astrarre.transfer.v0.api.participants.FixedObjectVolume;
 import io.github.astrarre.transfer.v0.api.participants.ObjectVolume;
 import io.github.astrarre.transfer.v0.api.item.ItemSlotParticipant;
 import io.github.astrarre.transfer.v0.fabric.inventory.VoidingInventory;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.block.BlockState;
@@ -63,17 +63,23 @@ public final class FabricParticipants {
 	/**
 	 * get item container from item in an item container
 	 */
-	public static final ItemAccess<Participant<ItemKey>, Participant<ItemKey>> ITEM_ITEM = new ItemAccess<>(Participants.EMPTY.cast());
+	public static final ItemAccess<Participant<ItemKey>, ReplacingParticipant<ItemKey>> ITEM_ITEM = new ItemAccess<>(Participants.EMPTY.cast());
 	/**
 	 * get fluid container from fluid in an item container
 	 */
-	public static final ItemAccess<Participant<Fluid>, Participant<ItemKey>> FLUID_ITEM = new ItemAccess<>(Participants.EMPTY.cast());
+	public static final ItemAccess<Participant<Fluid>, ReplacingParticipant<ItemKey>> FLUID_ITEM = new ItemAccess<>(Participants.EMPTY.cast());
 
 	/**
 	 * if an insertable is looking for a limited set of items, this can help narrow it down
 	 */
-	public static final FunctionAccess<Insertable<ItemKey>, Set<Item>> FILTERS = FunctionAccess.newInstance(sets -> {
+	public static final FunctionAccess<Insertable<ItemKey>, Set<Item>> ITEM_FILTERS = FunctionAccess.newInstance(sets -> {
 		Set<Item> combined = new HashSet<>();
+		sets.forEach(combined::addAll);
+		return combined;
+	});
+
+	public static final FunctionAccess<Insertable<ItemKey>, Set<Fluid>> FLUID_FILTERS = FunctionAccess.newInstance(sets -> {
+		Set<Fluid> combined = new HashSet<>();
 		sets.forEach(combined::addAll);
 		return combined;
 	});
@@ -98,6 +104,12 @@ public final class FabricParticipants {
 		TO_INVENTORY.forInstance(Participants.EMPTY.cast(), participant -> EmptyInventory.INSTANCE);
 		TO_INVENTORY.forInstance(Participants.VOIDING.cast(), participant -> VoidingInventory.INSTANCE);
 
+		TO_INVENTORY.andThen(participant -> {
+			if(participant instanceof ArrayParticipant) {
+				return new ArrayParticipantInventory((ArrayParticipant<ItemKey>) participant);
+			}
+			return null;
+		});
 		TO_INVENTORY.andThen(ParticipantInventory::new);
 		FROM_INVENTORY.andThen((direction, inventory) -> {
 			if(inventory instanceof EmptyInventory) {
@@ -123,8 +135,8 @@ public final class FabricParticipants {
 			return new InventoryParticipant(inventory);
 		});
 
-		FILTERS.addProviderFunction();
-		FILTERS.dependsOn(Participants.AGGREGATE_WRAPPERS_INSERTABLE, function -> insertable -> {
+		ITEM_FILTERS.addProviderFunction();
+		ITEM_FILTERS.dependsOn(Participants.AGGREGATE_WRAPPERS_INSERTABLE, function -> insertable -> {
 			Collection<Insertable<ItemKey>> wrapped = Participants.unwrapInternal((Function) function, insertable);
 			if (wrapped == null) {
 				return Collections.emptySet();
@@ -132,7 +144,7 @@ public final class FabricParticipants {
 
 			Set<Item> combined = null;
 			for (Insertable<ItemKey> delegate : wrapped) {
-				combined = NUtil.addAll(combined, FILTERS.get().apply(delegate));
+				combined = NUtil.addAll(combined, ITEM_FILTERS.get().apply(delegate));
 			}
 			return combined;
 		});

@@ -3,6 +3,7 @@ package io.github.astrarre.itemview.v0.fabric;
 import io.github.astrarre.itemview.internal.TaggedItemImpl;
 import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
+import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -38,6 +39,7 @@ public interface ItemKey {
 	// todo cache ItemKey with versioning for mutable array tags
 
 	default ItemStack createItemStack(int count) {
+		if(count == 0) return ItemStack.EMPTY;
 		ItemStack stack = new ItemStack(this.getItem(), count);
 		stack.setTag(this.getTag().copyTag());
 		return stack;
@@ -48,16 +50,26 @@ public interface ItemKey {
 	/**
 	 * @return an immutable view of the ItemKey
 	 */
+	@NotNull
 	NBTagView getTag();
 
 	default CompoundTag getCompoundTag() {
 		return this.getTag().copyTag();
 	}
 
+	/**
+	 * @return true if the item and compound tags are equal
+	 */
 	default boolean isEqual(ItemStack stack) {
 		return stack.getItem() == this.getItem() && this.getTag().equals(stack.getTag());
 	}
 
+	/**
+	 * @return true if `count` == ItemStack#getCount and the items and compound tags are equal
+	 */
+	default boolean isEqual(int count, ItemStack stack) {
+		return count == stack.getCount() && this.isEqual(stack);
+	}
 	/**
 	 * @return the maximum stack size of the item
 	 */

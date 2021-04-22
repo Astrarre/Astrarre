@@ -6,6 +6,7 @@ import io.github.astrarre.transfer.v0.api.Insertable;
 import io.github.astrarre.transfer.v0.api.Participant;
 import io.github.astrarre.transfer.v0.api.Participants;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public interface DelegateParticipant<T> extends Participant<T>, Provider {
@@ -25,7 +26,7 @@ public interface DelegateParticipant<T> extends Participant<T>, Provider {
 	}
 
 	@Override
-	default int extract(@Nullable Transaction transaction, T type, int quantity) {
+	default int extract(@Nullable Transaction transaction, @NotNull T type, int quantity) {
 		return this.getDelegate().extract(transaction, type, quantity);
 	}
 
@@ -40,7 +41,7 @@ public interface DelegateParticipant<T> extends Participant<T>, Provider {
 	}
 
 	@Override
-	default int insert(@Nullable Transaction transaction, T type, int quantity) {
+	default int insert(@Nullable Transaction transaction, @NotNull T type, int quantity) {
 		return this.getDelegate().insert(transaction, type, quantity);
 	}
 
