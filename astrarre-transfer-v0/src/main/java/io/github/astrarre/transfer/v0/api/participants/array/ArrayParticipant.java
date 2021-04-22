@@ -59,8 +59,21 @@ public interface ArrayParticipant<T> extends Participant<T> {
 
 			@Override
 			public boolean replace(@Nullable Transaction transaction, T target, int targetAmount, T replacement, int replacementAmount) {
-				if(targetAmount == this.prioritySlot.getQuantity(transaction) && target.equals(this.prioritySlot.getKey(transaction))) {
-					this.prioritySlot.set(transaction, replacement, replacementAmount);
+				if(target.equals(this.prioritySlot.getKey(transaction))) {
+					int quantity = this.prioritySlot.getQuantity(transaction);
+					if(targetAmount == quantity) {
+						return this.prioritySlot.set(transaction, replacement, replacementAmount);
+					} else if(targetAmount < quantity) {
+						try (Transaction action = Transaction.create(false)) {
+							if (this.prioritySlot.extract(transaction, target, targetAmount) == targetAmount) {
+								if(this.insert(transaction, replacement, replacementAmount) == replacementAmount) {
+									action.commit();
+									return true;
+								}
+							}
+							return false;
+						}
+					}
 				}
 				return ReplacingParticipant.super.replace(transaction, target, targetAmount, replacement, replacementAmount);
 			}

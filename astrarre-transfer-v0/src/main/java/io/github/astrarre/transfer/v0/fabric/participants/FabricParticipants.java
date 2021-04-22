@@ -17,32 +17,39 @@ import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.itemview.v0.fabric.FabricSerializers;
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import io.github.astrarre.transfer.internal.NUtil;
+import io.github.astrarre.transfer.internal.compat.BucketItemParticipant;
+import io.github.astrarre.transfer.internal.compat.CauldronParticipant;
 import io.github.astrarre.transfer.internal.compat.InventoryParticipant;
 import io.github.astrarre.transfer.internal.compat.ProperPlayerInventory;
+import io.github.astrarre.transfer.internal.compat.ShulkerboxItemParticipant;
 import io.github.astrarre.transfer.internal.participantInventory.ArrayParticipantInventory;
-import io.github.astrarre.transfer.v0.api.ReplacingParticipant;
-import io.github.astrarre.transfer.v0.api.participants.array.ArrayParticipant;
-import io.github.astrarre.transfer.v0.fabric.inventory.CombinedSidedInventory;
-import io.github.astrarre.transfer.v0.fabric.inventory.EmptyInventory;
-import io.github.astrarre.transfer.v0.fabric.inventory.SidedInventoryAccess;
 import io.github.astrarre.transfer.internal.participantInventory.ParticipantInventory;
 import io.github.astrarre.transfer.v0.api.Insertable;
 import io.github.astrarre.transfer.v0.api.Participant;
 import io.github.astrarre.transfer.v0.api.Participants;
+import io.github.astrarre.transfer.v0.api.ReplacingParticipant;
+import io.github.astrarre.transfer.v0.api.item.ItemSlotParticipant;
 import io.github.astrarre.transfer.v0.api.participants.FixedObjectVolume;
 import io.github.astrarre.transfer.v0.api.participants.ObjectVolume;
-import io.github.astrarre.transfer.v0.api.item.ItemSlotParticipant;
+import io.github.astrarre.transfer.v0.api.participants.array.ArrayParticipant;
+import io.github.astrarre.transfer.v0.fabric.inventory.CombinedSidedInventory;
+import io.github.astrarre.transfer.v0.fabric.inventory.EmptyInventory;
+import io.github.astrarre.transfer.v0.fabric.inventory.SidedInventoryAccess;
 import io.github.astrarre.transfer.v0.fabric.inventory.VoidingInventory;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.HopperBlockEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
+import net.minecraft.item.BucketItem;
 import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -53,8 +60,10 @@ import net.minecraft.world.World;
  * get your inventories from {@link HopperBlockEntity#getInventoryAt(World, BlockPos)}
  */
 public final class FabricParticipants {
-	public static final Serializer<ObjectVolume<Fluid>> FLUID_OBJECT_VOLUME_SERIALIZER = ObjectVolume.serializer(Fluids.EMPTY, FabricSerializers.of(Registry.FLUID));
-	public static final Serializer<FixedObjectVolume<Fluid>> FLUID_FIXED_OBJECT_VOLUME_SERIALIZER = FixedObjectVolume.fixedSerializer(Fluids.EMPTY, FabricSerializers.of(Registry.FLUID));
+	public static final Serializer<ObjectVolume<Fluid>> FLUID_OBJECT_VOLUME_SERIALIZER = ObjectVolume.serializer(Fluids.EMPTY,
+			FabricSerializers.of(Registry.FLUID));
+	public static final Serializer<FixedObjectVolume<Fluid>> FLUID_FIXED_OBJECT_VOLUME_SERIALIZER = FixedObjectVolume.fixedSerializer(Fluids.EMPTY,
+			FabricSerializers.of(Registry.FLUID));
 	public static final WorldAccess<Participant<ItemKey>> ITEM_WORLD = new WorldAccess<>(Participants.EMPTY.cast());
 	public static final WorldAccess<Participant<Fluid>> FLUID_WORLD = new WorldAccess<>(Participants.EMPTY.cast());
 	public static final EntityAccess<Participant<ItemKey>> ITEM_ENTITY = new EntityAccess<>(Participants.EMPTY.cast());
@@ -100,31 +109,41 @@ public final class FabricParticipants {
 		ITEM_ITEM.addItemProviderFunctions();
 		FLUID_ITEM.addItemProviderFunctions();
 
-		// todo creative? maybe?
+		ITEM_ITEM.forBlockItemClassExact(ShulkerBoxBlock.class, (direction, key, count, participant) -> {
+			if (count == 1) {
+				return ShulkerboxItemParticipant.create(participant, key, BlockEntityType.SHULKER_BOX);
+			}
+			return null;
+		});
+
+		FLUID_ITEM.forItemClassExact(BucketItem.class, (direction, key, count, participant) -> new BucketItemParticipant(key, count, participant));
+
+		FLUID_WORLD.forBlock(Blocks.CAULDRON, (WorldFunction.NoBlockEntity<Participant<Fluid>>) (direction, state, world, pos) -> new CauldronParticipant(state, world, pos));
 		TO_INVENTORY.forInstance(Participants.EMPTY.cast(), participant -> EmptyInventory.INSTANCE);
 		TO_INVENTORY.forInstance(Participants.VOIDING.cast(), participant -> VoidingInventory.INSTANCE);
 
 		TO_INVENTORY.andThen(participant -> {
-			if(participant instanceof ArrayParticipant) {
+			if (participant instanceof ArrayParticipant) {
 				return new ArrayParticipantInventory((ArrayParticipant<ItemKey>) participant);
 			}
 			return null;
 		});
+
 		TO_INVENTORY.andThen(ParticipantInventory::new);
 		FROM_INVENTORY.andThen((direction, inventory) -> {
-			if(inventory instanceof EmptyInventory) {
+			if (inventory instanceof EmptyInventory) {
 				return Participants.EMPTY.cast();
 			}
 
-			if(inventory instanceof VoidingInventory) {
+			if (inventory instanceof VoidingInventory) {
 				return Participants.VOIDING.cast();
 			}
 
-			if(inventory instanceof ParticipantInventory) {
+			if (inventory instanceof ParticipantInventory) {
 				return ((ParticipantInventory) inventory).participant;
 			}
 
-			if(inventory instanceof PlayerInventory) {
+			if (inventory instanceof PlayerInventory) {
 				inventory = new ProperPlayerInventory((PlayerInventory) inventory);
 			}
 
@@ -180,17 +199,6 @@ public final class FabricParticipants {
 		return new ItemSlotParticipant(key, quantity);
 	}
 
-	public static SidedInventory create(Inventory bottom, Inventory top, Inventory north, Inventory south, Inventory west, Inventory east, boolean cache) {
-		return new CombinedSidedInventory(ImmutableMap.<Direction, Inventory>builder()
-				                                  .put(Direction.UP, (top))
-				                                  .put(Direction.DOWN, (bottom))
-				                                  .put(Direction.NORTH, (north))
-				                                  .put(Direction.EAST, (east))
-				                                  .put(Direction.SOUTH, (south))
-				                                  .put(Direction.WEST, (west))
-				                                  .build(), cache);
-	}
-
 	public static SidedInventory getSidedInventoryAt(WorldFunction<Participant<ItemKey>> function,
 			World world,
 			BlockPos pos,
@@ -209,6 +217,23 @@ public final class FabricParticipants {
 				FabricParticipants.TO_INVENTORY.get().apply(function.get(Direction.NORTH, state, world, pos, entity)),
 				FabricParticipants.TO_INVENTORY.get().apply(function.get(Direction.SOUTH, state, world, pos, entity)),
 				FabricParticipants.TO_INVENTORY.get().apply(function.get(Direction.WEST, state, world, pos, entity)),
-				FabricParticipants.TO_INVENTORY.get().apply(function.get(Direction.EAST, state, world, pos, entity)), true);
+				FabricParticipants.TO_INVENTORY.get().apply(function.get(Direction.EAST, state, world, pos, entity)),
+				true);
+	}
+
+	public static SidedInventory create(Inventory bottom,
+			Inventory top,
+			Inventory north,
+			Inventory south,
+			Inventory west,
+			Inventory east,
+			boolean cache) {
+		return new CombinedSidedInventory(ImmutableMap.<Direction, Inventory>builder().put(Direction.UP, (top))
+		                                                                              .put(Direction.DOWN, (bottom))
+		                                                                              .put(Direction.NORTH, (north))
+		                                                                              .put(Direction.EAST, (east))
+		                                                                              .put(Direction.SOUTH, (south))
+		                                                                              .put(Direction.WEST, (west))
+		                                                                              .build(), cache);
 	}
 }

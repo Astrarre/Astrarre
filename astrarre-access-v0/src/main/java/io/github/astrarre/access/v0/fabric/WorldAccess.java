@@ -11,6 +11,7 @@ import io.github.astrarre.access.v0.api.func.IterFunc;
 import io.github.astrarre.access.v0.fabric.func.WorldFunction;
 import io.github.astrarre.access.v0.fabric.provider.BlockEntityProvider;
 import io.github.astrarre.access.v0.fabric.provider.BlockProvider;
+import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;

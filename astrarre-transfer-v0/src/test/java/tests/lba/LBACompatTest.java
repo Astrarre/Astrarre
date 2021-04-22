@@ -43,8 +43,8 @@ public class LBACompatTest {
 	public void shulkerTest() {
 		ItemSlotParticipant participant = new ItemSlotParticipant();
 		participant.insert(null, ItemKey.of(Items.SHULKER_BOX), 1);
-		Participant<ItemKey> part = ShulkerboxItemParticipant.create(participant, ItemKey.of(Items.SHULKER_BOX), BlockEntityType.SHULKER_BOX);
-		part.insert(null, ItemKey.of(Items.STONE), 4);
+		//Participant<ItemKey> part = ShulkerboxItemParticipant.create(participant, ItemKey.of(Items.SHULKER_BOX), BlockEntityType.SHULKER_BOX);
+		//part.insert(null, ItemKey.of(Items.STONE), 4);
 		System.out.println(participant);
 	}
 }

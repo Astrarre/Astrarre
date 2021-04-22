@@ -12,7 +12,7 @@ import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.access.v0.api.provider.Provider;
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import io.github.astrarre.transfer.v0.api.Insertable;
-import io.github.astrarre.transfer.v0.api.delegate.FilteringInsertable;
+import io.github.astrarre.transfer.v0.api.filter.FilteringInsertable;
 import io.github.astrarre.transfer.v0.fabric.participants.FabricParticipants;
 import io.github.astrarre.util.v0.fabric.Tags;
 import org.jetbrains.annotations.Nullable;

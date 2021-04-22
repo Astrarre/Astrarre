@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "id": "astrarre-transfer-v0-testmod",
+  "version": "${version}",
+  "entrypoints": {
+    "main": [
+      "testmod.TestModMain"
+    ]
+  }
+}

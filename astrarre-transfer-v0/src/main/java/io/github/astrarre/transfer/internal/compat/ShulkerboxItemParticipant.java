@@ -10,6 +10,7 @@ import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import io.github.astrarre.transfer.v0.api.Insertable;
 import io.github.astrarre.transfer.v0.api.Participant;
 import io.github.astrarre.transfer.v0.api.Participants;
+import io.github.astrarre.transfer.v0.api.ReplacingParticipant;
 import io.github.astrarre.transfer.v0.api.transaction.Key;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import io.github.astrarre.transfer.v0.api.transaction.keys.DiffKey;
@@ -25,19 +26,19 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 
 public class ShulkerboxItemParticipant implements Participant<ItemKey> {
-	public final Participant<ItemKey> container;
+	public final ReplacingParticipant<ItemKey> container;
 	public final ShulkerBoxBlockEntity shulkerbox;
 	public final ShulkerKey key = new ShulkerKey();
 	public final Key.Object<ItemKey> currentKey;
 
-	public ShulkerboxItemParticipant(Participant<ItemKey> container, ItemKey key, ShulkerBoxBlockEntity shulkerbox) {
+	public ShulkerboxItemParticipant(ReplacingParticipant<ItemKey> container, ItemKey key, ShulkerBoxBlockEntity shulkerbox) {
 		this.container = container;
 		this.shulkerbox = shulkerbox;
 		shulkerbox.deserializeInventory(key.getTag().getTag("BlockEntityTag").toTag());
 		this.currentKey = new ObjectKeyImpl<>(key);
 	}
 
-	public static Participant<ItemKey> create(Participant<ItemKey> container, ItemKey key, BlockEntityType<? extends ShulkerBoxBlockEntity> type) {
+	public static Participant<ItemKey> create(ReplacingParticipant<ItemKey> container, ItemKey key, BlockEntityType<? extends ShulkerBoxBlockEntity> type) {
 		ShulkerBoxBlockEntity shulkerbox = type.instantiate();
 		if (shulkerbox == null) {
 			return Participants.EMPTY.cast();
@@ -92,22 +93,19 @@ public class ShulkerboxItemParticipant implements Participant<ItemKey> {
 			int val = action.applyAsInt(transaction);
 
 			ItemKey current = this.currentKey.get(transaction);
-			if (this.container.extract(transaction, current, 1) != 1) { // if we can retrieve the 'current' shulkerbox from the inventory
-				transaction.abort();
-				return 0;
-			}
 
 			CompoundTag tag = new CompoundTag();
 			Inventories.toTag(tag, new ExposedDefaultList<>(this.key.get(transaction), ItemStack.EMPTY), false);
 			((ImmutableAccess) tag).astrarre_setImmutable();
 			ItemKey withNewTag = current.withTag(FabricViews.immutableView(tag));
-			this.currentKey.set(transaction, withNewTag);
 
-			if (this.container.insert(transaction, withNewTag, 1) != 1) { // if we can insert the 'new' shulkerbox from the inventory
+			if (this.container.replace(transaction, current, 1, withNewTag, 1)) {
+				this.currentKey.set(transaction, withNewTag);
+				return val;
+			} else {
 				transaction.abort();
 				return 0;
 			}
-			return val;
 		}
 	}
 

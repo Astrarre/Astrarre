@@ -5,6 +5,9 @@ import java.util.AbstractList;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 
+/**
+ * a list implementation for the Inventory class
+ */
 public class InventoryList extends AbstractList<ItemStack> {
 	public final Inventory inventory;
 

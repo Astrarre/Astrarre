@@ -36,7 +36,7 @@ public class ParticipantFluidExtractable implements FluidExtractable {
 		try (Transaction transaction = Transaction.create(simulation.isAction())) {
 			if (filter instanceof ExactFluidFilter) {
 				FluidKey fluid = ((ExactFluidFilter) filter).fluid;
-				if (fluid.getRawFluid() != null) {
+				if (fluid.getRawFluid() != null &&  fluid.getRawFluid() != Fluids.EMPTY) {
 					return fluid.withAmount(FluidAmount.of(this.participant.extract(transaction, fluid.getRawFluid(), quantity), Droplet.BUCKET));
 				} else {
 					return FluidVolumeUtil.EMPTY;

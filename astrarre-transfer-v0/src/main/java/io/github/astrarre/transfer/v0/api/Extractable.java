@@ -2,7 +2,7 @@ package io.github.astrarre.transfer.v0.api;
 
 import io.github.astrarre.transfer.internal.participants.ExtractableParticipant;
 import io.github.astrarre.transfer.internal.TransferInternal;
-import io.github.astrarre.transfer.v0.api.delegate.FilteringInsertable;
+import io.github.astrarre.transfer.v0.api.filter.FilteringInsertable;
 import io.github.astrarre.transfer.v0.api.participants.FixedObjectVolume;
 import io.github.astrarre.transfer.v0.api.participants.ObjectVolume;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;

@@ -1,6 +1,5 @@
 package io.github.astrarre.transfer.v0.fabric.inventory;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.entity.player.PlayerEntity;
@@ -9,13 +8,20 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Direction;
 
 public class VoidingInventory implements SidedInventory {
+	private static final int SIZE = 128;
+	private static final int[] ARRAY = new int[SIZE];
+	static {
+		for (int i = 0; i < ARRAY.length; i++) {
+			ARRAY[i] = i;
+		}
+	}
 	public static final VoidingInventory INSTANCE = new VoidingInventory();
 	protected VoidingInventory() {
 	}
 
 	@Override
 	public int size() {
-		return 10;
+		return SIZE;
 	}
 
 	@Override
@@ -57,7 +63,7 @@ public class VoidingInventory implements SidedInventory {
 
 	@Override
 	public int[] getAvailableSlots(Direction side) {
-		return ArrayUtils.EMPTY_INT_ARRAY;
+		return ARRAY;
 	}
 
 	@Override

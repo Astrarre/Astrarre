@@ -1,4 +1,4 @@
-package io.github.astrarre.transfer.v0.api.delegate;
+package io.github.astrarre.transfer.v0.api.filter;
 
 import io.github.astrarre.transfer.v0.api.Insertable;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;

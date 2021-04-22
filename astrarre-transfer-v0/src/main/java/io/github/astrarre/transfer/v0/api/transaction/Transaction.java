@@ -21,10 +21,6 @@ public final class Transaction implements AutoCloseable {
 	// this is composited with andThen
 	private Key compositeKey;
 
-	private Transaction() {
-		this(true);
-	}
-
 	private Transaction(boolean intent) {
 		this.intent = intent;
 		this.parent = ACTIVE.get();

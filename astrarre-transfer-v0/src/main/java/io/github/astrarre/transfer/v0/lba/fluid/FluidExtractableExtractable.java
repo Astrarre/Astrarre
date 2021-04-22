@@ -19,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.fluid.Fluid;
+import net.minecraft.fluid.Fluids;
 
 public class FluidExtractableExtractable implements Extractable.Simple<Fluid> {
 	protected final FluidExtractable extractable;
@@ -56,7 +57,7 @@ public class FluidExtractableExtractable implements Extractable.Simple<Fluid> {
 			if(Droplet.BUCKET % denom != 0) {
 				return;
 			}
-			if(!verify.isEmpty() && verify.getRawFluid() != null) {
+			if(!verify.isEmpty() && verify.getRawFluid() != null && verify.getRawFluid() != Fluids.EMPTY) {
 				try(Transaction transaction1 = Transaction.create()) {
 					int count = verify.getAmount_F().asInt(81000, RoundingMode.FLOOR);
 					if(insertable.insert(transaction, LBAFluidsCompat.of(verify).type, count) != count) {
