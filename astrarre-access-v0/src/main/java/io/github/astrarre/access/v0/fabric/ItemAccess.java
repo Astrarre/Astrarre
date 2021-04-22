@@ -9,11 +9,17 @@ import io.github.astrarre.access.v0.fabric.func.ItemFunction;
 import io.github.astrarre.access.v0.fabric.provider.ItemProvider;
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 
 public class ItemAccess<T, C> extends Access<ItemFunction<T, C>> {
 	private final MapFilter<Item, ItemFunction<T, C>> itemTypes;
+	private final MapFilter<Block, ItemFunction<T, C>> blockTypes;
 	private final MapFilter<ItemKey, ItemFunction<T, C>> itemKeyTypes;
+	private final MapFilter<Class<? extends Item>, ItemFunction<T, C>> itemClassTypes;
+	private final MapFilter<Class<? extends Block>, ItemFunction<T, C>> blockClassTypes;
 	private boolean addedProviderFunction;
 
 	public ItemAccess() {
@@ -41,6 +47,9 @@ public class ItemAccess<T, C> extends Access<ItemFunction<T, C>> {
 		super(combiner);
 		this.itemTypes = new MapFilter<>(combiner);
 		this.itemKeyTypes = new MapFilter<>(combiner);
+		this.itemClassTypes = new MapFilter<>(combiner);
+		this.blockTypes = new MapFilter<>(combiner);
+		this.blockClassTypes = new MapFilter<>(combiner);
 	}
 
 	public static <T, C> ItemAccess<T, C> newInstance(IterFunc<T> combiner) {
@@ -75,6 +84,13 @@ public class ItemAccess<T, C> extends Access<ItemFunction<T, C>> {
 		return this;
 	}
 
+	public ItemAccess<T, C> forItems(ItemFunction<T, C> function, Item... items) {
+		for (Item item : items) {
+			this.forItem(item, function);
+		}
+		return this;
+	}
+
 	/**
 	 * registers a filter for an item that exactly matches the ItemKey
 	 */
@@ -84,4 +100,62 @@ public class ItemAccess<T, C> extends Access<ItemFunction<T, C>> {
 		}
 		return this;
 	}
+
+	public ItemAccess<T, C> forItemKeys(ItemFunction<T, C> function, ItemKey... keys) {
+		for (ItemKey key : keys) {
+			this.forItemKey(key, function);
+		}
+		return this;
+	}
+
+	/**
+	 * registers a filter for an item that exactly matches the ItemKey
+	 */
+	public ItemAccess<T, C> forItemClassExact(Class<? extends Item> item, ItemFunction<T, C> function) {
+		if (this.itemClassTypes.add(item, function)) {
+			this.andThen((direction, itemKey, count, container) -> this.itemClassTypes.get(itemKey.getItem().getClass()).get(direction, itemKey, count, container));
+		}
+		return this;
+	}
+
+	public ItemAccess<T, C> forBlockItem(Block item, ItemFunction<T, C> function) {
+		if (this.blockTypes.add(item, function)) {
+			this.andThen((direction, key, count, container) -> {
+				Item i = key.getItem();
+				if(i instanceof BlockItem) {
+					return this.blockTypes.get(((BlockItem) i).getBlock()).get(direction, key, count, container);
+				}
+				return null;
+			});
+		}
+		return this;
+	}
+
+	public ItemAccess<T, C> forBlockItems(ItemFunction<T, C> function, Block... items) {
+		for (Block item : items) {
+			this.forBlockItem(item, function);
+		}
+		return this;
+	}
+
+	public ItemAccess<T, C> forBlockItemClassExact(Class<? extends Block> cls, ItemFunction<T, C> function) {
+		if (this.blockClassTypes.add(cls, function)) {
+			this.andThen((direction, key, count, container) -> {
+				Item i = key.getItem();
+				if(i instanceof BlockItem) {
+					return this.blockClassTypes.get(((BlockItem) i).getBlock().getClass()).get(direction, key, count, container);
+				}
+				return null;
+			});
+		}
+		return this;
+	}
+
+	public ItemAccess<T, C> forBlockItemClassesExact(ItemFunction<T, C> function, Class<? extends Block>... items) {
+		for (Class<? extends Block> item : items) {
+			this.forBlockItemClassExact(item, function);
+		}
+		return this;
+	}
+
 }
