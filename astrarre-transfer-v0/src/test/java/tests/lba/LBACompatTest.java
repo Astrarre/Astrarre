@@ -1,12 +1,13 @@
 package tests.lba;
 
-import alexiil.mc.lib.attributes.item.ItemInsertable;
-import alexiil.mc.lib.attributes.item.SingleItemSlot;
-import alexiil.mc.lib.attributes.item.impl.DirectFixedItemInv;
 import alexiil.mc.lib.attributes.item.impl.FullFixedItemInv;
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
+import io.github.astrarre.transfer.internal.SlotParticipant;
+import io.github.astrarre.transfer.internal.compat.ShulkerboxItemParticipant;
+import io.github.astrarre.transfer.v0.api.Participant;
+import io.github.astrarre.transfer.v0.api.item.ItemSlotParticipant;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
-import io.github.astrarre.transfer.v0.lba.ItemInsertableInsertable;
+import io.github.astrarre.transfer.v0.lba.item.ItemInsertableInsertable;
 import net.devtech.potatounit.TestRunner;
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,11 +15,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import net.minecraft.Bootstrap;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 
 @RunWith(TestRunner.Client.class)
-public class ItemInsertableInsertableTests {
+public class LBACompatTest {
 	@Before
 	public void bootstrap() {
 		Bootstrap.initialize();
@@ -26,13 +28,23 @@ public class ItemInsertableInsertableTests {
 
 	@Test
 	public void test() {
-		FullFixedItemInv insertable = new FullFixedItemInv(1);
+		/*FullFixedItemInv insertable = new FullFixedItemInv(1);
 		ItemInsertableInsertable ins = new ItemInsertableInsertable(insertable);
 		try(Transaction transaction = Transaction.create()) {
 			Assert.assertEquals(10, ins.insert(transaction, ItemKey.of(Items.TNT), 10));
 			Assert.assertEquals(10, ins.insert(transaction, ItemKey.of(Items.TNT), 10));
 			Assert.assertEquals(0, ins.insert(transaction, ItemKey.of(Items.STONE), 10));
 		}
-		Assert.assertEquals(new ItemStack(Items.TNT, 20), insertable.getInvStack(0));
+
+		Assert.assertTrue(ItemStack.areEqual(insertable.getInvStack(0), new ItemStack(Items.TNT, 20)));*/
+	}
+
+	@Test
+	public void shulkerTest() {
+		ItemSlotParticipant participant = new ItemSlotParticipant();
+		participant.insert(null, ItemKey.of(Items.SHULKER_BOX), 1);
+		Participant<ItemKey> part = ShulkerboxItemParticipant.create(participant, ItemKey.of(Items.SHULKER_BOX), BlockEntityType.SHULKER_BOX);
+		part.insert(null, ItemKey.of(Items.STONE), 4);
+		System.out.println(participant);
 	}
 }

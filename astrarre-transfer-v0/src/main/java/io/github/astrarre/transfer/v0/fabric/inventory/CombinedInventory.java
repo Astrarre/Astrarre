@@ -1,5 +1,9 @@
 package io.github.astrarre.transfer.v0.fabric.inventory;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -9,17 +13,25 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 public class CombinedInventory implements Inventory {
-	private final Inventory[] inventories;
+	protected final List<Inventory> inventories;
+	protected final boolean cache;
+	protected int size = -1;
 
-	public static Inventory combine(Inventory... inventories) {
-		return new CombinedInventory(inventories);
+
+	public static Inventory combine(boolean cache, Inventory... inventories) {
+		return new CombinedInventory(new ArrayList<>(new HashSet<>(Arrays.asList(inventories))), cache);
 	}
 
-	public CombinedInventory(Inventory[] inventories) {
+	/**
+	 * I recommend using a set
+	 * @param cache true if the sizes of the inventories do not change
+	 */
+	public CombinedInventory(List<Inventory> inventories, boolean cache) {
 		this.inventories = inventories;
+		this.cache = cache;
 	}
 
-	private SlotAccess get(int slot) {
+	protected SlotAccess get(int slot) {
 		for (Inventory inventory : this.inventories) {
 			if (slot - inventory.size() < 0) {
 				return new SlotAccess(inventory, slot);
@@ -32,10 +44,15 @@ public class CombinedInventory implements Inventory {
 
 	@Override
 	public int size() {
+		if(this.size != -1 && this.cache) {
+			return this.size;
+		}
+
 		int index = 0;
 		for (Inventory inventory : this.inventories) {
 			index += inventory.size();
 		}
+		this.size = index;
 		return index;
 	}
 
@@ -167,9 +184,9 @@ public class CombinedInventory implements Inventory {
 		return builder.toString();
 	}
 
-	private static final class SlotAccess {
-		private final Inventory inventory;
-		private final int slot;
+	protected static final class SlotAccess {
+		public final Inventory inventory;
+		public final int slot;
 
 		private SlotAccess(Inventory inventory, int slot) {
 			this.inventory = inventory;

@@ -4,9 +4,9 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "IdentifierMixin",
-    "MinecraftServerMixin"
-  ],
-  "client": [
+    "MinecraftServerMixin",
+    "SetTagAccess",
+    "TagWrapperAccess"
   ],
   "injectors": {
     "defaultRequire": 1

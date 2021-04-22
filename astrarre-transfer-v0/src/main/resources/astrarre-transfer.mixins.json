@@ -3,6 +3,7 @@
   "package": "io.github.astrarre.transfer.internal.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "BucketItemAccess",
     "ItemStackMixin"
   ],
   "client": [

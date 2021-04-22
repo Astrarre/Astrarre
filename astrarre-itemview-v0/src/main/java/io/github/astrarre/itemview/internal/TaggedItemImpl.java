@@ -80,4 +80,13 @@ public class TaggedItemImpl implements ItemKey {
 	public int hashCode() {
 		return this.hashCode;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder(this.item.toString());
+		if(!this.nbtTag.isEmpty()) {
+			builder.append(' ').append(this.nbtTag);
+		}
+		return builder.toString();
+	}
 }

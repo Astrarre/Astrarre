@@ -29,6 +29,10 @@ public interface ItemKey {
 		return (ItemKey) item;
 	}
 
+	static ItemKey of(Item item, NBTagView view) {
+		return new TaggedItemImpl(item, FabricViews.immutableView(view.toTag()));
+	}
+
 	ItemKey EMPTY = new TaggedItemImpl(Items.AIR, NBTagView.EMPTY);
 
 	// todo cache ItemKey with versioning for mutable array tags
@@ -59,6 +63,8 @@ public interface ItemKey {
 	 */
 	int getMaxStackSize();
 
+	default boolean isEmpty() {return this == EMPTY;}
+
 	default ItemKey withTag(NBTagView n) {
 		if (n.isEmpty()) {
 			return (ItemKey) this.getItem();
@@ -68,6 +74,6 @@ public interface ItemKey {
 			return (ItemKey) Items.AIR;
 		}
 
-		return new TaggedItemImpl(this.getItem(), n);
+		return new TaggedItemImpl(this.getItem(), FabricViews.immutableView(n.toTag()));
 	}
 }

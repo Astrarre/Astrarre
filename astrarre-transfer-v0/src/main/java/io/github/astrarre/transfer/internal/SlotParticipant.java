@@ -26,8 +26,7 @@ public class SlotParticipant implements Participant<ItemKey> {
 	public void extract(Transaction transaction, Insertable<ItemKey> insertable) {
 		ItemKey item = this.item.get(transaction);
 		int count = this.count.get(transaction);
-		if (this.inventory instanceof FilteringInventory && !((FilteringInventory) this.inventory)
-				                                                     .canExtract(this.index, item.createItemStack(count))) {
+		if (this.inventory instanceof FilteringInventory && !((FilteringInventory) this.inventory).canExtract(this.index, item.createItemStack(count))) {
 			return;
 		}
 

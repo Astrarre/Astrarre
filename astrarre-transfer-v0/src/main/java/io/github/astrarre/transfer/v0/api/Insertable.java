@@ -20,6 +20,8 @@ public interface Insertable<T> {
 	int insert(@Nullable Transaction transaction, T type, int quantity);
 
 	/**
+	 * This should only be implemented if checking if the container is full is faster than just inserting.
+	 * Eg. checking if an inventory is full is about as fast as actually inserting an item in (same complexity), so it would not have an isFull function
 	 * @return if true, insert should return 0 else undefined
 	 */
 	default boolean isFull(@Nullable Transaction transaction) {

@@ -1,6 +1,7 @@
 package io.github.astrarre.transfer.v0.api;
 
 import io.github.astrarre.transfer.internal.TransferInternal;
+import io.github.astrarre.transfer.v0.api.participants.DelegateParticipant;
 
 /**
  * @see Droplet
@@ -18,5 +19,9 @@ public interface Participant<T> extends Extractable<T>, Insertable<T> {
 	}
 	default boolean supportsInsertion() {
 		return true;
+	}
+
+	default DelegateParticipant<T> delegate() {
+		return () -> this;
 	}
 }

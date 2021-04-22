@@ -1,4 +1,4 @@
-package io.github.astrarre.recipes.internal.mixin;
+package io.github.astrarre.util.internal.mixin;
 
 import java.util.Set;
 

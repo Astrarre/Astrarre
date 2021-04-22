@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
 
+import com.google.common.collect.ImmutableMap;
 import io.github.astrarre.access.v0.api.BiFunctionAccess;
 import io.github.astrarre.access.v0.api.FunctionAccess;
 import io.github.astrarre.access.v0.fabric.EntityAccess;
@@ -17,6 +18,7 @@ import io.github.astrarre.itemview.v0.fabric.FabricSerializers;
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import io.github.astrarre.transfer.internal.NUtil;
 import io.github.astrarre.transfer.internal.SlotParticipant;
+import io.github.astrarre.transfer.internal.compat.InventoryParticipant;
 import io.github.astrarre.transfer.internal.compat.ProperPlayerInventory;
 import io.github.astrarre.transfer.v0.fabric.inventory.CombinedSidedInventory;
 import io.github.astrarre.transfer.v0.fabric.inventory.EmptyInventory;
@@ -29,6 +31,8 @@ import io.github.astrarre.transfer.v0.api.participants.AggregateParticipant;
 import io.github.astrarre.transfer.v0.api.participants.FixedObjectVolume;
 import io.github.astrarre.transfer.v0.api.participants.ObjectVolume;
 import io.github.astrarre.transfer.v0.api.item.ItemSlotParticipant;
+import io.github.astrarre.transfer.v0.fabric.inventory.VoidingInventory;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.block.BlockState;
@@ -57,15 +61,13 @@ public final class FabricParticipants {
 	public static final EntityAccess<Participant<Fluid>> FLUID_ENTITY = new EntityAccess<>(Participants.EMPTY.cast());
 
 	/**
-	 * interdependent with {@link #ITEM_INVENTORY}
+	 * get item container from item in an item container
 	 */
 	public static final ItemAccess<Participant<ItemKey>, Participant<ItemKey>> ITEM_ITEM = new ItemAccess<>(Participants.EMPTY.cast());
 	/**
-	 * interdependent with {@link #FLUID_INVENTORY}
+	 * get fluid container from fluid in an item container
 	 */
 	public static final ItemAccess<Participant<Fluid>, Participant<ItemKey>> FLUID_ITEM = new ItemAccess<>(Participants.EMPTY.cast());
-	public static final ItemAccess<Participant<ItemKey>, Inventory> ITEM_INVENTORY = new ItemAccess<>(Participants.EMPTY.cast());
-	public static final ItemAccess<Participant<Fluid>, Inventory> FLUID_INVENTORY = new ItemAccess<>(Participants.EMPTY.cast());
 
 	/**
 	 * if an insertable is looking for a limited set of items, this can help narrow it down
@@ -91,21 +93,21 @@ public final class FabricParticipants {
 		FLUID_ENTITY.addEntityProviderFunction();
 		ITEM_ITEM.addItemProviderFunctions();
 		FLUID_ITEM.addItemProviderFunctions();
-		ITEM_INVENTORY.addItemProviderFunctions();
-		FLUID_INVENTORY.addItemProviderFunctions();
 
-		ITEM_ITEM.dependsOn(ITEM_INVENTORY, function -> (direction, key, count, container) -> function.get(direction, key, count, TO_INVENTORY.get().apply(container)));
-		ITEM_INVENTORY.dependsOn(ITEM_ITEM, function -> (direction, key, count, container) -> function.get(direction, key, count, FROM_INVENTORY.get().apply(null, container)));
-
-		FLUID_ITEM.dependsOn(FLUID_INVENTORY, function -> (direction, key, count, container) -> function.get(direction, key, count, TO_INVENTORY.get().apply(container)));
-		FLUID_INVENTORY.dependsOn(FLUID_ITEM, function -> (direction, key, count, container) -> function.get(direction, key, count, FROM_INVENTORY.get().apply(null, container)));
-
-		// todo voiding and creative sink
+		// todo creative? maybe?
 		TO_INVENTORY.forInstance(Participants.EMPTY.cast(), participant -> EmptyInventory.INSTANCE);
+		TO_INVENTORY.forInstance(Participants.VOIDING.cast(), participant -> VoidingInventory.INSTANCE);
 
 		TO_INVENTORY.andThen(ParticipantInventory::new);
-
 		FROM_INVENTORY.andThen((direction, inventory) -> {
+			if(inventory instanceof EmptyInventory) {
+				return Participants.EMPTY.cast();
+			}
+
+			if(inventory instanceof VoidingInventory) {
+				return Participants.VOIDING.cast();
+			}
+
 			if(inventory instanceof ParticipantInventory) {
 				return ((ParticipantInventory) inventory).participant;
 			}
@@ -114,17 +116,11 @@ public final class FabricParticipants {
 				inventory = new ProperPlayerInventory((PlayerInventory) inventory);
 			}
 
-			if (inventory instanceof SidedInventory && direction != null) {
+			if (inventory instanceof SidedInventory) {
 				inventory = new SidedInventoryAccess((SidedInventory) inventory, direction);
 			}
 
-			Participant<ItemKey>[] list = new Participant[inventory.size()];
-			for (int i = 0; i < inventory.size(); i++) {
-				list[i] = new SlotParticipant(inventory, i);
-			}
-			// todo inventory aggregate participant to avoid wrapping and re-wrapping inventory
-			// also we need some kind of caching thing tbh
-			return new AggregateParticipant<>(list);
+			return new InventoryParticipant(inventory);
 		});
 
 		FILTERS.addProviderFunction();
@@ -172,8 +168,15 @@ public final class FabricParticipants {
 		return new ItemSlotParticipant(key, quantity);
 	}
 
-	public static SidedInventory create(Inventory bottom, Inventory top, Inventory north, Inventory south, Inventory west, Inventory east) {
-		return new CombinedSidedInventory(bottom, top, north, south, west, east);
+	public static SidedInventory create(Inventory bottom, Inventory top, Inventory north, Inventory south, Inventory west, Inventory east, boolean cache) {
+		return new CombinedSidedInventory(ImmutableMap.<Direction, Inventory>builder()
+				                                  .put(Direction.UP, (top))
+				                                  .put(Direction.DOWN, (bottom))
+				                                  .put(Direction.NORTH, (north))
+				                                  .put(Direction.EAST, (east))
+				                                  .put(Direction.SOUTH, (south))
+				                                  .put(Direction.WEST, (west))
+				                                  .build(), cache);
 	}
 
 	public static SidedInventory getSidedInventoryAt(WorldFunction<Participant<ItemKey>> function,
@@ -189,11 +192,11 @@ public final class FabricParticipants {
 			entity = world.getBlockEntity(pos);
 		}
 
-		return new CombinedSidedInventory(FabricParticipants.TO_INVENTORY.get().apply(function.get(Direction.UP, state, world, pos, entity)),
+		return create(FabricParticipants.TO_INVENTORY.get().apply(function.get(Direction.UP, state, world, pos, entity)),
 				FabricParticipants.TO_INVENTORY.get().apply(function.get(Direction.DOWN, state, world, pos, entity)),
 				FabricParticipants.TO_INVENTORY.get().apply(function.get(Direction.NORTH, state, world, pos, entity)),
 				FabricParticipants.TO_INVENTORY.get().apply(function.get(Direction.SOUTH, state, world, pos, entity)),
 				FabricParticipants.TO_INVENTORY.get().apply(function.get(Direction.WEST, state, world, pos, entity)),
-				FabricParticipants.TO_INVENTORY.get().apply(function.get(Direction.EAST, state, world, pos, entity)));
+				FabricParticipants.TO_INVENTORY.get().apply(function.get(Direction.EAST, state, world, pos, entity)), true);
 	}
 }

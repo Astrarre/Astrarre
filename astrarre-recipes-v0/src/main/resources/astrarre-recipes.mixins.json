@@ -4,9 +4,6 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "IdentifierAccess",
-    "SetTagAccess",
-    "TagDelegateAccess",
-    "TagWrapperAccess"
   ],
   "client": [
   ],

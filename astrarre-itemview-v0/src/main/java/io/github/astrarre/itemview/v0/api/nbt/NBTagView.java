@@ -178,6 +178,7 @@ public interface NBTagView extends Iterable<String>, NbtValue {
 	 * view.getNumber(path, 0)
 	 * </code>
 	 */
+	@NotNull
 	default Number getNumber(String path) {
 		return this.getNumber(path, 0);
 	}
@@ -193,6 +194,7 @@ public interface NBTagView extends Iterable<String>, NbtValue {
 	 * view.getString(path, "")
 	 * </code>
 	 */
+	@NotNull
 	default String getString(String path) {
 		return this.getString(path, "");
 	}
@@ -209,8 +211,9 @@ public interface NBTagView extends Iterable<String>, NbtValue {
 	 */
 	@Nullable Object get(String path);
 
+	@NotNull
 	default NBTagView getTag(String path) {
-		return this.getTag(path, null);
+		return this.getTag(path, NBTagView.EMPTY);
 	}
 
 	NBTagView getTag(String path, NBTagView def);

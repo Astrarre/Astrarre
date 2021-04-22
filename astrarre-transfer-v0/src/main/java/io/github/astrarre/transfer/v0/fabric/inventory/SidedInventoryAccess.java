@@ -1,5 +1,7 @@
 package io.github.astrarre.transfer.v0.fabric.inventory;
 
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
@@ -7,33 +9,31 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Direction;
 
 public class SidedInventoryAccess implements Inventory, FilteringInventory {
-	private int[] validSlots;
 	private final SidedInventory inventory;
-	private final Direction direction;
+	@Nullable private final Direction direction;
+	private int[] validSlots;
 
-	public SidedInventoryAccess(SidedInventory inventory, Direction direction) {
+	public SidedInventoryAccess(SidedInventory inventory, @Nullable Direction direction) {
 		this.inventory = inventory;
 		this.direction = direction;
-		this.validSlots = inventory.getAvailableSlots(direction);
-	}
-
-	public void updateSlots() {
-		this.validSlots = this.inventory.getAvailableSlots(this.direction);
+		if (direction != null) {
+			this.validSlots = inventory.getAvailableSlots(direction);
+		}
 	}
 
 	@Override
 	public int size() {
-		return this.validSlots.length;
+		return this.validSlots == null ? this.inventory.size() : this.validSlots.length;
 	}
 
 	@Override
 	public boolean isEmpty() {
-		if(this.validSlots.length == this.inventory.size()) {
+		if (this.validSlots == null || this.validSlots.length == this.inventory.size()) {
 			return this.inventory.isEmpty();
 		}
 
 		for (int slot : this.validSlots) {
-			if(!this.getStack(slot).isEmpty()) {
+			if (!this.getStack(slot).isEmpty()) {
 				return false;
 			}
 		}
@@ -52,16 +52,22 @@ public class SidedInventoryAccess implements Inventory, FilteringInventory {
 		return stack;
 	}
 
+	public void updateSlots() {
+		if (this.direction != null) {
+			this.validSlots = this.inventory.getAvailableSlots(this.direction);
+		}
+	}
+
 	@Override
 	public ItemStack removeStack(int slot) {
-		ItemStack stack = this.inventory.removeStack(this.validSlots[slot]);
+		ItemStack stack = this.inventory.removeStack(this.validSlots == null ? slot : this.validSlots[slot]);
 		this.updateSlots();
 		return stack;
 	}
 
 	@Override
 	public void setStack(int slot, ItemStack stack) {
-		this.inventory.setStack(this.validSlots[slot], stack);
+		this.inventory.setStack(this.validSlots == null ? slot : this.validSlots[slot], stack);
 		this.updateSlots();
 	}
 
@@ -93,7 +99,11 @@ public class SidedInventoryAccess implements Inventory, FilteringInventory {
 
 	@Override
 	public boolean isValid(int slot, ItemStack stack) {
-		return this.inventory.canInsert(this.validSlots[slot], stack, this.direction) && this.inventory.isValid(this.validSlots[slot], stack);
+		if (this.direction == null) {
+			return this.inventory.isValid(slot, stack);
+		} else {
+			return this.inventory.canInsert(this.validSlots[slot], stack, this.direction);
+		}
 	}
 
 	@Override
@@ -109,6 +119,10 @@ public class SidedInventoryAccess implements Inventory, FilteringInventory {
 
 	@Override
 	public boolean canExtract(int slot, ItemStack stack) {
-		return this.inventory.canExtract(this.validSlots[slot], stack, this.direction);
+		if (this.direction != null) {
+			return this.inventory.canExtract(this.validSlots[slot], stack, this.direction);
+		} else {
+			return true;
+		}
 	}
 }

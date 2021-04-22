@@ -1,18 +1,14 @@
 package io.github.astrarre.recipes.v0.fabric.value;
 
-import java.util.AbstractSet;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Set;
 
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
-import io.github.astrarre.recipes.internal.mixin.SetTagAccess;
-import io.github.astrarre.recipes.internal.mixin.TagDelegateAccess;
-import io.github.astrarre.recipes.internal.mixin.TagWrapperAccess;
-import io.github.astrarre.util.v0.api.Either;
 import io.github.astrarre.recipes.v0.api.util.PeekableReader;
 import io.github.astrarre.recipes.v0.api.value.ValueParser;
+import io.github.astrarre.util.v0.api.Either;
+import io.github.astrarre.util.v0.fabric.Tags;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.item.Item;
@@ -87,34 +83,6 @@ public class ItemMatcher {
 		if (this.itemMatch.hasLeft()) {
 			return Collections.singleton(this.itemMatch.getLeft());
 		}
-
-		Tag<Item> root = findRoot(this.itemMatch.getRight());
-		if (root instanceof SetTagAccess) {
-			return ((SetTagAccess) root).getValueSet();
-		} else {
-			return new AbstractSet<Item>() {
-				@Override
-				public Iterator<Item> iterator() {
-					return root.values().iterator();
-				}
-
-				@Override
-				public int size() {
-					return root.values().size();
-				}
-			};
-		}
-	}
-
-	public static <T> Tag<T> findRoot(Tag<T> root) {
-		while (true) {
-			if (root instanceof TagWrapperAccess) {
-				root = ((TagWrapperAccess) root).callGet();
-			} else if (root instanceof TagDelegateAccess) {
-				root = ((TagDelegateAccess) root).callGetTag();
-			} else {
-				return root;
-			}
-		}
+		return Tags.get(this.itemMatch.getRight());
 	}
 }

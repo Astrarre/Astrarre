@@ -12,6 +12,7 @@ import io.github.astrarre.transfer.v0.api.transaction.keys.ObjectKeyImpl;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 
 /**
  * A FixedObjectVolume for ItemKey (it uses the Item's max stack size). If initialized with a custom max size, it will take the min of the size of the
@@ -60,7 +61,7 @@ public class ItemSlotParticipant implements Participant<ItemKey> {
 			this.type.set(transaction, type.createItemStack(quantity));
 			return quantity;
 		} else if (type.isEqual(stack)) {
-			quantity = Math.min(Math.min(type.getMaxStackSize(), this.max) - stack.getCount(), quantity);
+			quantity = Math.min(Math.min(this.getMax(type), this.max) - stack.getCount(), quantity);
 			ItemStack copy = stack.copy();
 			copy.setCount(stack.getCount() + quantity);
 			this.type.set(transaction, copy);
@@ -110,5 +111,22 @@ public class ItemSlotParticipant implements Participant<ItemKey> {
 	@Override
 	public void clear(@Nullable Transaction transaction) {
 		this.type.set(transaction, ItemStack.EMPTY);
+	}
+
+	public int getMax(ItemKey key) {
+		return key.getMaxStackSize();
+	}
+
+	@Override
+	public String toString() {
+		ItemStack stack = this.type.get(null);
+		StringBuilder builder = new StringBuilder("[");
+		builder.append(stack.getItem().toString());
+		CompoundTag tag = stack.getTag();
+		if(tag != null && !tag.isEmpty()) {
+			builder.append(' ').append(tag);
+		}
+		builder.append('x').append(stack.getCount()).append(']');
+		return builder.toString();
 	}
 }

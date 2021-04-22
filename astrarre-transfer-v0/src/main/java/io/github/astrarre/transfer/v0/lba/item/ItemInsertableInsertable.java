@@ -1,4 +1,4 @@
-package io.github.astrarre.transfer.v0.lba;
+package io.github.astrarre.transfer.v0.lba.item;
 
 import alexiil.mc.lib.attributes.Simulation;
 import alexiil.mc.lib.attributes.item.ItemInsertable;

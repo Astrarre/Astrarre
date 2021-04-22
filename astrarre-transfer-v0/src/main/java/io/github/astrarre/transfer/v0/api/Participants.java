@@ -89,15 +89,6 @@ public enum Participants implements Participant<Object> {
 	public static final FunctionAccess<Extractable<?>, Extractable<?>> DIRECT_WRAPPERS_EXTRACTABLE = new FunctionAccess<>();
 
 	/**
-	 * if a participant is looking for a limited set of items, this can help narrow it down
-	 */
-	public static final FunctionAccess<Insertable<ItemKey>, @NotNull Set<Item>> FILTERS = FunctionAccess.newInstance(sets -> {
-		Set<Item> combined = new HashSet<>();
-		sets.forEach(combined::addAll);
-		return combined;
-	});
-
-	/**
 	 * unwraps a delegate recursively
 	 */
 	@NotNull

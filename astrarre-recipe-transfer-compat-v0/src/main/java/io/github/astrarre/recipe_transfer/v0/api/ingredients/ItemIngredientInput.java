@@ -9,8 +9,8 @@ import io.github.astrarre.recipes.v0.fabric.util.ItemIngredient;
 import io.github.astrarre.recipes.v0.fabric.value.FabricValueParsers;
 import io.github.astrarre.transfer.v0.api.Extractable;
 import io.github.astrarre.transfer.v0.api.Insertable;
-import io.github.astrarre.transfer.v0.api.Participants;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
+import io.github.astrarre.transfer.v0.fabric.participants.FabricParticipants;
 import org.jetbrains.annotations.Nullable;
 
 public class ItemIngredientInput implements RecipePart<ItemIngredient, Extractable<ItemKey>> {
@@ -66,7 +66,7 @@ public class ItemIngredientInput implements RecipePart<ItemIngredient, Extractab
 
 		@Override
 		public @Nullable Object get(Access<?> access) {
-			return access == Participants.FILTERS ? this.ingredient.matcher.items() : null;
+			return access == FabricParticipants.FILTERS ? this.ingredient.matcher.items() : null;
 		}
 	}
 }

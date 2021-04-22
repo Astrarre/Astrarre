@@ -1,26 +1,18 @@
 package io.github.astrarre.transfer.internal;
 
-import alexiil.mc.lib.attributes.ItemAttributeList;
-import alexiil.mc.lib.attributes.item.ItemAttributes;
-import alexiil.mc.lib.attributes.item.ItemExtractable;
-import alexiil.mc.lib.attributes.misc.LimitedConsumer;
-import alexiil.mc.lib.attributes.misc.Reference;
-
-import net.minecraft.item.ItemStack;
+import io.github.astrarre.transfer.v0.lba.item.LBAItemsCompat;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
 
 public class AstrarreTransferInitInternal implements ModInitializer {
-	public static boolean inLbaCompat;
+
 	@Override
 	public void onInitialize() {
-		ItemAttributes.EXTRACTABLE.appendItemAdder((Reference<ItemStack> reference, LimitedConsumer<ItemStack> consumer,
-				ItemAttributeList<ItemExtractable> list) -> {
-			inLbaCompat = true;
-			// extraction can only be done on Reference
-			// insertion can be done on both.. hmm
-			//  perhaps the best way to do this is a "smart" system that tries it's best to bridge the gap
-			inLbaCompat = false;
-		});
+		// todo optimize specific ItemFilters
+		// todo improve ItemExtractable/Insertable compat for FixedInv and Friends
+		if(FabricLoader.getInstance().isModLoaded("libblockattributes-items")) {
+			// todo enable once done LBAItemsCompat.init();
+		}
 	}
 }
