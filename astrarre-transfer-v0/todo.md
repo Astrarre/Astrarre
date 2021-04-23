@@ -1,5 +1,3 @@
-# Explicit LBA & Fluidity Compat
-Inventory compat technically suffices, but I rekon if we actually use the APIs we will have greater compatibility
-
-# provided participants
-Implement CauldronParticipant, BucketParticipant, ShulkerboxParticipant, *maybe ChestParticipant (blockentitydata)*
+# Explicit LBA
+better LBA compat (fixed inv n shit)
+# Docs, lots and lots of docs
