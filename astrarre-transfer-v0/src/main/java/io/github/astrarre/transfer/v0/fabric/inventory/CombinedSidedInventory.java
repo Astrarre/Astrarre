@@ -14,9 +14,11 @@ import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Direction;
 
+/**
+ * an inventory of inventories but with sides
+ */
 public final class CombinedSidedInventory extends CombinedInventory implements SidedInventory {
 	protected final Map<Direction, Inventory> sides;
-	// todo cached version
 	protected final Map<Direction, int[]> cache;
 
 	/**

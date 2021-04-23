@@ -24,6 +24,7 @@ public class AstrarreTransferTooltippedBlockItem extends BlockItem {
 	@Override
 	public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
 		super.appendTooltip(stack, world, tooltip, context);
+		//tooltip.astrarre-transfer-v0.compatible_tooltip for non-astrarre but compatible items
 		tooltip.add(new TranslatableText("tooltip.astrarre-transfer-v0.uses_tooltip").formatted(Formatting.DARK_GRAY, Formatting.ITALIC));
 	}
 }

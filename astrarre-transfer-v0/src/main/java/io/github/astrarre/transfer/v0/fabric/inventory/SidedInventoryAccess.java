@@ -8,6 +8,9 @@ import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Direction;
 
+/**
+ * access a sided inventory from one side
+ */
 public class SidedInventoryAccess implements Inventory, FilteringInventory {
 	private final SidedInventory inventory;
 	@Nullable private final Direction direction;

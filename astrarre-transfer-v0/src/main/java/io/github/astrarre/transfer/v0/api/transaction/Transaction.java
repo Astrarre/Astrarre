@@ -5,7 +5,7 @@ import io.github.astrarre.util.v0.api.Validate;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * a 'serialized world state' more documentation on the concept can be seen
+ * a 'serialized world state' more documentation on the concept can be seen todo here
  */
 public final class Transaction implements AutoCloseable {
 	/**

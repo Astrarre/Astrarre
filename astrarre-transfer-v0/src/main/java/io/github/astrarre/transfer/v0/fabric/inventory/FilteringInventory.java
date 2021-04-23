@@ -4,7 +4,7 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 
 /**
- * used for some transfer api specific things
+ * used for some transfer api specific things. Allows for enhanced compatiblity
  */
 public interface FilteringInventory extends Inventory {
 	boolean canInsert(int slot, ItemStack stack);

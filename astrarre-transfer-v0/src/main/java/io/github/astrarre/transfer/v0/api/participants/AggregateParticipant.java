@@ -18,9 +18,6 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * A participant that delegates to other participants
- *
- * inventory conversion function is registered for this class already
- * @see FabricParticipants#FROM_INVENTORY
  * @implNote {@link #iterator()}
  */
 public class AggregateParticipant<T> implements Participant<T>, Iterable<Participant<T>>, Provider {

@@ -14,7 +14,6 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * A default array participant implementation
- * @param <T>
  */
 public class ContainerParticipant<T> implements ArrayParticipant<T> {
 	protected final DiffKey.Array<T> type;

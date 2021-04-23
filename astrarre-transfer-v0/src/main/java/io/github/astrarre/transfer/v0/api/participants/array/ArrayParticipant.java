@@ -53,6 +53,9 @@ public interface ArrayParticipant<T> extends Participant<T> {
 		return count;
 	}
 
+	/**
+	 * @see ReplacingParticipant but it prioritizes a specific slot
+	 */
 	default ReplacingParticipant<T> getSlotReplacingParticipant(int slot) {
 		return new ReplacingParticipant<T>() {
 			final Slot<T> prioritySlot = ArrayParticipant.this.getSlots().get(slot);

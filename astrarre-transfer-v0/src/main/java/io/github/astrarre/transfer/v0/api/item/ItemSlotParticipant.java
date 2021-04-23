@@ -6,6 +6,7 @@ import io.github.astrarre.itemview.v0.fabric.FabricSerializers;
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import io.github.astrarre.transfer.v0.api.Insertable;
 import io.github.astrarre.transfer.v0.api.Participant;
+import io.github.astrarre.transfer.v0.api.participants.array.Slot;
 import io.github.astrarre.transfer.v0.api.transaction.Key;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import io.github.astrarre.transfer.v0.api.transaction.keys.ObjectKeyImpl;
@@ -19,7 +20,7 @@ import net.minecraft.nbt.CompoundTag;
  * A FixedObjectVolume for ItemKey (it uses the Item's max stack size). If initialized with a custom max size, it will take the min of the size of the
  * stack and the passed size
  */
-public class ItemSlotParticipant implements Participant<ItemKey> {
+public class ItemSlotParticipant implements Slot<ItemKey> {
 	public static final Serializer<ItemSlotParticipant> ITEM_KEY_SERIALIZER = Serializer.of((tag) -> new ItemSlotParticipant(FabricSerializers.ITEM_STACK.read(tag)), t -> FabricSerializers.ITEM_STACK.save(t.type.get(Transaction.GLOBAL)));
 
 	public final Key.Object<ItemStack> type;
@@ -41,6 +42,10 @@ public class ItemSlotParticipant implements Participant<ItemKey> {
 		}
 
 		this.type = new ObjectKeyImpl<>(object.createItemStack(quantity));
+	}
+
+	protected ItemSlotParticipant(Key.Object<ItemStack> key) {
+		this.type = key;
 	}
 
 	public ItemSlotParticipant(ItemStack stack) {
@@ -102,6 +107,25 @@ public class ItemSlotParticipant implements Participant<ItemKey> {
 		}
 
 		return 0;
+	}
+
+	@Override
+	public ItemKey getKey(@Nullable Transaction transaction) {
+		return ItemKey.of(this.getStack(transaction));
+	}
+
+	@Override
+	public int getQuantity(@Nullable Transaction transaction) {
+		return this.getStack(transaction).getCount();
+	}
+
+	@Override
+	public boolean set(@Nullable Transaction transaction, ItemKey key, int quantity) {
+		if(quantity <= key.getMaxStackSize()) {
+			this.type.set(transaction, key.createItemStack(quantity));
+			return true;
+		}
+		return false;
 	}
 
 	@Override

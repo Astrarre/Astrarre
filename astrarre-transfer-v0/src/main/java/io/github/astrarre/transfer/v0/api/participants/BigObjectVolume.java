@@ -10,6 +10,9 @@ import io.github.astrarre.transfer.v0.api.transaction.keys.ObjectKeyImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * an object volume that can store an unlimited* amount of a resource
+ */
 public class BigObjectVolume<T> implements Participant<T> {
 	public static final BigInteger INT_MAX = BigInteger.valueOf(Integer.MAX_VALUE);
 	protected final T empty;
@@ -36,10 +39,16 @@ public class BigObjectVolume<T> implements Participant<T> {
 		this.quantity = new ObjectKeyImpl<>(quantity);
 	}
 
+	/**
+	 * @return the resource instance
+	 */
 	public T getType(@Nullable Transaction transaction) {
 		return this.type.get(transaction);
 	}
 
+	/**
+	 * @return the amount stored
+	 */
 	public BigInteger getQuantity(@Nullable Transaction transaction) {
 		return this.quantity.get(transaction);
 	}

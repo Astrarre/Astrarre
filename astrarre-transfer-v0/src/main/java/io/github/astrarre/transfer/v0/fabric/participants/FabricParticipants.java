@@ -20,6 +20,7 @@ import io.github.astrarre.transfer.internal.NUtil;
 import io.github.astrarre.transfer.internal.compat.BucketItemParticipant;
 import io.github.astrarre.transfer.internal.compat.CauldronParticipant;
 import io.github.astrarre.transfer.internal.compat.InventoryParticipant;
+import io.github.astrarre.transfer.internal.compat.PlayerInventoryParticipant;
 import io.github.astrarre.transfer.internal.compat.ProperPlayerInventory;
 import io.github.astrarre.transfer.internal.compat.ShulkerboxItemParticipant;
 import io.github.astrarre.transfer.internal.participantInventory.ArrayParticipantInventory;
@@ -144,7 +145,7 @@ public final class FabricParticipants {
 			}
 
 			if (inventory instanceof PlayerInventory) {
-				inventory = new ProperPlayerInventory((PlayerInventory) inventory);
+				return new PlayerInventoryParticipant((PlayerInventory) inventory);
 			}
 
 			if (inventory instanceof SidedInventory) {
@@ -152,6 +153,20 @@ public final class FabricParticipants {
 			}
 
 			return new InventoryParticipant(inventory);
+		});
+
+		FLUID_FILTERS.addProviderFunction();
+		FLUID_FILTERS.dependsOn(Participants.AGGREGATE_WRAPPERS_INSERTABLE, function -> insertable -> {
+			Collection<Insertable<ItemKey>> wrapped = Participants.unwrapInternal((Function) function, insertable);
+			if (wrapped == null) {
+				return Collections.emptySet();
+			}
+
+			Set<Fluid> combined = null;
+			for (Insertable<ItemKey> delegate : wrapped) {
+				combined = NUtil.addAll(combined, FLUID_FILTERS.get().apply(delegate));
+			}
+			return combined;
 		});
 
 		ITEM_FILTERS.addProviderFunction();

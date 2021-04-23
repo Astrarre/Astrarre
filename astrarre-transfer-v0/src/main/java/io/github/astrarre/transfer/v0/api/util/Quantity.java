@@ -8,8 +8,12 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
 
+/**
+ * A resource and the amount of it
+ */
 public final class Quantity<T> {
 	public static final Quantity<Fluid> EMPTY_FLUID = new Quantity<>(Fluids.EMPTY, 0);
+	public static final Quantity<ItemKey> AMOUNT = new Quantity<>(ItemKey.EMPTY, 0);
 	public final T type;
 	public final int amount;
 

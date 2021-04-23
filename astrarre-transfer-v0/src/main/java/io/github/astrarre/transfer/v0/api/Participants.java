@@ -13,11 +13,16 @@ import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.access.v0.api.FunctionAccess;
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
+import io.github.astrarre.transfer.v0.fabric.participants.FabricParticipants;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.item.Item;
 
+/**
+ * A utility class for participants
+ * @see FabricParticipants
+ */
 public enum Participants implements Participant<Object> {
 	/**
 	 * a participant that cannot accept or give any resources

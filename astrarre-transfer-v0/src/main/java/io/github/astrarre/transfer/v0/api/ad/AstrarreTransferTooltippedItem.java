@@ -1,4 +1,4 @@
-package io.github.astrarre.transfer.v0.api.ad;
+package io.github.astrarre.transfer.v0.api.ad; // it's basically an ad, shhhh
 
 import java.util.List;
 
@@ -12,6 +12,9 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.World;
 
+/**
+ * A block item with a tooltip stating the item uses the Astrarre Transfer API so the user knows what mods are compatible
+ */
 public class AstrarreTransferTooltippedItem extends Item {
 	public AstrarreTransferTooltippedItem(Settings settings) {
 		super(settings);

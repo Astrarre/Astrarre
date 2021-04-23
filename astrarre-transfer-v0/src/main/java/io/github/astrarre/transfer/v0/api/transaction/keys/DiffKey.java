@@ -1,7 +1,5 @@
 package io.github.astrarre.transfer.v0.api.transaction.keys;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 

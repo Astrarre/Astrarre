@@ -11,6 +11,9 @@ import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.fluid.Fluid;
 
+/**
+ * a filtering insertable that filters based on a set of fluids, has compatibility for {@link FabricParticipants#FLUID_FILTERS}
+ */
 public class FluidFilteringInsertable  extends FilteringInsertable<Fluid> implements Provider {
 	public final Set<Fluid> items;
 	public FluidFilteringInsertable(Set<Fluid> items, Insertable<Fluid> delegate) {

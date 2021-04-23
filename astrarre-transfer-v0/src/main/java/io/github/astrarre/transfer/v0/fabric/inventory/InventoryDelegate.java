@@ -4,9 +4,13 @@ import java.util.Set;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
+/**
+ * delegates all calls to another inventory, allows you to use base classes like {@link SimpleInventory} with block entities
+ */
 public interface InventoryDelegate extends Inventory {
 	Inventory getInventoryDelegate();
 

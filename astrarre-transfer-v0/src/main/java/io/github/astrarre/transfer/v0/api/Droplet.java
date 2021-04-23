@@ -8,10 +8,35 @@ public final class Droplet {
 	 * one bucket in droplets
 	 */
 	public static final int BUCKET = 81_000;
+
 	/**
 	 * the number of droplets in a bucket
 	 */
 	public static final int BOTTLE = BUCKET / 3;
+
+	/**
+	 * The number of droplets of a liquid resource needed to equal one block of the solid material for materials that require 9 'ingots' for one block.
+	 * Eg. gold, diamonds, emeralds, iron, netherite, coal, slime
+	 */
+	public static final int BLOCK_9 = BUCKET;
+
+	/**
+	 * The number of droplets of a liquid resource needed to equal one 'ingot' or 'gem' of the solid material.
+	 * Eg. iron ingot, gold ingot, diamond, emerald, netherite ingot, glowstone, redstone
+	 */
+	public static final int INGOT = BUCKET / 9;
+
+	/**
+	 * The number of droplets of a liquid resource needed to equal one block of the solid material for materials that require 4 'ingots' for one block.
+	 * Eg. 1.17 copper, honey block, glowstone
+	 */
+	public static final int BLOCK_4 = INGOT * 4;
+
+	/**
+	 * The number of droplets of a liquid resource needed to equal one 'nugget' of the solid material.
+	 * Eg. iron nugget, gold nugget
+	 */
+	public static final int NUGGET = INGOT / 9;
 
 	/**
 	 * @return the number of droplets in the fraction, throws an exception if not divisible

@@ -10,6 +10,9 @@ import org.jetbrains.annotations.Nullable;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.tag.Tag;
 
+/**
+ * a filtering insertable based on a fluid tag
+ */
 public class FluidTagFilteringInsertable extends FilteringInsertable<Fluid> implements Provider {
 	public final Tag<Fluid> tag;
 	public FluidTagFilteringInsertable(Tag<Fluid> valid, Insertable<Fluid> delegate) {

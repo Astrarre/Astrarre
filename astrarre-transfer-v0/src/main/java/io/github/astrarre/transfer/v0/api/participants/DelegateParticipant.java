@@ -9,6 +9,9 @@ import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * a participant that directly delegates to another
+ */
 public interface DelegateParticipant<T> extends Participant<T>, Provider {
 	Participant<T> getDelegate();
 

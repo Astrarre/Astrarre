@@ -35,6 +35,7 @@ public class FixedObjectVolume<T> extends ObjectVolume<T> {
 
 	/**
 	 * @param empty the 'empty' version of the object (eg. Fluid#EMPTY)
+	 * @param max the maximum quantity of fluid that can be stored
 	 */
 	public FixedObjectVolume(T empty, int max) {
 		super(empty);

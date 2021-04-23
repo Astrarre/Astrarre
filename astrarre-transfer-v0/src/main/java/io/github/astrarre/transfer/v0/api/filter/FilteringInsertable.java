@@ -5,6 +5,10 @@ import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * A filtering insertable filters the resources that would be inserted into it's delegate
+ * @param <T> {@link Insertable}
+ */
 public class FilteringInsertable<T> implements Insertable<T> {
 	public final Filter<T> filter;
 	public final Insertable<T> delegate;
@@ -33,6 +37,11 @@ public class FilteringInsertable<T> implements Insertable<T> {
 	}
 
 	public interface Filter<T> {
+		/**
+		 * @param object the inserting type
+		 * @param quantity the amount being inserted
+		 * @return true if the inserting query should be passed on to the delegate
+		 */
 		boolean isValid(T object, int quantity);
 	}
 }

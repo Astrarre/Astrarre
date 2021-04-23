@@ -12,18 +12,22 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
+/**
+ * an inventory of inventories
+ */
 public class CombinedInventory implements Inventory {
 	protected final List<Inventory> inventories;
 	protected final boolean cache;
 	protected int size = -1;
 
-
+	/**
+	 * @param cache true if the sizes of the inventories do not change
+	 */
 	public static Inventory combine(boolean cache, Inventory... inventories) {
 		return new CombinedInventory(new ArrayList<>(new HashSet<>(Arrays.asList(inventories))), cache);
 	}
 
 	/**
-	 * I recommend using a set
 	 * @param cache true if the sizes of the inventories do not change
 	 */
 	public CombinedInventory(List<Inventory> inventories, boolean cache) {

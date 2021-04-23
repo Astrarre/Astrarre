@@ -10,12 +10,17 @@ import org.jetbrains.annotations.Nullable;
 import net.minecraft.util.Hand;
 
 public interface PlayerParticipant extends ArrayParticipant<ItemKey> {
+	/**
+	 * @return a replacing participant for the player's currently active slot for the given hand. Note: this does not update if the player selects a different slot
+	 */
 	ReplacingParticipant<ItemKey> getHandReplacingParticipant(Hand hand);
 
 	ReplacingParticipant<ItemKey> getCursorItemReplacingParticipant();
 
 	/**
 	 * attempts to insert the item into the player's inventory, if it is full, any remainder is dropped into the world
+	 * @deprecated not yet implemented
 	 */
+	@Deprecated
 	void insertOrDrop(@Nullable Transaction transaction, ItemKey key, int amount);
 }

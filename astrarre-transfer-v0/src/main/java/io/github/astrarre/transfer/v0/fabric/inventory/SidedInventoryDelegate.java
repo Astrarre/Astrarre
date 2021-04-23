@@ -1,12 +1,14 @@
 package io.github.astrarre.transfer.v0.fabric.inventory;
 
-import io.github.astrarre.transfer.v0.fabric.inventory.InventoryDelegate;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Direction;
 
+/**
+ * {@link InventoryDelegate} but for SidedInventory
+ */
 public interface SidedInventoryDelegate extends InventoryDelegate, SidedInventory {
 	@Override
 	SidedInventory getInventoryDelegate();

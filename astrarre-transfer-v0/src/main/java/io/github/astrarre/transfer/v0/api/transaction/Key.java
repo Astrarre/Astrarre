@@ -1,11 +1,20 @@
 package io.github.astrarre.transfer.v0.api.transaction;
 
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * A key is a handler of transaction-supporting data.
+ */
 public abstract class Key {
 	protected Runnable onApply;
 
+	/**
+	 * adds a listener to the key that is fired when the transaction is committed
+	 * @return this
+	 */
+	@Contract("_ -> this")
 	public Key onApply(Runnable runnable) {
 		if(this.onApply == null) {
 			this.onApply = runnable;

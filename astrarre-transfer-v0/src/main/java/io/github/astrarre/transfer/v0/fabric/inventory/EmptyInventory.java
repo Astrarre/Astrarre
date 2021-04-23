@@ -11,6 +11,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Direction;
 
+/**
+ * an inventory that cannot be inserted into or extracted from
+ */
 public class EmptyInventory implements SidedInventory {
 	public static final EmptyInventory INSTANCE = new EmptyInventory();
 

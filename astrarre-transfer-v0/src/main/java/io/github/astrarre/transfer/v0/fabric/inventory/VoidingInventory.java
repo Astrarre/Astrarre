@@ -1,12 +1,18 @@
 package io.github.astrarre.transfer.v0.fabric.inventory;
 
+import java.util.Set;
+
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.SidedInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Direction;
 
+/**
+ * an inventory that voids everything inserted into it
+ */
 public class VoidingInventory implements SidedInventory {
 	private static final int SIZE = 128;
 	private static final int[] ARRAY = new int[SIZE];
@@ -73,6 +79,34 @@ public class VoidingInventory implements SidedInventory {
 
 	@Override
 	public boolean canExtract(int slot, ItemStack stack, Direction dir) {
+		return false;
+	}
+
+	@Override
+	public int getMaxCountPerStack() {
+		return 128;
+	}
+
+	@Override
+	public void onOpen(PlayerEntity player) {
+	}
+
+	@Override
+	public void onClose(PlayerEntity player) {
+	}
+
+	@Override
+	public boolean isValid(int slot, ItemStack stack) {
+		return true;
+	}
+
+	@Override
+	public int count(Item item) {
+		return 0;
+	}
+
+	@Override
+	public boolean containsAny(Set<Item> items) {
 		return false;
 	}
 }

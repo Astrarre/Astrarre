@@ -1,6 +1,5 @@
 package io.github.astrarre.transfer.v0.api.participants.array;
 
-import io.github.astrarre.transfer.internal.TransferInternal;
 import io.github.astrarre.transfer.v0.api.Insertable;
 import io.github.astrarre.transfer.v0.api.Participant;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
@@ -12,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface Slot<T> extends Participant<T> {
 	/**
-	 * @return the key of the slot
+	 * @return the resource instance of the slot
 	 */
 	T getKey(@Nullable Transaction transaction);
 

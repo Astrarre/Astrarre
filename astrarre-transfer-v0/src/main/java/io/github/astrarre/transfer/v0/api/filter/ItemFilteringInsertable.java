@@ -12,6 +12,9 @@ import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.item.Item;
 
+/**
+ * a filtering insertable that filters based on a set of items, has compatibility for {@link FabricParticipants#ITEM_FILTERS}
+ */
 public class ItemFilteringInsertable extends FilteringInsertable<ItemKey> implements Provider {
 	public final Set<Item> items;
 	public ItemFilteringInsertable(Set<Item> items, Insertable<ItemKey> delegate) {

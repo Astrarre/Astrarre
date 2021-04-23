@@ -11,6 +11,9 @@ import org.jetbrains.annotations.Nullable;
 import net.minecraft.item.Item;
 import net.minecraft.tag.Tag;
 
+/**
+ * a filtering insertable that filters based on a tag of fluids, has compatibility for {@link FabricParticipants#FLUID_FILTERS}
+ */
 public class ItemTagFilteringInsertable extends FilteringInsertable<ItemKey> implements Provider {
 	public final Tag<Item> tag;
 	public ItemTagFilteringInsertable(Tag<Item> tag, Insertable<ItemKey> delegate) {
