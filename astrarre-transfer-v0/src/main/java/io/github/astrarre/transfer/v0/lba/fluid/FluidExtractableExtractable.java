@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 
-public class FluidExtractableExtractable implements Extractable.Simple<Fluid> {
+public class FluidExtractableExtractable implements Extractable<Fluid> {
 	protected final FluidExtractable extractable;
 	protected final FluidInsertableKey toExtract;
 

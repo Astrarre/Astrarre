@@ -18,7 +18,7 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Items;
 
-public class BucketItemParticipant implements Participant<Fluid>, Extractable.Simple<Fluid> {
+public class BucketItemParticipant implements Participant<Fluid> {
 	public final Key.Object<ItemKey> currentKey;
 	public final Key.Int quantity;
 	public final ReplacingParticipant<ItemKey> container;

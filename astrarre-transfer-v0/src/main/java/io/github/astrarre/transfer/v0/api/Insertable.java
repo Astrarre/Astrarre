@@ -16,7 +16,7 @@ public interface Insertable<T> {
 
 	/**
 	 * @param transaction the current transaction
-	 * @return the quantity actually inserted
+	 * @return the quantity actually inserted. <b>NOT THE REMAINDER</b>
 	 */
 	int insert(@Nullable Transaction transaction, @NotNull T type, int quantity);
 

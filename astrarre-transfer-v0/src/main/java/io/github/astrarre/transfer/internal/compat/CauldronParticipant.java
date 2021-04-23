@@ -17,7 +17,7 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class CauldronParticipant implements Participant<Fluid>, Extractable.Simple<Fluid> {
+public class CauldronParticipant implements Participant<Fluid> {
 	protected final World world;
 	protected final BlockPos pos;
 	protected final Key key;

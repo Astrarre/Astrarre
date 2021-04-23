@@ -27,16 +27,15 @@ public interface Extractable<T> {
 	 * @param transaction the current transaction
 	 * @return the quantity actually extracted
 	 */
-	int extract(@Nullable Transaction transaction, @NotNull T type, int quantity);
+	default int extract(@Nullable Transaction transaction, @NotNull T type, int quantity) {
+		ObjectVolume<T> volume = new FixedObjectVolume<>(null, quantity);
+		FilteringInsertable<T> filter = new FilteringInsertable<>((object, quantity1) -> object.equals(type), volume);
+		this.extract(transaction, filter);
+		return volume.getQuantity(transaction);
+	}
 
-	interface Simple<T> extends Extractable<T> {
-		@Override
-		default int extract(@Nullable Transaction transaction, @NotNull T type, int quantity) {
-			ObjectVolume<T> volume = new FixedObjectVolume<>(null, quantity);
-			FilteringInsertable<T> filter = new FilteringInsertable<>((object, quantity1) -> object.equals(type), volume);
-			this.extract(transaction, filter);
-			return volume.getQuantity(transaction);
-		}
+	interface Simple<T> {
+
 	}
 
 	/**
