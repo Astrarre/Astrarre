@@ -18,7 +18,7 @@ public interface Extractable<T> {
 	}
 
 	/**
-	 * attempt to insert the contents of the current inventory into the insertable.
+	 * Attempt to insert the contents of the current inventory into the insertable.
 	 * @see Insertable#isFull(Transaction)
 	 */
 	void extract(@Nullable Transaction transaction, Insertable<T> insertable);
