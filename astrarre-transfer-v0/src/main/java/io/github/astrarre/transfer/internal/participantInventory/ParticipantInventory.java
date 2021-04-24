@@ -173,10 +173,6 @@ public class ParticipantInventory implements Inventory, FilteringInventory {
 		return items.contains(stack.getItem());
 	}
 
-	private void reflectStack() {
-
-	}
-
 	@Override
 	public void clear() {
 		this.participant.clear(null);

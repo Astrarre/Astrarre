@@ -7,6 +7,7 @@ import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import io.github.astrarre.transfer.v0.fabric.participants.FabricParticipants;
 import io.github.astrarre.transfer.v0.api.item.ItemSlotParticipant;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * an object volume that has a maximum quantity.
@@ -47,6 +48,13 @@ public class FixedObjectVolume<T> extends ObjectVolume<T> {
 		this.max = max;
 	}
 
+	@Override
+	public boolean set(@Nullable Transaction transaction, T key, int quantity) {
+		if(quantity > this.getMax(transaction)) {
+			return false;
+		}
+		return super.set(transaction, key, quantity);
+	}
 
 	@Override
 	public int insert(Transaction transaction, @NotNull T type, int quantity) {

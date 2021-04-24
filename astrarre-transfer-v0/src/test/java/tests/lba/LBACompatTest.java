@@ -1,22 +1,13 @@
 package tests.lba;
 
-import alexiil.mc.lib.attributes.item.impl.FullFixedItemInv;
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
-import io.github.astrarre.transfer.internal.SlotParticipant;
-import io.github.astrarre.transfer.internal.compat.ShulkerboxItemParticipant;
-import io.github.astrarre.transfer.v0.api.Participant;
 import io.github.astrarre.transfer.v0.api.item.ItemSlotParticipant;
-import io.github.astrarre.transfer.v0.api.transaction.Transaction;
-import io.github.astrarre.transfer.v0.lba.item.ItemInsertableInsertable;
 import net.devtech.potatounit.TestRunner;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import net.minecraft.Bootstrap;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 
 @RunWith(TestRunner.Client.class)

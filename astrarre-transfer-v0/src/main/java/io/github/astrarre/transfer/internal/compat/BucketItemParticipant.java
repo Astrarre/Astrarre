@@ -35,7 +35,7 @@ public class BucketItemParticipant implements Participant<Fluid> {
 		Fluid fluid = access.getFluid();
 		if (Fluids.EMPTY != fluid) {
 			try(Transaction action = Transaction.create()) {
-				int toInsert = this.quantity.get(action) * Droplet.BUCKET;
+				int toInsert = Droplet.minMultiply(this.quantity.get(action), Droplet.BUCKET);
 				int insert = insertable.insert(action, access.getFluid(), toInsert);
 				if(insert != toInsert) { // too lazy to do partial results, if your stacking filled buckets it's your fault
 					action.abort();

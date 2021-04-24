@@ -45,7 +45,7 @@ public class ParticipantFluidExtractable implements FluidExtractable {
 
 			ObjectVolume<Fluid> participant = new FixedObjectVolume<>(Fluids.EMPTY, quantity);
 			this.participant.extract(transaction, new FluidFilterFilteringInsertable(filter, participant));
-			return FluidKeys.get(participant.getType(transaction)).withAmount(FluidAmount.of(participant.getQuantity(transaction), Droplet.BUCKET));
+			return FluidKeys.get(participant.getKey(transaction)).withAmount(FluidAmount.of(participant.getQuantity(transaction), Droplet.BUCKET));
 		}
 	}
 }

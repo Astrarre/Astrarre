@@ -64,8 +64,9 @@ public class ItemSlotParticipant implements Slot<ItemKey> {
 
 		ItemStack stack = this.type.get(transaction);
 		if (stack.isEmpty()) {
-			this.type.set(transaction, type.createItemStack(quantity));
-			return quantity;
+			int count = Math.min(quantity, type.getMaxStackSize());
+			this.type.set(transaction, type.createItemStack(count));
+			return count;
 		} else if (type.isEqual(stack)) {
 			quantity = Math.min(Math.min(this.getMax(type), this.max) - stack.getCount(), quantity);
 			ItemStack copy = stack.copy();

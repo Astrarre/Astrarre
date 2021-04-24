@@ -16,9 +16,4 @@ public class NUtil {
 		}
 		return current;
 	}
-
-	@NotNull
-	public static <T> Set<T> nn(@Nullable Set<T> cur) {
-		return cur == null ? Collections.emptySet() : cur;
-	}
 }

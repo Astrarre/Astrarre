@@ -65,4 +65,28 @@ public final class Droplet {
 		}
 		return (int) Math.round(val);
 	}
+
+	/**
+	 * multiplies the two numbers, if they would have overflown, return intmax
+	 */
+	public static int minMultiply(int val, int num) {
+		int max = Integer.MAX_VALUE / num;
+		if(val > max) {
+			return Integer.MAX_VALUE;
+		} else {
+			return num * val;
+		}
+	}
+
+	/**
+	 * add the two numbers, if they would have overflown, return intmax
+	 */
+	public static int minSum(int val, int num) {
+		int max = Integer.MAX_VALUE - num;
+		if(val > max) {
+			return Integer.MAX_VALUE;
+		} else {
+			return num + val;
+		}
+	}
 }

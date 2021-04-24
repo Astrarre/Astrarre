@@ -1,5 +1,6 @@
 package io.github.astrarre.transfer.v0.api.participants.array;
 
+import io.github.astrarre.transfer.v0.api.Droplet;
 import io.github.astrarre.transfer.v0.api.Insertable;
 import io.github.astrarre.transfer.v0.api.Participant;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
@@ -48,7 +49,7 @@ public interface Slot<T> extends Participant<T> {
 	 */
 	@Override
 	default int insert(@Nullable Transaction transaction, @NotNull T key, int quantity) {
-		int result = (int) Math.min((long)this.getQuantity(transaction) + quantity, Integer.MAX_VALUE);
+		int result = Droplet.minSum(this.getQuantity(transaction), quantity);
 		if(this.set(transaction, this.getKey(transaction), result)) {
 			return result - this.getQuantity(transaction);
 		}
