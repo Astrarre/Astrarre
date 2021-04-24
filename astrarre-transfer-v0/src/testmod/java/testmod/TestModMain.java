@@ -8,6 +8,7 @@ import io.github.astrarre.transfer.v0.api.Insertable;
 import io.github.astrarre.transfer.v0.api.Participant;
 import io.github.astrarre.transfer.v0.api.ReplacingParticipant;
 import io.github.astrarre.transfer.v0.api.ad.AstrarreTransferTooltippedItem;
+import io.github.astrarre.transfer.v0.api.participants.FixedObjectVolume;
 import io.github.astrarre.transfer.v0.api.player.PlayerParticipant;
 import io.github.astrarre.transfer.v0.api.transaction.Key;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
@@ -48,8 +49,22 @@ public class TestModMain implements ModInitializer {
 			World world = context.getWorld();
 			if (!world.isClient) {
 				Participant<Fluid> participant = FabricParticipants.FLUID_WORLD.get().get(context.getSide(), world, context.getBlockPos());
-				int inserted = participant.insert(Transaction.GLOBAL, Fluids.WATER, Droplet.BOTTLE);
-				context.getPlayer().sendMessage(new LiteralText("Inserted " + inserted + "dp"), false);
+				if (context.getPlayer().isSneaking()) {
+					// a FixedObjectVolume is a container with a fixed size, so this container can hold 1 bottle's worth of fluid
+					FixedObjectVolume<Fluid> container = new FixedObjectVolume(Fluids.EMPTY, Droplet.BOTTLE);
+					// the participant will try to dump as much of it's contents into our container as possible
+					participant.extract(Transaction.GLOBAL, container);
+					context.getPlayer().sendMessage(new LiteralText("Extracted " + container.getQuantity(Transaction.GLOBAL) + "dp"), false);
+				} else {
+					try(Transaction transaction = Transaction.create()) {
+						int inserted = participant.insert(transaction, Fluids.WATER, Droplet.BUCKET);
+						if(inserted != Droplet.BUCKET) {
+							transaction.abort(); // read part 1
+						} else {
+							context.getPlayer().sendMessage(new LiteralText("Inserted " + inserted + "dp"), false);
+						}
+					}
+				}
 			}
 			return ActionResult.CONSUME;
 		}
