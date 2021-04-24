@@ -50,8 +50,9 @@ public interface Slot<T> extends Participant<T> {
 	@Override
 	default int insert(@Nullable Transaction transaction, @NotNull T key, int quantity) {
 		int result = Droplet.minSum(this.getQuantity(transaction), quantity);
+		int oldQuantity = this.getQuantity(transaction);
 		if(this.set(transaction, this.getKey(transaction), result)) {
-			return result - this.getQuantity(transaction);
+			return result - oldQuantity;
 		}
 		return 0;
 	}
