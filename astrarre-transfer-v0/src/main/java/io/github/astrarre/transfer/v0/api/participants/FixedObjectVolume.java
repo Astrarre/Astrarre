@@ -14,7 +14,6 @@ import org.jetbrains.annotations.Nullable;
  * @see ItemSlotParticipant
  */
 public class FixedObjectVolume<T> extends ObjectVolume<T> {
-	public static final Serializer<FixedObjectVolume<ItemKey>> ITEM_KEY_SERIALIZER = fixedSerializer(ItemKey.EMPTY, ItemKey.SERIALIZER);
 	protected int max;
 
 	/**

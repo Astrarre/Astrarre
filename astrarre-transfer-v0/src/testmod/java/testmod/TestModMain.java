@@ -17,6 +17,10 @@ import io.github.astrarre.transfer.v0.fabric.participants.FabricParticipants;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Item;
@@ -31,6 +35,10 @@ import net.minecraft.world.World;
 import net.fabricmc.api.ModInitializer;
 
 public class TestModMain implements ModInitializer {
+	public static final Block TANK_BLOCK = Registry.register(Registry.BLOCK, new Identifier("testmod:tank_block"), new MyTankBlock(AbstractBlock.Settings.copy(
+			Blocks.STONE)));
+	public static final BlockEntityType<?> TANK_TYPE = Registry.register(Registry.BLOCK_ENTITY_TYPE, new Identifier("testmod:tank_block"), BlockEntityType.Builder.create(MyTankBlock.Tile::new, TANK_BLOCK).build(null));
+
 	public static final FluidCellItem ITEM = new FluidCellItem();
 
 	@Override
@@ -56,14 +64,8 @@ public class TestModMain implements ModInitializer {
 					participant.extract(Transaction.GLOBAL, container);
 					context.getPlayer().sendMessage(new LiteralText("Extracted " + container.getQuantity(Transaction.GLOBAL) + "dp"), false);
 				} else {
-					try(Transaction transaction = Transaction.create()) {
-						int inserted = participant.insert(transaction, Fluids.WATER, Droplet.BUCKET);
-						if(inserted != Droplet.BUCKET) {
-							transaction.abort(); // read part 1
-						} else {
-							context.getPlayer().sendMessage(new LiteralText("Inserted " + inserted + "dp"), false);
-						}
-					}
+					int inserted = participant.insert(Transaction.GLOBAL, Fluids.WATER, Droplet.BUCKET);
+					context.getPlayer().sendMessage(new LiteralText("Inserted " + inserted + "dp"), false);
 				}
 			}
 			return ActionResult.CONSUME;
@@ -88,9 +90,7 @@ public class TestModMain implements ModInitializer {
 		public ActionResult useOnBlock(ItemUsageContext context) {
 			World world = context.getWorld();
 			if (!world.isClient) {
-				ReplacingParticipant<ItemKey> participant = ((PlayerParticipant) FabricParticipants.FROM_INVENTORY.get()
-				                                                                                                  .apply(null,
-						                                                                                                  context.getPlayer().inventory)).getHandReplacingParticipant(context.getHand());
+				ReplacingParticipant<ItemKey> participant = ((PlayerParticipant) FabricParticipants.FROM_INVENTORY.get().apply(null, context.getPlayer().inventory)).getHandReplacingParticipant(context.getHand());
 				Participant<Fluid> fluidCell = FabricParticipants.FLUID_ITEM.get().get(null, ItemKey.of(context.getStack()), 1, participant);
 				fluidCell.insert(Transaction.GLOBAL, Fluids.WATER, 100);
 				System.out.println(fluidCell.insert(Transaction.GLOBAL, Fluids.LAVA, 100));

@@ -9,6 +9,7 @@ import io.github.astrarre.itemview.v0.api.nbt.NbtValue;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.text.Text;
@@ -30,7 +31,7 @@ public interface FabricSerializers {
 		return new BlockPos(view.getInt("x"), view.getInt("y"), view.getInt("z"));
 	}, (pos) -> NBTagView.builder().putInt("x", pos.getX()).putInt("y", pos.getY()).putInt("z", pos.getZ()));
 	Serializer<Text> TEXT = Serializer.of(value -> Text.Serializer.fromJson(value.asString()), text -> NbtValue.of(NBTType.STRING, Text.Serializer.toJson(text)));
-
+	Serializer<Fluid> FLUID = of(Registry.FLUID);
 
 	static Serializer<Entity> entity(World world) {
 		return Serializer.of((s) -> EntityType.getEntityFromTag(Objects.requireNonNull(s.asTag().toTag(), "no entry found!"), world)
