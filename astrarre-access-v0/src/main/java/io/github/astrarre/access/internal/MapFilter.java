@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import io.github.astrarre.access.v0.api.func.IterFunc;
+import io.github.astrarre.util.v0.api.func.IterFunc;
 
 public class MapFilter<T, A> {
 	private final IterFunc<A> combine;

@@ -10,6 +10,7 @@ import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import io.github.astrarre.transfer.v0.api.Participant;
 import io.github.astrarre.transfer.v0.api.Participants;
 import io.github.astrarre.transfer.v0.fabric.participants.FabricParticipants;
+import io.github.astrarre.util.v0.api.Id;
 import io.github.astrarre.util.v0.api.Validate;
 
 import net.minecraft.block.entity.HopperBlockEntity;
@@ -20,19 +21,33 @@ import net.minecraft.world.World;
 import net.fabricmc.api.ModInitializer;
 
 public class TransferInternalAstrarre implements ModInitializer {
+	public static final WorldAccess<Participant<ItemKey>> HOPPER_BLOCK_ENTITY_GET_INVENTORY = new WorldAccess<>(Id.create(
+			"astrarre-transfer-compat-v0",
+			"hopper_block_entity_get_inventory"), Participants.EMPTY.cast());
 	private static final Method METHOD;
+
 	static {
 		Method target = null;
 		for (Method method : HopperBlockEntity.class.getDeclaredMethods()) {
-			if(method.getName().equals("astrarre_copied_getInventoryAt")) {
+			if (method.getName().equals("astrarre_copied_getInventoryAt")) {
 				target = method;
 				break;
 			}
 		}
-		if(target == null) {
+		if (target == null) {
 			throw new IllegalStateException("Unable to find target method!");
 		}
 		METHOD = target;
+	}
+
+	static {
+		HOPPER_BLOCK_ENTITY_GET_INVENTORY.andThen((WorldFunction.NoBlock<Participant<ItemKey>>) (direction, world, pos) -> FabricParticipants.FROM_INVENTORY
+				                                                                                                                   .get()
+				                                                                                                                   .apply(
+						                                                                                                                   direction,
+						                                                                                                                   getInvAt(
+								                                                                                                                   world,
+								                                                                                                                   pos)));
 	}
 
 	private static Inventory getInvAt(World world, BlockPos pos) {
@@ -42,12 +57,6 @@ public class TransferInternalAstrarre implements ModInitializer {
 			throw Validate.rethrow(e);
 		}
 	}
-
-	public static final WorldAccess<Participant<ItemKey>> HOPPER_BLOCK_ENTITY_GET_INVENTORY = new WorldAccess<>(Participants.EMPTY.cast());
-	static {
-		HOPPER_BLOCK_ENTITY_GET_INVENTORY.andThen((WorldFunction.NoBlock<Participant<ItemKey>>)(direction, world, pos) -> FabricParticipants.FROM_INVENTORY.get().apply(direction, getInvAt(world, pos)));
-	}
-
 
 	@Override
 	public void onInitialize() {

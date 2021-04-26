@@ -14,6 +14,7 @@ import io.github.astrarre.access.v0.api.FunctionAccess;
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import io.github.astrarre.transfer.v0.fabric.participants.FabricParticipants;
+import io.github.astrarre.util.v0.api.Id;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -77,7 +78,7 @@ public enum Participants implements Participant<Object> {
 	 * 		should account for this in your compat layer
 	 * @see #unwrap(Access, Object)
 	 */
-	public static final FunctionAccess<Participant<?>, Iterable<Participant<?>>> AGGREGATE_WRAPPERS = new FunctionAccess<>();
+	public static final FunctionAccess<Participant<?>, Iterable<Participant<?>>> AGGREGATE_WRAPPERS = new FunctionAccess<>(id("aggregate_wrappers"));
 
 	/**
 	 * (a circular dependency with {@link #AGGREGATE_WRAPPERS} that checks for wrapper with only one participant
@@ -87,18 +88,18 @@ public enum Participants implements Participant<Object> {
 	 *
 	 * @see #unwrap(Access, Object)
 	 */
-	public static final FunctionAccess<Participant<?>, Participant<?>> DIRECT_WRAPPERS = new FunctionAccess<>();
-	public static final FunctionAccess<Insertable<?>, Iterable<Insertable<?>>> AGGREGATE_WRAPPERS_INSERTABLE = new FunctionAccess<>();
-	public static final FunctionAccess<Insertable<?>, Insertable<?>> DIRECT_WRAPPERS_INSERTABLE = new FunctionAccess<>();
-	public static final FunctionAccess<Extractable<?>, Iterable<Extractable<?>>> AGGREGATE_WRAPPERS_EXTRACTABLE = new FunctionAccess<>();
-	public static final FunctionAccess<Extractable<?>, Extractable<?>> DIRECT_WRAPPERS_EXTRACTABLE = new FunctionAccess<>();
+	public static final FunctionAccess<Participant<?>, Participant<?>> DIRECT_WRAPPERS = new FunctionAccess<>(id("direct_wrappers"));
+	public static final FunctionAccess<Insertable<?>, Iterable<Insertable<?>>> AGGREGATE_WRAPPERS_INSERTABLE = new FunctionAccess<>(id("aggregate_wrappers_insertable"));
+	public static final FunctionAccess<Insertable<?>, Insertable<?>> DIRECT_WRAPPERS_INSERTABLE = new FunctionAccess<>(id("direct_wrappers_insertable"));
+	public static final FunctionAccess<Extractable<?>, Iterable<Extractable<?>>> AGGREGATE_WRAPPERS_EXTRACTABLE = new FunctionAccess<>(id("aggregate_wrappers_extractable"));
+	public static final FunctionAccess<Extractable<?>, Extractable<?>> DIRECT_WRAPPERS_EXTRACTABLE = new FunctionAccess<>(id("direct_wrappers_extractable"));
 
 	/**
 	 * unwraps a delegate recursively
 	 */
 	@NotNull
-	public static <T> Collection<T> unwrap(Access<Function<T, Collection<T>>> access, T instance) {
-		Collection<T> collection = unwrapInternal(access.get(), instance);
+	public static <T> Collection<T> unwrap(Access<Function<T, Collection<T>>> access, T instance, boolean includeWrappers) {
+		Collection<T> collection = unwrapInternal(access.get(), instance, includeWrappers);
 		if (collection == null) {
 			return Collections.singleton(instance);
 		}
@@ -173,23 +174,27 @@ public enum Participants implements Participant<Object> {
 	 * @return null if the instance is not a wrapper
 	 */
 	@Nullable
-	public static <T> Collection<T> unwrapInternal(Function<T, Collection<T>> func, T instance) {
+	public static <T> Collection<T> unwrapInternal(Function<T, Collection<T>> func, T instance, boolean includeWrappers) {
 		Collection<T> starting = func.apply(instance);
 		if (starting == null) {
 			return null;
 		} else {
 			List<T> valid = new ArrayList<>();
 			for (T t : starting) {
-				Collection<T> unwrapped = unwrapInternal(func, t);
+				Collection<T> unwrapped = unwrapInternal(func, t, includeWrappers);
 				if (unwrapped == null) {
 					valid.add(t);
 				} else {
 					valid.addAll(unwrapped);
 				}
 			}
+			if(includeWrappers) {
+				valid.add(instance);
+			}
 			return valid;
 		}
 	}
+
 
 	private static <T> T getOnly(Iterable<T> val) {
 		Iterator<T> iter = val.iterator();
@@ -198,5 +203,9 @@ public enum Participants implements Participant<Object> {
 		// if more than one element, then we can't reliably add compat, so ignore it
 		if(iter.hasNext()) return null;
 		return first;
+	}
+
+	private static Id id(String name) {
+		return Id.create("astrarre-transfer-v0", name);
 	}
 }

@@ -37,6 +37,7 @@ import io.github.astrarre.transfer.v0.fabric.inventory.CombinedSidedInventory;
 import io.github.astrarre.transfer.v0.fabric.inventory.EmptyInventory;
 import io.github.astrarre.transfer.v0.fabric.inventory.SidedInventoryAccess;
 import io.github.astrarre.transfer.v0.fabric.inventory.VoidingInventory;
+import io.github.astrarre.util.v0.api.Id;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.block.BlockState;
@@ -65,41 +66,41 @@ public final class FabricParticipants {
 			FabricSerializers.of(Registry.FLUID));
 	public static final Serializer<FixedObjectVolume<Fluid>> FLUID_FIXED_OBJECT_VOLUME_SERIALIZER = FixedObjectVolume.fixedSerializer(Fluids.EMPTY,
 			FabricSerializers.of(Registry.FLUID));
-	public static final WorldAccess<Participant<ItemKey>> ITEM_WORLD = new WorldAccess<>(Participants.EMPTY.cast());
-	public static final WorldAccess<Participant<Fluid>> FLUID_WORLD = new WorldAccess<>(Participants.EMPTY.cast());
-	public static final EntityAccess<Participant<ItemKey>> ITEM_ENTITY = new EntityAccess<>(Participants.EMPTY.cast());
-	public static final EntityAccess<Participant<Fluid>> FLUID_ENTITY = new EntityAccess<>(Participants.EMPTY.cast());
+	public static final WorldAccess<Participant<ItemKey>> ITEM_WORLD = new WorldAccess<>(id("item_world"), Participants.EMPTY.cast());
+	public static final WorldAccess<Participant<Fluid>> FLUID_WORLD = new WorldAccess<>(id("fluid_world"), Participants.EMPTY.cast());
+	public static final EntityAccess<Participant<ItemKey>> ITEM_ENTITY = new EntityAccess<>(id("item_entity"), Participants.EMPTY.cast());
+	public static final EntityAccess<Participant<Fluid>> FLUID_ENTITY = new EntityAccess<>(id("fluid_entity"), Participants.EMPTY.cast());
 
 	/**
 	 * get item container from item in an item container
 	 */
-	public static final ItemAccess<Participant<ItemKey>, ReplacingParticipant<ItemKey>> ITEM_ITEM = new ItemAccess<>(Participants.EMPTY.cast());
+	public static final ItemAccess<Participant<ItemKey>, ReplacingParticipant<ItemKey>> ITEM_ITEM = new ItemAccess<>(id("item_item"), Participants.EMPTY.cast());
 	/**
 	 * get fluid container from fluid in an item container
 	 */
-	public static final ItemAccess<Participant<Fluid>, ReplacingParticipant<ItemKey>> FLUID_ITEM = new ItemAccess<>(Participants.EMPTY.cast());
+	public static final ItemAccess<Participant<Fluid>, ReplacingParticipant<ItemKey>> FLUID_ITEM = new ItemAccess<>(id("fluid_item"),Participants.EMPTY.cast());
 
 	/**
 	 * if an insertable is looking for a limited set of items, this can help narrow it down
 	 */
-	public static final FunctionAccess<Insertable<ItemKey>, Set<Item>> ITEM_FILTERS = FunctionAccess.newInstance(sets -> {
+	public static final FunctionAccess<Insertable<ItemKey>, Set<Item>> ITEM_FILTERS = FunctionAccess.newInstance(id("item_filters"), sets -> {
 		Set<Item> combined = new HashSet<>();
 		sets.forEach(combined::addAll);
 		return combined;
 	});
 
-	public static final FunctionAccess<Insertable<ItemKey>, Set<Fluid>> FLUID_FILTERS = FunctionAccess.newInstance(sets -> {
+	public static final FunctionAccess<Insertable<ItemKey>, Set<Fluid>> FLUID_FILTERS = FunctionAccess.newInstance(id("fluid_filters"), sets -> {
 		Set<Fluid> combined = new HashSet<>();
 		sets.forEach(combined::addAll);
 		return combined;
 	});
 
-	public static final FunctionAccess<Participant<ItemKey>, Inventory> TO_INVENTORY = new FunctionAccess<>();
+	public static final FunctionAccess<Participant<ItemKey>, Inventory> TO_INVENTORY = new FunctionAccess<>(id("to_inventory"));
 
 	/**
 	 * this is where you should access to convert, this contains astrarre's standard converters.
 	 */
-	public static final BiFunctionAccess<Direction, Inventory, Participant<ItemKey>> FROM_INVENTORY = new BiFunctionAccess<>();
+	public static final BiFunctionAccess<Direction, Inventory, Participant<ItemKey>> FROM_INVENTORY = new BiFunctionAccess<>(id("from_inventory"));
 
 	static {
 		ITEM_WORLD.addWorldProviderFunctions();
@@ -156,8 +157,9 @@ public final class FabricParticipants {
 		});
 
 		FLUID_FILTERS.addProviderFunction();
+		// todo optimize, this should stop at the first wrapper that actually implements the access
 		FLUID_FILTERS.dependsOn(Participants.AGGREGATE_WRAPPERS_INSERTABLE, function -> insertable -> {
-			Collection<Insertable<ItemKey>> wrapped = Participants.unwrapInternal((Function) function, insertable);
+			Collection<Insertable<ItemKey>> wrapped = Participants.unwrapInternal((Function) function, insertable, true);
 			if (wrapped == null) {
 				return Collections.emptySet();
 			}
@@ -171,7 +173,7 @@ public final class FabricParticipants {
 
 		ITEM_FILTERS.addProviderFunction();
 		ITEM_FILTERS.dependsOn(Participants.AGGREGATE_WRAPPERS_INSERTABLE, function -> insertable -> {
-			Collection<Insertable<ItemKey>> wrapped = Participants.unwrapInternal((Function) function, insertable);
+			Collection<Insertable<ItemKey>> wrapped = Participants.unwrapInternal((Function) function, insertable, true);
 			if (wrapped == null) {
 				return Collections.emptySet();
 			}
@@ -250,5 +252,9 @@ public final class FabricParticipants {
 		                                                                              .put(Direction.SOUTH, (south))
 		                                                                              .put(Direction.WEST, (west))
 		                                                                              .build(), cache);
+	}
+
+	private static Id id(String name) {
+		return Id.create("astrarre-transfer-v0", name);
 	}
 }

@@ -3,9 +3,10 @@ package io.github.astrarre.access.v0.fabric;
 import io.github.astrarre.access.internal.MapFilter;
 import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.access.v0.api.FunctionAccess;
-import io.github.astrarre.access.v0.api.func.IterFunc;
+import io.github.astrarre.util.v0.api.func.IterFunc;
 import io.github.astrarre.access.v0.fabric.func.EntityFunction;
 import io.github.astrarre.access.v0.fabric.provider.EntityProvider;
+import io.github.astrarre.util.v0.api.Id;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
@@ -18,16 +19,16 @@ public class EntityAccess<T> extends Access<EntityFunction<T>> {
 	private final MapFilter<EntityType<?>, EntityFunction<T>> entityTypes;
 	private final MapFilter<Pair<EquipmentSlot, Item>, EntityFunction<T>> equipmentFilters;
 
-	public EntityAccess() {
-		this((T) null);
+	public EntityAccess(Id id) {
+		this(id, (T) null);
 	}
 
 	/**
 	 * docs for each of the constructors are the same from FunctionAccess
 	 * @see FunctionAccess
 	 */
-	public EntityAccess(T defaultValue) {
-		this((functions) -> (d, e) -> {
+	public EntityAccess(Id id, T defaultValue) {
+		this(id, (functions) -> (d, e) -> {
 			for (EntityFunction<T> function : functions) {
 				T val = function.get(d, e);
 				if (val != null) {
@@ -38,8 +39,8 @@ public class EntityAccess<T> extends Access<EntityFunction<T>> {
 		});
 	}
 
-	public EntityAccess(IterFunc<EntityFunction<T>> iterFunc) {
-		super(iterFunc);
+	public EntityAccess(Id id, IterFunc<EntityFunction<T>> iterFunc) {
+		super(id, iterFunc);
 		this.entityTypes = new MapFilter<>(iterFunc);
 		this.equipmentFilters = new MapFilter<>(iterFunc);
 	}
@@ -47,8 +48,8 @@ public class EntityAccess<T> extends Access<EntityFunction<T>> {
 	/**
 	 * @param combiner combines the return value of the function
 	 */
-	public static <T> EntityAccess<T> newInstance(IterFunc<T> combiner) {
-		return new EntityAccess<>((functions) -> (d, e) -> {
+	public static <T> EntityAccess<T> newInstance(Id id, IterFunc<T> combiner) {
+		return new EntityAccess<>(id, (functions) -> (d, e) -> {
 			for (EntityFunction<T> function : functions) {
 				T val = function.get(d, e);
 				if (val != null) {

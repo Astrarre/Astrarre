@@ -4,13 +4,13 @@ import com.google.common.collect.Iterators;
 import io.github.astrarre.access.internal.MapFilter;
 import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.access.v0.api.FunctionAccess;
-import io.github.astrarre.access.v0.api.func.IterFunc;
+import io.github.astrarre.util.v0.api.func.IterFunc;
 import io.github.astrarre.access.v0.fabric.func.ItemFunction;
 import io.github.astrarre.access.v0.fabric.provider.ItemProvider;
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
+import io.github.astrarre.util.v0.api.Id;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 
@@ -22,8 +22,8 @@ public class ItemAccess<T, C> extends Access<ItemFunction<T, C>> {
 	private final MapFilter<Class<? extends Block>, ItemFunction<T, C>> blockClassTypes;
 	private boolean addedProviderFunction;
 
-	public ItemAccess() {
-		this((T) null);
+	public ItemAccess(Id id) {
+		this(id, (T) null);
 	}
 
 	/**
@@ -31,8 +31,8 @@ public class ItemAccess<T, C> extends Access<ItemFunction<T, C>> {
 	 *
 	 * @see FunctionAccess
 	 */
-	public ItemAccess(T defaultValue) {
-		this(arr -> (direction, key, count, container) -> {
+	public ItemAccess(Id id, T defaultValue) {
+		this(id, arr -> (direction, key, count, container) -> {
 			for (ItemFunction<T, C> function : arr) {
 				T value = function.get(direction, key, count, container);
 				if (value != null) {
@@ -43,8 +43,8 @@ public class ItemAccess<T, C> extends Access<ItemFunction<T, C>> {
 		});
 	}
 
-	public ItemAccess(IterFunc<ItemFunction<T, C>> combiner) {
-		super(combiner);
+	public ItemAccess(Id id, IterFunc<ItemFunction<T, C>> combiner) {
+		super(id, combiner);
 		this.itemTypes = new MapFilter<>(combiner);
 		this.itemKeyTypes = new MapFilter<>(combiner);
 		this.itemClassTypes = new MapFilter<>(combiner);
@@ -52,8 +52,8 @@ public class ItemAccess<T, C> extends Access<ItemFunction<T, C>> {
 		this.blockClassTypes = new MapFilter<>(combiner);
 	}
 
-	public static <T, C> ItemAccess<T, C> newInstance(IterFunc<T> combiner) {
-		return new ItemAccess<>((functions) -> (direction, key, count, container) -> combiner.combine(() -> Iterators.transform(functions.iterator(),
+	public static <T, C> ItemAccess<T, C> newInstance(Id id, IterFunc<T> combiner) {
+		return new ItemAccess<>(id, (functions) -> (direction, key, count, container) -> combiner.combine(() -> Iterators.transform(functions.iterator(),
 				input -> input.get(direction, key, count, container))));
 	}
 

@@ -5,8 +5,9 @@ import java.util.function.Function;
 
 import com.google.common.collect.Iterators;
 import io.github.astrarre.access.internal.MapFilter;
-import io.github.astrarre.access.v0.api.func.IterFunc;
+import io.github.astrarre.util.v0.api.func.IterFunc;
 import io.github.astrarre.access.v0.api.provider.Provider;
+import io.github.astrarre.util.v0.api.Id;
 
 public class FunctionAccess<A, B> extends Access<Function<A, B>> {
 	private final MapFilter<A, Function<A, B>> instanceFunctions;
@@ -16,8 +17,8 @@ public class FunctionAccess<A, B> extends Access<Function<A, B>> {
 	/**
 	 * combines {@link FunctionAccess (AccessFunction)} and {@link FunctionAccess (BinaryOperator)}
 	 */
-	public FunctionAccess() {
-		this(a -> val -> {
+	public FunctionAccess(Id id) {
+		this(id, a -> val -> {
 			for (Function<A, B> function : a) {
 				B ret = function.apply(val);
 				if (ret != null) {
@@ -31,8 +32,8 @@ public class FunctionAccess<A, B> extends Access<Function<A, B>> {
 	/**
 	 * {@inheritDoc}
 	 */
-	public FunctionAccess(IterFunc<Function<A, B>> iterFunc) {
-		super(iterFunc);
+	public FunctionAccess(Id id, IterFunc<Function<A, B>> iterFunc) {
+		super(id, iterFunc);
 		this.instanceFunctions = new MapFilter<>(iterFunc, true);
 		this.classFunctions = new MapFilter<>(iterFunc, true);
 	}
@@ -40,8 +41,8 @@ public class FunctionAccess<A, B> extends Access<Function<A, B>> {
 	/**
 	 * @param combiner combines the return value of the function
 	 */
-	public static <A, B> FunctionAccess<A, B> newInstance(IterFunc<B> combiner) {
-		return new FunctionAccess<>(functions -> a -> combiner.combine(() -> Iterators.filter(Iterators.transform(functions.iterator(),
+	public static <A, B> FunctionAccess<A, B> newInstance(Id id, IterFunc<B> combiner) {
+		return new FunctionAccess<>(id, functions -> a -> combiner.combine(() -> Iterators.filter(Iterators.transform(functions.iterator(),
 				input -> input.apply(a)), Objects::nonNull)));
 	}
 

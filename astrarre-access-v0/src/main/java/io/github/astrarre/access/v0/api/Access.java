@@ -12,37 +12,61 @@ import java.util.function.Supplier;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
-import io.github.astrarre.access.v0.api.func.IterFunc;
+import io.github.astrarre.access.v0.api.entry.AccessAPIEntrypoint;
+import io.github.astrarre.util.v0.api.func.IterFunc;
 import io.github.astrarre.access.v0.fabric.EntityAccess;
+import io.github.astrarre.access.v0.fabric.ItemAccess;
 import io.github.astrarre.access.v0.fabric.WorldAccess;
+import io.github.astrarre.util.v0.api.Id;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+
+import net.fabricmc.loader.entrypoint.minecraft.hooks.EntrypointUtils;
 
 /**
  * An access is essentially a list of functions, like an event handler. Like a function, it allows for any number of inputs and an output.
  * To create an access you must have some way of combining all the listeners into one, so the output can be easily accessed.
- * Access' can be circularly dependent on other Access'.
+ * Accesses can be circularly dependent on other Accesses.
  * @param <F> a function type
  * @see BiFunctionAccess
  * @see FunctionAccess
  * @see EntityAccess
  * @see WorldAccess
+ * @see ItemAccess
  */
 public class Access<F> {
-	protected final IterFunc<F> combiner;
-	protected List<Object> delegates = new ArrayList<>();
-	protected Consumer<Access<F>> listener;
-	protected F compiledFunction;
-
 	/**
-	 * @see Accesses
-	 * @param combiner andThen
+	 * fired when a new access is created
 	 */
-	public Access(IterFunc<F> combiner) {
-		this.combiner = combiner;
-		this.recompile();
+	public static final Access<Consumer<Access<?>>> ON_ACCESS_INIT = new Access<>(Id.create("astrarre-access-v0", "on_access_init"), arr -> access -> {
+		for (Consumer<Access<?>> consumer : arr) {
+			consumer.accept(access);
+		}
+	});
+	static {
+		EntrypointUtils.invoke("astrarre-transfer-v0:access_entrypoint", AccessAPIEntrypoint.class, AccessAPIEntrypoint::onAccessAPIInit);
 	}
 
+	protected final IterFunc<F> combiner;
+	protected List<Object> delegates = new ArrayList<>();
+	protected List<Consumer<Access<F>>> listener;
+	protected F compiledFunction;
+	/**
+	 * the id of this access
+	 */
+	public final Id id;
+
+	/**
+	 * @param combiner andThen
+	 */
+	public Access(Id id, IterFunc<F> combiner) {
+		this.id = id;
+		this.combiner = combiner;
+		this.recompile();
+		if(ON_ACCESS_INIT != null) {
+			ON_ACCESS_INIT.get().accept(this);
+		}
+	}
 
 	@NotNull
 	public F get() {
@@ -56,10 +80,12 @@ public class Access<F> {
 	@Contract("_ -> new")
 	public Supplier<F> getExcluding(Collection<Access<?>> accesses) {
 		AtomicReference<F> reference = new AtomicReference<>();
-		this.addListener(a -> {
+		Consumer<Access<F>> consumer = a -> {
 			F val = compile(a.getWithout(accesses), a.combiner);
 			reference.set(val);
-		});
+		};
+		consumer.accept(this);
+		this.addListener(consumer);
 		return reference::get;
 	}
 
@@ -89,12 +115,10 @@ public class Access<F> {
 	 */
 	@Contract("_ -> this")
 	public Access<F> addListener(Consumer<Access<F>> listener) {
-		listener.accept(this);
-		if (this.listener == null) {
-			this.listener = listener;
-		} else {
-			this.listener = this.listener.andThen(listener);
+		if(this.listener == null) {
+			this.listener = new ArrayList<>();
 		}
+		this.listener.add(listener);
 		return this;
 	}
 
@@ -120,7 +144,7 @@ public class Access<F> {
 	}
 
 	/**
-	 * adds a function to this access, the later you register, the higher your priority
+	 * adds a function to this access, the later you register, the lower your priority
 	 */
 	@Contract("_ -> this")
 	public Access<F> andThen(F func) {
@@ -151,7 +175,7 @@ public class Access<F> {
 		Func<E, F> dependency = new Func<>(access, function);
 		if(end) this.delegates.add(dependency);
 		else this.delegates.add(0, dependency);
-		access.addListener(a -> {
+		Consumer<Access<E>> consumer = a -> {
 			HashSet<Access<?>> accesses = new HashSet<>();
 			Iterable<Object> inputs = a.getWithout(accesses);
 			if(dependency.inputs == null || !Iterables.elementsEqual(inputs, dependency.inputs)) {
@@ -159,7 +183,9 @@ public class Access<F> {
 				dependency.delegate = function.apply(compile(inputs, a.combiner));
 				this.recompile();
 			}
-		});
+		};
+		consumer.accept(access);
+		access.addListener(consumer);
 		return this;
 	}
 
@@ -216,7 +242,9 @@ public class Access<F> {
 	protected void recompile() {
 		this.compiledFunction = this.combiner.combine(() -> Iterators.transform(this.delegates.iterator(), this::get));
 		if (this.listener != null) {
-			this.listener.accept(this);
+			for (Consumer<Access<F>> consumer : this.listener) {
+				consumer.accept(this);
+			}
 		}
 	}
 

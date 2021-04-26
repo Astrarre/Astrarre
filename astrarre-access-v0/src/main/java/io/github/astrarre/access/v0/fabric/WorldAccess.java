@@ -7,11 +7,11 @@ import com.google.common.collect.Iterators;
 import io.github.astrarre.access.internal.MapFilter;
 import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.access.v0.api.FunctionAccess;
-import io.github.astrarre.access.v0.api.func.IterFunc;
+import io.github.astrarre.util.v0.api.func.IterFunc;
 import io.github.astrarre.access.v0.fabric.func.WorldFunction;
 import io.github.astrarre.access.v0.fabric.provider.BlockEntityProvider;
 import io.github.astrarre.access.v0.fabric.provider.BlockProvider;
-import org.jetbrains.annotations.NotNull;
+import io.github.astrarre.util.v0.api.Id;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -24,8 +24,8 @@ public class WorldAccess<T> extends Access<WorldFunction<T>> {
 	private final MapFilter<Block, WorldFunction<T>> blockTypes;
 	private boolean addedProviderFunction;
 
-	public WorldAccess() {
-		this((T) null);
+	public WorldAccess(Id id) {
+		this(id, (T) null);
 	}
 
 	/**
@@ -33,8 +33,8 @@ public class WorldAccess<T> extends Access<WorldFunction<T>> {
 	 *
 	 * @see FunctionAccess
 	 */
-	public WorldAccess(T defaultValue) {
-		this((functions) -> (direction, state, world, pos, entity) -> {
+	public WorldAccess(Id id, T defaultValue) {
+		this(id, (functions) -> (direction, state, world, pos, entity) -> {
 			for (WorldFunction<T> function : functions) {
 				T val = function.get(direction, state, world, pos, entity);
 				if (val != defaultValue && val != null) {
@@ -45,15 +45,15 @@ public class WorldAccess<T> extends Access<WorldFunction<T>> {
 		});
 	}
 
-	public WorldAccess(IterFunc<WorldFunction<T>> iterFunc) {
-		super(iterFunc);
+	public WorldAccess(Id id, IterFunc<WorldFunction<T>> iterFunc) {
+		super(id, iterFunc);
 		this.blockEntityTypes = new MapFilter<>(iterFunc);
 		this.blockStateTypes = new MapFilter<>(iterFunc);
 		this.blockTypes = new MapFilter<>(iterFunc);
 	}
 
-	public static <T> WorldAccess<T> newInstance(IterFunc<T> combiner) {
-		return new WorldAccess<>((functions) -> (direction, state, world, pos, entity) -> combiner.combine(() -> Iterators.transform(functions.iterator(),
+	public static <T> WorldAccess<T> newInstance(Id id, IterFunc<T> combiner) {
+		return new WorldAccess<>(id, (functions) -> (direction, state, world, pos, entity) -> combiner.combine(() -> Iterators.transform(functions.iterator(),
 				input -> input.get(direction, state, world, pos, entity))));
 	}
 

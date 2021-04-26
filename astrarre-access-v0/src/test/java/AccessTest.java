@@ -1,7 +1,7 @@
 import java.util.function.Function;
 
 import io.github.astrarre.access.v0.api.Access;
-import io.github.astrarre.access.v0.api.func.IterFunc;
+import io.github.astrarre.util.v0.api.func.IterFunc;
 import net.devtech.potatounit.TestRunner;
 import org.junit.Assert;
 import org.junit.Before;
