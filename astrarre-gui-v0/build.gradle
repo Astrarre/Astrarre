@@ -3,5 +3,7 @@ dependsOn(project, 'astrarre-rendering-v0', 'astrarre-networking-v0')
 fapi(project, 'fabric-resource-loader-v0')
 
 dependencies {
-    modCompileOnly "me.shedaniel:RoughlyEnoughItems-api:5.11.188"
+    modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:5.11.188") {
+        exclude module: 'fabric-loader'
+    }
 }
