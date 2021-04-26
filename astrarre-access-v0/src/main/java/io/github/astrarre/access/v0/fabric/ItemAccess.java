@@ -35,7 +35,7 @@ public class ItemAccess<T, C> extends Access<ItemFunction<T, C>> {
 		this(id, arr -> (direction, key, count, container) -> {
 			for (ItemFunction<T, C> function : arr) {
 				T value = function.get(direction, key, count, container);
-				if (value != null) {
+				if (value != null && value != defaultValue) {
 					return value;
 				}
 			}
