@@ -1,12 +1,11 @@
 package io.github.astrarre.transfer.v0.api.transaction;
 
 
-import io.github.astrarre.util.v0.api.Validate;
-import io.github.astrarre.util.v0.fabric.MinecraftServers;
-import org.jetbrains.annotations.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+import io.github.astrarre.util.v0.api.Validate;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * a 'serialized world state' more documentation on the concept can be seen todo here
@@ -23,7 +22,7 @@ public final class Transaction implements AutoCloseable {
 	private final int nest;
 	private final boolean intent;
 	// this is composited with andThen
-	private Key compositeKey;
+	private List<Key> keys;
 
 	private Transaction(boolean intent) {
 		this.intent = intent;
@@ -72,25 +71,10 @@ public final class Transaction implements AutoCloseable {
 	@Deprecated
 	@SuppressWarnings ("DeprecatedIsStillUsed")
 	public void enlistKey(Key key) {
-		if (this.compositeKey == null) {
-			this.compositeKey = key;
-		} else {
-			this.compositeKey = new Key() {
-				private final Key old = Transaction.this.compositeKey;
-
-				@Override
-				public void onApply(Transaction transaction) {
-					this.old.onApply(transaction);
-					key.onApply(transaction);
-				}
-
-				@Override
-				public void onAbort(Transaction transaction) {
-					this.old.onAbort(transaction);
-					key.onAbort(transaction);
-				}
-			};
+		if(this.keys == null) {
+			this.keys = new ArrayList<>();
 		}
+		this.keys.add(key);
 	}
 
 	public Transaction getParent() {
@@ -116,20 +100,24 @@ public final class Transaction implements AutoCloseable {
 		this.validateThread(
 				"Transaction must be invalidated on the same thread it was created on, and you cannot commit a transaction without invalidating " +
 				"it's" + " children!");
-		if (this.compositeKey != null) {
-			this.compositeKey.onApply(this);
-		}
 		ACTIVE.set(this.parent);
+		if(this.keys != null) {
+			for (Key key : this.keys) {
+				key.onApply(this);
+			}
+		}
 	}
 
 	public void abort() {
 		this.validateThread(
 				"Transaction must be invalidated on the same thread it was created on, and you cannot abort a transaction without invalidating it's "
 				+ "children!");
-		if (this.compositeKey != null) {
-			this.compositeKey.onAbort(this);
-		}
 		ACTIVE.set(this.parent);
+		if(this.keys != null) {
+			for (Key key : this.keys) {
+				key.onAbort(this);
+			}
+		}
 	}
 
 	/**

@@ -64,7 +64,15 @@ public class LBACompatTest {
 		ItemSlotParticipant participant = new ItemSlotParticipant(ItemKey.of(Items.GLASS_BOTTLE), 1);
 		ArrayParticipant<ItemKey> array = () -> Collections.singletonList(participant);
 		Participant<Fluid> part = FabricParticipants.FLUID_ITEM.get().get(null, ItemKey.of(Items.GLASS_BOTTLE), 1, array.getSlotReplacingParticipant(0));
-		int bottle = part.insert(Transaction.GLOBAL, Fluids.WATER, Droplet.BOTTLE);
-		Assert.assertEquals(Droplet.BOTTLE, bottle);
+		Transaction a = Transaction.create();
+		Assert.assertEquals(Droplet.BOTTLE, part.insert(a,  Fluids.WATER, Droplet.BOTTLE));
+		/*try(Transaction b = a.nest()) {
+			Participant<Fluid> part2 = FabricParticipants.FLUID_ITEM.get().get(null, ItemKey.of(Items.POTION), 1, array.getSlotReplacingParticipant(0));
+			Assert.assertEquals(Droplet.BOTTLE, part2.extract(b, Fluids.WATER, Droplet.BOTTLE));
+			try(Transaction c = b.nest()) {
+				Assert.assertEquals(Droplet.BOTTLE, part.insert(c, Fluids.WATER, Droplet.BOTTLE));
+			}
+		}*/
+		a.close();
 	}
 }
