@@ -28,21 +28,14 @@ public class EntityAccess<T> extends Access<EntityFunction<T>> {
 	 * @see FunctionAccess
 	 */
 	public EntityAccess(Id id, T defaultValue) {
-		this(id, (functions) -> (d, e) -> {
-			for (EntityFunction<T> function : functions) {
-				T val = function.get(d, e);
-				if (val != null) {
-					return val;
-				}
-			}
-			return defaultValue;
-		});
+		this(id, EntityFunction.skipIfNull(defaultValue));
 	}
 
 	public EntityAccess(Id id, IterFunc<EntityFunction<T>> iterFunc) {
 		super(id, iterFunc);
-		this.entityTypes = new MapFilter<>(iterFunc);
-		this.equipmentFilters = new MapFilter<>(iterFunc);
+		IterFunc<EntityFunction<T>> comb = EntityFunction.skipIfNull(null);
+		this.entityTypes = new MapFilter<>(comb);
+		this.equipmentFilters = new MapFilter<>(comb);
 	}
 
 	/**

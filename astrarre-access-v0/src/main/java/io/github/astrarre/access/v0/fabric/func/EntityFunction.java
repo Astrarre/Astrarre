@@ -2,6 +2,7 @@ package io.github.astrarre.access.v0.fabric.func;
 
 import java.util.function.BinaryOperator;
 
+import io.github.astrarre.util.v0.api.func.IterFunc;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.entity.Entity;
@@ -15,6 +16,18 @@ import net.minecraft.util.math.Direction;
 public interface EntityFunction<T> {
 	// todo caching
 	T get(@Nullable Direction direction, Entity entity);
+
+	static <T> IterFunc<EntityFunction<T>> skipIfNull(T defaultValue) {
+		return (functions) -> (d, e) -> {
+			for (EntityFunction<T> function : functions) {
+				T val = function.get(d, e);
+				if (val != null) {
+					return val;
+				}
+			}
+			return defaultValue;
+		};
+	}
 
 	static <T> EntityFunction<@Nullable T> empty() {
 		return (direction, entity) -> null;

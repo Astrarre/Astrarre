@@ -34,22 +34,15 @@ public class WorldAccess<T> extends Access<WorldFunction<T>> {
 	 * @see FunctionAccess
 	 */
 	public WorldAccess(Id id, T defaultValue) {
-		this(id, (functions) -> (direction, state, world, pos, entity) -> {
-			for (WorldFunction<T> function : functions) {
-				T val = function.get(direction, state, world, pos, entity);
-				if (val != defaultValue && val != null) {
-					return val;
-				}
-			}
-			return defaultValue;
-		});
+		this(id, WorldFunction.skipIfNull(defaultValue));
 	}
 
 	public WorldAccess(Id id, IterFunc<WorldFunction<T>> iterFunc) {
 		super(id, iterFunc);
-		this.blockEntityTypes = new MapFilter<>(iterFunc);
-		this.blockStateTypes = new MapFilter<>(iterFunc);
-		this.blockTypes = new MapFilter<>(iterFunc);
+		IterFunc<WorldFunction<T>> comb = WorldFunction.skipIfNull(null);
+		this.blockEntityTypes = new MapFilter<>(comb);
+		this.blockStateTypes = new MapFilter<>(comb);
+		this.blockTypes = new MapFilter<>(comb);
 	}
 
 	public static <T> WorldAccess<T> newInstance(Id id, IterFunc<T> combiner) {

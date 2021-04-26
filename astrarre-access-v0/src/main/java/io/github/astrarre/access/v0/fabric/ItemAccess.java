@@ -26,30 +26,24 @@ public class ItemAccess<T, C> extends Access<ItemFunction<T, C>> {
 		this(id, (T) null);
 	}
 
+
 	/**
 	 * docs for each of the constructors are the same from FunctionAccess
 	 *
 	 * @see FunctionAccess
 	 */
 	public ItemAccess(Id id, T defaultValue) {
-		this(id, arr -> (direction, key, count, container) -> {
-			for (ItemFunction<T, C> function : arr) {
-				T value = function.get(direction, key, count, container);
-				if (value != null && value != defaultValue) {
-					return value;
-				}
-			}
-			return defaultValue;
-		});
+		this(id, ItemFunction.skipIfNull(defaultValue));
 	}
 
 	public ItemAccess(Id id, IterFunc<ItemFunction<T, C>> combiner) {
 		super(id, combiner);
-		this.itemTypes = new MapFilter<>(combiner);
-		this.itemKeyTypes = new MapFilter<>(combiner);
-		this.itemClassTypes = new MapFilter<>(combiner);
-		this.blockTypes = new MapFilter<>(combiner);
-		this.blockClassTypes = new MapFilter<>(combiner);
+		IterFunc<ItemFunction<T, C>> comb = ItemFunction.skipIfNull(null);
+		this.itemTypes = new MapFilter<>(comb);
+		this.itemKeyTypes = new MapFilter<>(comb);
+		this.itemClassTypes = new MapFilter<>(comb);
+		this.blockTypes = new MapFilter<>(comb);
+		this.blockClassTypes = new MapFilter<>(comb);
 	}
 
 	public static <T, C> ItemAccess<T, C> newInstance(Id id, IterFunc<T> combiner) {

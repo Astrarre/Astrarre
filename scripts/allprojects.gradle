@@ -44,7 +44,9 @@ allprojects {
         mappings "net.fabricmc:yarn:${yarn_mappings}:v2"
         modImplementation "net.fabricmc:fabric-loader:${loader_version}"
         testImplementation 'junit:junit:4.13.1'
-        testImplementation 'net.devtech:PotatoUnit:1.0.2'
+        testImplementation('net.devtech:PotatoUnit:1.0.3') {
+            exclude module: 'fabric-loader'
+        }
         testmodCompile sourceSets.main.output
         testmodImplementation('com.github.astei:lazydfu:0.1.1') {
             exclude module: 'fabric-loader'
