@@ -1,4 +1,4 @@
-package io.github.astrarre.access.v0.api.func;
+package io.github.astrarre.util.v0.api.func;
 
 /**
  * combines a list of items into one item

@@ -2,7 +2,11 @@ package io.github.astrarre.transfer.v0.api.transaction;
 
 
 import io.github.astrarre.util.v0.api.Validate;
+import io.github.astrarre.util.v0.fabric.MinecraftServers;
 import org.jetbrains.annotations.Nullable;
+
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 
 /**
  * a 'serialized world state' more documentation on the concept can be seen todo here
@@ -143,6 +147,33 @@ public final class Transaction implements AutoCloseable {
 			}
 			throw new IllegalStateException(err);
 		}
+	}
+
+	/**
+	 * @return the stacktrace of where the transaction was initialized, or null if {@link Validate#IS_DEV} is false
+	 * @see Validate#IS_DEV
+	 */
+	@Nullable
+	public StackTraceElement[] getInitializationStacktrace() {
+		if(this.debug == null) {
+			return null;
+		}
+		return this.debug.getStackTrace().clone();
+	}
+
+	/**
+	 * @return an exception who's stacktrace is where the transaction was initialized, or null if {@link Validate#IS_DEV} is false
+	 * @see Validate#IS_DEV
+	 */
+	@Nullable
+	public TransactionInitialization getInitialization() {
+		if(this.debug == null) {
+			return null;
+		}
+
+		TransactionInitialization debugException = new TransactionInitialization();
+		debugException.setStackTrace(this.debug.getStackTrace());
+		return debugException;
 	}
 
 	private static final class TransactionInitialization extends Throwable {
