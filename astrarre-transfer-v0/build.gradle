@@ -44,10 +44,15 @@ dependencies {
         exclude module: 'fabric-loader'
         exclude module: 'fabric-api'
     }
-    modImplementation('TechReborn:TechReborn-1.16:3.8.3+build.231') {
+
+    modRuntime('TechReborn:TechReborn-1.16:3.8.3+build.231') {
+        exclude module: 'fabric-loader'
+        exclude module: 'fabric-api'
+    }
+    modRuntime("net.fabricmc.fabric-api:fabric-api:$fabric_version") {
         exclude module: 'fabric-loader'
     }
-    modImplementation('me.steven:Industrial-Revolution-master:1.9.4-BETA') {
+    modRuntime('me.steven:Industrial-Revolution-master:1.9.4-BETA') {
         exclude module: 'fabric-loader'
         exclude module: 'fabric-api'
     }
