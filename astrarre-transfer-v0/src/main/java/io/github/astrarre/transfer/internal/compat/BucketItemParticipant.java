@@ -1,9 +1,8 @@
 package io.github.astrarre.transfer.internal.compat;
 
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
-import io.github.astrarre.transfer.internal.mixin.BucketItemAccess;
+import io.github.astrarre.transfer.internal.mixin.BucketItemAccess_AccessFluid;
 import io.github.astrarre.transfer.v0.api.Droplet;
-import io.github.astrarre.transfer.v0.api.Extractable;
 import io.github.astrarre.transfer.v0.api.Insertable;
 import io.github.astrarre.transfer.v0.api.Participant;
 import io.github.astrarre.transfer.v0.api.ReplacingParticipant;
@@ -31,7 +30,7 @@ public class BucketItemParticipant implements Participant<Fluid> {
 
 	@Override
 	public void extract(@Nullable Transaction transaction, Insertable<Fluid> insertable) {
-		BucketItemAccess access = (BucketItemAccess) this.currentKey.get(transaction).getItem();
+		BucketItemAccess_AccessFluid access = (BucketItemAccess_AccessFluid) this.currentKey.get(transaction).getItem();
 		Fluid fluid = access.getFluid();
 		if (Fluids.EMPTY != fluid) {
 			try(Transaction action = Transaction.create()) {
@@ -55,7 +54,7 @@ public class BucketItemParticipant implements Participant<Fluid> {
 	@Override
 	public int insert(@Nullable Transaction transaction, @NotNull Fluid type, int quantity) {
 		if(quantity == 0 || type == Fluids.EMPTY) return 0;
-		BucketItemAccess access = (BucketItemAccess) this.currentKey.get(transaction).getItem();
+		BucketItemAccess_AccessFluid access = (BucketItemAccess_AccessFluid) this.currentKey.get(transaction).getItem();
 		Fluid fluid = access.getFluid();
 		if(fluid == Fluids.EMPTY) {
 			ItemKey current = this.currentKey.get(transaction);
