@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.item.ItemStack;
 
 @Mixin(ItemStack.class)
-public class ItemStackMixin implements ItemStackAccess {
+public class ItemStackMixin_TrackStacks implements ItemStackAccess {
 	private List<Consumer<ItemStack>> list;
 
 	@Override
