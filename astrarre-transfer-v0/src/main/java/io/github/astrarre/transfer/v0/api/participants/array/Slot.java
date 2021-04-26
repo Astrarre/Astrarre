@@ -36,6 +36,9 @@ public interface Slot<T> extends Participant<T> {
 	 * @return the amount extracted
 	 */
 	default int extract(@Nullable Transaction transaction, int quantity) {
+		if(quantity == 0) {
+			return 0;
+		}
 		int toTake = Math.min(quantity, this.getQuantity(transaction));
 		if(this.set(transaction, this.getKey(transaction), this.getQuantity(transaction) - toTake)) {
 			return toTake;
@@ -49,6 +52,9 @@ public interface Slot<T> extends Participant<T> {
 	 */
 	@Override
 	default int insert(@Nullable Transaction transaction, @NotNull T key, int quantity) {
+		if(quantity == 0) {
+			return 0;
+		}
 		int result = Droplet.minSum(this.getQuantity(transaction), quantity);
 		int oldQuantity = this.getQuantity(transaction);
 		if(this.set(transaction, this.getKey(transaction), result)) {
@@ -59,6 +65,7 @@ public interface Slot<T> extends Participant<T> {
 
 	@Override
 	default void extract(@Nullable Transaction transaction, Insertable<T> insertable) {
+		if(insertable.isFull(transaction)) return;
 		try(Transaction transaction1 = Transaction.create()) {
 			int capacity = insertable.insert(transaction1, this.getKey(transaction), this.getQuantity(transaction));
 			if(this.extract(transaction, capacity) != capacity) {

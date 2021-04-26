@@ -26,8 +26,14 @@ public class Validate {
 	}
 
 	public static final boolean IS_CLIENT = FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
-	public static void void_(Object object) {}
 
+	public static void ifModPresent(String mod, Runnable toRun) {
+		if(FabricLoader.getInstance().isModLoaded(mod)) {
+			toRun.run();
+		}
+	}
+
+	public static void void_(Object object) {}
 	public static <T> T ifClient(Supplier<T> supplier) {
 		if(IS_CLIENT) {
 			supplier.get();

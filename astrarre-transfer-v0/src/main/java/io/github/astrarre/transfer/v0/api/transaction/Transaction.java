@@ -176,6 +176,14 @@ public final class Transaction implements AutoCloseable {
 		return debugException;
 	}
 
+	public Transaction nest(boolean intent) {
+		return Transaction.create(intent);
+	}
+
+	public Transaction nest() {
+		return Transaction.create();
+	}
+
 	private static final class TransactionInitialization extends Throwable {
 		public TransactionInitialization() {
 			super("Transaction initialization stacktrace");

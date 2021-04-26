@@ -89,4 +89,8 @@ public final class Droplet {
 			return num + val;
 		}
 	}
+
+	public static int fromMb(int mb) {
+		return mb * 81;
+	}
 }

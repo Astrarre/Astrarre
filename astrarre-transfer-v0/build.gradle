@@ -10,6 +10,9 @@ repositories {
         name = "dblsaiko"
         url = "https://maven.dblsaiko.net/"
     }
+    maven {
+        url = 'http://maven.modmuss50.me'
+    }
 }
 
 dependencies {
@@ -19,6 +22,7 @@ dependencies {
     modCompileOnly ("net.fabricmc.fabric-api:fabric-api:0.30.0+1.16") {
         exclude module: 'fabric-loader'
     }
+    modCompileOnly('RebornCore:RebornCore-1.16:4.7.2+build.134')
 }
 
 sourceSets {

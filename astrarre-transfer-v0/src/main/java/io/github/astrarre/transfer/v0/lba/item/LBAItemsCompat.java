@@ -26,7 +26,7 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ItemStack;
 
 @ApiStatus.Experimental
-public class LBAItemsCompat {
+public class LBAItemsCompat { // todo add accesses
 	public static boolean inExtractableItemsCompat, inInsertableItemsCompat;
 	public static boolean inExtractableBlocksCompat, inInsertableBlocksCompat;
 	static {

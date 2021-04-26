@@ -12,6 +12,7 @@ import java.util.function.Function;
 import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.access.v0.api.FunctionAccess;
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
+import io.github.astrarre.transfer.v0.api.participants.FixedObjectVolume;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import io.github.astrarre.transfer.v0.fabric.participants.FabricParticipants;
 import io.github.astrarre.util.v0.api.Id;
@@ -76,7 +77,7 @@ public enum Participants implements Participant<Object> {
 	 * 		Additionally if someone wraps a container, its behavior wont be the same as its delegates (obviously, why else would they wrap it), so
 	 * 		you
 	 * 		should account for this in your compat layer
-	 * @see #unwrap(Access, Object)
+	 * @see #unwrap(Access, Object, boolean)
 	 */
 	public static final FunctionAccess<Participant<?>, Iterable<Participant<?>>> AGGREGATE_WRAPPERS = new FunctionAccess<>(id("aggregate_wrappers"));
 
@@ -86,13 +87,41 @@ public enum Participants implements Participant<Object> {
 	 * if your participant has a single delegate, use this registry. if you can only add compatibility for participants with one delegate, but not
 	 * multiple delegates, use this registry.
 	 *
-	 * @see #unwrap(Access, Object)
+	 * @see #unwrap(Access, Object, boolean)
 	 */
 	public static final FunctionAccess<Participant<?>, Participant<?>> DIRECT_WRAPPERS = new FunctionAccess<>(id("direct_wrappers"));
 	public static final FunctionAccess<Insertable<?>, Iterable<Insertable<?>>> AGGREGATE_WRAPPERS_INSERTABLE = new FunctionAccess<>(id("aggregate_wrappers_insertable"));
 	public static final FunctionAccess<Insertable<?>, Insertable<?>> DIRECT_WRAPPERS_INSERTABLE = new FunctionAccess<>(id("direct_wrappers_insertable"));
 	public static final FunctionAccess<Extractable<?>, Iterable<Extractable<?>>> AGGREGATE_WRAPPERS_EXTRACTABLE = new FunctionAccess<>(id("aggregate_wrappers_extractable"));
 	public static final FunctionAccess<Extractable<?>, Extractable<?>> DIRECT_WRAPPERS_EXTRACTABLE = new FunctionAccess<>(id("direct_wrappers_extractable"));
+
+	/**
+	 * @param tryAgain if the destination cannot accept the quantity of fluid first extracted, should it try again with the lower amount
+	 * @param amount the maximum amount of fluid to transfer
+	 * @return the amount transfered
+	 */
+	public static <T> int move(Transaction transaction, Extractable<T> from, Insertable<T> to, int amount, boolean tryAgain) {
+		try(Transaction action = transaction.nest()) {
+			FixedObjectVolume<T> volume = new FixedObjectVolume<>(null, amount);
+			from.extract(action, volume);
+			T key = volume.getKey(action);
+			if(key == null) {
+				action.abort();
+				return 0;
+			}
+			int toInsert = volume.getQuantity(action);
+			int inserted = to.insert(action, key, toInsert);
+			if(toInsert != inserted) {
+				action.abort();
+				if (tryAgain) {
+					return move(transaction, from, to, inserted, false);
+				} else {
+					return 0;
+				}
+			}
+			return inserted;
+		}
+	}
 
 	/**
 	 * unwraps a delegate recursively
@@ -118,14 +147,20 @@ public enum Participants implements Participant<Object> {
 		DIRECT_WRAPPERS.dependsOn(AGGREGATE_WRAPPERS, p -> a -> getOnly(p.apply(a)));
 		AGGREGATE_WRAPPERS_EXTRACTABLE.dependsOn(DIRECT_WRAPPERS_EXTRACTABLE, p -> a -> {
 			Extractable<?> extractable = p.apply(a);
-			if(extractable == null) return null;
-			else return Collections.singleton(extractable);
+			if (extractable == null) {
+				return null;
+			} else {
+				return Collections.singleton(extractable);
+			}
 		});
 		DIRECT_WRAPPERS_EXTRACTABLE.dependsOn(AGGREGATE_WRAPPERS_EXTRACTABLE, p -> a -> getOnly(p.apply(a)));
 		AGGREGATE_WRAPPERS_INSERTABLE.dependsOn(DIRECT_WRAPPERS_INSERTABLE, p -> a -> {
 			Insertable<?> extractable = p.apply(a);
-			if(extractable == null) return null;
-			else return Collections.singleton(extractable);
+			if (extractable == null) {
+				return null;
+			} else {
+				return Collections.singleton(extractable);
+			}
 		});
 		DIRECT_WRAPPERS_INSERTABLE.dependsOn(AGGREGATE_WRAPPERS_INSERTABLE, p -> a -> getOnly(p.apply(a)));
 		AGGREGATE_WRAPPERS_INSERTABLE.dependsOn(AGGREGATE_WRAPPERS, p -> i -> {
