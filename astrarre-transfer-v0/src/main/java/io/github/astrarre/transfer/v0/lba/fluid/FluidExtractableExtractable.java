@@ -6,8 +6,6 @@ import alexiil.mc.lib.attributes.Simulation;
 import alexiil.mc.lib.attributes.fluid.FluidExtractable;
 import alexiil.mc.lib.attributes.fluid.amount.FluidAmount;
 import alexiil.mc.lib.attributes.fluid.filter.ExactFluidFilter;
-import alexiil.mc.lib.attributes.fluid.volume.FluidKey;
-import alexiil.mc.lib.attributes.fluid.volume.FluidKeys;
 import alexiil.mc.lib.attributes.fluid.volume.FluidVolume;
 import io.github.astrarre.transfer.v0.api.Droplet;
 import io.github.astrarre.transfer.v0.api.Extractable;
@@ -15,7 +13,6 @@ import io.github.astrarre.transfer.v0.api.Insertable;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import io.github.astrarre.transfer.v0.api.transaction.keys.ObjectKeyImpl;
 import io.github.astrarre.transfer.v0.api.util.Quantity;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.fluid.Fluid;
@@ -24,9 +21,14 @@ import net.minecraft.fluid.Fluids;
 public class FluidExtractableExtractable implements Extractable<Fluid> {
 	protected final FluidExtractable extractable;
 	protected final FluidInsertableKey toExtract;
+	protected final boolean transactionAware;
 
-	public FluidExtractableExtractable(FluidExtractable extractable) {
+	/**
+	 * @param aware true if the context that was used to get this FluidExtractable is transaction-aware
+	 */
+	public FluidExtractableExtractable(FluidExtractable extractable, boolean aware) {
 		this.extractable = extractable;
+		this.transactionAware = aware;
 		this.toExtract = new FluidInsertableKey();
 	}
 

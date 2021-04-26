@@ -24,10 +24,15 @@ import net.minecraft.item.ItemStack;
 public class FluidInsertableInsertable implements Insertable<Fluid> {
 	protected final FluidInsertable insertable;
 	protected final FluidInsertableKey key;
+	protected final boolean aware;
 
-	public FluidInsertableInsertable(FluidInsertable insertable) {
+	/**
+	 * @see FluidExtractableExtractable
+	 */
+	public FluidInsertableInsertable(FluidInsertable insertable, boolean aware) {
 		this.insertable = insertable;
 		this.key = new FluidInsertableKey();
+		this.aware = aware;
 	}
 
 	@Override

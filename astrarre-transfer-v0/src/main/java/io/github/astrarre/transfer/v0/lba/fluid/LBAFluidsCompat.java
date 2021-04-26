@@ -61,8 +61,9 @@ public class LBAFluidsCompat {
 			LBAItemApiApiContext context = new LBAItemApiApiContext(container, key.createItemStack(count));
 			FluidExtractable extractable = FluidAttributes.EXTRACTABLE.get(context, context);
 			FluidInsertable insertable = FluidAttributes.INSERTABLE.get(context, context);
-			FluidExtractableExtractable extract = new FluidExtractableExtractable(extractable);
-			FluidInsertableInsertable insert = new FluidInsertableInsertable(insertable);
+			// todo reserve stacks?? idfk this is p a i n
+			FluidExtractableExtractable extract = new FluidExtractableExtractable(extractable, true);
+			FluidInsertableInsertable insert = new FluidInsertableInsertable(insertable, true);
 			return Participant.of(extract, insert);
 		});
 		FabricParticipants.FLUID_WORLD.andThen((WorldFunction.NoBlock<Participant<Fluid>>) (direction, world, pos) -> {
@@ -72,8 +73,8 @@ public class LBAFluidsCompat {
 
 			FluidExtractable extractable = FluidAttributes.EXTRACTABLE.get(world, pos, SearchOptions.inDirection(direction));
 			FluidInsertable insertable = FluidAttributes.INSERTABLE.get(world, pos, SearchOptions.inDirection(direction));
-			FluidExtractableExtractable extract = new FluidExtractableExtractable(extractable);
-			FluidInsertableInsertable insert = new FluidInsertableInsertable(insertable);
+			FluidExtractableExtractable extract = new FluidExtractableExtractable(extractable, true);
+			FluidInsertableInsertable insert = new FluidInsertableInsertable(insertable, true);
 			return Participant.of(extract, insert);
 		});
 	}
