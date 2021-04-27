@@ -37,8 +37,8 @@ public class Val<V> {
 		return new Val<>(d);
 	}
 	
-	protected V val;
-	protected List<Listener<V>> listeners;
+	private V val;
+	private List<Listener<V>> listeners;
 
 	public Val(V val) {
 		this.val = val;

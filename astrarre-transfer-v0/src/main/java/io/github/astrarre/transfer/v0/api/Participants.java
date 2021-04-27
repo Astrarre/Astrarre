@@ -100,8 +100,8 @@ public enum Participants implements Participant<Object> {
 	 * @param amount the maximum amount of fluid to transfer
 	 * @return the amount transfered
 	 */
-	public static <T> int move(Transaction transaction, Extractable<T> from, Insertable<T> to, int amount, boolean tryAgain) {
-		try(Transaction action = transaction.nest()) {
+	public static <T> int move(@Nullable Transaction transaction, Extractable<T> from, Insertable<T> to, int amount, boolean tryAgain) {
+		try(Transaction action = Transaction.create()) {
 			FixedObjectVolume<T> volume = new FixedObjectVolume<>(null, amount);
 			from.extract(action, volume);
 			T key = volume.getKey(action);

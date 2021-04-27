@@ -12,7 +12,7 @@ import reborncore.common.util.Tank;
 
 import net.minecraft.fluid.Fluid;
 
-public class TankParticipant implements Slot<Fluid> {
+public class TankParticipant implements Slot<Fluid> { // this actually works
 	public final Tank tank;
 	/**
 	 * stores the amount of fluid in the tank in mb
@@ -42,9 +42,10 @@ public class TankParticipant implements Slot<Fluid> {
 	public boolean set(@Nullable Transaction transaction, Fluid key, int quantity) {
 		if(quantity % 81 == 0) {
 			int mbQuantity = quantity / 81;
-			if(!this.tank.getCapacity().equalOrMoreThan(FluidValue.fromRaw(mbQuantity))) {
+			if(this.tank.getCapacity().equalOrMoreThan(FluidValue.fromRaw(mbQuantity))) {
 				this.fluid.set(transaction, key);
 				this.mb.set(transaction, mbQuantity);
+				return true;
 			}
 		}
 		return false;

@@ -57,7 +57,7 @@ public interface Slot<T> extends Participant<T> {
 		}
 		int result = Droplet.minSum(this.getQuantity(transaction), quantity);
 		int oldQuantity = this.getQuantity(transaction);
-		if(this.set(transaction, this.getKey(transaction), result)) {
+		if(this.set(transaction, key, result)) {
 			return result - oldQuantity;
 		}
 		return 0;

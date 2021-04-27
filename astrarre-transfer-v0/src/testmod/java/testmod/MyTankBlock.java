@@ -32,26 +32,26 @@ public class MyTankBlock extends Block implements BlockEntityProvider {
 	}
 
 	public static class Tile extends BlockEntity implements io.github.astrarre.access.v0.fabric.provider.BlockEntityProvider {
-		public FixedObjectVolume<ItemKey> volume = new FixedObjectVolume<>(ItemKey.EMPTY, Droplet.BOTTLE * 2);
+		public FixedObjectVolume<Fluid> volume = new FixedObjectVolume<>(Fluids.EMPTY, Droplet.BUCKET);
 		public Tile() {
 			super(TestModMain.TANK_TYPE);
 		}
 
 		@Override
 		public CompoundTag toTag(CompoundTag tag) {
-			FixedObjectVolume.fixedSerializer(ItemKey.EMPTY, ItemKey.SERIALIZER).save((NBTagView.Builder) tag, "tank", this.volume);
+			FixedObjectVolume.fixedSerializer(Fluids.EMPTY, FabricSerializers.FLUID).save((NBTagView.Builder) tag, "tank", this.volume);
 			return super.toTag(tag);
 		}
 
 		@Override
 		public void fromTag(BlockState state, CompoundTag tag) {
-			this.volume = FixedObjectVolume.fixedSerializer(ItemKey.EMPTY, ItemKey.SERIALIZER).read(FabricViews.view(tag), "tank");
+			this.volume = FixedObjectVolume.fixedSerializer(Fluids.EMPTY, FabricSerializers.FLUID).read(FabricViews.view(tag), "tank");
 			super.fromTag(state, tag);
 		}
 
 		@Override
 		public @Nullable Object get(Access<?> access, Direction direction) {
-			if(access == FabricParticipants.ITEM_WORLD) {
+			if(access == FabricParticipants.FLUID_WORLD) {
 				return this.volume;
 			}
 			return null;
