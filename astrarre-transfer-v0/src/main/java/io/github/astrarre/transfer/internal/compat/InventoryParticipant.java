@@ -70,8 +70,11 @@ public class InventoryParticipant implements ArrayParticipant<ItemKey>, Provider
 
 		@Override
 		public boolean set(@Nullable Transaction transaction, ItemKey key, int quantity) {
-			this.participant.array.get(transaction).set(this.index, key.createItemStack(quantity));
-			return true;
+			if(this.participant.inventory.isValid(this.index, key.createItemStack(quantity))) {
+				this.participant.array.get(transaction).set(this.index, key.createItemStack(quantity));
+				return true;
+			}
+			return false;
 		}
 
 		@Override

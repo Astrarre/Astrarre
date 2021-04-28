@@ -1,0 +1,13 @@
+version '0.0.0'
+dependsOn(project, 'astrarre-itemview-v0', 'astrarre-util-v0')
+// todo delet 'fabric-tag-extensions-v0', 'fabric-api-base' dependencies (compileOnly) and make the mixin conditional
+fapi(project, 'fabric-resource-loader-v0', 'fabric-tag-extensions-v0', 'fabric-api-base')
+
+sourceSets {
+    generator {
+    }
+}
+
+dependencies {
+    generatorImplementation 'org.freemarker:freemarker:2.3.31'
+}

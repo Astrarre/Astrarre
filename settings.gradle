@@ -18,5 +18,6 @@ include 'astrarre-transfer-v0'
 include 'astrarre-access-v0'
 include 'astrarre-gui-v0'
 include 'astrarre-networking-v0'
+include 'astrarre-recipe-v0'
 include 'astrarre-transfer-compat-v0'
 
