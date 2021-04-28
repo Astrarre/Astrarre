@@ -12,6 +12,7 @@ import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import io.github.astrarre.transfer.v0.api.transaction.keys.DiffKey;
 import io.github.astrarre.transfer.v0.fabric.inventory.InventoryList;
 import io.github.astrarre.transfer.v0.fabric.participants.FabricParticipants;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.inventory.Inventory;
@@ -69,8 +70,14 @@ public class InventoryParticipant implements ArrayParticipant<ItemKey>, Provider
 		}
 
 		@Override
+		public int insert(@Nullable Transaction transaction, @NotNull ItemKey key, int quantity) {
+			int current = this.participant.array.get(transaction).get(this.index).getCount();
+			return Slot.super.insert(transaction, key, Math.min(this.participant.inventory.getMaxCountPerStack() - current, quantity));
+		}
+
+		@Override
 		public boolean set(@Nullable Transaction transaction, ItemKey key, int quantity) {
-			if(this.participant.inventory.isValid(this.index, key.createItemStack(quantity))) {
+			if(this.participant.inventory.isValid(this.index, key.createItemStack(quantity)) && this.participant.inventory.getMaxCountPerStack() >= quantity) {
 				this.participant.array.get(transaction).set(this.index, key.createItemStack(quantity));
 				return true;
 			}
