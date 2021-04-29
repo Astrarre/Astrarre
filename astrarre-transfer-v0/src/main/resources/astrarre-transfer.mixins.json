@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "BucketItemAccess_AccessFluid",
+    "IngredientAccess",
     "ItemStackMixin_TrackStacks",
     "WorldMixin_PostTickEvent"
   ],
