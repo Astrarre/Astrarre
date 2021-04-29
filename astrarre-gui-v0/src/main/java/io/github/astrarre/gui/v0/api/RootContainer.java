@@ -1,6 +1,8 @@
 package io.github.astrarre.gui.v0.api;
 
 import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import io.github.astrarre.gui.internal.RootContainerInternal;
@@ -9,6 +11,7 @@ import io.github.astrarre.gui.internal.vanilla.DefaultScreen;
 import io.github.astrarre.gui.internal.vanilla.DefaultScreenHandler;
 import io.github.astrarre.gui.v0.api.access.Interactable;
 import io.github.astrarre.gui.v0.api.base.panel.APanel;
+import io.github.astrarre.gui.v0.api.inv.ContainerGui;
 import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
 import org.jetbrains.annotations.Nullable;
@@ -31,6 +34,23 @@ import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
  * root container, this is not meant to be implemented. Astrarre implements it for Screen and HUD
  */
 public interface RootContainer {
+	static void openContainer(NetworkMember member, BiFunction<RootContainer, NetworkMember, ContainerGui> function) {
+		openC(member, container -> {
+			function.apply(container, member).initialize();
+		});
+	}
+
+	static void openC(NetworkMember member, Consumer<RootContainer> consumer) {
+		open(member, container -> {
+			consumer.accept(container);
+			return null;
+		});
+	}
+
+	/**
+	 * @see #openC(NetworkMember, Consumer)
+	 * @return the value returned from the function
+	 */
 	static <T> T open(NetworkMember member, Function<RootContainer, T> function) {
 		ServerPlayerEntity entity = (ServerPlayerEntity) member;
 		Object[] ref = new Object[] {null};

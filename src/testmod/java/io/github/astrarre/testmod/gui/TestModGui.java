@@ -46,6 +46,7 @@ public class TestModGui {
 				slot.setTransformation(Transformation.translate(6 + inventoryColumn * 18, 82 + inventoryRow * 18, 0));
 				center.add(slot);
 				hotbar.add(slot);
+
 			}
 		}
 

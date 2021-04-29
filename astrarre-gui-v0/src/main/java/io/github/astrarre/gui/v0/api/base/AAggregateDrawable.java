@@ -48,9 +48,11 @@ public abstract class AAggregateDrawable extends ADrawable implements Interactab
 	/**
 	 * If called on the client, the method is ignored. This method also automatically adds the drawable to each of this panel's roots
 	 *
+	 * @param drawable if null, nothing happens
 	 * @see #addClient(ADrawable)
 	 */
 	public void add(ADrawable drawable) {
+		if(drawable == null) return;
 		if (!this.isClient()) {
 			for (RootContainer root : this.roots) {
 				root.addRoot(drawable);
@@ -66,6 +68,7 @@ public abstract class AAggregateDrawable extends ADrawable implements Interactab
 	 * @see #removeClient(ADrawable)
 	 */
 	public void remove(ADrawable drawable) {
+		if(drawable == null) return;
 		if(!this.isClient() && this.onRemove(drawable)) {
 			this.sendToClients(REMOVE_DRAWABLE, NBTagView.builder().putInt("syncId", drawable.getSyncId()));
 		}
@@ -97,6 +100,7 @@ public abstract class AAggregateDrawable extends ADrawable implements Interactab
 	 * does not sync to the server, if the method is called on the server it is ignored
 	 */
 	public void addClient(ADrawable drawable) {
+		if(drawable == null) return;
 		if (this.isClient()) {
 			for (RootContainer root : this.roots) {
 				root.addRoot(drawable);
@@ -108,6 +112,7 @@ public abstract class AAggregateDrawable extends ADrawable implements Interactab
 	}
 
 	public void removeClient(ADrawable drawable) {
+		if(drawable == null) return;
 		if(this.isClient() && this.onRemove(drawable)) {
 			this.drawables.remove(drawable);
 			this.onDrawablesChange();

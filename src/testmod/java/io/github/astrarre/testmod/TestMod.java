@@ -21,7 +21,7 @@ public class TestMod implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		Registry.register(Registry.ITEM, new Identifier("testmod", "test"), new TestItem(new Item.Settings().group(ItemGroup.MISC)));
-		TestModBlock.modInit();
+	//	TestModBlock.modInit();
 		//Recipe.getInput(new IntIngredient(), "test");
 	}
 

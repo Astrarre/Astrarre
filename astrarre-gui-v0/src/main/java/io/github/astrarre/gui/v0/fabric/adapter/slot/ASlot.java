@@ -41,7 +41,7 @@ import net.fabricmc.api.Environment;
  * @see APlayerSlot
  */
 public abstract class ASlot extends ADrawable implements Interactable {
-	public static final Polygon SQUARE_16x16 = new Polygon.Builder(4).addVertex(0, 0).addVertex(0, 18).addVertex(18, 18).addVertex(18, 0).build();
+	public static final Polygon SQUARE_18x18 = new Polygon.Builder(4).addVertex(0, 0).addVertex(0, 18).addVertex(18, 18).addVertex(18, 0).build();
 	public static final Sprite.Sized SLOT = Sprite.of(Id.create("minecraft", "textures/gui/container/furnace.png"))
 			                                        .cutout(55 / 256f, 16 / 256f, 18 / 256f, 18 / 256f).sized(18, 18);
 	private static final Transformation TRANSFORMATION = Transformation.translate(1, 1, 300);
@@ -60,7 +60,7 @@ public abstract class ASlot extends ADrawable implements Interactable {
 		super(id);
 		this.inventory = inventory;
 		this.index = index;
-		this.setBounds(SQUARE_16x16);
+		this.setBounds(SQUARE_18x18);
 	}
 
 	@Environment (EnvType.CLIENT)
@@ -72,7 +72,7 @@ public abstract class ASlot extends ADrawable implements Interactable {
 		if (input.hasKey("targetSlotIds")) {
 			this.temp = input.get("targetSlotIds", NBTType.INT_ARRAY);
 		}
-		this.setBounds(SQUARE_16x16);
+		this.setBounds(SQUARE_18x18);
 	}
 
 	@Environment (EnvType.CLIENT)
