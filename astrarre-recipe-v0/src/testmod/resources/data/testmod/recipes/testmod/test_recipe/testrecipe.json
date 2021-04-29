@@ -1,0 +1,7 @@
+{
+  "tag": "enderman_holdable",
+  "ingredient": {
+    "item": "minecraft:stone"
+  },
+  "stack": "minecraft:stone"
+}

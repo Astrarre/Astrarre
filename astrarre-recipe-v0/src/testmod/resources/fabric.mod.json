@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "id": "astrarre-gui-v0-testmod",
+  "version": "0.0.0",
+  "entrypoints": {
+    "main": [
+      "testmod.TestMod"
+    ]
+  }
+}
