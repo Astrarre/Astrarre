@@ -46,7 +46,7 @@ public class Recipes {
 		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
 			@Override
 			public Identifier getFabricId() {
-				return new Identifier(recipeId.getNamespace(), "recipe/" + recipeId.getPath());
+				return new Identifier(recipeId.getNamespace(), "recipehandler/" + recipeId.getPath());
 			}
 
 			@Override

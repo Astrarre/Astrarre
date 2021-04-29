@@ -15,8 +15,5 @@
   ],
   "depends": {
     "fabricloader": ">=0.8.9"
-  },
-  "mixins": [
-    "astrarre-recipes.mixins.json"
-  ]
+  }
 }
