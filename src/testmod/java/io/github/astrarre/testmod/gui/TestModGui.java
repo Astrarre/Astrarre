@@ -46,7 +46,6 @@ public class TestModGui {
 				slot.setTransformation(Transformation.translate(6 + inventoryColumn * 18, 82 + inventoryRow * 18, 0));
 				center.add(slot);
 				hotbar.add(slot);
-
 			}
 		}
 
@@ -54,10 +53,10 @@ public class TestModGui {
 			ASlot slot = new APlayerSlot(entity.inventory, hotbarIndex);
 			slot.setTransformation(Transformation.translate(6 + hotbarIndex * 18, 140, 0));
 			center.add(slot);
-			slot.linkAll(container, hotbar);
-			for (ASlot hotbarSlot : hotbar) {
-				hotbarSlot.link(container, slot);
-			}
+			//slot.linkAll(container, hotbar);
+			//for (ASlot hotbarSlot : hotbar) {
+				//hotbarSlot.link(container, slot);
+			//}
 		}
 
 		AProgressBar bar1 = new AProgressBar(AstrarreIcons.FURNACE_PROGRESS_BAR_FULL, AstrarreIcons.FURNACE_PROGRESS_BAR_EMPTY, AProgressBar.Direction.RIGHT);
