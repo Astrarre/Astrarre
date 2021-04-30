@@ -9,9 +9,9 @@ import net.minecraft.recipe.Ingredient;
 
 @Mixin (Ingredient.class)
 public interface IngredientAccess {
-	@Accessor
-	ItemStack[] getMatchingStacks();
+	@Accessor("matchingStacks")
+	ItemStack[] astrarre_transfer$getMatchingStacks();
 
-	@Invoker
-	void callCacheMatchingStacks();
+	@Invoker("cacheMatchingStacks")
+	void astrarre_transfer$callCacheMatchingStacks();
 }

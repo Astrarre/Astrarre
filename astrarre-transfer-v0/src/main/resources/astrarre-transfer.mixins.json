@@ -8,8 +8,6 @@
     "ItemStackMixin_TrackStacks",
     "WorldMixin_PostTickEvent"
   ],
-  "client": [
-  ],
   "injectors": {
     "defaultRequire": 1
   }

@@ -27,8 +27,8 @@ public class IngredientFilteringInsertable extends FilteringInsertable<ItemKey> 
 	public @Nullable Object get(Access<?> access) {
 		if(access == FabricParticipants.ITEM_FILTERS) {
 			if(this.items == null) {
-				((IngredientAccess) (Object) this.ingredient).callCacheMatchingStacks();
-				ItemStack[] stacks = ((IngredientAccess) (Object) this.ingredient).getMatchingStacks();
+				((IngredientAccess) (Object) this.ingredient).astrarre_transfer$callCacheMatchingStacks();
+				ItemStack[] stacks = ((IngredientAccess) (Object) this.ingredient).astrarre_transfer$getMatchingStacks();
 				ObjectOpenHashSet<Item> items = new ObjectOpenHashSet<>(stacks.length);
 				for (ItemStack stack : stacks) {
 					items.add(stack.getItem());
