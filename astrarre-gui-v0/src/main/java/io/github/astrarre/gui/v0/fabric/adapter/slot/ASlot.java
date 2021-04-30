@@ -182,6 +182,9 @@ public abstract class ASlot extends ADrawable implements Interactable {
 	public ItemStack quickTransferStack(RootContainer container) {
 		if (this.slotIds == null) {
 			this.slotIds = new IntArrayList();
+			if(this.targetSlotIds == null) {
+				throw new IllegalStateException("Slot was not linked " + this);
+			}
 			for (ASlot slot : this.targetSlotIds.get(container)) {
 				this.slotIds.add(slot.minecraftSlots.get(container).id);
 			}

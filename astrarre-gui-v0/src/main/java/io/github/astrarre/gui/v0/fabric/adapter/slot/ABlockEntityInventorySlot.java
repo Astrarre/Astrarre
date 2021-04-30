@@ -53,4 +53,9 @@ public class ABlockEntityInventorySlot<B extends BlockEntity & Inventory> extend
 	}
 
 	public static void init() {}
+
+	@Override
+	public String toString() {
+		return "BlockEntityInventorySlot at " + this.getPos() + " in " + this.getWorld().getRegistryKey().getValue();
+	}
 }

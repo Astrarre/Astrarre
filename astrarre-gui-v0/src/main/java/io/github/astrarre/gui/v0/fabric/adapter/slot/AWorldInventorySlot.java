@@ -19,7 +19,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 /**
- * a slot who's inventory is retrieved from HopperBlockEntity#getInventoryAt
+ * a slot who's inventory is retrieved from HopperBlockEntity#getInventoryAt.
+ *
  */
 public class AWorldInventorySlot extends ASlot {
 	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry

@@ -15,7 +15,6 @@ import net.fabricmc.api.Environment;
 
 public final class APlayerSlot extends ASlot {
 	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.register(Id.create("astrarre-gui-v0", "player_slot"), APlayerSlot::new);
-
 	@Environment(EnvType.CLIENT)
 	private APlayerSlot(NBTagView input) {
 		super(ENTRY, input);
@@ -39,5 +38,10 @@ public final class APlayerSlot extends ASlot {
 	protected Inventory readInventoryData(NBTagView input) {
 		PlayerEntity player = MinecraftClient.getInstance().player;
 		return player.inventory;
+	}
+
+	@Override
+	public String toString() {
+		return "APlayerSlot " + ((PlayerInventory)this.inventory).player.getEntityName();
 	}
 }
