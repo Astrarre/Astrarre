@@ -183,7 +183,7 @@ public abstract class ASlot extends ADrawable implements Interactable {
 		if (this.slotIds == null) {
 			this.slotIds = new IntArrayList();
 			if(this.targetSlotIds.get(container) == null) {
-				throw new IllegalStateException("Slot was not linked " + this);
+				throw new IllegalStateException("Slot was not linked (" + this + ") https://github.com/Astrarre/Astrarre/wiki/Astrarre-Gui-v0#adding-inventory-slots");
 			}
 			for (ASlot slot : this.targetSlotIds.get(container)) {
 				this.slotIds.add(slot.minecraftSlots.get(container).id);
