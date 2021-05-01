@@ -1,4 +1,5 @@
 {
+  "type": "testmod:test_recipe",
   "tag": "enderman_holdable",
   "ingredient": {
     "item": "minecraft:stone"

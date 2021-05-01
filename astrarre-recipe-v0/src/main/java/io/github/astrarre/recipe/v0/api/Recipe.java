@@ -1,8 +1,16 @@
 package io.github.astrarre.recipe.v0.api;
 
-public interface Recipe {
+import net.minecraft.util.Identifier;
+
+public abstract class Recipe {
+	Identifier id = null;
+
 	/**
-	 * called after the mod has been initialized, can be used to validate and throw errors
+	 * called after the recipe has been initialized, can be used to validate and throw errors
 	 */
-	default void onInit() {}
+	public void onInit() {}
+
+	public Identifier getId() {
+		return this.id;
+	}
 }
