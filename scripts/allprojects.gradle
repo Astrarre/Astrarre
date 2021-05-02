@@ -1,3 +1,4 @@
+
 allprojects {
     group = 'io.github.astrarre'
     if (project != rootProject) {
@@ -72,30 +73,52 @@ allprojects {
         from sourceSets.main.allSource
     }
 
-    publishing {
-        publications {
-            mavenJava(MavenPublication) {
-                artifactId = "$project.name-fabric"
-                // regular old implementation jar
-                artifact(remapJar) {
-                    builtBy remapJar
-                }
+    afterEvaluate {
+        task remapJar2(type: remapJar.class) {
+            group = "astrarre"
+            archiveClassifier = "lite"
+            addNestedDependencies = remapJar.addNestedDependencies
+            addDefaultNestedDependencies = false
+            remapAccessWidener = remapJar.remapAccessWidener
+            jarRemapper = remapJar.jarRemapper
+            input = remapJar.input
+        }
+        remapJar2.dependsOn(jar)
 
-                // sources for ye normal folk
-                artifact(sourcesJar) {
-                    builtBy remapSourcesJar
+        publishing {
+            publications {
+                mavenJava(MavenPublication) {
+                    artifactId = "$project.name-fabric"
+                    // regular old implementation jar
+                    artifact(remapJar) {
+                        builtBy remapJar
+                    }
+
+                    // sources for ye normal folk
+                    artifact(sourcesJar) {
+                        builtBy remapSourcesJar
+                    }
+                }
+                mavenJava2(MavenPublication) {
+                    artifactId = "$project.name-fabric-lite"
+                    artifact(remapJar2) {
+                        builtBy remapJar2
+                    }
+                    artifact(sourcesJar) {
+                        builtBy remapSourcesJar
+                    }
                 }
             }
-        }
 
-        repositories {
-            maven {
-                def mavenUrl = project.hasProperty('maven_url') ? project.property('maven_url') : ""
-                url mavenUrl
-                if(mavenUrl.startsWith("http")) {
-                    credentials {
-                        username project.hasProperty('maven_username') ? project.property('maven_username') : ""
-                        password project.hasProperty('maven_password') ? project.property('maven_password') : ""
+            repositories {
+                maven {
+                    def mavenUrl = project.hasProperty('maven_url') ? project.property('maven_url') : ""
+                    url mavenUrl
+                    if (mavenUrl.startsWith("http")) {
+                        credentials {
+                            username project.hasProperty('maven_username') ? project.property('maven_username') : ""
+                            password project.hasProperty('maven_password') ? project.property('maven_password') : ""
+                        }
                     }
                 }
             }

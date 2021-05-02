@@ -7,7 +7,7 @@ plugins {
     id "fabric-loom" version "0.7.26"
 }
 
-version '0.0.0'
+version '1.0.0'
 group = 'io.github.astrarre'
 
 loom {
@@ -15,9 +15,11 @@ loom {
     //runDir = "run"
 }
 
+project.configurations.detachedConfiguration()
 apply from: 'scripts/allprojects.gradle'
 
 static def fapi(Project proj, String... modules) {
+    proj.extensions.add("fapi_deps", modules)
     proj.configure(proj) {
         dependencies {
             if(modules.length == 0) {
@@ -29,6 +31,26 @@ static def fapi(Project proj, String... modules) {
                     include(modImplementation(fabricApi.module(it, fabric_version)) {
                         exclude module: 'fabric-loader'
                     })
+                }
+            }
+        }
+
+        modules.each {
+            def str = it
+            publishing {
+                publications {
+                    mavenJava2(MavenPublication) {
+                        pom.withXml {
+                            def depsNode = getOrCreateNode(asNode(), "dependencies")
+                            proj.each {
+                                def depNode = depsNode.appendNode("dependency")
+                                depNode.appendNode("groupId", "net.fabricmc.fabric-api")
+                                depNode.appendNode("artifactId", str)
+                                depNode.appendNode("version", fabricApi.moduleVersion(str, fabric_version))
+                                depNode.appendNode("scope", "compile")
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -77,11 +99,24 @@ static def dependsOn(Project proj, Iterable<Project> projs) {
         publications {
             mavenJava(MavenPublication) {
                 pom.withXml {
-                    def depsNode = asNode().appendNode("dependencies")
+                    def depsNode = getOrCreateNode(asNode(), "dependencies")
                     projs.each {
                         def depNode = depsNode.appendNode("dependency")
                         depNode.appendNode("groupId", it.group)
                         depNode.appendNode("artifactId", "$it.name-fabric")
+                        depNode.appendNode("version", it.version)
+                        depNode.appendNode("scope", "compile")
+                    }
+                }
+            }
+
+            mavenJava2(MavenPublication) {
+                pom.withXml {
+                    def depsNode = asNode().appendNode("dependencies")
+                    projs.each {
+                        def depNode = depsNode.appendNode("dependency")
+                        depNode.appendNode("groupId", it.group)
+                        depNode.appendNode("artifactId", "$it.name-fabric-lite")
                         depNode.appendNode("version", it.version)
                         depNode.appendNode("scope", "compile")
                     }
@@ -94,4 +129,18 @@ static def dependsOn(Project proj, Iterable<Project> projs) {
 static def dependsOn(Project proj, String... projects) {
     List<Project> projs = projects.collect { proj.rootProject.project(it) }
     dependsOn(proj, projs)
+}
+
+static Node getOrCreateNode(Node node, String name) {
+    Node dependencies = null
+    for(Node n : node) {
+        if(name == n.name()) {
+            dependencies = n
+            break
+        }
+    }
+    if(dependencies == null) {
+        dependencies = node.appendNode(name)
+    }
+    return dependencies
 }
