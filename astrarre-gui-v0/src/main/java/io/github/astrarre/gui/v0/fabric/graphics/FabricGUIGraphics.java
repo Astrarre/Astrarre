@@ -18,10 +18,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 
-public class FabricGuiGraphics extends FabricGraphics3d implements GuiGraphics {
+public class FabricGUIGraphics extends FabricGraphics3d implements GuiGraphics {
 	public final Screen screen;
 
-	public FabricGuiGraphics(MatrixStack matrices, Screen screen) {
+	public FabricGUIGraphics(MatrixStack matrices, Screen screen) {
 		super(matrices);
 		this.screen = screen;
 	}

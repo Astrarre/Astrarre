@@ -1,5 +1,7 @@
 package io.github.astrarre.rendering.v0.api.textures.client;
 
+import java.util.Objects;
+
 import io.github.astrarre.rendering.v0.api.textures.Sprite;
 
 import net.fabricmc.api.EnvType;
@@ -19,4 +21,6 @@ public interface ManagedSprite extends Sprite {
 	int frames();
 	int width(int frame);
 	int height(int frame);
+
+
 }

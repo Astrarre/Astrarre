@@ -14,7 +14,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-public class GuiPacketHandler {
+public class GUIPacketHandler {
 	public static final Id DRAWABLE_PACKET_CHANNEL = Id.create("astrarre-gui-v0", "sync");
 	public static final Id ADD_DRAWABLE = Id.create("astrarre-gui-v0", "add_drawable");
 	public static final Id REMOVE_DRAWABLE = Id.create("astrarre-gui-v0", "remove_drawable");
@@ -99,13 +99,13 @@ public class GuiPacketHandler {
 			builder.putInt("type", root.getType().ordinal());
 			builder.putInt("syncId", syncId);
 			builder.putTag("payload", tag);
-			member.send(GuiPacketHandler.DRAWABLE_PACKET_CHANNEL, builder);
+			member.send(GUIPacketHandler.DRAWABLE_PACKET_CHANNEL, builder);
 		}
 	}
 
 	public static void sendToServer(RootContainer root, NBTagView tag, int channel, int id) {
 		ModPacketHandler.INSTANCE.sendToServer(
-				GuiPacketHandler.DRAWABLE_PACKET_CHANNEL,
+				GUIPacketHandler.DRAWABLE_PACKET_CHANNEL,
 				NBTagView.builder().putInt("channel", channel).putInt("syncId", id).putTag("payload", tag).putInt("type", root.getType().ordinal()));
 	}
 

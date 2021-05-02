@@ -20,7 +20,6 @@ import net.fabricmc.api.ModInitializer;
 
 public class TestMod implements ModInitializer {
 	public static final List<TestRecipe> TEST_RECIPE = Recipes.createRecipe(new Identifier("testmod:test_recipe"), TestRecipe.class);
-
 	public static class TestRecipe extends Recipe {
 		public final Tag<Block> tag;
 		public final Ingredient ingredient;

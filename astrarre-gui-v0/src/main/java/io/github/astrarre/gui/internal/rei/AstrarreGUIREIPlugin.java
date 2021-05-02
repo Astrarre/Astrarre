@@ -1,28 +1,24 @@
 package io.github.astrarre.gui.internal.rei;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.github.astrarre.gui.internal.access.ScreenRootAccess;
 import io.github.astrarre.gui.internal.vanilla.DefaultHandledScreen;
 import io.github.astrarre.gui.internal.vanilla.DefaultScreen;
 import io.github.astrarre.gui.v0.api.ADrawable;
-import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.api.base.panel.APanel;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
 import me.shedaniel.math.Rectangle;
-import me.shedaniel.rei.api.BaseBoundsHandler;
 import me.shedaniel.rei.api.DisplayHelper;
-import me.shedaniel.rei.api.LiveRecipeGenerator;
-import me.shedaniel.rei.api.OverlayDecider;
 import me.shedaniel.rei.api.RecipeCategory;
 import me.shedaniel.rei.api.RecipeDisplay;
 import me.shedaniel.rei.api.RecipeHelper;
 import me.shedaniel.rei.api.plugins.REIPluginV0;
+import me.shedaniel.rei.gui.widget.Widget;
 import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.math.Vector4f;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 
@@ -82,30 +78,11 @@ public class AstrarreGUIREIPlugin implements REIPluginV0 {
 
 	@Override
 	public void registerPluginCategories(RecipeHelper recipeHelper) {
-		recipeHelper.registerLiveRecipeGenerator(new LiveRecipeGenerator<RecipeDisplay>() {
-			@Override
-			public Identifier getCategoryIdentifier() {
-				return null;
-			}
 
-			// todo
-		});
 	}
 
 	@Override
 	public void registerRecipeDisplays(RecipeHelper recipeHelper) {
-		// todo autocrafting handler as well
-		recipeHelper.registerCategory(new RecipeCategory<RecipeDisplay>() {
-			@Override
-			public @NotNull Identifier getIdentifier() {
-				return null;
-			}
-
-			@Override
-			public @NotNull String getCategoryName() {
-				return null;
-			}
-		});
 	}
 
 	public static Rectangle get(Object screen) {

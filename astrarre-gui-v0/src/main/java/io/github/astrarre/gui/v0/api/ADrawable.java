@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import io.github.astrarre.gui.internal.DrawableInternal;
-import io.github.astrarre.gui.internal.GuiPacketHandler;
+import io.github.astrarre.gui.internal.GUIPacketHandler;
 import io.github.astrarre.gui.internal.properties.ClientSyncedProperty;
 import io.github.astrarre.gui.internal.properties.DefaultProperty;
 import io.github.astrarre.gui.internal.properties.ServerSyncedProperty;
@@ -132,7 +132,7 @@ public abstract class ADrawable extends DrawableInternal {
 	public final void sendToClients(int channel, NBTagView tag) {
 		if (this.isClient()) return;
 		for (RootContainer root : this.roots) {
-			GuiPacketHandler.sendToClients(root, tag, channel, this.getSyncId());
+			GUIPacketHandler.sendToClients(root, tag, channel, this.getSyncId());
 		}
 	}
 
@@ -148,7 +148,7 @@ public abstract class ADrawable extends DrawableInternal {
 		}
 
 		for (RootContainer root : this.roots) {
-			GuiPacketHandler.sendToServer(root, tag, channel, this.getSyncId());
+			GUIPacketHandler.sendToServer(root, tag, channel, this.getSyncId());
 		}
 	}
 

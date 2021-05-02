@@ -122,7 +122,7 @@ public abstract class RootContainerInternal implements RootContainer {
 		if (!this.isClient()) {
 			NetworkMember member = this.getViewer();
 			if (member != null) {
-				GuiPacketHandler.addDrawable(this, member, drawable);
+				GUIPacketHandler.addDrawable(this, member, drawable);
 			}
 		}
 	}
@@ -142,7 +142,7 @@ public abstract class RootContainerInternal implements RootContainer {
 		if (!this.isClient()) {
 			NetworkMember member = this.getViewer();
 			if (member != null) {
-				GuiPacketHandler.removeDrawable(member, this, id);
+				GUIPacketHandler.removeDrawable(member, this, id);
 			}
 		}
 	}

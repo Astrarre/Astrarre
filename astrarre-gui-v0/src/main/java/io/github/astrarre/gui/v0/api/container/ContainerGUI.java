@@ -1,4 +1,4 @@
-package io.github.astrarre.gui.v0.api.inv;
+package io.github.astrarre.gui.v0.api.container;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ import io.github.astrarre.rendering.v0.api.Transformation;
 
 import net.minecraft.entity.player.PlayerInventory;
 
-public abstract class ContainerGui {
+public abstract class ContainerGUI {
 	/*the number of pixels from the bottom of the panel to the first slot (hotbar)*/
 	private static final int PIXELS_TO_INVENTORY_BOTTOM = 7;
 	/*the number of pixels from the bottom of the main inventory area to the hotbar row*/
@@ -42,7 +42,7 @@ public abstract class ContainerGui {
 	/**
 	 * @see RootContainer#openContainer(NetworkMember, BiFunction)
 	 */
-	public ContainerGui(RootContainer container, NetworkMember member, int width, int height) {
+	public ContainerGUI(RootContainer container, NetworkMember member, int width, int height) {
 		this.container = container;
 		this.member = member;
 		this.width = width;
@@ -52,13 +52,13 @@ public abstract class ContainerGui {
 	/**
 	 * called when the gui opens (kinda like a post-constructor thing)
 	 */
-	public void initialize() {
+	public void initContainer() {
 		APanel contentPanel = this.container.getContentPanel();
 		contentPanel.add(this.getBackground());
 		AAggregateDrawable mainPanel = this.getMainPanel();
 		List<ASlot> slots = this.addPlayerInventory(mainPanel);
 		contentPanel.add(this.getPanelBackground(mainPanel));
-		this.addGui(mainPanel, this.getBackgroundWidth(), this.getContainerHeight() - INVENTORY_HEIGHT, slots);
+		this.addGui(mainPanel, this.getContainerWidth(), this.getContainerHeight() - INVENTORY_HEIGHT, slots);
 	}
 
 	/**
@@ -71,7 +71,7 @@ public abstract class ContainerGui {
 	 * @return all the 'inventory slots' (anything you could reasonably shift-click from/to)
 	 */
 	protected List<ASlot> addPlayerInventory(AAggregateDrawable mainPanel) {
-		int inventoryStartX = this.getBackgroundWidth() / 2 - (INVENTORY_ROW_LENGTH * SLOT_WIDTH) / 2, inventoryStartY = this.getContainerHeight() - (PIXELS_TO_INVENTORY_BOTTOM + (4 * SLOT_WIDTH) + 4);
+		int inventoryStartX = this.getContainerWidth() / 2 - (INVENTORY_ROW_LENGTH * SLOT_WIDTH) / 2, inventoryStartY = this.getContainerHeight() - (PIXELS_TO_INVENTORY_BOTTOM + (4 * SLOT_WIDTH) + 4);
 		PlayerInventory inventory = this.member.to().inventory;
 
 		List<ASlot> mainInventorySlots = new ArrayList<>(27);
@@ -104,7 +104,7 @@ public abstract class ContainerGui {
 	}
 
 	protected AAggregateDrawable getMainPanel() {
-		return new ACenteringPanel(this.getBackgroundWidth(), this.getContainerHeight());
+		return new ACenteringPanel(this.getContainerWidth(), this.getContainerHeight());
 	}
 
 	/**
@@ -119,11 +119,11 @@ public abstract class ContainerGui {
 		return new ADarkenedBackground();
 	}
 
-	protected int getBackgroundWidth() {
+	public int getContainerWidth() {
 		return this.width;
 	}
 
-	protected int getContainerHeight() {
+	public int getContainerHeight() {
 		return this.height;
 	}
 }

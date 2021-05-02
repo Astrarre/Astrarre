@@ -31,6 +31,7 @@ public interface Sprite extends Serializable {
 			throw new UnsupportedOperationException("unknown sprite type");
 		}
 	});
+
 	Serializer<Sized> SIZED_SER = Serializer.of((view) -> {
 		NBTagView tag = view.asTag();
 		return new Sized(SERIALIZER.read(tag, "sprite"), tag.getFloat("width"), tag.getFloat("height"));
@@ -125,4 +126,6 @@ public interface Sprite extends Serializable {
 			return view;
 		}
 	}
+
+
 }

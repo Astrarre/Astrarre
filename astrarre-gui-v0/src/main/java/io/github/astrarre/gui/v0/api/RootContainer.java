@@ -11,7 +11,7 @@ import io.github.astrarre.gui.internal.vanilla.DefaultScreen;
 import io.github.astrarre.gui.internal.vanilla.DefaultScreenHandler;
 import io.github.astrarre.gui.v0.api.access.Interactable;
 import io.github.astrarre.gui.v0.api.base.panel.APanel;
-import io.github.astrarre.gui.v0.api.inv.ContainerGui;
+import io.github.astrarre.gui.v0.api.container.ContainerGUI;
 import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
 import org.jetbrains.annotations.Nullable;
@@ -34,9 +34,9 @@ import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
  * root container, this is not meant to be implemented. Astrarre implements it for Screen and HUD
  */
 public interface RootContainer {
-	static void openContainer(NetworkMember member, BiFunction<RootContainer, NetworkMember, ContainerGui> function) {
+	static void openContainer(NetworkMember member, BiFunction<RootContainer, NetworkMember, ContainerGUI> function) {
 		openC(member, container -> {
-			function.apply(container, member).initialize();
+			function.apply(container, member).initContainer();
 		});
 	}
 
@@ -101,7 +101,11 @@ public interface RootContainer {
 		 */
 		@Deprecated
 		HUD,
-		SCREEN
+		SCREEN,
+		/**
+		 * an REI recipe screen
+		 */
+		REI_RECIPE
 	}
 
 	Type getType();
@@ -131,12 +135,14 @@ public interface RootContainer {
 	void removeRoot(ADrawable drawable);
 
 	/**
-	 * The result will be null if on the clientside
-	 * if {@link #getType()} == {@link Type#SCREEN}
-	 * if {@link #getType()} == {@link Type#HUD} and on the server
+	 * The result will be null if on the clientside or if {@link #getType()} == {@link Type#HUD} and on the server
 	 */
+	@Nullable
 	NetworkMember getViewer();
 
+	/**
+	 * may not work as intended if {@link #getType()} == {@link Type#REI_RECIPE}
+	 */
 	@Environment(EnvType.CLIENT)
 	<T extends ADrawable & Interactable> void setFocus(T drawable);
 
@@ -151,6 +157,9 @@ public interface RootContainer {
 	 */
 	@Nullable ADrawable forId(int id);
 
+	/**
+	 * @return the current number of ticks the screen has been open, if not implemented, returns -1
+	 */
 	int getTick();
 
 	void addCloseListener(Runnable onClose);
@@ -167,4 +176,14 @@ public interface RootContainer {
 	void addResizeListener(OnResize resize);
 
 	Serializer<ADrawable> getSerializer();
+
+	/**
+	 * @return for screens and HUD, returns the window width. For screen handlers, returns -1. And for REI recipes, returns the bounds of the recipe display
+	 */
+	int getWidth();
+
+	/**
+	 * @return for screens and HUD, returns the window height. For screen handlers, returns -1. And for REI recipes, returns the bounds of the recipe display
+	 */
+	int getHeight();
 }

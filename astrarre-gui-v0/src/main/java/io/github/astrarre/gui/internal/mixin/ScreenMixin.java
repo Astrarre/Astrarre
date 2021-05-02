@@ -10,7 +10,7 @@ import io.github.astrarre.gui.internal.access.ResizeListenerAccess;
 import io.github.astrarre.gui.internal.access.ScreenRootAccess;
 import io.github.astrarre.gui.internal.containers.ScreenRootContainer;
 import io.github.astrarre.gui.v0.api.RootContainer;
-import io.github.astrarre.gui.v0.fabric.graphics.FabricGuiGraphics;
+import io.github.astrarre.gui.v0.fabric.graphics.FabricGUIGraphics;
 import io.github.astrarre.rendering.internal.DummyScreen;
 import io.github.astrarre.gui.v0.api.graphics.GuiGraphics;
 import org.lwjgl.opengl.GL11;
@@ -46,7 +46,7 @@ public abstract class ScreenMixin implements ScreenRootAccess, ParentElement, Re
 				if(!enabled) {
 					RenderSystem.enableDepthTest();
 				}
-				GuiGraphics g3d = new FabricGuiGraphics(matrices, (Screen) (Object) this);
+				GuiGraphics g3d = new FabricGUIGraphics(matrices, (Screen) (Object) this);
 				internal.getContentPanel().mouseHover(internal, mouseX, mouseY);
 				internal.getContentPanel().render(internal, g3d, delta);
 				g3d.flush();

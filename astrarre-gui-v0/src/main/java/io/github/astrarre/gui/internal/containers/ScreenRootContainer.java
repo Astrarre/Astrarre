@@ -43,7 +43,17 @@ public class ScreenRootContainer<T extends Screen> extends RootContainerInternal
 
 	@Override
 	public void addResizeListener(OnResize resize) {
-		((ResizeListenerAccess) resize).addResizeListener(resize);
+		((ResizeListenerAccess) this.screen).addResizeListener(resize);
+	}
+
+	@Override
+	public int getWidth() {
+		return this.screen.width;
+	}
+
+	@Override
+	public int getHeight() {
+		return this.screen.height;
 	}
 
 	@Override

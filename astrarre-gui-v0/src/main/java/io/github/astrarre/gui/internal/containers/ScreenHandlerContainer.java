@@ -76,6 +76,22 @@ public class ScreenHandlerContainer extends RootContainerInternal implements Slo
 	}
 
 	@Override
+	public int getWidth() {
+		if(this.isClient) {
+			return this.screen.width;
+		}
+		return -1;
+	}
+
+	@Override
+	public int getHeight() {
+		if(this.isClient) {
+			return this.screen.height;
+		}
+		return -1;
+	}
+
+	@Override
 	public void addSlot(Slot slot) {
 		((ScreenHandlerAccess) this.handler).callAddSlot(slot);
 	}
