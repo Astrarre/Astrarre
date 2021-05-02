@@ -37,7 +37,7 @@ public abstract class ContainerGUI {
 	protected final RootContainer container;
 	protected final NetworkMember member;
 
-	private final int width, height;
+	protected final int width, height;
 
 	/**
 	 * @see RootContainer#openContainer(NetworkMember, BiFunction)

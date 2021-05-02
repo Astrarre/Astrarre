@@ -9,7 +9,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * A superior Lazy class to mojang's
+ * A superior Lazy class to Mojang's
+ * @see net.minecraft.util.Lazy
  */
 public final class Lazy<T> {
 	private Supplier<T> supplier;
@@ -19,6 +20,7 @@ public final class Lazy<T> {
 		this.supplier = null;
 		this.instance = Objects.requireNonNull(instance, "Lazy cannot be initialized with null value!");
 	}
+
 
 	public Lazy(Supplier<@NotNull T> supplier) {
 		this.supplier = supplier;

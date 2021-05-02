@@ -40,12 +40,20 @@ public class ATextFieldWidget extends AAbstractButtonAdapter<TextFieldWidget> {
 	protected ATextFieldWidget(DrawableRegistry.Entry id, NBTagView input) {
 		super(id, input);
 		this.text = input.getString("text");
-		Polygon enclosing = this.getBounds().getEnclosing();
-		this.drawable = new net.minecraft.client.gui.widget.TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, (int)enclosing.getX(2), (int)enclosing.getY(2), null);
-		this.drawable.active = this.enabled;
-		this.drawable.setEditable(this.isEnabled());
-		this.drawable.setChangedListener(this::sendTextToServer);
-		this.drawable.setTextPredicate(this::sanitize);
+	}
+
+	@Override
+	protected void onAdded(RootContainer container) {
+		super.onAdded(container);
+		if(container.isClient()) {
+			Polygon enclosing = this.getBounds().getEnclosing();
+			this.drawable = new net.minecraft.client.gui.widget.TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, (int)enclosing.getX(2), (int)enclosing.getY(2), null);
+			this.drawable.setText(this.text);
+			this.drawable.active = this.enabled;
+			this.drawable.setEditable(this.isEnabled());
+			this.drawable.setChangedListener(this::sendTextToServer);
+			this.drawable.setTextPredicate(this::sanitize);
+		}
 	}
 
 	@Override
@@ -114,7 +122,9 @@ public class ATextFieldWidget extends AAbstractButtonAdapter<TextFieldWidget> {
 
 	@Override
 	public boolean mouseClicked(RootContainer container, double mouseX, double mouseY, int button) {
-		container.setFocus(this);
+		if(this.enabled) {
+			container.setFocus(this);
+		}
 		return super.mouseClicked(container, mouseX, mouseY, button);
 	}
 

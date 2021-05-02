@@ -57,7 +57,9 @@ public class Recipes {
 			Map<Identifier, net.minecraft.recipe.Recipe<?>> rec = recipes.get(recipeType);
 			List<T> list = new ArrayList<>(rec.size());
 			for (net.minecraft.recipe.Recipe<?> value : rec.values()) {
-				list.add(((RecipeWrapper<T>)value).instance);
+				T instance = ((RecipeWrapper<T>)value).instance;
+				list.add(instance);
+				instance.onInit();
 			}
 			values.set(list);
 		});

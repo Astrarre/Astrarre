@@ -10,4 +10,7 @@ import me.shedaniel.rei.api.RecipeDisplay;
  */
 public class RecipeDisplays {
 	public static final FunctionAccess<Recipe, RecipeDisplay> REI_COMPATIBILITY = new FunctionAccess<>(Id.create("astrarre-recipe-v0", "rei_compat"));
+	static {
+		REI_COMPATIBILITY.addProviderFunction();
+	}
 }

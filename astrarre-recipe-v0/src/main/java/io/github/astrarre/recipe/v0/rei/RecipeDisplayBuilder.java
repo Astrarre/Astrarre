@@ -5,8 +5,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 
+import com.google.common.collect.ForwardingCollection;
+import com.google.common.collect.ForwardingList;
 import com.google.common.collect.ImmutableList;
+import com.mojang.datafixers.types.Func;
 import io.github.astrarre.recipe.v0.api.Recipe;
 import io.github.astrarre.util.v0.fabric.Tags;
 import me.shedaniel.rei.api.EntryStack;
@@ -47,9 +51,26 @@ public class RecipeDisplayBuilder<T extends Recipe> {
 		return this;
 	}
 
+	public static <T> List<EntryStack> of(Tag<T> tag, Function<T, EntryStack> stackFunction) {
+		return new ForwardingList<EntryStack>() {
+			protected List<EntryStack> delegate;
+			@Override
+			protected List<EntryStack> delegate() {
+				if(this.delegate == null) {
+					List<EntryStack> stacks = new ArrayList<>();
+					for (T item : Tags.get(tag)) {
+						stacks.add(stackFunction.apply(item));
+					}
+					this.delegate = stacks;
+				}
+				return this.delegate;
+			}
+		};
+	}
+
 	@Contract("_ -> this")
 	public RecipeDisplayBuilder<T> addInput(Tag<Item> input) {
-		this.inputs.add(EntryStack.ofItems((Collection) Tags.get(input)));
+		this.inputs.add(of(input, EntryStack::create));
 		return this;
 	}
 
@@ -88,13 +109,7 @@ public class RecipeDisplayBuilder<T extends Recipe> {
 	 */
 	@Contract("_,_ -> this")
 	public RecipeDisplayBuilder<T> addInput(Tag<Fluid> input, int droplets) {
-		List<EntryStack> stacks = new ArrayList<>();
-		for (Fluid fluid : Tags.get(input)) {
-			EntryStack stack = EntryStack.create(fluid, droplets);
-			stack.setting(EntryStack.Settings.Fluid.AMOUNT_TOOLTIP, stack1 ->  I18n.translate("tooltip.rei.fluid_amount", stack1.getAmount()));
-			stacks.add(stack);
-		}
-		this.inputs.add(stacks);
+		this.inputs.add(of(input, fluid -> EntryStack.create(fluid, droplets)));
 		return this;
 	}
 
@@ -121,7 +136,7 @@ public class RecipeDisplayBuilder<T extends Recipe> {
 
 	@Contract("_ -> this")
 	public RecipeDisplayBuilder<T> addOutput(Tag<Item> output) {
-		this.outputs.add(EntryStack.ofItems((Collection) Tags.get(output)));
+		this.outputs.add(of(output, EntryStack::create));
 		return this;
 	}
 
@@ -160,13 +175,7 @@ public class RecipeDisplayBuilder<T extends Recipe> {
 	 */
 	@Contract("_,_ -> this")
 	public RecipeDisplayBuilder<T> addOutput(Tag<Fluid> output, int droplets) {
-		List<EntryStack> stacks = new ArrayList<>();
-		for (Fluid fluid : Tags.get(output)) {
-			EntryStack stack = EntryStack.create(fluid, droplets);
-			stack.setting(EntryStack.Settings.Fluid.AMOUNT_TOOLTIP, stack1 ->  I18n.translate("tooltip.rei.fluid_amount", stack1.getAmount()));
-			stacks.add(stack);
-		}
-		this.outputs.add(stacks);
+		this.outputs.add(of(output, fluid -> EntryStack.create(fluid, droplets)));
 		return this;
 	}
 
@@ -196,7 +205,7 @@ public class RecipeDisplayBuilder<T extends Recipe> {
 	 */
 	@Contract("_ -> this")
 	public RecipeDisplayBuilder<T> addCatalyst(Tag<Item> catalyst) {
-		this.catalysts.add(EntryStack.ofItems((Collection) Tags.get(catalyst)));
+		this.catalysts.add(of(catalyst, EntryStack::create));
 		return this;
 	}
 
@@ -247,13 +256,7 @@ public class RecipeDisplayBuilder<T extends Recipe> {
 	 */
 	@Contract("_,_ -> this")
 	public RecipeDisplayBuilder<T> addCatalyst(Tag<Fluid> catalyst, int droplets) {
-		List<EntryStack> stacks = new ArrayList<>();
-		for (Fluid fluid : Tags.get(catalyst)) {
-			EntryStack stack = EntryStack.create(fluid, droplets);
-			stack.setting(EntryStack.Settings.Fluid.AMOUNT_TOOLTIP, stack1 ->  I18n.translate("tooltip.rei.fluid_amount", stack1.getAmount()));
-			stacks.add(stack);
-		}
-		this.catalysts.add(stacks);
+		this.catalysts.add(of(catalyst, fluid -> EntryStack.create(fluid, droplets)));
 		return this;
 	}
 

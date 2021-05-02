@@ -13,8 +13,8 @@
     "main": [
       "io.github.astrarre.testmod.TestMod"
     ],
-    "preLaunch": [
-      "io.github.astrarre.testmod.TestModPreLaunchTesting"
+    "rei_plugins": [
+      "io.github.astrarre.testmod.TestModREIPlugin"
     ]
   },
   "authors": [
