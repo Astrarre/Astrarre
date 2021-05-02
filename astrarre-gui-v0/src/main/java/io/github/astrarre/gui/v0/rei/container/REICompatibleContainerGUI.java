@@ -13,14 +13,20 @@ import me.shedaniel.rei.api.RecipeDisplay;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * This ContainerGUI allows you to use the same code for both REI and regular machines
+ * This ContainerGUI allows you to use the same code for both REI and regular GUIs in the same bit of code
  */
 public abstract class REICompatibleContainerGUI<T extends RecipeDisplay> extends ContainerGUI {
 
+	/**
+	 * regular gui constructor
+	 */
 	public REICompatibleContainerGUI(RootContainer container, NetworkMember member, int width, int height) {
 		super(container, member, width, height);
 	}
 
+	/**
+	 * REI constructor
+	 */
 	public REICompatibleContainerGUI(RootContainer container, int width, int height) {
 		super(container, null, width, height);
 	}
@@ -38,5 +44,4 @@ public abstract class REICompatibleContainerGUI<T extends RecipeDisplay> extends
 	 * @param context if {@link Either#hasLeft()} then the container is a REI recipe displaying GUI, else it's a normal gui that was opened
 	 */
 	protected abstract void addGui(AAggregateDrawable panel, int width, int height, Either<T, List<ASlot>> context);
-
 }
