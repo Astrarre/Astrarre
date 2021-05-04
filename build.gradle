@@ -15,7 +15,6 @@ loom {
     //runDir = "run"
 }
 
-project.configurations.detachedConfiguration()
 apply from: 'scripts/allprojects.gradle'
 
 static def fapi(Project proj, String... modules) {

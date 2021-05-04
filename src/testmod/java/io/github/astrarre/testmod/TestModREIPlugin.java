@@ -40,7 +40,7 @@ public class TestModREIPlugin implements REIPluginV0 {
 	@Override
 	public void registerRecipeDisplays(RecipeHelper recipeHelper) {
 		for (TestRecipe recipe : TestMod.RECIPE_LIST) {
-			RecipeHelper.getInstance().registerDisplay(new RecipeDisplayBuilder<>().addInput(recipe.item).build(recipe, new Identifier("test:category")));
+			recipeHelper.registerDisplay(new RecipeDisplayBuilder<>().addInput(recipe.item).build(recipe, new Identifier("test:category")));
 		}
 	}
 }
