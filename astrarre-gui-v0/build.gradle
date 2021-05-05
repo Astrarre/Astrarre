@@ -1,4 +1,4 @@
-version '1.2.0'
+version '1.2.1'
 dependsOn(project, 'astrarre-rendering-v0', 'astrarre-networking-v0')
 fapi(project, 'fabric-resource-loader-v0', 'fabric-screen-handler-api-v1', 'fabric-networking-api-v1', 'fabric-api-base')
 

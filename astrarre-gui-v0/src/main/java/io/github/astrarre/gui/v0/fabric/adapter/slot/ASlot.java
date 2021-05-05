@@ -78,6 +78,22 @@ public abstract class ASlot extends ADrawable implements Interactable {
 	@Environment (EnvType.CLIENT)
 	protected abstract Inventory readInventoryData(NBTagView input);
 
+	/**
+	 * @see #link(RootContainer, ASlot) but max priority (inserted at begining of list)
+	 */
+	public void linkAllFirst(RootContainer container, Iterable<ASlot> slots) {
+		for (ASlot slot : slots) {
+			this.linkFirst(container, slot);
+		}
+	}
+
+	/**
+	 * @see #link(RootContainer, ASlot) but max priority (inserted at begining of list)
+	 */
+	public void linkFirst(RootContainer container, ASlot slot) {
+		this.targetSlotIds.computeIfAbsent(container, a -> new ArrayList<>()).add(0, slot);
+	}
+
 	public void linkAll(RootContainer container, Iterable<ASlot> slots) {
 		for (ASlot slot : slots) {
 			this.link(container, slot);
