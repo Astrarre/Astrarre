@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import io.github.astrarre.gui.v0.api.base.AWindowDrawable;
 import io.github.astrarre.gui.v0.api.base.borders.ABeveledBorder;
 import io.github.astrarre.gui.v0.api.base.borders.ASimpleBorder;
 import io.github.astrarre.gui.v0.api.base.panel.ACenteringPanel;
@@ -18,8 +19,8 @@ import io.github.astrarre.gui.v0.api.base.widgets.AInfo;
 import io.github.astrarre.gui.v0.api.base.widgets.ALabel;
 import io.github.astrarre.gui.v0.api.base.widgets.APasswordTextField;
 import io.github.astrarre.gui.v0.api.base.widgets.AProgressBar;
+import io.github.astrarre.gui.v0.api.base.widgets.AScrollBar;
 import io.github.astrarre.gui.v0.api.base.widgets.ATextFieldWidget;
-import io.github.astrarre.gui.v0.api.base.widgets.ScrollBar;
 import io.github.astrarre.gui.v0.fabric.adapter.slot.ABlockEntityInventorySlot;
 import io.github.astrarre.gui.v0.fabric.adapter.slot.APlayerSlot;
 import io.github.astrarre.gui.v0.fabric.adapter.slot.AWorldInventorySlot;
@@ -77,11 +78,12 @@ public class DrawableRegistry {
 		ATextFieldWidget.init();
 		APlayerSlot.init();
 		AWorldInventorySlot.init();
-		ScrollBar.init();
 		AProgressBar.init();
 		ALabel.init();
 		AGridPanel.init();
 		ABlockEntityInventorySlot.init();
+		AWindowDrawable.init();
+		AScrollBar.init();
 	}
 
 	@Nullable

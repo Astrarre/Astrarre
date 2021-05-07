@@ -19,7 +19,7 @@ import net.minecraft.client.util.math.Vector4f;
  * Everything outside the window is culled and not drawn onto the screen
  */
 public class AWindowDrawable extends AAggregateDrawable {
-	private static final ThreadLocal<Vector4f> VECTOR_POOL = new ThreadLocal<>();
+	private static final ThreadLocal<Vector4f> VECTOR_POOL = ThreadLocal.withInitial(Vector4f::new);
 	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.registerForward(Id.create("astrarre-gui-v0", "window"), AWindowDrawable::new);
 	protected final int width, height;
 	protected final boolean optimizeWithBounds;
@@ -53,6 +53,9 @@ public class AWindowDrawable extends AAggregateDrawable {
 		}
 	}
 
+	public static void init() {
+	}
+
 	@Override
 	protected boolean onSync(ADrawable drawable) {
 		if(this.isClient() && this.optimizeWithBounds) {
@@ -70,9 +73,6 @@ public class AWindowDrawable extends AAggregateDrawable {
 	private void compute(ADrawable drawable, boolean remove) {
 		Polygon enclosing = drawable.getBounds().getEnclosing();
 		Vector4f v4f = VECTOR_POOL.get();
-		if(v4f == null) {
-			VECTOR_POOL.set(v4f = new Vector4f(0, 0, 0, 0)); // todo use withInitial
-		}
 		v4f.set(this.width, this.height, 1, 1);
 		v4f.transform(drawable.getInvertedMatrix());
 		float minX = enclosing.getX(0), minY = enclosing.getY(0);

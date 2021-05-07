@@ -105,6 +105,11 @@ public abstract class AAggregateDrawable extends ADrawable implements Interactab
 	}
 
 	protected boolean onSync(ADrawable drawable) {
+		if(this.isClient()) {
+			this.onDrawablesChange();
+			drawable.addBoundsChangeListener((drawable1, old, current) -> this.onDrawablesChange());
+			drawable.addTransformationChangeListener((drawable1, old, current) -> this.onDrawablesChange());
+		}
 		return true;
 	}
 
@@ -251,9 +256,8 @@ public abstract class AAggregateDrawable extends ADrawable implements Interactab
 		for (Interactable interactable : this.interactables()) {
 			transformation(interactable, v3f, mouseX, mouseY);
 			float mX = v3f.getX(), mY = v3f.getY();
-			transformation(interactable, v3f, deltaX, deltaY);
-			if (((ADrawable) interactable).getBounds().isInside(mX, mY) && interactable
-					                                                              .mouseDragged(container, mX, mY, button, v3f.getX(), v3f.getY())) {
+			transformation(interactable, v3f, mouseX + deltaX, mouseY + deltaY);
+			if (((ADrawable) interactable).getBounds().isInside(mX, mY) && interactable.mouseDragged(container, mX, mY, button, v3f.getX() - mX, v3f.getY() - mY)) {
 				return true;
 			}
 		}
