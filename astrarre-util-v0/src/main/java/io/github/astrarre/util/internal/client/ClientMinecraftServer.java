@@ -6,7 +6,6 @@ import io.github.astrarre.util.v0.api.common.MinecraftServer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.Player;
-import net.minecraft.level.Level;
 
 public class ClientMinecraftServer implements MinecraftServer {
 	protected final Minecraft minecraft;

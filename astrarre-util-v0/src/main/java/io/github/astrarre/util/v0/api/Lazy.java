@@ -2,21 +2,15 @@ package io.github.astrarre.util.v0.api;
 
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import io.github.astrarre.util.internal.mixin.LazyAccess;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * A superior Lazy class to Mojang's, works with null values
- * @see net.minecraft.util.Lazy
  */
 public final class Lazy<T> implements Supplier<T> {
 	public static final Lazy<?> EMPTY = new Lazy<>((Object) null);
@@ -138,18 +132,6 @@ public final class Lazy<T> implements Supplier<T> {
 
 	public Optional<T> raw() {
 		return Optional.ofNullable(this.instance);
-	}
-
-	@Contract("-> new")
-	public net.minecraft.util.Lazy<T> toMC() {
-		if(this.supplier == null) {
-			net.minecraft.util.Lazy<T> lazy = new net.minecraft.util.Lazy<>(null);
-			((LazyAccess)lazy).setValue(this.instance);
-			return lazy;
-		} else {
-			// has to be `this`/`this::get`, because we don't want to evaluate the supplier twice on accident
-			return new net.minecraft.util.Lazy<>(this);
-		}
 	}
 
 	public enum State {

@@ -5,6 +5,7 @@
   "mixins": [
     "IdentifierMixin",
     "LazyAccess",
+    "MinecraftMixin_ClientMCServer",
     "MinecraftServerMixin",
     "MinecraftServerMixin_ServerMCServer",
     "SetTagAccess",

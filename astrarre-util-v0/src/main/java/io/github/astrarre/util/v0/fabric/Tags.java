@@ -1,20 +1,7 @@
 package io.github.astrarre.util.v0.fabric;
 
-import java.util.AbstractSet;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Set;
-
-import io.github.astrarre.util.internal.FapiMixinPlugin;
-import io.github.astrarre.util.internal.fapimixin.TagDelegateAccess;
-import io.github.astrarre.util.internal.mixin.SetTagAccess;
-import io.github.astrarre.util.internal.mixin.TagWrapperAccess;
-
-import net.minecraft.item.Item;
-import net.minecraft.tag.Tag;
-
-public class Tags {
-	public static <T> Set<T> get(Tag<T> tag) {
+public class Tags { // todo port Tags
+	/*public static <T> Set<T> get(Tag<T> tag) {
 		Tag<T> root = findRoot(tag);
 		if (root instanceof SetTagAccess) {
 			return ((SetTagAccess) root).getValueSet();
@@ -43,5 +30,5 @@ public class Tags {
 				return root;
 			}
 		}
-	}
+	}*/
 }

@@ -57,6 +57,10 @@ allprojects {
             transitive false
         }
 
+        implementation group: 'org.jetbrains', name: 'annotations', version: '20.1.0'
+        implementation group: 'it.unimi.dsi', name: 'fastutil', version: '8.5.4'
+
+
         testImplementation('junit:junit:4.13.1') {
             exclude module: 'fabric-loader'
         }
