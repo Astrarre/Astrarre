@@ -12,6 +12,7 @@ import io.github.astrarre.gui.v0.api.access.Container;
 import io.github.astrarre.gui.v0.api.access.Interactable;
 import io.github.astrarre.itemview.v0.api.nbt.NBTType;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
+import io.github.astrarre.rendering.v0.api.util.Polygon;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntLists;
@@ -54,10 +55,10 @@ public abstract class AAggregateDrawable extends ADrawable implements Interactab
 	public void add(ADrawable drawable) {
 		if(drawable == null) return;
 		if (!this.isClient()) {
-			for (RootContainer root : this.roots) {
-				root.addRoot(drawable);
-			}
 			if (this.onAdd(drawable)) {
+				for (RootContainer root : this.roots) {
+					root.addRoot(drawable);
+				}
 				this.sendToClients(ADD_DRAWABLE, NBTagView.builder().putInt("syncId", drawable.getSyncId()));
 			}
 		}
@@ -74,7 +75,22 @@ public abstract class AAggregateDrawable extends ADrawable implements Interactab
 		}
 	}
 
-	protected void onDrawablesChange() {}
+	protected void onDrawablesChange() {
+		float minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, maxX = 0, maxY = 0;
+		for (ADrawable drawable : this.drawables) {
+			Polygon p = drawable.getBounds().toBuilder().transform(drawable.getTransformation()).build().getEnclosing();
+			float minXa = p.getX(0), minYa = p.getY(0), maxXa = p.getX(2), maxYa = p.getY(2);
+			minX = Math.min(minXa, minX);
+			minY = Math.min(minYa, minY);
+			maxX = Math.max(maxXa, maxX);
+			maxY = Math.max(maxYa, maxY);
+		}
+		if(minX == Integer.MAX_VALUE || minY == Integer.MAX_VALUE) {
+			this.setBounds(Polygon.EMPTY);
+		} else {
+			this.setBounds(Polygon.rectangle(minX, minY, maxX, maxY));
+		}
+	}
 
 	protected boolean onRemove(ADrawable drawable) {
 		this.drawables.remove(drawable);
@@ -102,11 +118,11 @@ public abstract class AAggregateDrawable extends ADrawable implements Interactab
 	public void addClient(ADrawable drawable) {
 		if(drawable == null) return;
 		if (this.isClient()) {
-			for (RootContainer root : this.roots) {
-				root.addRoot(drawable);
-			}
 			if (this.onAdd(drawable)) {
 				this.onDrawablesChange();
+				for (RootContainer root : this.roots) {
+					root.addRoot(drawable);
+				}
 			}
 		}
 	}
