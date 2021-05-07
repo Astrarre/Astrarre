@@ -9,7 +9,8 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.longs.LongList;
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.nbt.Tag;
+import net.minecraft.util.io.AbstractTag;
+
 
 @SuppressWarnings ({
 		"unchecked",
@@ -32,8 +33,8 @@ public final class NBTType<T> implements Serializer<T> {
 	public static final NBTType<String> STRING = new NBTType<>(String.class, 8);
 	// list
 	public static final NBTType<NBTagView> TAG = new NBTType<>(NBTagView.class, 10);
-	public static final NBTType<IntList> INT_ARRAY = new NBTType<>(IntList.class, 11);
-	public static final NBTType<LongList> LONG_ARRAY = new NBTType<>(LongList.class, 12);
+	public static final NBTType<IntList> INT_ARRAY = new NBTType<>(IntList.class, 11, 7);
+	public static final NBTType<LongList> LONG_ARRAY = new NBTType<>(LongList.class, 12, 7);
 	// gap
 	public static final NBTType<Number> NUMBER = new NBTType<>(Number.class, 99);
 
@@ -114,7 +115,7 @@ public final class NBTType<T> implements Serializer<T> {
 
 	@Override
 	public T read(NbtValue value) {
-		return FabricViews.view((Tag) value, this);
+		return FabricViews.view((AbstractTag) value, this);
 	}
 
 	@Override

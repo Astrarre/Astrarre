@@ -1,11 +1,12 @@
 package io.github.astrarre.itemview.v0.fabric;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import com.google.gson.internal.Primitives;
 import io.github.astrarre.itemview.internal.access.AbstractListTagAccess;
 import io.github.astrarre.itemview.internal.access.ImmutableAccess;
-import io.github.astrarre.itemview.v0.api.Serializer;
+import io.github.astrarre.itemview.internal.mixin.nbt.CompoundTagAccess;
 import io.github.astrarre.itemview.v0.api.nbt.NBTType;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import it.unimi.dsi.fastutil.bytes.ByteList;
@@ -14,30 +15,70 @@ import it.unimi.dsi.fastutil.longs.LongList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.nbt.AbstractNumberTag;
-import net.minecraft.nbt.ByteArrayTag;
-import net.minecraft.nbt.ByteTag;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.DoubleTag;
-import net.minecraft.nbt.FloatTag;
-import net.minecraft.nbt.IntArrayTag;
-import net.minecraft.nbt.IntTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.LongArrayTag;
-import net.minecraft.nbt.LongTag;
-import net.minecraft.nbt.ShortTag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.util.io.AbstractTag;
+import net.minecraft.util.io.ByteArrayTag;
+import net.minecraft.util.io.ByteTag;
+import net.minecraft.util.io.CompoundTag;
+import net.minecraft.util.io.DoubleTag;
+import net.minecraft.util.io.FloatTag;
+import net.minecraft.util.io.IntTag;
+import net.minecraft.util.io.ListTag;
+import net.minecraft.util.io.LongTag;
+import net.minecraft.util.io.ShortTag;
+import net.minecraft.util.io.StringTag;
 
 @SuppressWarnings ("ConstantConditions")
 public class FabricViews {
+	public static boolean isEmpty(CompoundTag tag) {
+		return tag == null || tag.values().isEmpty();
+	}
+
+	public static AbstractTag clone(AbstractTag tag) {
+		AbstractTag val = null;
+		if(tag instanceof CompoundTag) {
+			Map<String, AbstractTag> data = ((CompoundTagAccess)tag).getData();
+			CompoundTag clone = new CompoundTag();
+			for (Map.Entry<String, AbstractTag> entry : data.entrySet()) {
+				String key = entry.getKey();
+				AbstractTag t = entry.getValue();
+				clone.put(key, clone(t));
+			}
+			val = clone;
+		} else if(tag instanceof ByteTag) {
+			val = new ByteTag(((ByteTag) tag).data);
+		} else if(tag instanceof ByteArrayTag) {
+			val = new ByteArrayTag(((ByteArrayTag) tag).data.clone());
+		} else if(tag instanceof DoubleTag) {
+			val = new DoubleTag(((DoubleTag) tag).data);
+		} else if(tag instanceof FloatTag) {
+			val = new FloatTag(((FloatTag) tag).data);
+		} else if(tag instanceof IntTag) {
+			val = new IntTag(((IntTag) tag).data);
+		} else if(tag instanceof ListTag) {
+			ListTag copy = new ListTag();
+			ListTag casted = (ListTag) tag;
+			for (int i = 0; i < ((ListTag) tag).size(); i++) {
+				copy.add(clone(casted.get(i)));
+			}
+			val = copy;
+		} else if(tag instanceof LongTag) {
+			val = new LongTag(((LongTag) tag).data);
+		} else if(tag instanceof ShortTag) {
+			val = new ShortTag(((ShortTag) tag).data);
+		} else if(tag instanceof StringTag) {
+			val = new StringTag(((StringTag) tag).data);
+		}
+
+		val.setType(tag.getType());
+		return val;
+	}
+
 	/**
 	 * @return an immutable compound tag view
 	 */
 	@NotNull
 	public static NBTagView immutableView(@Nullable CompoundTag tag) {
-		if (tag == null || tag.isEmpty()) {
+		if (tag == null || tag.values().isEmpty()) {
 			return NBTagView.EMPTY;
 		}
 
@@ -45,7 +86,7 @@ public class FabricViews {
 			return (NBTagView) tag;
 		}
 
-		NBTagView view = (NBTagView) tag.copy();
+		NBTagView view = (NBTagView) clone(tag);
 		((ImmutableAccess)view).astrarre_setImmutable();
 		return view;
 	}
@@ -55,16 +96,22 @@ public class FabricViews {
 	 */
 	@NotNull
 	public static NBTagView view(@Nullable CompoundTag tag) {
-		return (tag == null || tag.isEmpty()) ? NBTagView.EMPTY : (NBTagView) tag;
+		return isEmpty(tag) ? NBTagView.EMPTY : (NBTagView) tag;
 	}
 
-	public static <T> T immutableView(Tag tag, NBTType<T> type) {
-		return view(tag.copy(), type);
+	public static <T> T immutableView(AbstractTag tag, NBTType<T> type) {
+		return view(clone(tag), type);
 	}
 
 	@SuppressWarnings ("unchecked")
-	public static <T> T view(Tag tag, @Nullable NBTType<T> type) {
+	public static <T> T view(AbstractTag tag, @Nullable NBTType<T> type) {
 		Object ret = null;
+		if(tag instanceof ByteTag) {
+			if(type == NBTType.BOOL) {
+				return (T) Boolean.valueOf(((ByteTag) tag).data == 1);
+			}
+			return ((ByteTag) tag).data;
+		} else if(tag instanceof )
 		if (tag instanceof AbstractNumberTag) {
 			Number number = ((AbstractNumberTag) tag).getNumber();
 			if (type == NBTType.BOOL) {
@@ -80,7 +127,7 @@ public class FabricViews {
 			// compound tag implements NBTagView, shhh
 			ret = tag;
 		} else if (tag instanceof StringTag) {
-			ret = tag.asString();
+			ret = ((StringTag)tag).data;
 		} else if(tag == null) {
 			return null;
 		}
@@ -98,7 +145,7 @@ public class FabricViews {
 	}
 
 
-	public static Tag from(Object object) {
+	public static AbstractTag from(Object object) {
 		if(object instanceof Boolean) {
 			return ByteTag.of((Boolean)object);
 		} else if(object instanceof Byte) {

@@ -13,7 +13,7 @@ import net.minecraft.server.MinecraftServer;
 
 @Mixin(Minecraft.class)
 public class MinecraftMixin_ClientMCServer {
-	@Inject(method = "run", at = @At(value = "INVOKE", target = "Ljava/lang/System;currentTimeMillis()J", ordinal = 0))
+	@Inject(method = "run", at = @At(value = "INVOKE", target = "Ljava/lang/System;currentTimeMillis()J", ordinal = 0, remap = false), remap = false)
 	public void onStart(CallbackInfo ci) {
 		MinecraftServers.activeServer = new ClientMinecraftServer((Minecraft) (Object) this);
 	}
