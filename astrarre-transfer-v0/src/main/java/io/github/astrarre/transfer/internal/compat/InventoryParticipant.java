@@ -32,7 +32,7 @@ public class InventoryParticipant implements ArrayParticipant<ItemKey>, Provider
 		return new AbstractList<Slot<ItemKey>>() {
 			@Override
 			public Slot<ItemKey> get(int index) {
-				return new SlotImpl(InventoryParticipant.this, index);
+				return InventoryParticipant.this.createSlot(index);
 			}
 
 			@Override
@@ -50,7 +50,11 @@ public class InventoryParticipant implements ArrayParticipant<ItemKey>, Provider
 		return null;
 	}
 
-	public static final class SlotImpl implements Slot<ItemKey> {
+	protected Slot<ItemKey> createSlot(int index) {
+		return new SlotImpl(this, index);
+	}
+
+	public static class SlotImpl implements Slot<ItemKey> {
 		public final InventoryParticipant participant;
 		public final int index;
 
