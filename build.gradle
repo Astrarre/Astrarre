@@ -1,37 +1,70 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            name = 'Fabric'
+            url = 'https://maven.fabricmc.net/'
+        }
+        maven {
+            name = 'Jitpack'
+            url 'https://jitpack.io/'
+        }
+        maven {
+            name = 'HalfOf2'
+            url = 'https://storage.googleapis.com/devan-maven/'
+        }
+    }
+    dependencies {
+        classpath 'com.github.Chocohead:Fabric-Loom:d823377'
+    }
+}
+
 plugins {
     id 'java'
     id 'idea'
     id 'eclipse'
     id 'java-library'
     id 'maven-publish'
-    id "fabric-loom" version "0.7.26"
 }
 
-version '1.0.0'
-group = 'io.github.astrarre'
+apply plugin: 'fabric-loom'
 
-loom {
-    shareCaches = true
-    //runDir = "run"
-}
+version '1.1.1'
+group 'io.github.astrarre'
+
+minecraft {}
 
 apply from: 'scripts/allprojects.gradle'
 
+int major = 0, minor = 0, patch = 0
+int total = subprojects.size(), current = 0
+subprojects {project ->
+    afterEvaluate {
+        current++
+        if(current == total) {
+            String[] vers = version.split("\\.")
+            major = Math.max(Integer.parseInt(vers[0]), major)
+            minor += Integer.parseInt(vers[1])
+            patch += Integer.parseInt(vers[2])
+        }
+        println version
+    }
+}
 static def fapi(Project proj, String... modules) {
     proj.extensions.add("fapi_deps", modules)
     proj.configure(proj) {
         dependencies {
-            if(modules.length == 0) {
-                modImplementation("net.fabricmc.fabric-api:fabric-api:${fabric_version}") {
-                    exclude module: 'fabric-loader'
+            //if(modules.length == 0) {
+                modImplementation("com.github.minecraft-cursed-legacy:Cursed-Legacy-API:${project.api_version}") {
+                    exclude module: 'cursed-fabric-loader'
                 }
-            } else {
+            /*} else {
                 modules.each {
                     include(modImplementation(fabricApi.module(it, fabric_version)) {
-                        exclude module: 'fabric-loader'
+                        exclude module: 'cursed-fabric-loader'
                     })
                 }
-            }
+            }*/
         }
 
         modules.each {
@@ -43,8 +76,8 @@ static def fapi(Project proj, String... modules) {
                             def depsNode = getOrCreateNode(asNode(), "dependencies")
                             proj.each {
                                 def depNode = depsNode.appendNode("dependency")
-                                depNode.appendNode("groupId", "net.fabricmc.fabric-api")
-                                depNode.appendNode("artifactId", str)
+                                depNode.appendNode("groupId", "com.github.minecraft-cursed-legacy")
+                                depNode.appendNode("artifactId", "Cursed-Legacy-API")
                                 depNode.appendNode("version", fabricApi.moduleVersion(str, fabric_version))
                                 depNode.appendNode("scope", "compile")
                             }
@@ -65,6 +98,8 @@ dependencies {
 }
 
 fapi(project)
+import net.fabricmc.loom.task.fernflower.FernFlowerTask
+println genSources.class
 
 static def nanoevents(Project proj) {
     proj.configure(proj) {

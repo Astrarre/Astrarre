@@ -4,6 +4,7 @@
   "plugin": "io.github.astrarre.util.internal.FapiMixinPlugin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "IdMixin_Id",
     "TagDelegateAccess"
   ],
   "injectors": {

@@ -6,6 +6,7 @@
     "IdentifierMixin",
     "LazyAccess",
     "MinecraftServerMixin",
+    "MinecraftServerMixin_ServerMCServer",
     "SetTagAccess",
     "TagWrapperAccess"
   ],

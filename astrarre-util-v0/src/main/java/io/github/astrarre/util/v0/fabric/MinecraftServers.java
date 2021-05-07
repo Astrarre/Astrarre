@@ -1,8 +1,7 @@
 package io.github.astrarre.util.v0.fabric;
 
+import io.github.astrarre.util.v0.api.common.MinecraftServer;
 import org.jetbrains.annotations.Nullable;
-
-import net.minecraft.server.MinecraftServer;
 
 public class MinecraftServers {
 	/**

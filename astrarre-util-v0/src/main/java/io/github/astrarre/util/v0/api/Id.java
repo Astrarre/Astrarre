@@ -1,7 +1,8 @@
 package io.github.astrarre.util.v0.api;
 
 
-import net.minecraft.util.Identifier;
+import io.github.astrarre.util.internal.FapiMixinPlugin;
+import io.github.astrarre.util.internal.IdentifierImpl;
 
 /**
  * A small abstraction over Identifier with a shorter name
@@ -9,12 +10,11 @@ import net.minecraft.util.Identifier;
  * overrides equals and hashcode
  */
 public interface Id {
-	static Id of(Identifier identifier) {
-		return (Id) identifier;
-	}
-
 	static Id create(String id, String path) {
-		return (Id) new Identifier(id, path);
+		if(FapiMixinPlugin.FAPI) {
+			return (Id) (Object) new io.github.minecraftcursedlegacy.api.registry.Id(id, path);
+		}
+		return new IdentifierImpl(id, path);
 	}
 
 	/**
@@ -30,8 +30,4 @@ public interface Id {
 
 	String mod();
 	String path();
-
-	default Identifier to() {
-		return (Identifier) this;
-	}
 }

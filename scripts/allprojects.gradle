@@ -1,4 +1,3 @@
-
 allprojects {
     group = 'io.github.astrarre'
     if (project != rootProject) {
@@ -10,7 +9,14 @@ allprojects {
         plugins.apply "fabric-loom"
     }
 
-    minecraft {}
+    minecraft {
+        addLibraryFilter {library ->
+            return !(library.startsWith('net.minecraft:launchwrapper:') ||
+                    library.startsWith('net.sf.jopt-simple:jopt-simple:') ||
+                    library.startsWith('org.ow2.asm:asm-all:'))
+        }
+    }
+
     repositories {
         mavenLocal()
         mavenCentral()
@@ -20,6 +26,10 @@ allprojects {
         maven { url 'https://jitpack.io' }
         maven { url 'https://maven.legacyfabric.net/' }
         maven { url "https://maven.shedaniel.me/" }
+        maven {
+            name = 'HalfOf2'
+            url = 'https://storage.googleapis.com/devan-maven/'
+        }
     }
 
     sourceSets {
@@ -39,9 +49,14 @@ allprojects {
     }
 
     dependencies {
-        minecraft "com.mojang:minecraft:${minecraft_version}"
-        mappings "net.fabricmc:yarn:${yarn_mappings}:v2"
-        modImplementation "net.fabricmc:fabric-loader:${loader_version}"
+        minecraft "com.mojang:minecraft:${project.minecraft_version}"
+
+        mappings "io.github.minecraft-cursed-legacy:plasma:b1.7.3-build.${project.plasma_build}"
+
+        modImplementation("io.github.minecraft-cursed-legacy:cursed-fabric-loader:${project.loader_version}") {
+            transitive false
+        }
+
         testImplementation('junit:junit:4.13.1') {
             exclude module: 'fabric-loader'
         }
@@ -49,10 +64,12 @@ allprojects {
             exclude module: 'fabric-loader'
         }
         testmodCompile sourceSets.main.output
-        testmodImplementation('com.github.astei:lazydfu:0.1.1') {
+        /*testmodImplementation('com.github.astei:lazydfu:0.1.1') {
             exclude module: 'fabric-loader'
             exclude module: 'fabric-api'
-        }
+        }*/
+
+        //modImplementation "com.github.minecraft-cursed-legacy:Cursed-Legacy-API:${project.api_version}"
     }
 
     processResources {
@@ -77,10 +94,10 @@ allprojects {
         task remapJar2(type: remapJar.class) {
             group = "astrarre"
             archiveClassifier = "lite"
-            addNestedDependencies = remapJar.addNestedDependencies
-            addDefaultNestedDependencies = false
-            remapAccessWidener = remapJar.remapAccessWidener
-            jarRemapper = remapJar.jarRemapper
+            addNestedDependencies = false
+            // todo
+            //remapAccessWidener = remapJar.remapAccessWidener
+            //jarRemapper = remapJar.jarRemapper
             input = remapJar.input
         }
         remapJar2.dependsOn(jar)
@@ -88,7 +105,7 @@ allprojects {
         publishing {
             publications {
                 mavenJava(MavenPublication) {
-                    artifactId = "$project.name-fabric"
+                    artifactId = "$project.name-cursed"
                     // regular old implementation jar
                     artifact(remapJar) {
                         builtBy remapJar
@@ -100,7 +117,7 @@ allprojects {
                     }
                 }
                 mavenJava2(MavenPublication) {
-                    artifactId = "$project.name-fabric-lite"
+                    artifactId = "$project.name-cursed-lite"
                     artifact(remapJar2) {
                         builtBy remapJar2
                     }

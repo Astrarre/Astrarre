@@ -1,6 +1,5 @@
-version '1.2.1'
+version '1.2.2'
 dependsOn(project, 'astrarre-rendering-v0', 'astrarre-networking-v0')
-fapi(project, 'fabric-resource-loader-v0', 'fabric-screen-handler-api-v1', 'fabric-networking-api-v1', 'fabric-api-base')
 
 dependencies {
     modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:5.11.188") {

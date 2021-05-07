@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 import net.fabricmc.loader.api.FabricLoader;
 
 public class FapiMixinPlugin implements IMixinConfigPlugin {
-	public static final boolean FAPI = FabricLoader.getInstance().isModLoaded("fabric-tag-extensions-v0");
+	public static final boolean FAPI = FabricLoader.getInstance().isModLoaded("legacy-registries");
 
 	@Override
 	public void onLoad(String mixinPackage) {

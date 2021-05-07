@@ -54,7 +54,7 @@ public class ScreenHandlerContainer extends RootContainerInternal implements Slo
 		if (this.isClient) {
 			return null;
 		}
-		return (NetworkMember) Iterables.tryFind(MinecraftServers.activeServer.getPlayerManager().getPlayerList(), p -> p.currentScreenHandler == this.handler).orNull();
+		return (NetworkMember) Iterables.tryFind(MinecraftServers.activeServer.getPlayers(), p -> p.currentScreenHandler == this.handler).orNull();
 	}
 
 	@Override

@@ -6,5 +6,4 @@ dependencies {
 }
 
 dependsOn(project, 'astrarre-util-v0', 'astrarre-itemview-v0')
-fapi(project, 'fabric-api-base', 'fabric-rendering-fluids-v1')
 
