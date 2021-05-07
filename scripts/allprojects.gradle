@@ -76,7 +76,6 @@ allprojects {
     afterEvaluate {
         task remapJar2(type: remapJar.class) {
             group = "astrarre"
-            archiveClassifier = "lite"
             addNestedDependencies = remapJar.addNestedDependencies
             addDefaultNestedDependencies = false
             remapAccessWidener = remapJar.remapAccessWidener

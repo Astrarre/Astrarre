@@ -12,6 +12,7 @@ import io.github.astrarre.util.v0.api.Id;
 import io.github.astrarre.util.v0.api.Val;
 import org.jetbrains.annotations.Nullable;
 
+import net.minecraft.client.Mouse;
 import net.minecraft.util.math.MathHelper;
 
 /**
