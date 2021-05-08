@@ -1,0 +1,14 @@
+# The name of the mod loader type to load - for regular FML @Mod mods it should be javafml
+modLoader="javafml"
+# A version range to match for said mod loader - for regular FML @Mod it will be the forge version
+# Forge for 1.16.3 is version 34
+loaderVersion="[34,)"
+# A URL to refer people to when problems occur with this mod
+issueTrackerURL="https://github.com/Astrarre/Astrarre"
+# If the mods defined in this file should show as seperate resource packs
+showAsResourcePack=false
+
+[[mods]]
+modId="astrarre-networking-v0"
+version="${version}"
+licence="LGPLv3"
