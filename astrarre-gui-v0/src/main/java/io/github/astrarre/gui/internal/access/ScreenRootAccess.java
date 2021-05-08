@@ -12,7 +12,7 @@ public interface ScreenRootAccess {
 		throw new UnsupportedOperationException();
 	}
 
-	void readRoot(PacketByteBuf buf);
+	void readRoot(NBTagView buf);
 
 	void astrarre_focusPanel();
 }

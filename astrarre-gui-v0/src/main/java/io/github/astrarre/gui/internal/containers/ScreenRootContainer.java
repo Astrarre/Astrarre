@@ -5,6 +5,7 @@ import io.github.astrarre.gui.internal.access.ResizeListenerAccess;
 import io.github.astrarre.gui.internal.access.ScreenRootAccess;
 import io.github.astrarre.gui.v0.api.ADrawable;
 import io.github.astrarre.gui.v0.api.access.Interactable;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
 
 import net.minecraft.client.gui.screen.Screen;
@@ -17,7 +18,7 @@ public class ScreenRootContainer<T extends Screen> extends RootContainerInternal
 		this.screen = screen;
 	}
 
-	public ScreenRootContainer(T screen, PacketByteBuf input) {
+	public ScreenRootContainer(T screen, NBTagView input) {
 		super(c -> ((ScreenRootContainer) c).screen = screen, input);
 	}
 

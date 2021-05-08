@@ -26,5 +26,6 @@
     "rei_plugins": [
       "io.github.astrarre.gui.internal.rei.AstrarreGUIREIPlugin"
     ]
-  }
+  },
+  "accessWidener": "astrarre-gui.accesswidener"
 }

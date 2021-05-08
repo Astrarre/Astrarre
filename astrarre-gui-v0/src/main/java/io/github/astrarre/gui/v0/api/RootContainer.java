@@ -20,7 +20,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
@@ -28,7 +28,6 @@ import net.minecraft.text.Text;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 
 /**
  * root container, this is not meant to be implemented. Astrarre implements it for Screen and HUD
@@ -54,17 +53,10 @@ public interface RootContainer {
 	static <T> T open(NetworkMember member, Function<RootContainer, T> function) {
 		ServerPlayerEntity entity = (ServerPlayerEntity) member;
 		Object[] ref = new Object[] {null};
-		entity.openHandledScreen(new ExtendedScreenHandlerFactory() {
-			private RootContainerInternal contentPanel;
-
-			@Override
-			public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
-				this.contentPanel.write(buf);
-			}
-
+		entity.openHandledScreen(new NamedScreenHandlerFactory() {
 			@Override
 			public Text getDisplayName() {
-				return new LiteralText("astrarre filler text");
+				return new LiteralText("Astrarre GUI");
 			}
 
 			@Override
@@ -72,7 +64,6 @@ public interface RootContainer {
 				DefaultScreenHandler handler = new DefaultScreenHandler(syncId);
 				RootContainerInternal container = ((ScreenRootAccess)handler).getRoot();
 				ref[0] = function.apply(container);
-				this.contentPanel = container;
 				return handler;
 			}
 		});

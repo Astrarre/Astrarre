@@ -11,6 +11,7 @@ import io.github.astrarre.gui.v0.api.access.Interactable;
 import io.github.astrarre.gui.v0.api.access.Tickable;
 import io.github.astrarre.gui.v0.api.base.panel.APanel;
 import io.github.astrarre.itemview.v0.api.Serializer;
+import io.github.astrarre.itemview.v0.api.nbt.NBTType;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.itemview.v0.fabric.FabricViews;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
@@ -35,19 +36,18 @@ public abstract class RootContainerInternal implements RootContainer {
 		this.addRoot(this.panel = new APanel());
 	}
 
-	protected RootContainerInternal(PacketByteBuf input) {
+	protected RootContainerInternal(NBTagView input) {
 		this(internal -> {}, input);
 	}
 
-	protected RootContainerInternal(Consumer<RootContainerInternal> toRun, PacketByteBuf input) {
+	protected RootContainerInternal(Consumer<RootContainerInternal> toRun, NBTagView input) {
 		this.reading = true;
 		toRun.accept(this);
-		int size = input.readInt();
-		for (int i = 0; i < size; i++) {
-			ADrawable drawable = this.getSerializer().read(FabricViews.view(input.readCompoundTag()), "drawable");
+		for (NBTagView view : input.get("drawables", NBTType.listOf(NBTType.TAG))) {
+			ADrawable drawable = this.getSerializer().read(view, "drawable");
 			this.addSynced(drawable);
 		}
-		int panelId = input.readInt();
+		int panelId = input.getInt("panelSyncId");
 		this.reading = false;
 		this.panel = (APanel) this.forId(panelId);
 		for (ADrawable value : this.reversedRegistry.values()) {
@@ -59,14 +59,15 @@ public abstract class RootContainerInternal implements RootContainer {
 	 * @deprecated internal
 	 */
 	@Deprecated
-	public void write(PacketByteBuf output) {
-		output.writeInt(this.componentRegistry.size());
+	public void write(NBTagView.Builder output) {
+		List<NBTagView> list = new ArrayList<>();
 		for (ADrawable drawable : this.componentRegistry.keySet()) {
 			NBTagView.Builder builder = NBTagView.builder();
 			this.getSerializer().save(builder, "drawable", drawable);
-			output.writeCompoundTag(builder.toTag());
+			list.add(builder);
 		}
-		output.writeInt(this.panel.getSyncId());
+		output.put("drawables", NBTType.ANY_LIST, list);
+		output.putInt("panelSyncId", this.panel.getSyncId());
 	}
 
 	void addSynced(ADrawable drawable) {
