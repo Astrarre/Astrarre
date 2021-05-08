@@ -4,7 +4,8 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "FluidTagsAccess",
-    "RecipeManagerMixin_RecipePostReloadEvent"
+    "RecipeManagerAccess",
+    "SinglePreperationResourceReloadListenerMixin_RecipePostReloadEvent"
   ],
   "injectors": {
     "defaultRequire": 1
