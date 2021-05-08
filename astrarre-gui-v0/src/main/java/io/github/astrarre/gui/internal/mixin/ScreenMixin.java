@@ -11,6 +11,7 @@ import io.github.astrarre.gui.internal.access.ScreenRootAccess;
 import io.github.astrarre.gui.internal.containers.ScreenRootContainer;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.gui.v0.fabric.graphics.FabricGUIGraphics;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.rendering.internal.DummyScreen;
 import io.github.astrarre.gui.v0.api.graphics.GuiGraphics;
 import org.lwjgl.opengl.GL11;
@@ -74,7 +75,7 @@ public abstract class ScreenMixin implements ScreenRootAccess, ParentElement, Re
 	}
 
 	@Override
-	public void readRoot(PacketByteBuf input) {
+	public void readRoot(NBTagView input) {
 		this.internal = new ScreenRootContainer<>((Screen) (Object) this, input);
 	}
 

@@ -113,7 +113,7 @@ public abstract class HandledScreenMixin extends ScreenMixin {
 	@Shadow @Nullable protected Slot focusedSlot;
 
 	@Override
-	public void readRoot(PacketByteBuf buf) {
+	public void readRoot(NBTagView buf) {
 		throw new UnsupportedOperationException();
 	}
 }

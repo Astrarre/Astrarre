@@ -1,7 +1,10 @@
 version '1.2.1'
 dependsOn(project, 'astrarre-rendering-v0', 'astrarre-networking-v0')
 
+minecraft {
+    accessWidener = file('src/main/resources/astrarre-gui.accesswidener')
+}
+
 loom {
     mixinConfig "astrarre-gui.mixins.json"
 }
-

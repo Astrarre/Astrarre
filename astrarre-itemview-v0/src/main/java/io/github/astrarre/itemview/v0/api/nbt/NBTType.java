@@ -17,7 +17,7 @@ import net.minecraft.nbt.Tag;
 })
 public final class NBTType<T> implements Serializer<T> {
 	public static final NBTType<Object> ANY = new NBTType<>(Object.class, 0, -1);
-	public static final NBTType<List<Object>> ANY_LIST = NBTType.listOf(NBTType.ANY);
+	public static final NBTType<List> ANY_LIST = (NBTType) NBTType.listOf(NBTType.ANY);
 
 	// start
 	public static final NBTType<Boolean> BOOL = new NBTType<>(boolean.class, -3, 1);

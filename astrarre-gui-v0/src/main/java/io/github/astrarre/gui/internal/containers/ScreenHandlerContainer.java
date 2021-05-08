@@ -11,6 +11,7 @@ import io.github.astrarre.gui.internal.access.SlotAddAccess;
 import io.github.astrarre.gui.internal.mixin.ScreenHandlerAccess;
 import io.github.astrarre.gui.v0.api.ADrawable;
 import io.github.astrarre.gui.v0.api.access.Interactable;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
 import io.github.astrarre.util.v0.fabric.MinecraftServers;
 
@@ -32,7 +33,7 @@ public class ScreenHandlerContainer extends RootContainerInternal implements Slo
 		this.handler = handler;
 	}
 
-	public ScreenHandlerContainer(ScreenHandler handler, PacketByteBuf input) {
+	public ScreenHandlerContainer(ScreenHandler handler, NBTagView input) {
 		super(e -> {
 			((ScreenHandlerContainer) e).handler = handler;
 			((ScreenHandlerContainer) e).isClient = true;

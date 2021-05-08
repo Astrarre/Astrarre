@@ -7,6 +7,7 @@ import io.github.astrarre.gui.internal.access.ExtraSlotAccess;
 import io.github.astrarre.gui.internal.access.ScreenRootAccess;
 import io.github.astrarre.gui.internal.containers.ScreenHandlerContainer;
 import io.github.astrarre.gui.internal.vanilla.NilSlot;
+import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -53,7 +54,7 @@ public abstract class ScreenHandlerMixin implements ScreenRootAccess {
 	}
 
 	@Override
-	public void readRoot(PacketByteBuf input) {
+	public void readRoot(NBTagView input) {
 		this.internal = new ScreenHandlerContainer((ScreenHandler) (Object) this, input);
 	}
 

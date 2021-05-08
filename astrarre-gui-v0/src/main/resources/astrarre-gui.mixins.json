@@ -4,11 +4,15 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "HandledScreenMixin",
+    "HandledScreensAccess",
     "MinecraftClientMixin",
     "ScreenAccess",
     "ScreenHandlerAccess",
     "ScreenHandlerMixin",
-    "ScreenMixin"
+    "ScreenHandlerTypeAccess",
+    "ScreenMixin",
+    "ServerPlayerEntityMixin_CustomPacket",
+    "ServerPlayNetworkHandlerMixin_IgnoreFakePacket"
   ],
   "injectors": {
     "defaultRequire": 1
