@@ -28,8 +28,6 @@ import net.minecraft.util.Identifier;
 
 @Mod("testmod")
 public class TestMod {
-	public static final List<TestRecipe> RECIPE_LIST = Recipes.createRecipe(new Identifier("testmod:test_recipe"), TestRecipe.class);
-
 	public TestMod() {
 		IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 		modEventBus.addGenericListener(Item.class, (Consumer<RegistryEvent.Register<Item>>) event -> {
