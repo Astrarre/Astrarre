@@ -1,5 +1,8 @@
 version '1.1.0'
 
+minecraft {
+    //accessWidener = file('src/main/resources/astrarre-rendering.accesswidener')
+}
 dependencies {
     implementation 'com.github.Astrarre:earcut4j:3.0.1'
     include 'com.github.Astrarre:earcut4j:3.0.1'

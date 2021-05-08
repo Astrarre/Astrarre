@@ -267,6 +267,15 @@ public final class Polygon implements Serializable {
 		return triangulation;
 	}
 
+	public float get(Axis2d axis, int vertex) {
+		if(axis.isX()) {
+			return this.getX(vertex);
+		} else {
+			return this.getY(vertex);
+		}
+	}
+
+
 	public interface PointWalker {
 		void accept(float x1, float y1, float x2, float y2);
 	}
