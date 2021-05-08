@@ -14,8 +14,8 @@ import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.util.math.Matrix4f;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ADelegateDrawable extends ADrawable implements Interactable, Container {
 	private final int id;
@@ -30,7 +30,7 @@ public class ADelegateDrawable extends ADrawable implements Interactable, Contai
 		this.id = delegate.getSyncId();
 	}
 
-	@Environment (EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	protected ADelegateDrawable(DrawableRegistry.Entry id, NBTagView input) {
 		super(id);
 		this.id = input.getInt("syncId");
@@ -97,7 +97,7 @@ public class ADelegateDrawable extends ADrawable implements Interactable, Contai
 	}
 
 	@Override
-	@Environment (EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void mouseMoved(RootContainer container, double mouseX, double mouseY) {
 		if (!(this.getDelegate() instanceof Interactable)) {
 			return;
@@ -106,7 +106,7 @@ public class ADelegateDrawable extends ADrawable implements Interactable, Contai
 	}
 
 	@Override
-	@Environment (EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public boolean mouseClicked(RootContainer container, double mouseX, double mouseY, int button) {
 		if (!(this.getDelegate() instanceof Interactable)) {
 			return false;
@@ -115,7 +115,7 @@ public class ADelegateDrawable extends ADrawable implements Interactable, Contai
 	}
 
 	@Override
-	@Environment (EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public boolean mouseReleased(RootContainer container, double mouseX, double mouseY, int button) {
 		if (!(this.getDelegate() instanceof Interactable)) {
 			return false;
@@ -124,7 +124,7 @@ public class ADelegateDrawable extends ADrawable implements Interactable, Contai
 	}
 
 	@Override
-	@Environment (EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public boolean mouseDragged(RootContainer container, double mouseX, double mouseY, int button, double deltaX, double deltaY) {
 		if (!(this.getDelegate() instanceof Interactable)) {
 			return false;
@@ -133,7 +133,7 @@ public class ADelegateDrawable extends ADrawable implements Interactable, Contai
 	}
 
 	@Override
-	@Environment (EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public boolean mouseScrolled(RootContainer container, double mouseX, double mouseY, double amount) {
 		if (!(this.getDelegate() instanceof Interactable)) {
 			return false;
@@ -142,7 +142,7 @@ public class ADelegateDrawable extends ADrawable implements Interactable, Contai
 	}
 
 	@Override
-	@Environment (EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public boolean keyPressed(RootContainer container, int keyCode, int scanCode, int modifiers) {
 		if (!(this.getDelegate() instanceof Interactable)) {
 			return false;
@@ -151,7 +151,7 @@ public class ADelegateDrawable extends ADrawable implements Interactable, Contai
 	}
 
 	@Override
-	@Environment (EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public boolean keyReleased(RootContainer container, int keyCode, int scanCode, int modifiers) {
 		if (!(this.getDelegate() instanceof Interactable)) {
 			return false;
@@ -160,7 +160,7 @@ public class ADelegateDrawable extends ADrawable implements Interactable, Contai
 	}
 
 	@Override
-	@Environment (EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public boolean charTyped(RootContainer container, char chr, int modifiers) {
 		if (!(this.getDelegate() instanceof Interactable)) {
 			return false;
@@ -201,7 +201,7 @@ public class ADelegateDrawable extends ADrawable implements Interactable, Contai
 	}
 
 	@Override
-	@Environment (EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public boolean isHovering(RootContainer container, double mouseX, double mouseY) {
 		if (!(this.getDelegate() instanceof Interactable)) {
 			return false;

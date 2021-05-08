@@ -1,6 +1,8 @@
 package io.github.astrarre.rendering.internal.util;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.render.BufferBuilder;
@@ -10,10 +12,7 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Matrix4f;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-
-@Environment (EnvType.CLIENT)
+@OnlyIn (Dist.CLIENT)
 public class MatrixGraphicsUtil {
 	/**
 	 * @see DrawableHelper#fill(Matrix4f, int, int, int, int, int)

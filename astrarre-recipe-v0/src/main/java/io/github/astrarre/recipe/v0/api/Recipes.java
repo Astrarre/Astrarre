@@ -16,6 +16,7 @@ import io.github.astrarre.recipe.internal.vanilla.CustomRecipeType;
 import io.github.astrarre.recipe.internal.vanilla.RecipeWrapper;
 import io.github.astrarre.recipe.v0.fabric.RecipePostReloadEvent;
 import io.github.astrarre.util.v0.api.Val;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityType;
@@ -50,8 +51,8 @@ public class Recipes {
 	public static <T extends Recipe> List<T> createRecipe(Gson gson, Identifier recipeId, Class<T> type) {
 		CustomRecipeType<?> recipeType = new CustomRecipeType<>(recipeId);
 		Registry.register(Registry.RECIPE_TYPE, recipeId, recipeType);
-		CustomRecipeSerializer<?> serializer = new CustomRecipeSerializer<>(type, recipeType, gson);
-		Registry.register(Registry.RECIPE_SERIALIZER, recipeId, serializer);
+		CustomRecipeSerializer<?> serializer = new CustomRecipeSerializer<>(type, recipeType, gson, recipeId);
+		ForgeRegistries.RECIPE_SERIALIZERS.register(serializer);
 		Val<List<T>> values = new Val<>();
 		RecipePostReloadEvent.EVENT.addListener((manager, recipes) -> {
 			Map<Identifier, net.minecraft.recipe.Recipe<?>> rec = recipes.get(recipeType);

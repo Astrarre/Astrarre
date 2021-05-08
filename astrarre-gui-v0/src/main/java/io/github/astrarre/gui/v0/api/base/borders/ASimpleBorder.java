@@ -8,8 +8,8 @@ import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.gui.v0.api.graphics.GuiGraphics;
 import io.github.astrarre.util.v0.api.Id;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * makes a black line around the bounds of the delegate drawable
@@ -20,7 +20,7 @@ public final class ASimpleBorder extends ADelegateDrawable {
 		super(ENTRY, delegate);
 	}
 
-	@Environment(EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	protected ASimpleBorder(NBTagView input) {
 		super(ENTRY, input);
 	}

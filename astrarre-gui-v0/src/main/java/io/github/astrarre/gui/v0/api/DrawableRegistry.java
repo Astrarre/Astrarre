@@ -29,8 +29,8 @@ import io.github.astrarre.util.v0.api.Id;
 import io.github.astrarre.util.v0.api.Validate;
 import org.jetbrains.annotations.Nullable;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class DrawableRegistry {
 	private static final Map<Id, Function<NBTagView, ADrawable>> REGISTRY = new HashMap<>();
@@ -45,7 +45,7 @@ public class DrawableRegistry {
 	}
 
 	public interface NewDrawable {
-		@Environment(EnvType.CLIENT)
+		@OnlyIn(Dist.CLIENT)
 		ADrawable init(Entry entry, NBTagView input);
 	}
 

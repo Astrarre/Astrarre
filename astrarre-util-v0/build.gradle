@@ -1,7 +1,4 @@
 version '1.1.1'
-
-dependencies {
-    modCompileOnly ("net.fabricmc.fabric-api:fabric-api:$fabric_version") {
-        exclude module: 'fabric-loader'
-    }
+loom {
+    mixinConfig "astrarre-util.mixins.json"
 }

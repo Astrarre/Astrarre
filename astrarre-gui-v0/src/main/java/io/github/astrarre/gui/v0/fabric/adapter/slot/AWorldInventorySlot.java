@@ -15,8 +15,8 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * a slot who's inventory is retrieved from HopperBlockEntity#getInventoryAt.
@@ -45,12 +45,12 @@ public class AWorldInventorySlot extends ASlot {
 		return HopperBlockEntity.getInventoryAt(this.world, this.pos);
 	}
 
-	@Environment (EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	private AWorldInventorySlot(NBTagView input) {
 		this(ENTRY, input);
 	}
 
-	@Environment (EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	protected AWorldInventorySlot(DrawableRegistry.Entry id, NBTagView input) {
 		super(id, input);
 	}
@@ -65,7 +65,7 @@ public class AWorldInventorySlot extends ASlot {
 	}
 
 	@Override
-	@Environment (EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	protected Inventory readInventoryData(NBTagView input) {
 		MinecraftClient client = MinecraftClient.getInstance();
 		if (client.world != null && Objects.equals(client.world.getRegistryKey().getValue(), Serializer.ID.read(input, "world"))) {

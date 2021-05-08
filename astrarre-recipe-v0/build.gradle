@@ -1,9 +1,13 @@
 version '0.0.0'
 dependsOn(project, 'astrarre-util-v0', 'astrarre-access-v0')
-fapi(project, 'fabric-resource-loader-v0', 'fabric-tag-extensions-v0', 'fabric-api-base')
 
 dependencies {
-    modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:5.11.188") {
+    /*modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:5.11.188") {
         exclude module: 'fabric-loader'
-    }
+        exclude module: 'fabric-api'
+    }*/
+}
+
+loom {
+    mixinConfig "astrarre-recipe.mixins.json"
 }

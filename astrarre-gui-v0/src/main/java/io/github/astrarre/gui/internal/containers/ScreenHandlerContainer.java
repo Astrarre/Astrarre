@@ -19,12 +19,12 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ScreenHandlerContainer extends RootContainerInternal implements SlotAddAccess {
-	@Environment (EnvType.CLIENT) public HandledScreen<?> screen;
-	@Environment (EnvType.CLIENT) public List<OnResize> resizeList;
+	@OnlyIn(Dist.CLIENT) public HandledScreen<?> screen;
+	@OnlyIn(Dist.CLIENT) public List<OnResize> resizeList;
 	public ScreenHandler handler;
 	private boolean isClient;
 
@@ -63,7 +63,7 @@ public class ScreenHandlerContainer extends RootContainerInternal implements Slo
 	}
 
 	@Override
-	@Environment (EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void addResizeListener(OnResize resize) {
 		if (this.screen == null) {
 			if (this.resizeList == null) {

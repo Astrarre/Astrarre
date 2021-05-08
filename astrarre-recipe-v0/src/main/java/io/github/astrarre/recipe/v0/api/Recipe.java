@@ -1,12 +1,10 @@
 package io.github.astrarre.recipe.v0.api;
 
-import io.github.astrarre.recipe.v0.rei.RecipeDisplays;
 
 import net.minecraft.util.Identifier;
 
 /**
  * @see Recipes
- * @see RecipeDisplays
  */
 public abstract class Recipe {
 	volatile Identifier id = null;

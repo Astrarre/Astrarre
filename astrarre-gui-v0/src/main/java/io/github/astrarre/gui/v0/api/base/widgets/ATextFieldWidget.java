@@ -14,8 +14,8 @@ import org.jetbrains.annotations.Nullable;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ATextFieldWidget extends AAbstractButtonAdapter<TextFieldWidget> {
 	public static final int UPDATE_TEXT = 1;
@@ -27,7 +27,7 @@ public class ATextFieldWidget extends AAbstractButtonAdapter<TextFieldWidget> {
 		super(ENTRY, width, height);
 	}
 
-	@Environment(EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	private ATextFieldWidget(NBTagView input) {
 		this(ENTRY, input);
 	}
@@ -36,7 +36,7 @@ public class ATextFieldWidget extends AAbstractButtonAdapter<TextFieldWidget> {
 		super(id, width, height);
 	}
 
-	@Environment(EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	protected ATextFieldWidget(DrawableRegistry.Entry id, NBTagView input) {
 		super(id, input);
 		this.text = input.getString("text");

@@ -8,8 +8,9 @@ import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.gui.v0.api.graphics.GuiGraphics;
 import io.github.astrarre.util.v0.api.Id;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+
 
 public class APanel extends AAggregateDrawable {
 	private static final DrawableRegistry.Entry PANEL = DrawableRegistry.register(Id.create("astrarre-gui-v0", "panel"), APanel::new);
@@ -22,12 +23,12 @@ public class APanel extends AAggregateDrawable {
 		super(entry);
 	}
 
-	@Environment (EnvType.CLIENT)
+	@OnlyIn (Dist.CLIENT)
 	private APanel(NBTagView input) {
 		this(PANEL, input);
 	}
 
-	@Environment (EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	protected APanel(DrawableRegistry.Entry entry, NBTagView input) {
 		super(entry, input);
 	}

@@ -4,11 +4,11 @@ import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.networking.internal.ModPacketHandlerImpl;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
 import io.github.astrarre.util.v0.api.Id;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import net.minecraft.server.network.ServerPlayerEntity;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 
 /**
  * communicate between server and client
@@ -16,7 +16,7 @@ import net.fabricmc.api.Environment;
 public interface ModPacketHandler {
 	ModPacketHandler INSTANCE = ModPacketHandlerImpl.INSTANCE;
 
-	@Environment (EnvType.CLIENT)
+	@OnlyIn (Dist.CLIENT)
 	void sendToServer(Id id, NBTagView output);
 	void sendToClient(ServerPlayerEntity entity, Id id, NBTagView out);
 

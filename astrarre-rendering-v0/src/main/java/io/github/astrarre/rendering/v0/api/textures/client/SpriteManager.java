@@ -9,18 +9,18 @@ import java.util.stream.Stream;
 import io.github.astrarre.rendering.internal.textures.AstrarreSpriteManager;
 import io.github.astrarre.rendering.internal.textures.SpriteAtlasManagerManager;
 import io.github.astrarre.util.v0.api.Id;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.resource.ReloadableResourceManager;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 
 /**
  * make your own sprite atlas
  */
-@Environment (EnvType.CLIENT)
+@OnlyIn (Dist.CLIENT)
 public interface SpriteManager {
 	static Builder create(String modid, String path) {
 		return new Builder(modid, path);
@@ -49,7 +49,7 @@ public interface SpriteManager {
 
 	ManagedSprite getSprite(Id sprite);
 
-	@Environment (EnvType.CLIENT)
+	@OnlyIn (Dist.CLIENT)
 	class Builder {
 		private final String modid;
 		private final String path;

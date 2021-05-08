@@ -12,8 +12,8 @@ import io.github.astrarre.rendering.v0.api.util.Close;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
 import io.github.astrarre.util.v0.api.Id;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public final class ABeveledBorder extends ADelegateDrawable {
 	public static final Transformation TRANSLATE_N2_N2_0 = Transformation.translate(-5, -4, 0);
@@ -24,7 +24,7 @@ public final class ABeveledBorder extends ADelegateDrawable {
 		super(ENTRY, delegate);
 	}
 
-	@Environment (EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	private ABeveledBorder(NBTagView input) {
 		super(ENTRY, input);
 	}

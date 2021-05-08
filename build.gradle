@@ -4,7 +4,7 @@ plugins {
     id 'eclipse'
     id 'java-library'
     id 'maven-publish'
-    id "fabric-loom" version "0.7.26"
+    id 'forgified-fabric-loom' version '0.6-SNAPSHOT'
 }
 
 version '1.1.1'
@@ -17,74 +17,8 @@ loom {
 
 apply from: 'scripts/allprojects.gradle'
 
-static def fapi(Project proj, String... modules) {
-    proj.extensions.add("fapi_deps", modules)
-    proj.configure(proj) {
-        dependencies {
-            if(modules.length == 0) {
-                modImplementation("net.fabricmc.fabric-api:fabric-api:${fabric_version}") {
-                    exclude module: 'fabric-loader'
-                }
-            } else {
-                modules.each {
-                    include(modImplementation(fabricApi.module(it, fabric_version)) {
-                        exclude module: 'fabric-loader'
-                    })
-                }
-            }
-        }
-
-        modules.each {
-            def str = it
-            publishing {
-                publications {
-                    mavenJava2(MavenPublication) {
-                        pom.withXml {
-                            def depsNode = getOrCreateNode(asNode(), "dependencies")
-                            proj.each {
-                                def depNode = depsNode.appendNode("dependency")
-                                depNode.appendNode("groupId", "net.fabricmc.fabric-api")
-                                depNode.appendNode("artifactId", str)
-                                depNode.appendNode("version", fabricApi.moduleVersion(str, fabric_version))
-                                depNode.appendNode("scope", "compile")
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
 dependencies {
     dependsOn(project, subprojects)
-    modImplementation("me.shedaniel:RoughlyEnoughItems:5.11.188") {
-        exclude module: 'fabric-api'
-        exclude module: 'fabric-loader'
-    }
-}
-
-fapi(project)
-
-static def nanoevents(Project proj) {
-    proj.configure(proj) {
-        def nano_events_ver = "3.0.6"
-        def nano_events_ap = "1.0.4"
-        modImplementation("net.devtech:NanoEvents:$nano_events_ver") {
-            transitive = false
-        }
-
-        testmodCompileOnly "net.devtech:nanoevents-ap:$nano_events_ap"
-        compileOnly "net.devtech:nanoevents-ap:$nano_events_ap"
-        annotationProcessor "net.devtech:nanoevents-ap:$nano_events_ap"
-        testmodAnnotationProcessor "net.devtech:nanoevents-ap:$nano_events_ap"
-
-        processResources {
-            from(sourceSets.main.output.classesDirs.singleFile) {
-                include "nanoevents/**"
-            }
-        }
-    }
 }
 
 static def dependsOn(Project proj, Iterable<Project> projs) {
@@ -102,7 +36,7 @@ static def dependsOn(Project proj, Iterable<Project> projs) {
                     projs.each {
                         def depNode = depsNode.appendNode("dependency")
                         depNode.appendNode("groupId", it.group)
-                        depNode.appendNode("artifactId", "$it.name-fabric")
+                        depNode.appendNode("artifactId", "$it.name-forge")
                         depNode.appendNode("version", it.version)
                         depNode.appendNode("scope", "compile")
                     }
@@ -115,7 +49,7 @@ static def dependsOn(Project proj, Iterable<Project> projs) {
                     projs.each {
                         def depNode = depsNode.appendNode("dependency")
                         depNode.appendNode("groupId", it.group)
-                        depNode.appendNode("artifactId", "$it.name-fabric-lite")
+                        depNode.appendNode("artifactId", "$it.name-forge-lite")
                         depNode.appendNode("version", it.version)
                         depNode.appendNode("scope", "compile")
                     }

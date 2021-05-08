@@ -7,6 +7,7 @@ import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
 import io.github.astrarre.recipe.v0.api.InternalRecipeAccess;
 import io.github.astrarre.recipe.v0.api.Recipe;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -19,11 +20,13 @@ public class CustomRecipeSerializer<T extends Recipe> implements RecipeSerialize
 	protected final Class<T> type;
 	protected final RecipeType<?> recipeType;
 	protected final Gson gson;
+	protected Identifier identifier;
 
-	public CustomRecipeSerializer(Class<T> type, RecipeType<?> recipeType, Gson gson) {
+	public CustomRecipeSerializer(Class<T> type, RecipeType<?> recipeType, Gson gson, Identifier identifier) {
 		this.type = type;
 		this.recipeType = recipeType;
 		this.gson = gson;
+		this.identifier = identifier;
 	}
 
 	@Override
@@ -45,5 +48,22 @@ public class CustomRecipeSerializer<T extends Recipe> implements RecipeSerialize
 	public void write(PacketByteBuf buf, RecipeWrapper<T> recipe) {
 		JsonElement element = this.gson.toJsonTree(recipe.instance);
 		buf.writeCompoundTag((CompoundTag) Dynamic.convert(JsonOps.INSTANCE, NbtOps.INSTANCE, element));
+	}
+
+	@Override
+	public RecipeSerializer<?> setRegistryName(Identifier arg) {
+		this.identifier = arg;
+		return this;
+	}
+
+	@Nullable
+	@Override
+	public Identifier getRegistryName() {
+		return this.identifier;
+	}
+
+	@Override
+	public Class<RecipeSerializer<?>> getRegistryType() {
+		return (Class) RecipeSerializer.class;
 	}
 }

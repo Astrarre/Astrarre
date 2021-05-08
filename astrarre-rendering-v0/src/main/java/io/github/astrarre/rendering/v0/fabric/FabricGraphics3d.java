@@ -3,6 +3,8 @@ package io.github.astrarre.rendering.v0.fabric;
 import io.github.astrarre.rendering.internal.util.MatrixGraphicsUtil;
 import io.github.astrarre.rendering.internal.util.SetupTeardown;
 import io.github.astrarre.rendering.v0.api.Graphics3d;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
@@ -11,10 +13,7 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Matrix4f;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-
-@Environment (EnvType.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class FabricGraphics3d extends FabricGraphics2d implements Graphics3d {
 	public FabricGraphics3d(MatrixStack matrices) {
 		super(matrices);

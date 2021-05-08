@@ -14,6 +14,8 @@ import io.github.astrarre.util.v0.api.collection.UnsafeFloatArrayList;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntLists;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.render.BufferBuilder;
@@ -23,8 +25,6 @@ import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.Vector4f;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 
 public final class Polygon implements Serializable {
 	public static final Serializer<Polygon> SERIALIZER = Serializer.of(Polygon::new);
@@ -241,7 +241,7 @@ public final class Polygon implements Serializable {
 	 * @deprecated internal
 	 */
 	@Deprecated
-	@Environment (EnvType.CLIENT)
+	@OnlyIn (Dist.CLIENT)
 	public BufferBuilder triangleBuffer(MatrixStack stack, VertexFormat format, UnaryOperator<VertexConsumer> consumer) {
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 		buffer.begin(GL11.GL_TRIANGLES, format);

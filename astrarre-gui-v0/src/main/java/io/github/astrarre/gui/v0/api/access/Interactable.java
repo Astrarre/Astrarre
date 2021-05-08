@@ -4,15 +4,15 @@ import io.github.astrarre.gui.v0.api.RootContainer;
 
 import net.minecraft.client.gui.Element;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * implement on Drawable
  * @see Element
  */
 public interface Interactable {
-	@Environment(EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	default void mouseMoved(RootContainer container, double mouseX, double mouseY) {
 	}
 
@@ -30,7 +30,7 @@ public interface Interactable {
 	 * @param mouseY the Y coordinate of the mouse
 	 * @param button the mouse button number
 	 */
-	@Environment(EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	default boolean mouseClicked(RootContainer container, double mouseX, double mouseY, int button) {
 		return false;
 	}
@@ -49,7 +49,7 @@ public interface Interactable {
 	 * @param mouseY the Y coordinate of the mouse
 	 * @param button the mouse button number
 	 */
-	@Environment(EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	default boolean mouseReleased(RootContainer container, double mouseX, double mouseY, int button) {
 		return false;
 	}
@@ -70,7 +70,7 @@ public interface Interactable {
 	 * @param deltaX the difference of the current X with the previous X coordinate
 	 * @param deltaY the difference of the current Y with the previous Y coordinate
 	 */
-	@Environment(EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	default boolean mouseDragged(RootContainer container, double mouseX, double mouseY, int button, double deltaX, double deltaY) {
 		return false;
 	}
@@ -85,7 +85,7 @@ public interface Interactable {
 	 * @param mouseY the Y coordinate of the mouse
 	 * @param amount value is {@code > 1} if scrolled down, {@code < 1} if scrolled up
 	 */
-	@Environment(EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	default boolean mouseScrolled(RootContainer container, double mouseX, double mouseY, double amount) {
 		return false;
 	}
@@ -104,7 +104,7 @@ public interface Interactable {
 	 * @param scanCode the unique/platform-specific scan code of the keyboard input
 	 * @param modifiers a GLFW bitfield describing the modifier keys that are held down (see {@linkplain https://www.glfw.org/docs/3.3/group__mods.html GLFW Modifier key flags})
 	 */
-	@Environment(EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	default boolean keyPressed(RootContainer container, int keyCode, int scanCode, int modifiers) {
 		return false;
 	}
@@ -123,7 +123,7 @@ public interface Interactable {
 	 * @param scanCode the unique/platform-specific scan code of the keyboard input
 	 * @param modifiers a GLFW bitfield describing the modifier keys that are held down (see {@linkplain https://www.glfw.org/docs/3.3/group__mods.html GLFW Modifier key flags})
 	 */
-	@Environment(EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	default boolean keyReleased(RootContainer container, int keyCode, int scanCode, int modifiers) {
 		return false;
 	}
@@ -141,7 +141,7 @@ public interface Interactable {
 	 * @param chr the captured character
 	 * @param modifiers a GLFW bitfield describing the modifier keys that are held down (see <a href="https://www.glfw.org/docs/3.3/group__mods.html">GLFW Modifier key flags</a>)
 	 */
-	@Environment(EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	default boolean charTyped(RootContainer container, char chr, int modifiers) {
 		return false;
 	}
@@ -150,16 +150,16 @@ public interface Interactable {
 	 * This method is for handling tab / ctrl+tab calls, if the function returns false
 	 * @return true if the component handled the cycle forward call.
 	 */
-	@Environment(EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	default boolean handleFocusCycle(RootContainer container, boolean forward) {
 		return false;
 	}
 
 	default boolean canFocus(RootContainer container) {return false;}
 
-	@Environment(EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	default void onFocus(RootContainer container) {}
-	@Environment(EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	default void onLostFocus(RootContainer container) {}
 
 	/**
@@ -172,13 +172,13 @@ public interface Interactable {
 		return false;
 	}
 
-	@Environment(EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	default void mouseHover(RootContainer container, double mouseX, double mouseY) {
 	}
 
 	/**
 	 * fired when the mouse moves out of the bounds of the component. This is only fired if the mouseHover event is handled
 	 */
-	@Environment(EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	default void onLoseHover(RootContainer container) {}
 }

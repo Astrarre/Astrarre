@@ -7,8 +7,8 @@ import io.github.astrarre.rendering.v0.api.Transformation;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
 import io.github.astrarre.util.v0.api.Id;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * a panel who's [0, 0] lies at [centerX - width/2, centerY - height/2] of the root container
@@ -25,7 +25,7 @@ public class ACenteringPanel extends APanel {
 		this.setBounds(Polygon.rectangle(width, height));
 	}
 
-	@Environment(EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	private ACenteringPanel(NBTagView input) {
 		super(ENTRY, input);
 		this.width = input.getInt("width");

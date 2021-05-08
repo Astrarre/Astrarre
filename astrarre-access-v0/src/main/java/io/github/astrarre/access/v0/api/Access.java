@@ -12,16 +12,17 @@ import java.util.function.Supplier;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
-import io.github.astrarre.access.v0.api.entry.AccessAPIEntrypoint;
-import io.github.astrarre.util.v0.api.func.IterFunc;
 import io.github.astrarre.access.v0.fabric.EntityAccess;
 import io.github.astrarre.access.v0.fabric.ItemAccess;
 import io.github.astrarre.access.v0.fabric.WorldAccess;
+import io.github.astrarre.access.v0.forge.AccessInitEvent;
 import io.github.astrarre.util.v0.api.Id;
+import io.github.astrarre.util.v0.api.func.IterFunc;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import net.fabricmc.loader.entrypoint.minecraft.hooks.EntrypointUtils;
 
 /**
  * An access is essentially a list of functions, like an event handler. Like a function, it allows for any number of inputs and an output.
@@ -35,17 +36,6 @@ import net.fabricmc.loader.entrypoint.minecraft.hooks.EntrypointUtils;
  * @see ItemAccess
  */
 public class Access<F> {
-	/**
-	 * fired when a new access is created
-	 */
-	public static final Access<Consumer<Access<?>>> ON_ACCESS_INIT = new Access<>(Id.create("astrarre-access-v0", "on_access_init"), arr -> access -> {
-		for (Consumer<Access<?>> consumer : arr) {
-			consumer.accept(access);
-		}
-	});
-	static {
-		EntrypointUtils.invoke("astrarre-transfer-v0:access_entrypoint", AccessAPIEntrypoint.class, AccessAPIEntrypoint::onAccessAPIInit);
-	}
 
 	protected final IterFunc<F> combiner;
 	protected List<Object> delegates = new ArrayList<>();
@@ -63,9 +53,8 @@ public class Access<F> {
 		this.id = id;
 		this.combiner = combiner;
 		this.recompile();
-		if(ON_ACCESS_INIT != null) {
-			ON_ACCESS_INIT.get().accept(this);
-		}
+		IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+		modEventBus.post(new AccessInitEvent(this));
 	}
 
 	@NotNull

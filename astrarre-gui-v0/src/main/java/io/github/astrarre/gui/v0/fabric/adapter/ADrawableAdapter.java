@@ -11,11 +11,11 @@ import io.github.astrarre.rendering.v0.fabric.FabricGraphics;
 import net.minecraft.client.gui.screen.TickableElement;
 import net.minecraft.client.util.math.MatrixStack;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public abstract class ADrawableAdapter<T extends net.minecraft.client.gui.Drawable> extends ADrawable implements Interactable {
-	@Environment (EnvType.CLIENT) protected T drawable;
+	@OnlyIn(Dist.CLIENT) protected T drawable;
 
 	private int mx = 1_000_000, my = 1_000_000;
 	private int tick;

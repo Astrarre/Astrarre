@@ -31,8 +31,8 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * Slots are 18x18 by default todo gui editor/maker todo split Graphics
@@ -51,10 +51,10 @@ public abstract class ASlot extends ADrawable implements Interactable {
 	protected Map<RootContainer, List<ASlot>> targetSlotIds = new WeakHashMap<>();
 	protected IntList temp;
 	protected boolean highlighted;
-	@Environment (EnvType.CLIENT) protected boolean render;
-	@Environment (EnvType.CLIENT) protected IntList slotIds;
-	@Environment (EnvType.CLIENT) private int overrideClient = -1;
-	@Environment (EnvType.CLIENT) private ItemStack override;
+	@OnlyIn(Dist.CLIENT) protected boolean render;
+	@OnlyIn(Dist.CLIENT) protected IntList slotIds;
+	@OnlyIn(Dist.CLIENT) private int overrideClient = -1;
+	@OnlyIn(Dist.CLIENT) private ItemStack override;
 
 	protected ASlot(DrawableRegistry.Entry id, Inventory inventory, int index) {
 		super(id);
@@ -63,7 +63,7 @@ public abstract class ASlot extends ADrawable implements Interactable {
 		this.setBounds(SQUARE_18x18);
 	}
 
-	@Environment (EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	protected ASlot(DrawableRegistry.Entry id, NBTagView input) {
 		super(id);
 		this.inventory = this.readInventoryData(input);
@@ -75,7 +75,7 @@ public abstract class ASlot extends ADrawable implements Interactable {
 		this.setBounds(SQUARE_18x18);
 	}
 
-	@Environment (EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	protected abstract Inventory readInventoryData(NBTagView input);
 
 	/**
@@ -194,7 +194,7 @@ public abstract class ASlot extends ADrawable implements Interactable {
 	 *
 	 * @return the itemstack that was transfered
 	 */
-	@Environment (EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public ItemStack quickTransferStack(RootContainer container) {
 		if (this.slotIds == null) {
 			this.slotIds = new IntArrayList();

@@ -2,13 +2,13 @@ package io.github.astrarre.gui.v0.api.access;
 
 import io.github.astrarre.gui.v0.api.RootContainer;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public interface Tickable {
 	/**
 	 * ticked only on the client
 	 */
-	@Environment(EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	void tick(RootContainer container);
 }

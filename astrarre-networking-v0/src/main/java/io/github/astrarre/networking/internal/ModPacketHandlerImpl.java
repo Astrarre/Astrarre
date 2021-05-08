@@ -12,6 +12,8 @@ import io.github.astrarre.networking.v0.api.ModPacketHandler;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
 import io.github.astrarre.util.v0.api.Id;
 import io.netty.buffer.Unpooled;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
@@ -20,8 +22,6 @@ import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 
 /**
  * a registry for dealing with custom packets
@@ -33,7 +33,7 @@ public class ModPacketHandlerImpl implements ModPacketHandler {
 	private final Multimap<Id, ServerReceiver> asyncServerRegistry = HashMultimap.create(), syncServerRegistry = HashMultimap.create();
 
 	@Override
-	@Environment(EnvType.CLIENT)
+	@OnlyIn (Dist.CLIENT)
 	public void sendToServer(Id id, NBTagView output) {
 		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 		buf.writeCompoundTag(output.toTag());
@@ -89,7 +89,7 @@ public class ModPacketHandlerImpl implements ModPacketHandler {
 	 * @deprecated internal
 	 */
 	@Deprecated
-	@Environment(EnvType.CLIENT)
+	@OnlyIn (Dist.CLIENT)
 	public boolean onReceiveAsync(CustomPayloadS2CPacket packet) {
 		return this.fire((Id) packet.getChannel(), packet.getData(), this.asyncClientRegistry.get((Id) packet.getChannel()));
 	}
@@ -98,7 +98,7 @@ public class ModPacketHandlerImpl implements ModPacketHandler {
 	 * @deprecated internal
 	 */
 	@Deprecated
-	@Environment(EnvType.CLIENT)
+	@OnlyIn (Dist.CLIENT)
 	public boolean onReceive(CustomPayloadS2CPacket packet) {
 		return this.fire((Id) packet.getChannel(), packet.getData(), this.syncClientRegistry.get((Id) packet.getChannel()));
 	}

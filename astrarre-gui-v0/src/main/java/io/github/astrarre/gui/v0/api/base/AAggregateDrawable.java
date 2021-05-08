@@ -23,8 +23,8 @@ import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.util.math.Vector4f;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public abstract class AAggregateDrawable extends ADrawable implements Interactable, Container {
 	private static final Logger LOGGER = LogManager.getLogger("ListWidget");
@@ -39,7 +39,7 @@ public abstract class AAggregateDrawable extends ADrawable implements Interactab
 		this.drawables = new ArrayList<>();
 	}
 
-	@Environment (EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	protected AAggregateDrawable(DrawableRegistry.Entry id, NBTagView input) {
 		super(id);
 		this.pendingDrawables = new IntArrayList(input.get("drawables", NBTType.INT_ARRAY, IntLists.EMPTY_LIST));
@@ -195,7 +195,7 @@ public abstract class AAggregateDrawable extends ADrawable implements Interactab
 	}
 
 	@Override
-	@Environment (EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void mouseMoved(RootContainer container, double mouseX, double mouseY) {
 		Vector4f v3f = new Vector4f(0, 0, 0, 0);
 		for (Interactable interactable : this.interactables()) {
@@ -222,7 +222,7 @@ public abstract class AAggregateDrawable extends ADrawable implements Interactab
 	}
 
 	@Override
-	@Environment (EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public boolean mouseClicked(RootContainer container, double mouseX, double mouseY, int button) {
 		Vector4f v3f = new Vector4f(0, 0, 0, 1);
 		for (Interactable interactable : this.interactables()) {
@@ -236,7 +236,7 @@ public abstract class AAggregateDrawable extends ADrawable implements Interactab
 	}
 
 	@Override
-	@Environment (EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public boolean mouseReleased(RootContainer container, double mouseX, double mouseY, int button) {
 		Vector4f v3f = new Vector4f(0, 0, 0, 1);
 		for (Interactable interactable : this.interactables()) {
@@ -250,7 +250,7 @@ public abstract class AAggregateDrawable extends ADrawable implements Interactab
 	}
 
 	@Override
-	@Environment (EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public boolean mouseDragged(RootContainer container, double mouseX, double mouseY, int button, double deltaX, double deltaY) {
 		Vector4f v3f = new Vector4f(0, 0, 0, 1);
 		for (Interactable interactable : this.interactables()) {
@@ -265,7 +265,7 @@ public abstract class AAggregateDrawable extends ADrawable implements Interactab
 	}
 
 	@Override
-	@Environment (EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public boolean mouseScrolled(RootContainer container, double mouseX, double mouseY, double amount) {
 		Vector4f v3f = new Vector4f(0, 0, 0, 1);
 		for (Interactable interactable : this.interactables()) {
@@ -279,7 +279,7 @@ public abstract class AAggregateDrawable extends ADrawable implements Interactab
 	}
 
 	@Override
-	@Environment (EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public boolean keyPressed(RootContainer container, int keyCode, int scanCode, int modifiers) {
 		if (this.focused != null) {
 			return this.focused.keyPressed(container, keyCode, scanCode, modifiers);
@@ -288,7 +288,7 @@ public abstract class AAggregateDrawable extends ADrawable implements Interactab
 	}
 
 	@Override
-	@Environment (EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public boolean keyReleased(RootContainer container, int keyCode, int scanCode, int modifiers) {
 		if (this.focused != null) {
 			return this.focused.keyReleased(container, keyCode, scanCode, modifiers);
@@ -297,7 +297,7 @@ public abstract class AAggregateDrawable extends ADrawable implements Interactab
 	}
 
 	@Override
-	@Environment (EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public boolean charTyped(RootContainer container, char chr, int modifiers) {
 		if (this.focused != null) {
 			return this.focused.charTyped(container, chr, modifiers);
@@ -306,7 +306,7 @@ public abstract class AAggregateDrawable extends ADrawable implements Interactab
 	}
 
 	@Override
-	@Environment (EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public boolean handleFocusCycle(RootContainer container, boolean forward) {
 		if (this.focused != null && this.focused.handleFocusCycle(container, forward)) {
 			return true;
@@ -332,7 +332,7 @@ public abstract class AAggregateDrawable extends ADrawable implements Interactab
 	}
 
 	@Override
-	@Environment (EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public boolean isHovering(RootContainer container, double mouseX, double mouseY) {
 		Vector4f v3f = new Vector4f(0, 0, 0, 1);
 		for (Interactable interactable : this.interactables()) {
@@ -346,7 +346,7 @@ public abstract class AAggregateDrawable extends ADrawable implements Interactab
 	}
 
 	@Override
-	@Environment(EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void mouseHover(RootContainer container, double mouseX, double mouseY) {
 		Interactable interactable = this.drawableAt(container, mouseX, mouseY);
 		if (this.hovered != interactable && this.hovered != null) {

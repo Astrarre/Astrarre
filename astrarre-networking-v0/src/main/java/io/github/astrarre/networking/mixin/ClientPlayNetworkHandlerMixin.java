@@ -1,6 +1,8 @@
 package io.github.astrarre.networking.mixin;
 
 import io.github.astrarre.networking.internal.ModPacketHandlerImpl;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -11,10 +13,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 
-@Environment (EnvType.CLIENT)
+@OnlyIn (Dist.CLIENT)
 @Mixin (ClientPlayNetworkHandler.class)
 public class ClientPlayNetworkHandlerMixin {
 	@Shadow private MinecraftClient client;

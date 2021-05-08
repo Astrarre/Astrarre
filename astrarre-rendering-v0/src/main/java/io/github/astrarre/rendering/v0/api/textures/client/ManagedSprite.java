@@ -3,15 +3,15 @@ package io.github.astrarre.rendering.v0.api.textures.client;
 import java.util.Objects;
 
 import io.github.astrarre.rendering.v0.api.textures.Sprite;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 
 /**
  * SpriteInfos can be animated textures and come from atlases
  * @see SpriteManager
  */
-@Environment(EnvType.CLIENT)
+@OnlyIn (Dist.CLIENT)
 public interface ManagedSprite extends Sprite {
 	static ManagedSprite of(net.minecraft.client.texture.Sprite sprite) {
 		return (ManagedSprite) sprite;

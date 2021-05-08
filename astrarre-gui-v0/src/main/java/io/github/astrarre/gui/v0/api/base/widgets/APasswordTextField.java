@@ -6,8 +6,8 @@ import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.util.v0.api.Id;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * a text widget but it hashes the password before sending it over the internet. This isn't that secure, but whatever
@@ -19,7 +19,7 @@ public class APasswordTextField extends ATextFieldWidget {
 		super(ENTRY, width, height);
 	}
 
-	@Environment(EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	private APasswordTextField(NBTagView input) {
 		super(ENTRY, input);
 	}

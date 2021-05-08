@@ -14,6 +14,8 @@ import io.github.astrarre.gui.v0.api.base.panel.APanel;
 import io.github.astrarre.gui.v0.api.container.ContainerGUI;
 import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.MinecraftClient;
@@ -25,10 +27,6 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 
 /**
  * root container, this is not meant to be implemented. Astrarre implements it for Screen and HUD
@@ -54,7 +52,8 @@ public interface RootContainer {
 	static <T> T open(NetworkMember member, Function<RootContainer, T> function) {
 		ServerPlayerEntity entity = (ServerPlayerEntity) member;
 		Object[] ref = new Object[] {null};
-		entity.openHandledScreen(new ExtendedScreenHandlerFactory() {
+		// todo use a normal mixin, remove dependency on fapi
+		/**entity.openHandledScreen(new ExtendedScreenHandlerFactory() {
 			private RootContainerInternal contentPanel;
 
 			@Override
@@ -75,21 +74,21 @@ public interface RootContainer {
 				this.contentPanel = container;
 				return handler;
 			}
-		});
+		});*/
 		return (T) ref[0];
 	}
 
 	/**
 	 * opens a new clientside only gui
 	 */
-	@Environment(EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	static RootContainer openClientOnly() {
 		Screen screen = new DefaultScreen();
 		MinecraftClient.getInstance().openScreen(screen);
 		return ((ScreenRootAccess)screen).getClientRoot();
 	}
 
-	@Environment(EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	static Optional<RootContainer> currentScreen() {
 		return Optional.ofNullable(MinecraftClient.getInstance().currentScreen).map(ScreenRootAccess.class::cast).map(ScreenRootAccess::getClientRoot);
 	}
@@ -143,7 +142,7 @@ public interface RootContainer {
 	/**
 	 * may not work as intended if {@link #getType()} == {@link Type#REI_RECIPE}
 	 */
-	@Environment(EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	<T extends ADrawable & Interactable> void setFocus(T drawable);
 
 	/**
@@ -172,7 +171,7 @@ public interface RootContainer {
 	 * this method only works for client-side guis, if you're serializing components to the client, your component should attach this on the client when it is deserialized
 	 * minecraft guis scale in such a way that you don't need to change the size of your component, but you may need to translate it
 	 */
-	@Environment(EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	void addResizeListener(OnResize resize);
 
 	Serializer<ADrawable> getSerializer();

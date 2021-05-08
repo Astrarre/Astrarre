@@ -1,32 +1,31 @@
 package io.github.astrarre.gui.internal;
 
-import io.github.astrarre.gui.internal.access.ScreenRootAccess;
+import java.util.function.Consumer;
+
 import io.github.astrarre.gui.internal.vanilla.DefaultHandledScreen;
 import io.github.astrarre.gui.internal.vanilla.DefaultScreenHandler;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
+import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.util.Identifier;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
-import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
-import net.fabricmc.loader.api.FabricLoader;
-
-public class AstrarreInitializer implements ModInitializer {
-	public static final ScreenHandlerType<DefaultScreenHandler> PANEL_SCREEN = ScreenHandlerRegistry.registerExtended(new Identifier(
-			"astrarre-gui-v0",
-			"default_screen"), (syncId, inventory, buf) -> {
+@Mod("astrarre-gui-v0")
+public class AstrarreInitializer {
+	public static final ScreenHandlerType<DefaultScreenHandler> PANEL_SCREEN = new ScreenHandlerType<>((syncId, inventory) -> {
 		DefaultScreenHandler handler = new DefaultScreenHandler(syncId);
-		((ScreenRootAccess)handler).readRoot(buf);
+		//todo ((ScreenRootAccess)handler).readRoot(buf);
 		return handler;
 	});
 
-	@Override
-	public void onInitialize() {
-		if(FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
-			ScreenRegistry.register(PANEL_SCREEN, DefaultHandledScreen::new);
-		}
+	public AstrarreInitializer() {
+		IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+		modEventBus.addGenericListener(ScreenHandlerType.class, (Consumer<RegistryEvent.Register<ScreenHandlerType<?>>>) event -> {
+			event.getRegistry().register(PANEL_SCREEN);
+		});
+		HandledScreens.register(PANEL_SCREEN, DefaultHandledScreen::new);
 	}
 
 }

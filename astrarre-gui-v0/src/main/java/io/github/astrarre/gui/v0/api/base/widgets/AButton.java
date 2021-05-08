@@ -19,8 +19,8 @@ import io.github.astrarre.rendering.v0.api.util.Polygon;
 import io.github.astrarre.util.v0.api.Id;
 import org.jetbrains.annotations.Nullable;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class AButton extends ADrawable implements Interactable {
 	public static final Data MEDIUM = new Data(
@@ -165,7 +165,7 @@ public class AButton extends ADrawable implements Interactable {
 	/**
 	 * fired when the button is pressed on the client, if serializing you must register the class
 	 */
-	@Environment (EnvType.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void onPressClient() {
 		this.sendToServer(PRESSED, NBTagView.EMPTY);
 		this.onPress.forEach(Runnable::run);

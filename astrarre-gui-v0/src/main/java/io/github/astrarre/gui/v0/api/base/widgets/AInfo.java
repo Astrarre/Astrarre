@@ -18,15 +18,15 @@ import io.github.astrarre.util.v0.api.Id;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class AInfo extends ADelegateDrawable implements Interactable {
 	private static final DrawableRegistry.Entry ENTRY = DrawableRegistry.registerForward(Id.create("astrarre-gui-v0", "info_widget"), AInfo::new);
 	public final List<Text> tooltip;
 	public final int width;
-	@Environment (EnvType.CLIENT) protected boolean isHover;
-	@Environment(EnvType.CLIENT) protected List<OrderedText> wrapped;
+	@OnlyIn(Dist.CLIENT) protected boolean isHover;
+	@OnlyIn(Dist.CLIENT) protected List<OrderedText> wrapped;
 
 	/**
 	 * @param width the maximum width of the tooltip (used for wrapping)
