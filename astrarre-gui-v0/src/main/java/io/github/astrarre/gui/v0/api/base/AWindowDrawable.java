@@ -37,6 +37,7 @@ public class AWindowDrawable extends AAggregateDrawable {
 		super(id);
 		this.width = width;
 		this.height = height;
+		this.setBounds(Polygon.rectangle(width, height));
 		this.optimizeWithBounds = bounds;
 		this.actuallyDraw = null;
 	}
@@ -57,15 +58,24 @@ public class AWindowDrawable extends AAggregateDrawable {
 	}
 
 	@Override
+	protected void onDrawablesChange() { // prevent bounds recomputation
+	}
+
+	@Override
+	protected boolean onSyncRemove(ADrawable drawable) {
+		if(this.isClient() && super.onSyncRemove(drawable)) {
+			this.actuallyDraw.remove(drawable);
+			return true;
+		}
+		return false;
+	}
+
+	@Override
 	protected boolean onSync(ADrawable drawable) {
 		if(this.isClient() && this.optimizeWithBounds) {
 			this.compute(drawable, false);
-			drawable.addBoundsChangeListener((drawable1, old, current) -> {
-				this.compute(drawable1, true);
-			});
-			drawable.addTransformationChangeListener((drawable1, old, current) -> {
-				this.compute(drawable1, true);
-			});
+			drawable.addBoundsChangeListener((drawable1, old, current) -> this.compute(drawable1, true));
+			drawable.addTransformationChangeListener((drawable1, old, current) -> this.compute(drawable1, true));
 		}
 		return super.onSync(drawable);
 	}
