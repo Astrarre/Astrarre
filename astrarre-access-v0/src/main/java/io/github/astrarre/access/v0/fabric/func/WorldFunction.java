@@ -1,7 +1,9 @@
 package io.github.astrarre.access.v0.fabric.func;
 
 import java.util.function.BinaryOperator;
+import java.util.function.Predicate;
 
+import io.github.astrarre.access.internal.SkippingWorldFunction;
 import io.github.astrarre.util.v0.api.func.IterFunc;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,16 +19,18 @@ public interface WorldFunction<T> {
 		return (WorldFunction<T>) EMPTY;
 	}
 
+	/**
+	 * finds the first non-default, non-null value, else returns the default value
+	 */
 	static <T> IterFunc<WorldFunction<T>> skipIfNull(T defaultValue) {
-		return (functions) -> (direction, state, world, pos, entity) -> {
-			for (WorldFunction<T> function : functions) {
-				T val = function.get(direction, state, world, pos, entity);
-				if (val != defaultValue && val != null) {
-					return val;
-				}
-			}
-			return defaultValue;
-		};
+		return skipIf(t -> t != null && t != defaultValue, defaultValue);
+	}
+
+	/**
+	 * finds the first non-default, non-null value, else returns the default value
+	 */
+	static <T> IterFunc<WorldFunction<T>> skipIf(Predicate<T> predicate, T defaultValue) {
+		return (functions) -> new SkippingWorldFunction<>(functions, predicate, defaultValue);
 	}
 
 	/**
@@ -176,4 +180,5 @@ public interface WorldFunction<T> {
 			return this.get(direction, world, pos, null);
 		}
 	}
+
 }

@@ -55,6 +55,7 @@ public class Recipes {
 		Val<List<T>> values = new Val<>();
 		RecipePostReloadEvent.EVENT.addListener((manager, recipes) -> {
 			Map<Identifier, net.minecraft.recipe.Recipe<?>> rec = recipes.get(recipeType);
+			if(rec == null) return;
 			List<T> list = new ArrayList<>(rec.size());
 			for (net.minecraft.recipe.Recipe<?> value : rec.values()) {
 				T instance = ((RecipeWrapper<T>)value).instance;
