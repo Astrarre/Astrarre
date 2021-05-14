@@ -12,7 +12,7 @@ repositories {
 
 dependencies {
     ...
-    modImplementation 'io.github.astrarre:astrarre-fabric:0.0.0'
+    modImplementation 'io.github.astrarre:astrarre-fabric:<version>'
 }
 ```
 
