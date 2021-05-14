@@ -17,6 +17,7 @@ dependencies {
 ```
 
 ## Versions
+The maven versions for each of the modules:\
 ![root](https://img.shields.io/maven-metadata/v?label=root&metadataUrl=https%3A%2F%2Fstorage.googleapis.com%2Fdevan-maven%2Fio%2Fgithub%2Fastrarre%2Fastrarre-fabric%2Fmaven-metadata.xml&style=for-the-badge)\
 ![access v0](https://img.shields.io/maven-metadata/v?label=Access%20v0&metadataUrl=https%3A%2F%2Fstorage.googleapis.com%2Fdevan-maven%2Fio%2Fgithub%2Fastrarre%2Fastrarre-access-v0-fabric%2Fmaven-metadata.xml&style=for-the-badge)\
 ![gui v0](https://img.shields.io/maven-metadata/v?label=gui%20v0&metadataUrl=https%3A%2F%2Fstorage.googleapis.com%2Fdevan-maven%2Fio%2Fgithub%2Fastrarre%2Fastrarre-gui-v0-fabric%2Fmaven-metadata.xml&style=for-the-badge)\
