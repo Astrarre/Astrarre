@@ -1,4 +1,4 @@
-version '1.1.0'
+version '1.1.1'
 
 minecraft {
     //accessWidener = file('src/main/resources/astrarre-rendering.accesswidener')

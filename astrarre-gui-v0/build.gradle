@@ -1,4 +1,4 @@
-version '1.2.1'
+version '1.2.2'
 dependsOn(project, 'astrarre-rendering-v0', 'astrarre-networking-v0')
 
 minecraft {
