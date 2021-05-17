@@ -3,6 +3,7 @@ package io.github.astrarre.transfer.v0.api.transaction;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 import io.github.astrarre.util.v0.api.Validate;
 import org.jetbrains.annotations.Nullable;
@@ -23,6 +24,7 @@ public final class Transaction implements AutoCloseable {
 	private final boolean intent;
 	// this is composited with andThen
 	private List<Key> keys;
+	private boolean invalidated = false;
 
 	private Transaction(boolean intent) {
 		this.intent = intent;
@@ -97,25 +99,29 @@ public final class Transaction implements AutoCloseable {
 	}
 
 	public void commit() {
-		this.validateThread(
-				"Transaction must be invalidated on the same thread it was created on, and you cannot commit a transaction without invalidating " +
-				"it's" + " children!");
-		ACTIVE.set(this.parent);
-		if(this.keys != null) {
-			for (Key key : this.keys) {
-				key.onApply(this);
-			}
-		}
+		this.invalidate(Key::onApply, "commit");
 	}
 
 	public void abort() {
+		this.invalidate(Key::onAbort, "abort");
+	}
+
+	protected void invalidate(BiConsumer<Key, Transaction> func, String name) {
+		if(this.invalidated) {
+			String msg = "Cannot invalidate the same transaction twice!";
+			if (!Validate.IS_DEV) {
+				msg += "(use '-Dastrarre-enable-debug' to see where transaction was created)";
+			}
+			this.throwError(new IllegalStateException(msg));
+		}
+		this.invalidated = true;
 		this.validateThread(
-				"Transaction must be invalidated on the same thread it was created on, and you cannot abort a transaction without invalidating it's "
+				"Transaction must be invalidated on the same thread it was created on, and you cannot " + name + " a transaction without invalidating it's "
 				+ "children!");
 		ACTIVE.set(this.parent);
 		if(this.keys != null) {
 			for (Key key : this.keys) {
-				key.onAbort(this);
+				func.accept(key, this);
 			}
 		}
 	}
@@ -128,13 +134,21 @@ public final class Transaction implements AutoCloseable {
 	 */
 	public void validateThread(String err) {
 		if (ACTIVE.get() != this) {
-			if(this.debug != null) {
-				TransactionInitialization debugException = new TransactionInitialization();
-				debugException.setStackTrace(this.debug.getStackTrace());
-				throw new IllegalStateException(err, debugException);
+			if(!Validate.IS_DEV) {
+				err += "(use '-Dastrarre-enable-debug' to see where transaction was created)";
 			}
-			throw new IllegalStateException(err);
+			this.throwError(new IllegalStateException(err));
 		}
+	}
+
+	public <T extends Throwable> void throwError(T exception) throws T {
+		if(this.debug != null) {
+			TransactionInitialization debugException = new TransactionInitialization();
+			debugException.setStackTrace(this.debug.getStackTrace());
+			exception.initCause(debugException);
+			throw exception;
+		}
+		throw exception;
 	}
 
 	/**
@@ -176,5 +190,6 @@ public final class Transaction implements AutoCloseable {
 		public TransactionInitialization() {
 			super("Transaction initialization stacktrace");
 		}
+
 	}
 }
