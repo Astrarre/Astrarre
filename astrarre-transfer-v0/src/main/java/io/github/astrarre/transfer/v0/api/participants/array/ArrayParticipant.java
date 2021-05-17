@@ -85,7 +85,7 @@ public interface ArrayParticipant<T> extends Participant<T> {
 			public void extract(@Nullable Transaction transaction, Insertable<T> insertable) {
 				for (Slot<T> slot : ArrayParticipant.this.getSlots()) {
 					if(slot.equals(this.prioritySlot)) {
-						break; // low priority
+						continue; // low priority
 					}
 					slot.extract(transaction, insertable);
 					if(insertable.isFull(transaction)) {
@@ -102,7 +102,7 @@ public interface ArrayParticipant<T> extends Participant<T> {
 				int count = 0;
 				for (Slot<T> slot : ArrayParticipant.this.getSlots()) {
 					if(slot.equals(this.prioritySlot)) {
-						break; // low priority
+						continue; // low priority
 					}
 					int extracted = slot.extract(transaction, type, quantity);
 					count += extracted;
@@ -123,7 +123,7 @@ public interface ArrayParticipant<T> extends Participant<T> {
 				int count = 0;
 				for (Slot<T> slot : ArrayParticipant.this.getSlots()) {
 					if(slot.equals(this.prioritySlot)) {
-						break; // low priority
+						continue;
 					}
 					int inserted = slot.insert(transaction, type, quantity);
 					count += inserted;

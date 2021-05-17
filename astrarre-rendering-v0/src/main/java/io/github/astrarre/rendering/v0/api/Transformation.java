@@ -52,10 +52,6 @@ public final class Transformation implements Serializable {
 		this.scaleX = scaleX;
 		this.scaleY = scaleY;
 		this.scaleZ = scaleZ;
-		try(MemoryStack stack = MemoryStack.stackPush()) {
-			IntBuffer buffer = stack.mallocInt(10);
-			Struct
-		}
 	}
 
 	protected Transformation(NbtValue value) {

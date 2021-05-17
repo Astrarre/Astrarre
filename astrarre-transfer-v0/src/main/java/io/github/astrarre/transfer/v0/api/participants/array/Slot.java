@@ -1,5 +1,6 @@
 package io.github.astrarre.transfer.v0.api.participants.array;
 
+import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import io.github.astrarre.transfer.v0.api.Droplet;
 import io.github.astrarre.transfer.v0.api.Insertable;
 import io.github.astrarre.transfer.v0.api.Participant;
@@ -56,7 +57,7 @@ public interface Slot<T> extends Participant<T> {
 			return 0;
 		}
 		T current = this.getKey(transaction);
-		if(!this.isSame(current, key)) {
+		if(!(this.isSame(current, key) || this.isEmpty(transaction))) {
 			return 0;
 		}
 
@@ -89,5 +90,12 @@ public interface Slot<T> extends Participant<T> {
 
 	default boolean isSame(T origin, T incoming) {
 		return origin.equals(incoming);
+	}
+
+	interface Item extends Slot<ItemKey> {
+		@Override
+		default boolean isEmpty(@Nullable Transaction transaction) {
+			return this.getKey(transaction).isEmpty();
+		}
 	}
 }
