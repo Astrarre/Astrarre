@@ -30,12 +30,12 @@ public class BucketItemParticipant implements Participant<Fluid> {
 
 	@Override
 	public void extract(@Nullable Transaction transaction, Insertable<Fluid> insertable) {
-		BucketItemAccess_AccessFluid access = (BucketItemAccess_AccessFluid) this.currentKey.get(transaction).getItem();
-		Fluid fluid = access.getFluid();
+		ItemKey current = this.currentKey.get(transaction);
+		Fluid fluid = this.get(current);
 		if (Fluids.EMPTY != fluid) {
 			try(Transaction action = Transaction.create()) {
-				int toInsert = Droplet.minMultiply(this.quantity.get(action), Droplet.BUCKET);
-				int insert = insertable.insert(action, access.getFluid(), toInsert);
+				int toInsert = Droplet.minMultiply(this.quantity.get(action), this.quantity(current));
+				int insert = insertable.insert(action, fluid, toInsert);
 				if(insert != toInsert) { // too lazy to do partial results, if your stacking filled buckets it's your fault
 					action.abort();
 					return;
@@ -44,7 +44,7 @@ public class BucketItemParticipant implements Participant<Fluid> {
 				int quantity = this.quantity.get(action);
 				// todo if player context use empty bucket
 				if(this.extractTest(action, this.currentKey.get(action), quantity)) {
-					this.currentKey.set(action, ItemKey.of(Items.BUCKET));
+					this.currentKey.set(action, this.emptyItem());
 				} else {
 					action.abort();
 				}
@@ -53,27 +53,26 @@ public class BucketItemParticipant implements Participant<Fluid> {
 	}
 
 	protected boolean extractTest(Transaction transaction, ItemKey current, int quantity) {
-		return this.container.replace(transaction, current, quantity, ItemKey.of(Items.BUCKET), quantity);
+		return this.container.replace(transaction, current, quantity, this.emptyItem(), quantity);
 	}
 
 	@Override
 	public int insert(@Nullable Transaction transaction, @NotNull Fluid type, int quantity) {
-		if(quantity == 0 || type == Fluids.EMPTY) return 0;
-		BucketItemAccess_AccessFluid access = (BucketItemAccess_AccessFluid) this.currentKey.get(transaction).getItem();
-		Fluid fluid = access.getFluid();
+		if(quantity == 0 || type == Fluids.EMPTY || !this.isValid(type)) return 0;
+		Fluid fluid = this.get(this.currentKey.get(transaction));
 		if(fluid == Fluids.EMPTY) {
 			ItemKey current = this.currentKey.get(transaction);
-			int neededBuckets = Math.floorDiv(quantity, Droplet.BUCKET);
+			int neededBuckets = Math.floorDiv(quantity, this.quantity(current));
 			int currentBuckets = this.quantity.get(transaction);
 			int bucketsToTake = neededBuckets;
 			if(neededBuckets > currentBuckets) {
 				bucketsToTake = currentBuckets;
 			}
-			if(this.container.replace(transaction, current, bucketsToTake, ItemKey.of(type.getBucketItem()), bucketsToTake)) {
+			ItemKey filledItem = this.filledItem(type);
+			if(this.container.replace(transaction, current, bucketsToTake, filledItem, bucketsToTake)) {
 				if(bucketsToTake == currentBuckets) { // if every bucket was taken out
-					this.currentKey.set(transaction, ItemKey.of(type.getBucketItem()));
-					// we can make this assumption because our api is actually good, so even in the worst case scenario there wont be duplication/loss
-					this.quantity.set(transaction, type.getBucketItem().getMaxCount());
+					this.currentKey.set(transaction, filledItem);
+					this.quantity.set(transaction, filledItem.getMaxStackSize());
 				} else {
 					this.quantity.set(transaction, currentBuckets - bucketsToTake);
 				}
@@ -81,5 +80,25 @@ public class BucketItemParticipant implements Participant<Fluid> {
 			}
 		}
 		return 0;
+	}
+
+	protected boolean isValid(Fluid fluid) {
+		return true;
+	}
+
+	protected ItemKey filledItem(Fluid fluid) {
+		return ItemKey.of(fluid.getBucketItem());
+	}
+
+	protected ItemKey emptyItem() {
+		return ItemKey.of(Items.BUCKET);
+	}
+
+	protected Fluid get(ItemKey item) {
+		return ((BucketItemAccess_AccessFluid)item.getItem()).getFluid();
+	}
+
+	protected int quantity(ItemKey key) {
+		return Droplet.BUCKET;
 	}
 }

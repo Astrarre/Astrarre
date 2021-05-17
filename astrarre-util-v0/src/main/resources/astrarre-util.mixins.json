@@ -5,6 +5,7 @@
   "mixins": [
     "IdentifierMixin",
     "LazyAccess",
+    "LivingEntityMixin_FakePlayerEntity",
     "MinecraftServerMixin",
     "SetTagAccess",
     "TagWrapperAccess"
