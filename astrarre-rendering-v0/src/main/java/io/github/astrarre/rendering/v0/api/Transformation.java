@@ -1,6 +1,8 @@
 package io.github.astrarre.rendering.v0.api;
 
 
+import java.nio.IntBuffer;
+
 import io.github.astrarre.itemview.v0.api.Serializable;
 import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.itemview.v0.api.nbt.NBTType;
@@ -8,6 +10,8 @@ import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.itemview.v0.api.nbt.NbtValue;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
+import org.lwjgl.system.MemoryStack;
+import org.lwjgl.system.Struct;
 
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
@@ -48,6 +52,10 @@ public final class Transformation implements Serializable {
 		this.scaleX = scaleX;
 		this.scaleY = scaleY;
 		this.scaleZ = scaleZ;
+		try(MemoryStack stack = MemoryStack.stackPush()) {
+			IntBuffer buffer = stack.mallocInt(10);
+			Struct
+		}
 	}
 
 	protected Transformation(NbtValue value) {

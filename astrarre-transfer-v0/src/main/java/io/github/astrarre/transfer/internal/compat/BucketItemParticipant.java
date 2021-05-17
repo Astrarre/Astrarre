@@ -38,17 +38,22 @@ public class BucketItemParticipant implements Participant<Fluid> {
 				int insert = insertable.insert(action, access.getFluid(), toInsert);
 				if(insert != toInsert) { // too lazy to do partial results, if your stacking filled buckets it's your fault
 					action.abort();
+					return;
 				}
 
 				int quantity = this.quantity.get(action);
 				// todo if player context use empty bucket
-				if(this.container.replace(action, this.currentKey.get(action), quantity, ItemKey.of(Items.BUCKET), quantity)) {
+				if(this.extractTest(transaction, this.currentKey.get(action), quantity)) {
 					this.currentKey.set(action, ItemKey.of(Items.BUCKET));
 				} else {
 					action.abort();
 				}
 			}
 		}
+	}
+
+	protected boolean extractTest(Transaction transaction, ItemKey current, int quantity) {
+		return this.container.replace(transaction, current, quantity, ItemKey.of(Items.BUCKET), quantity);
 	}
 
 	@Override
