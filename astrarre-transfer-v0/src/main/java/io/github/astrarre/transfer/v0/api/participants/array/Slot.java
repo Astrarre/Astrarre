@@ -55,6 +55,11 @@ public interface Slot<T> extends Participant<T> {
 		if(quantity == 0) {
 			return 0;
 		}
+		T current = this.getKey(transaction);
+		if(!this.isSame(current, key)) {
+			return 0;
+		}
+
 		int result = Droplet.minSum(this.getQuantity(transaction), quantity);
 		int oldQuantity = this.getQuantity(transaction);
 		if(this.set(transaction, key, result)) {
@@ -76,9 +81,13 @@ public interface Slot<T> extends Participant<T> {
 
 	@Override
 	default int extract(@Nullable Transaction transaction, @NotNull T type, int quantity) {
-		if (type.equals(this.getKey(transaction))) {
+		if (this.isSame(this.getKey(transaction), type)) {
 			return this.extract(transaction, quantity);
 		}
 		return 0;
+	}
+
+	default boolean isSame(T origin, T incoming) {
+		return origin.equals(incoming);
 	}
 }
