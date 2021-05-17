@@ -2,8 +2,11 @@ package io.github.astrarre.transfer.v0.fabric.participants;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.function.Function;
 
 import com.google.common.collect.ImmutableMap;
@@ -19,6 +22,7 @@ import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import io.github.astrarre.transfer.internal.NUtil;
 import io.github.astrarre.transfer.internal.compat.BucketItemParticipant;
 import io.github.astrarre.transfer.internal.compat.CauldronParticipant;
+import io.github.astrarre.transfer.internal.compat.FishBucketItemParticipant;
 import io.github.astrarre.transfer.internal.compat.InventoryParticipant;
 import io.github.astrarre.transfer.internal.compat.PlayerInventoryParticipant;
 import io.github.astrarre.transfer.internal.compat.ProperPlayerInventory;
@@ -33,6 +37,7 @@ import io.github.astrarre.transfer.v0.api.item.ItemSlotParticipant;
 import io.github.astrarre.transfer.v0.api.participants.FixedObjectVolume;
 import io.github.astrarre.transfer.v0.api.participants.ObjectVolume;
 import io.github.astrarre.transfer.v0.api.participants.array.ArrayParticipant;
+import io.github.astrarre.transfer.v0.api.player.PlayerParticipant;
 import io.github.astrarre.transfer.v0.fabric.inventory.CombinedSidedInventory;
 import io.github.astrarre.transfer.v0.fabric.inventory.EmptyInventory;
 import io.github.astrarre.transfer.v0.fabric.inventory.SidedInventoryAccess;
@@ -52,6 +57,7 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.BucketItem;
+import net.minecraft.item.FishBucketItem;
 import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -102,6 +108,12 @@ public final class FabricParticipants {
 	 */
 	public static final BiFunctionAccess<Direction, Inventory, Participant<ItemKey>> FROM_INVENTORY = new BiFunctionAccess<>(id("from_inventory"));
 
+	protected static final Map<PlayerInventory, PlayerInventoryParticipant> PLAYER_INVENTORY_PARTICIPANT_MAP = new WeakHashMap<>();
+	public static PlayerParticipant forPlayerInventory(PlayerInventory inventory) {
+		// todo maybe store on player inventory
+		return PLAYER_INVENTORY_PARTICIPANT_MAP.computeIfAbsent(inventory, PlayerInventoryParticipant::new);
+	}
+
 	static {
 		ITEM_WORLD.addWorldProviderFunctions();
 		FLUID_WORLD.addWorldProviderFunctions();
@@ -119,6 +131,7 @@ public final class FabricParticipants {
 		});
 
 		FLUID_ITEM.forItemClassExact(BucketItem.class, (direction, key, count, participant) -> new BucketItemParticipant(key, count, participant));
+		FLUID_ITEM.forItemClassExact(FishBucketItem.class, (direction, key, count, participant) -> new FishBucketItemParticipant(key, count, participant));
 
 		FLUID_WORLD.forBlock(Blocks.CAULDRON, (WorldFunction.NoBlockEntity<Participant<Fluid>>) (direction, state, world, pos) -> new CauldronParticipant(state, world, pos));
 		TO_INVENTORY.forInstance(Participants.EMPTY.cast(), participant -> EmptyInventory.INSTANCE);
