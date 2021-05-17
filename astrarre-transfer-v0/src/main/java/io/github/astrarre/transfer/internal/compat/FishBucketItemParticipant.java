@@ -33,7 +33,6 @@ public class FishBucketItemParticipant extends BucketItemParticipant {
 				EntityType<?> type = ((FishBucketItemAccess_EntityTypeAccess) bucket).getFishType();
 				MinecraftServer server = MinecraftServers.activeServer;
 				if(server != null) {
-
 					LootManager manager = server.getLootManager();
 					LootTable table = manager.getTable(type.getLootTableId());
 					ServerWorld overworld = server.getOverworld(); // todo perhaps an access that gives more context like position and world?
@@ -47,6 +46,7 @@ public class FishBucketItemParticipant extends BucketItemParticipant {
 							.parameter(LootContextParameters.DAMAGE_SOURCE, DamageSource.OUT_OF_WORLD)
 							.parameter(LootContextParameters.ORIGIN, this.origin())
 							.build(LootContextTypes.ENTITY);
+
 
 					for (ItemStack stack : table.generateLoot(context)) {
 						if(this.container.insert(transaction, ItemKey.of(stack), stack.getCount()) != stack.getCount()) {

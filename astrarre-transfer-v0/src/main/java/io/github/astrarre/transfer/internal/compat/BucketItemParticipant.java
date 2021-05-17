@@ -43,7 +43,7 @@ public class BucketItemParticipant implements Participant<Fluid> {
 
 				int quantity = this.quantity.get(action);
 				// todo if player context use empty bucket
-				if(this.extractTest(transaction, this.currentKey.get(action), quantity)) {
+				if(this.extractTest(action, this.currentKey.get(action), quantity)) {
 					this.currentKey.set(action, ItemKey.of(Items.BUCKET));
 				} else {
 					action.abort();

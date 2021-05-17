@@ -7,6 +7,7 @@ import io.github.astrarre.itemview.v0.fabric.FabricViews;
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import org.jetbrains.annotations.NotNull;
 
+import net.minecraft.Bootstrap;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -18,6 +19,10 @@ public class TaggedItemImpl implements ItemKey {
 	private final int hashCode;
 
 	public TaggedItemImpl(Item item, NBTagView tag) {
+		if(item == null) {
+			Bootstrap.initialize();
+			item = Items.AIR;
+		}
 		this.item = item;
 		this.nbtTag = tag == null ? NBTagView.EMPTY : tag.copy();
 

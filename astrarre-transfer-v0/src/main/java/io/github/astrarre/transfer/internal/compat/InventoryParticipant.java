@@ -64,6 +64,11 @@ public class InventoryParticipant implements ArrayParticipant<ItemKey>, Provider
 		}
 
 		@Override
+		public boolean isEmpty(@Nullable Transaction transaction) {
+			return this.participant.array.get(transaction).get(this.index).isEmpty();
+		}
+
+		@Override
 		public ItemKey getKey(@Nullable Transaction transaction) {
 			return ItemKey.of(this.participant.array.get(transaction).get(this.index));
 		}
