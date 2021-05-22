@@ -27,6 +27,7 @@ import io.github.astrarre.transfer.internal.compat.InventoryParticipant;
 import io.github.astrarre.transfer.internal.compat.PlayerInventoryParticipant;
 import io.github.astrarre.transfer.internal.compat.ProperPlayerInventory;
 import io.github.astrarre.transfer.internal.compat.ShulkerboxItemParticipant;
+import io.github.astrarre.transfer.internal.compat.WaterBottleParticipant;
 import io.github.astrarre.transfer.internal.participantInventory.ArrayParticipantInventory;
 import io.github.astrarre.transfer.internal.participantInventory.ParticipantInventory;
 import io.github.astrarre.transfer.v0.api.Insertable;
@@ -59,6 +60,10 @@ import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.BucketItem;
 import net.minecraft.item.FishBucketItem;
 import net.minecraft.item.Item;
+import net.minecraft.item.PotionItem;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionUtil;
+import net.minecraft.potion.Potions;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.registry.Registry;
@@ -132,6 +137,13 @@ public final class FabricParticipants {
 
 		FLUID_ITEM.forItemClassExact(BucketItem.class, (direction, key, count, participant) -> new BucketItemParticipant(key, count, participant));
 		FLUID_ITEM.forItemClassExact(FishBucketItem.class, (direction, key, count, participant) -> new FishBucketItemParticipant(key, count, participant));
+		FLUID_ITEM.forItemClassExact(PotionItem.class, (direction, key, count, participant) -> {
+			Potion potion = PotionUtil.getPotion(key.getTag().toTag());
+			if(potion == Potions.WATER) {
+				return new WaterBottleParticipant(key, count, participant);
+			}
+			return null;
+		});
 
 		FLUID_WORLD.forBlock(Blocks.CAULDRON, (WorldFunction.NoBlockEntity<Participant<Fluid>>) (direction, state, world, pos) -> new CauldronParticipant(state, world, pos));
 		TO_INVENTORY.forInstance(Participants.EMPTY.cast(), participant -> EmptyInventory.INSTANCE);

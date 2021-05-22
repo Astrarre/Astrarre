@@ -50,11 +50,11 @@ public class MyTankBlock extends Block implements BlockEntityProvider {
 		Participant<Fluid> bucket = FabricParticipants.FLUID_ITEM.get().get(null, ItemKey.of(inHand), inHand.getCount(), participant.getHandReplacingParticipant(hand));
 		if(player.isSneaking()) {
 			int inserted = bucket.insert(Transaction.GLOBAL, Fluids.WATER, Droplet.BUCKET);
-			player.sendMessage(new LiteralText("Inserted " + inserted + "dp"), false);
+			player.sendMessage(new LiteralText("Inserted " + inserted + "dp into " + bucket.getClass().getSimpleName()), false);
 		} else {
 			FixedObjectVolume<Fluid> fixed = new FixedObjectVolume<>(Fluids.EMPTY, Droplet.BUCKET);
 			bucket.extract(Transaction.GLOBAL, fixed);
-			player.sendMessage(new LiteralText("Extracted " + fixed.getQuantity(Transaction.GLOBAL) + "dp of " + Registry.FLUID.getId(fixed.getKey(Transaction.GLOBAL))), false);
+			player.sendMessage(new LiteralText("Extracted " + fixed.getQuantity(Transaction.GLOBAL) + "dp of " + Registry.FLUID.getId(fixed.getKey(Transaction.GLOBAL)) + " into " + bucket.getClass().getSimpleName()), false);
 		}
 		return ActionResult.CONSUME;
 	}
