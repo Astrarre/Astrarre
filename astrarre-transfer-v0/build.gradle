@@ -3,14 +3,6 @@ dependsOn(project, 'astrarre-itemview-v0', 'astrarre-util-v0', 'astrarre-access-
 
 repositories {
     maven {
-        name = "BuildCraft"
-        url = "https://mod-buildcraft.com/maven"
-    }
-    maven {
-        name = "dblsaiko"
-        url = "https://maven.dblsaiko.net/"
-    }
-    maven {
         url = 'http://maven.modmuss50.me'
         content {
             includeGroup "RebornCore"
@@ -36,6 +28,20 @@ repositories {
             includeGroup "io.github.cottonmc"
         }
     }
+    maven {
+        url = "https://maven.cafeteria.dev/releases/"
+        content {
+            includeGroup "me.steven"
+        }
+    }
+    maven {
+        name = "BuildCraft"
+        url = "https://mod-buildcraft.com/maven"
+    }
+    maven {
+        name = "dblsaiko"
+        url = "https://maven.dblsaiko.net/"
+    }
     mavenLocal()
 }
 
@@ -56,7 +62,7 @@ dependencies {
     modRuntime("net.fabricmc.fabric-api:fabric-api:$fabric_version") {
         exclude module: 'fabric-loader'
     }
-    modRuntime('me.steven:Industrial-Revolution-master:1.9.4-BETA') {
+    modRuntime('me.steven:Industrial-Revolution-master:1.9.13-BETA') {
         exclude module: 'fabric-loader'
         exclude module: 'fabric-api'
     }

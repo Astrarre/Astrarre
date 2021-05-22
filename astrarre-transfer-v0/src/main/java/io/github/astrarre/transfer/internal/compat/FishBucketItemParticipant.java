@@ -40,14 +40,13 @@ public class FishBucketItemParticipant extends BucketItemParticipant {
 					if(fish == null) {
 						return false;
 					}
+					fish.setPos(this.origin().x, this.origin().y, this.origin().z);
 					LootContext context = new LootContext.Builder(overworld)
 							.random(overworld.random)
 							.parameter(LootContextParameters.THIS_ENTITY, fish)
 							.parameter(LootContextParameters.DAMAGE_SOURCE, DamageSource.OUT_OF_WORLD)
 							.parameter(LootContextParameters.ORIGIN, this.origin())
 							.build(LootContextTypes.ENTITY);
-
-
 					for (ItemStack stack : table.generateLoot(context)) {
 						if(this.container.insert(transaction, ItemKey.of(stack), stack.getCount()) != stack.getCount()) {
 							fish.remove();
