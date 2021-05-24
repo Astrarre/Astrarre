@@ -2,12 +2,11 @@ package io.github.astrarre.components.internal.lazyAsm;
 
 import io.github.astrarre.components.internal.access.CopyAccess;
 import io.github.astrarre.components.internal.access.DataObjectHolder;
-import io.github.astrarre.components.v0.api.factory.ComponentFactory;
-import io.github.astrarre.util.v0.api.Id;
 
-public class DataObjectHolderComponentFactory<C> extends ComponentFactory<C> {
-	public DataObjectHolderComponentFactory(Id name) {
-		super(name);
+public class DataObjectHolderComponentFactory<C> extends AbstractComponentFactory<C> {
+
+	public DataObjectHolderComponentFactory(String modid, String path) {
+		super(modid, path);
 	}
 
 	@Override

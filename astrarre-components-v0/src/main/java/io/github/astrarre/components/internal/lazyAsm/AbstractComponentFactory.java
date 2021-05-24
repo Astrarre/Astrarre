@@ -15,6 +15,7 @@ import io.github.astrarre.components.v0.api.components.FloatComponent;
 import io.github.astrarre.components.v0.api.components.IntComponent;
 import io.github.astrarre.components.v0.api.components.LongComponent;
 import io.github.astrarre.components.v0.api.components.ShortComponent;
+import io.github.astrarre.components.v0.api.factory.ComponentFactory;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
@@ -22,7 +23,7 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
-public abstract class LazyAsmComponentFactory<C> implements Opcodes {
+public abstract class AbstractComponentFactory<C> extends ComponentFactory<C> implements Opcodes {
 	private static final Map<Class<?>, Class<?>> TO_JAVA_MAP = new HashMap<>();
 	static {
 		TO_JAVA_MAP.put(BoolComponent.class, boolean.class);
@@ -38,20 +39,18 @@ public abstract class LazyAsmComponentFactory<C> implements Opcodes {
 
 	public static final Loader LOADER = new Loader();
 	private static final String COPY_ACCESS = Type.getInternalName(CopyAccess.class);
-	private static final String FACTORY = Type.getInternalName(LazyAsmComponentFactory.class);
-	private static final String FACTORY_DESC = Type.getDescriptor(LazyAsmComponentFactory.class);
+	private static final String FACTORY = Type.getInternalName(AbstractComponentFactory.class);
+	private static final String FACTORY_DESC = Type.getDescriptor(AbstractComponentFactory.class);
 	protected final String name;
 	protected DataHolderClass activeClass;
 
-	public abstract int getVersion(C context);
-	public abstract CopyAccess getData(C context);
-	public abstract void setData(C context, CopyAccess data, int version);
-
-	public LazyAsmComponentFactory(String name) {
-		this.name = name;
+	public AbstractComponentFactory(String modid, String path) {
+		this.name = modid + "__" + path;
 	}
 
-	public <V, T extends Component<C, V>> T create(Class<T> componentType, String id) {
+	@Override
+	public <V, T extends Component<C, V>> T create(Class<T> componentType, String modid, String path) {
+		String id = modid + "__" + path;
 		if(this.activeClass == null || this.activeClass.compiled != null) {
 			int version = this.activeClass == null ? 1 : (this.activeClass.version + 1);
 			this.activeClass = new DataHolderClass(this.activeClass, version, "astrarre-components-v0/generated/dataholder" + this.name + version);
@@ -61,7 +60,7 @@ public abstract class LazyAsmComponentFactory<C> implements Opcodes {
 		this.activeClass.fields.add(prototype);
 		try {
 			Class<?> c = this.generateComponentClass(componentType, this.activeClass.name, prototype, id);
-			return (T) c.getConstructor(LazyAsmComponentFactory.class, int.class).newInstance(this, this.activeClass.version);
+			return (T) c.getConstructor(AbstractComponentFactory.class, int.class).newInstance(this, this.activeClass.version);
 		} catch (ReflectiveOperationException e) {
 			throw new RuntimeException(e);
 		}
