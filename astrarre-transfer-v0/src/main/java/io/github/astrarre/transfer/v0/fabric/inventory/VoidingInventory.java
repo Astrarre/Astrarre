@@ -82,10 +82,6 @@ public class VoidingInventory implements SidedInventory {
 		return false;
 	}
 
-	@Override
-	public int getMaxCountPerStack() {
-		return 128;
-	}
 
 	@Override
 	public void onOpen(PlayerEntity player) {

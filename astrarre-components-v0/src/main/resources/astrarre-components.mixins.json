@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "io.github.astrarre.components.internal.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "BlockEntityMixin",
+    "EntityMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
