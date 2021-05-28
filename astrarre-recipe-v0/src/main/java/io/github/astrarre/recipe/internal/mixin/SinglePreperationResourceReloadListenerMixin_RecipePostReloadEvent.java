@@ -8,12 +8,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.recipe.RecipeManager;
 import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.ResourceReloadListener;
-import net.minecraft.resource.SinglePreparationResourceReloadListener;
+import net.minecraft.resource.ResourceReloader;
+import net.minecraft.resource.SinglePreparationResourceReloader;
 import net.minecraft.util.profiler.Profiler;
 
-@Mixin(SinglePreparationResourceReloadListener.class)
-public abstract class SinglePreperationResourceReloadListenerMixin_RecipePostReloadEvent implements ResourceReloadListener {
+@Mixin(SinglePreparationResourceReloader.class)
+public abstract class SinglePreperationResourceReloadListenerMixin_RecipePostReloadEvent implements ResourceReloader {
 	@Inject(method = "method_18790", at = @At("RETURN"))
 	public void onPostReload(ResourceManager manager, Profiler profiler, Object object, CallbackInfo info) {
 		if((Object)this instanceof RecipeManager) {

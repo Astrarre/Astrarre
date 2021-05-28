@@ -49,12 +49,14 @@ public class PlayerInventoryParticipant extends InventoryParticipant implements 
 
 		@Override
 		protected void setRootValue(ItemStack val) {
-			this.inventory.setCursorStack(val);
+			if(this.inventory.player.currentScreenHandler == null) throw new IllegalStateException("Player not in GUI, so cannot set cursor stack");
+			this.inventory.player.currentScreenHandler.setCursorStack(val);
 		}
 
 		@Override
 		protected ItemStack getRootValue() {
-			return this.inventory.getCursorStack();
+			if(this.inventory.player.currentScreenHandler == null) throw new IllegalStateException("Player not in GUI, so cannot get cursor stack");
+			return this.inventory.player.currentScreenHandler.getCursorStack();
 		}
 	}
 }

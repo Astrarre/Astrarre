@@ -27,7 +27,7 @@ public class HopperBlockEntityTransformer_InventoryCrossCompatibilityHooks {
 			TransferInternalAstrarre.HOPPER_BLOCK_ENTITY_GET_INVENTORY));
 
 	public static Inventory get(BlockPos pos, World world, BlockState state) {
-		if (!state.getBlock().hasBlockEntity()) {
+		if (!state.hasBlockEntity()) {
 			return get(pos, world, state, null);
 		}
 		return null;

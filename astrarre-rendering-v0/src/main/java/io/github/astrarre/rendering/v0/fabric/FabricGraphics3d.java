@@ -7,6 +7,7 @@ import io.github.astrarre.rendering.v0.api.Graphics3d;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Matrix4f;
@@ -29,7 +30,7 @@ public class FabricGraphics3d extends FabricGraphics2d implements Graphics3d {
 		int g = color >> 8 & 255;
 		int b = color & 255;
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-		bufferBuilder.begin(1, VertexFormats.POSITION_COLOR);
+		bufferBuilder.begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR);
 		bufferBuilder.vertex(matrix, x1, y1, z1).color(r, g, b, a).next();
 		bufferBuilder.vertex(matrix, x2, y2, z2).color(r, g, b, a).next();
 		bufferBuilder.end();

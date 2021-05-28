@@ -135,4 +135,9 @@ public class ATextFieldWidget extends AAbstractButtonAdapter<TextFieldWidget> {
 	}
 
 	public static void init() {}
+
+	@Override
+	public void tick(RootContainer container) {
+		this.drawable.tick();
+	}
 }

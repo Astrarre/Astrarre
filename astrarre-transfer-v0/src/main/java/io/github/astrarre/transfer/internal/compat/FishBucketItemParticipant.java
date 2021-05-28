@@ -30,7 +30,7 @@ public class FishBucketItemParticipant extends BucketItemParticipant {
 		Item bucket = current.getItem();
 		if(bucket instanceof FishBucketItemAccess_EntityTypeAccess) {
 			if(super.extractTest(transaction, current, quantity)) {
-				EntityType<?> type = ((FishBucketItemAccess_EntityTypeAccess) bucket).getFishType();
+				EntityType<?> type = ((FishBucketItemAccess_EntityTypeAccess) bucket).getEntityType();
 				MinecraftServer server = MinecraftServers.activeServer;
 				if(server != null) {
 					LootManager manager = server.getLootManager();
@@ -49,11 +49,11 @@ public class FishBucketItemParticipant extends BucketItemParticipant {
 							.build(LootContextTypes.ENTITY);
 					for (ItemStack stack : table.generateLoot(context)) {
 						if(this.container.insert(transaction, ItemKey.of(stack), stack.getCount()) != stack.getCount()) {
-							fish.remove();
+							fish.remove(Entity.RemovalReason.DISCARDED);
 							return false;
 						}
 					}
-					fish.remove();
+					fish.remove(Entity.RemovalReason.DISCARDED);
 					return true;
 				}
 			}

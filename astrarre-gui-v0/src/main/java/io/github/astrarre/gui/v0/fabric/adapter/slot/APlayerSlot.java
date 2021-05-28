@@ -25,7 +25,7 @@ public final class APlayerSlot extends ASlot {
 	}
 
 	public APlayerSlot(NetworkMember member, int index) {
-		super(ENTRY, member.to().inventory, index);
+		super(ENTRY, member.to().getInventory(), index);
 	}
 
 	public static void init() {
@@ -37,7 +37,7 @@ public final class APlayerSlot extends ASlot {
 	@Override
 	protected Inventory readInventoryData(NBTagView input) {
 		PlayerEntity player = MinecraftClient.getInstance().player;
-		return player.inventory;
+		return player.getInventory();
 	}
 
 	@Override

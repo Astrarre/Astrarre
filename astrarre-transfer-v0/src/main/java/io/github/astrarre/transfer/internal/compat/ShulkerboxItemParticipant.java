@@ -19,11 +19,13 @@ import io.github.astrarre.util.v0.api.collection.ExposedDefaultList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.math.BlockPos;
 
 public class ShulkerboxItemParticipant implements Participant<ItemKey> {
 	public final ReplacingParticipant<ItemKey> container;
@@ -34,12 +36,12 @@ public class ShulkerboxItemParticipant implements Participant<ItemKey> {
 	public ShulkerboxItemParticipant(ReplacingParticipant<ItemKey> container, ItemKey key, ShulkerBoxBlockEntity shulkerbox) {
 		this.container = container;
 		this.shulkerbox = shulkerbox;
-		shulkerbox.deserializeInventory(key.getTag().getTag("BlockEntityTag").toTag());
+		shulkerbox.readInventoryNbt(key.getTag().getTag("BlockEntityTag").toTag());
 		this.currentKey = new ObjectKeyImpl<>(key);
 	}
 
 	public static Participant<ItemKey> create(ReplacingParticipant<ItemKey> container, ItemKey key, BlockEntityType<? extends ShulkerBoxBlockEntity> type) {
-		ShulkerBoxBlockEntity shulkerbox = type.instantiate();
+		ShulkerBoxBlockEntity shulkerbox = type.instantiate(BlockPos.ORIGIN, Blocks.SHULKER_BOX.getDefaultState());
 		if (shulkerbox == null) {
 			return Participants.EMPTY.cast();
 		}
@@ -94,8 +96,8 @@ public class ShulkerboxItemParticipant implements Participant<ItemKey> {
 
 			ItemKey current = this.currentKey.get(transaction);
 
-			CompoundTag tag = new CompoundTag();
-			Inventories.toTag(tag, new ExposedDefaultList<>(this.key.get(transaction), ItemStack.EMPTY), false);
+			NbtCompound tag = new NbtCompound();
+			Inventories.writeNbt(tag, new ExposedDefaultList<>(this.key.get(transaction), ItemStack.EMPTY), false);
 			((ImmutableAccess) tag).astrarre_setImmutable();
 			ItemKey withNewTag = current.withTag(FabricViews.immutableView(tag));
 

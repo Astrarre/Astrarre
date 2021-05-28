@@ -22,7 +22,7 @@ public class BlockEntitySyncedProperty<T> extends SyncedProperty<T> {
 
 	static {
 		ModPacketHandler.INSTANCE.registerSynchronizedClient(BLOCK_ENTITY_SYNC, (id, tag) -> {
-			RegistryKey<World> key = RegistryKey.of(Registry.DIMENSION, Serializer.ID.read(tag, "world").to());
+			RegistryKey<World> key = RegistryKey.of(Registry.WORLD_KEY, Serializer.ID.read(tag, "world").to());
 			BlockPos pos = FabricSerializers.BLOCK_POS.read(tag, "pos");
 			int syncId = tag.getInt("syncId");
 			ClientWorld world = MinecraftClient.getInstance().world;

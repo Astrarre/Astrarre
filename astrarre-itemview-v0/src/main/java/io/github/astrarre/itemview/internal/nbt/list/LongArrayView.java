@@ -1,14 +1,12 @@
 package io.github.astrarre.itemview.internal.nbt.list;
 
 import java.util.Arrays;
-
+import net.minecraft.nbt.NbtLongArray;
 import io.github.astrarre.itemview.v0.fabric.FabricViews;
 import it.unimi.dsi.fastutil.longs.AbstractLongList;
 
-import net.minecraft.nbt.LongArrayTag;
-
 public final class LongArrayView extends AbstractLongList {
-	private final LongArrayTag array;
+	private final NbtLongArray array;
 
 	/**
 	 * @deprecated unsafe
@@ -16,14 +14,14 @@ public final class LongArrayView extends AbstractLongList {
 	 */
 	@Deprecated
 	public static LongArrayView create(long[] array) {
-		return new LongArrayView(new LongArrayTag(array));
+		return new LongArrayView(new NbtLongArray(array));
 	}
 
 	public static LongArrayView createCopy(long[] array) {
 		return create(Arrays.copyOf(array, array.length));
 	}
 
-	private LongArrayView(LongArrayTag tag) {this.array = tag;}
+	private LongArrayView(NbtLongArray tag) {this.array = tag;}
 
 	@Override
 	public long getLong(int index) {
@@ -40,10 +38,10 @@ public final class LongArrayView extends AbstractLongList {
 
 	/**
 	 * @deprecated internal
-	 * @see FabricViews#view(LongArrayTag)
+	 * @see FabricViews#view(NbtLongArray)
 	 */
 	@Deprecated
-	public static LongArrayView create(LongArrayTag tag) {
+	public static LongArrayView create(NbtLongArray tag) {
 		return new LongArrayView(tag);
 	}
 
@@ -54,11 +52,11 @@ public final class LongArrayView extends AbstractLongList {
 	 * @see #asCopiedTag()
 	 */
 	@Deprecated
-	public LongArrayTag asTag() {
+	public NbtLongArray asTag() {
 		return this.array;
 	}
 
-	public LongArrayTag asCopiedTag() {
+	public NbtLongArray asCopiedTag() {
 		return this.array.copy();
 	}
 }

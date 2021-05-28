@@ -40,7 +40,7 @@ public interface SpriteManager {
 				path,
 				(Supplier) valid);
 		MinecraftClient client = MinecraftClient.getInstance();
-		((ReloadableResourceManager) client.getResourceManager()).registerListener(manager);
+		((ReloadableResourceManager) client.getResourceManager()).registerReloader(manager);
 		SpriteAtlasManagerManager.register(manager);
 		return (SpriteManager) manager;
 	}

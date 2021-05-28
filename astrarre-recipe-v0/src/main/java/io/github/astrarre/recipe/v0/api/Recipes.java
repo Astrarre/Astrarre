@@ -79,10 +79,10 @@ public class Recipes {
 	public static GsonBuilder defaultGson() {
 		return new GsonBuilder()
 				       .registerTypeAdapter(ItemStack.class, ItemStackSerializer.INSTANCE)
-				       .registerTypeAdapter(new TypeToken<Tag<Item>>() {}.getType(), new TagSerializer<>(ServerTagManagerHolder.getTagManager()::getItems))
-				       .registerTypeAdapter(new TypeToken<Tag<Fluid>>() {}.getType(), new TagSerializer<>(ServerTagManagerHolder.getTagManager()::getFluids))
-				       .registerTypeAdapter(new TypeToken<Tag<Block>>() {}.getType(), new TagSerializer<>(ServerTagManagerHolder.getTagManager()::getBlocks))
-				       .registerTypeAdapter(new TypeToken<Tag<EntityType<?>>>() {}.getType(), new TagSerializer<>(ServerTagManagerHolder.getTagManager()::getEntityTypes))
+				       .registerTypeAdapter(new TypeToken<Tag<Item>>() {}.getType(), new TagSerializer<>(ServerTagManagerHolder.getTagManager(), Registry.ITEM_KEY))
+				       .registerTypeAdapter(new TypeToken<Tag<Fluid>>() {}.getType(), new TagSerializer<>(ServerTagManagerHolder.getTagManager(), Registry.FLUID_KEY))
+				       .registerTypeAdapter(new TypeToken<Tag<Block>>() {}.getType(), new TagSerializer<>(ServerTagManagerHolder.getTagManager(), Registry.BLOCK_KEY))
+				       .registerTypeAdapter(new TypeToken<Tag<EntityType<?>>>() {}.getType(), new TagSerializer<>(ServerTagManagerHolder.getTagManager(), Registry.ENTITY_TYPE_KEY))
 				       .registerTypeAdapter(Ingredient.class, IngredientSerializer.INSTANCE);
 	}
 }

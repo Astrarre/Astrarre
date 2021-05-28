@@ -3,9 +3,8 @@ package io.github.astrarre.gui.internal;
 import io.github.astrarre.gui.v0.api.base.panel.APanel;
 
 import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.screen.TickableElement;
 
-public class PanelElement implements Element, TickableElement {
+public class PanelElement implements Element {
 	protected final APanel panel;
 	protected final RootContainerInternal internal;
 
@@ -64,7 +63,6 @@ public class PanelElement implements Element, TickableElement {
 		return this.panel.isHovering(this.internal, mouseX, mouseY);
 	}
 
-	@Override
 	public void tick() {
 		this.internal.tick++;
 		this.internal.tickComponents();

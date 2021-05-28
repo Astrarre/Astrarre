@@ -3,7 +3,9 @@ package io.github.astrarre.itemview.internal.mixin.nbt;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
+import net.minecraft.nbt.AbstractNbtNumber;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import io.github.astrarre.itemview.internal.access.ImmutableAccess;
 import io.github.astrarre.itemview.internal.util.ImmutableIterable;
 import io.github.astrarre.itemview.internal.util.NBTagUnmodifiableMap;
@@ -20,19 +22,15 @@ import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
-import net.minecraft.nbt.AbstractNumberTag;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-
-@Mixin(CompoundTag.class)
+@Mixin(NbtCompound.class)
 public abstract class CompoundTagMixin implements ImmutableAccess, NBTagView.Builder {
 	private boolean immutable;
-	@Shadow public abstract @Nullable Tag shadow$get(String key);
+	@Shadow public abstract @Nullable NbtElement shadow$get(String key);
 	@Shadow public abstract Set<String> getKeys();
-	@Shadow public abstract CompoundTag getCompound(String key);
+	@Shadow public abstract NbtCompound getCompound(String key);
 	@Shadow public abstract boolean shadow$isEmpty();
 
-	@Mutable @Shadow @Final private Map<String, Tag> tags;
+	@Mutable @Shadow @Final private Map<String, NbtElement> tags;
 
 	@Shadow public abstract void shadow$putByte(String key, byte value);
 
@@ -48,7 +46,7 @@ public abstract class CompoundTagMixin implements ImmutableAccess, NBTagView.Bui
 
 	@Shadow public abstract void shadow$putLong(String key, long value);
 
-	@Shadow @Nullable public abstract Tag put(String key, Tag tag);
+	@Shadow @Nullable public abstract NbtElement put(String key, NbtElement tag);
 
 	@Intrinsic
 	public boolean soft$isEmpty() {
@@ -57,80 +55,80 @@ public abstract class CompoundTagMixin implements ImmutableAccess, NBTagView.Bui
 
 	@Override
 	public byte getByte(String path, byte def) {
-		AbstractNumberTag tag = this.itemview_getTag(path, NBTType.BYTE);
+		AbstractNbtNumber tag = this.itemview_getTag(path, NBTType.BYTE);
 		if(tag != null) {
-			return tag.getByte();
+			return tag.byteValue();
 		}
 		return def;
 	}
 
 	@Override
 	public short getShort(String path, short def) {
-		AbstractNumberTag tag = this.itemview_getTag(path, NBTType.SHORT);
+		AbstractNbtNumber tag = this.itemview_getTag(path, NBTType.SHORT);
 		if(tag != null) {
-			return tag.getShort();
+			return tag.shortValue();
 		}
 		return def;
 	}
 
 	@Override
 	public int getInt(String path, int def) {
-		AbstractNumberTag tag = this.itemview_getTag(path, NBTType.INT);
+		AbstractNbtNumber tag = this.itemview_getTag(path, NBTType.INT);
 		if(tag != null) {
-			return tag.getInt();
+			return tag.intValue();
 		}
 		return def;
 	}
 
 	@Override
 	public float getFloat(String path, float def) {
-		AbstractNumberTag tag = this.itemview_getTag(path, NBTType.FLOAT);
+		AbstractNbtNumber tag = this.itemview_getTag(path, NBTType.FLOAT);
 		if(tag != null) {
-			return tag.getFloat();
+			return tag.floatValue();
 		}
 		return def;
 	}
 
 	@Override
 	public long getLong(String path, long def) {
-		AbstractNumberTag tag = this.itemview_getTag(path, NBTType.LONG);
+		AbstractNbtNumber tag = this.itemview_getTag(path, NBTType.LONG);
 		if(tag != null) {
-			return tag.getLong();
+			return tag.longValue();
 		}
 		return def;
 	}
 
 	@Override
 	public double getDouble(String path, double def) {
-		AbstractNumberTag tag = this.itemview_getTag(path, NBTType.DOUBLE);
+		AbstractNbtNumber tag = this.itemview_getTag(path, NBTType.DOUBLE);
 		if(tag != null) {
-			return tag.getDouble();
+			return tag.doubleValue();
 		}
 		return def;
 	}
 
 	@Override
 	public Number getNumber(String path, Number def) {
-		AbstractNumberTag tag = this.itemview_getTag(path, NBTType.NUMBER);
+		AbstractNbtNumber tag = this.itemview_getTag(path, NBTType.NUMBER);
 		if(tag != null) {
-			return tag.getNumber();
+			return tag.numberValue();
 		}
 		return def;
 	}
 
 	@Nullable
 	@Unique
-	private AbstractNumberTag itemview_getTag(String path, NBTType<?> type) {
-		Tag tag = this.shadow$get(path);
-		if(tag != null && (tag.getType() == type.getInternalType() || type == NBTType.NUMBER) && tag instanceof AbstractNumberTag) {
-			return ((AbstractNumberTag)tag);
+	private AbstractNbtNumber itemview_getTag(String path, NBTType<?> type) {
+		NbtElement tag = this.shadow$get(path);
+		if(tag != null && (tag.getType() == type.getInternalType() || type == NBTType.NUMBER) && tag instanceof AbstractNbtNumber) {
+			return ((AbstractNbtNumber)tag);
 		}
 		return null;
 	}
 
 	@Override
 	public String getString(String path, String def) {
-		Tag tag = this.shadow$get(path);
+		NbtElement tag = this.shadow$get(path);
 		if(tag != null && tag.getType() == NBTType.STRING.getInternalType()) {
 			return tag.asString();
 		}
@@ -144,7 +142,7 @@ public abstract class CompoundTagMixin implements ImmutableAccess, NBTagView.Bui
 
 	@Override
 	public Builder putValue(String path, NbtValue value) {
-		this.put(path, (Tag) value);
+		this.put(path, (NbtElement) value);
 		return this;
 	}
 
@@ -156,13 +154,13 @@ public abstract class CompoundTagMixin implements ImmutableAccess, NBTagView.Bui
 
 	@Override
 	public NBTagView getTag(String path, NBTagView def) {
-		CompoundTag tag = this.getCompound(path);
+		NbtCompound tag = this.getCompound(path);
 		return tag == null ? null : FabricViews.view(tag);
 	}
 
 	@Override
 	public <T> T get(String path, NBTType<T> type, T def) {
-		Tag tag = this.shadow$get(path);
+		NbtElement tag = this.shadow$get(path);
 		if(tag == null) {
 			return def;
 		}
@@ -184,7 +182,7 @@ public abstract class CompoundTagMixin implements ImmutableAccess, NBTagView.Bui
 		if(this.immutable) {
 			return this;
 		}
-		return FabricViews.immutableView((CompoundTag) (Object) this);
+		return FabricViews.immutableView((NbtCompound) (Object) this);
 	}
 
 	@Override

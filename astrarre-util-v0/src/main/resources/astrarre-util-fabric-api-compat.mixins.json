@@ -2,7 +2,7 @@
   "required": true,
   "package": "io.github.astrarre.util.internal.fapimixin",
   "plugin": "io.github.astrarre.util.internal.FapiMixinPlugin",
-  "compatibilityLevel": "JAVA_8",
+  "compatibilityLevel": "JAVA_16",
   "mixins": [
     "TagDelegateAccess"
   ],

@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 
 /**
  * A FixedObjectVolume for ItemKey (it uses the Item's max stack size). If initialized with a custom max size, it will take the min of the size of the
@@ -148,7 +148,7 @@ public class ItemSlotParticipant implements Slot<ItemKey> {
 		ItemStack stack = this.type.get(null);
 		StringBuilder builder = new StringBuilder("[");
 		builder.append(stack.getItem().toString());
-		CompoundTag tag = stack.getTag();
+		NbtCompound tag = stack.getTag();
 		if(tag != null && !tag.isEmpty()) {
 			builder.append(' ').append(tag);
 		}

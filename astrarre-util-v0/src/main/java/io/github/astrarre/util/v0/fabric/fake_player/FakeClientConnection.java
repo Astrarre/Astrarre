@@ -104,7 +104,7 @@ public class FakeClientConnection extends ClientConnection {
 	}
 
 	@Override
-	public void channelInactive(ChannelHandlerContext channelHandlerContext) throws Exception {
+	public void channelInactive(ChannelHandlerContext channelHandlerContext) {
 	}
 
 	@Override
@@ -112,7 +112,7 @@ public class FakeClientConnection extends ClientConnection {
 	}
 
 	@Override
-	protected void channelRead0(ChannelHandlerContext channelHandlerContext, Packet<?> packet) throws Exception {
+	protected void channelRead0(ChannelHandlerContext channelHandlerContext, Packet<?> packet) {
 	}
 
 	@Override

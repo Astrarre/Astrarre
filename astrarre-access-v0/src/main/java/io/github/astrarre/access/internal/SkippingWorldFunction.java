@@ -46,7 +46,7 @@ public class SkippingWorldFunction<T> implements WorldFunction<T> {
 				if (state == null) {
 					if (entity == null) {
 						state = world.getBlockState(pos);
-						askEntity = state.getBlock().hasBlockEntity();
+						askEntity = state.hasBlockEntity();
 					} else {
 						state = entity.getCachedState();
 					}
@@ -66,7 +66,7 @@ public class SkippingWorldFunction<T> implements WorldFunction<T> {
 				if (state == null) {
 					if (entity == null) {
 						state = world.getBlockState(pos);
-						askEntity = state.getBlock().hasBlockEntity();
+						askEntity = state.hasBlockEntity();
 					} else {
 						state = entity.getCachedState();
 					}

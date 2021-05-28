@@ -1,7 +1,7 @@
 {
   "required": true,
   "package": "io.github.astrarre.transfer.internal.mixin",
-  "compatibilityLevel": "JAVA_8",
+  "compatibilityLevel": "JAVA_16",
   "mixins": [
     "BucketItemAccess_AccessFluid",
     "FishBucketItemAccess_EntityTypeAccess",

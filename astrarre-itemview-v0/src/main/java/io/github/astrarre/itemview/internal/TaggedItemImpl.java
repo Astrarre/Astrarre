@@ -11,7 +11,7 @@ import net.minecraft.Bootstrap;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 
 public class TaggedItemImpl implements ItemKey {
 	private final NBTagView nbtTag;
@@ -31,7 +31,7 @@ public class TaggedItemImpl implements ItemKey {
 		this.hashCode = result;
 	}
 
-	public TaggedItemImpl(Item item, CompoundTag tag) {
+	public TaggedItemImpl(Item item, NbtCompound tag) {
 		this(item, FabricViews.immutableView(tag));
 	}
 

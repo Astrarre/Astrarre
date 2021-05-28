@@ -1,14 +1,12 @@
 package io.github.astrarre.itemview.internal.nbt.list;
 
 import java.util.Arrays;
-
+import net.minecraft.nbt.NbtByteArray;
 import io.github.astrarre.itemview.v0.fabric.FabricViews;
 import it.unimi.dsi.fastutil.bytes.AbstractByteList;
 
-import net.minecraft.nbt.ByteArrayTag;
-
 public final class ByteArrayView extends AbstractByteList {
-	private final ByteArrayTag array;
+	private final NbtByteArray array;
 
 	/**
 	 * @deprecated unsafe
@@ -16,14 +14,14 @@ public final class ByteArrayView extends AbstractByteList {
 	 */
 	@Deprecated
 	public static ByteArrayView create(byte[] array) {
-		return new ByteArrayView(new ByteArrayTag(array));
+		return new ByteArrayView(new NbtByteArray(array));
 	}
 
 	public static ByteArrayView createCopy(byte[] array) {
 		return create(Arrays.copyOf(array, array.length));
 	}
 
-	private ByteArrayView(ByteArrayTag tag) {this.array = tag;}
+	private ByteArrayView(NbtByteArray tag) {this.array = tag;}
 
 	@Override
 	public byte getByte(int index) {
@@ -38,10 +36,10 @@ public final class ByteArrayView extends AbstractByteList {
 	// internal
 	/**
 	 * @deprecated internal
-	 * @see FabricViews#view(ByteArrayTag)
+	 * @see FabricViews#view(NbtByteArray)
 	 */
 	@Deprecated
-	public static ByteArrayView create(ByteArrayTag tag) {
+	public static ByteArrayView create(NbtByteArray tag) {
 		return new ByteArrayView(tag);
 	}
 
@@ -52,11 +50,11 @@ public final class ByteArrayView extends AbstractByteList {
 	 * @see #asCopiedTag()
 	 */
 	@Deprecated
-	public ByteArrayTag asTag() {
+	public NbtByteArray asTag() {
 		return this.array;
 	}
 
-	public ByteArrayTag asCopiedTag() {
-		return (ByteArrayTag) this.array.copy();
+	public NbtByteArray asCopiedTag() {
+		return (NbtByteArray) this.array.copy();
 	}
 }

@@ -1,17 +1,19 @@
 package io.github.astrarre.transfer.internal.compat;
 
 import io.github.astrarre.transfer.v0.api.Droplet;
-import io.github.astrarre.transfer.v0.api.Extractable;
 import io.github.astrarre.transfer.v0.api.Insertable;
 import io.github.astrarre.transfer.v0.api.Participant;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import io.github.astrarre.transfer.v0.api.transaction.keys.ObjectKeyImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
+import net.minecraft.block.AbstractCauldronBlock;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CauldronBlock;
+import net.minecraft.block.LavaCauldronBlock;
+import net.minecraft.block.LeveledCauldronBlock;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.util.math.BlockPos;
@@ -31,37 +33,74 @@ public class CauldronParticipant implements Participant<Fluid> {
 	@Override
 	public void extract(@Nullable Transaction transaction, Insertable<Fluid> insertable) {
 		BlockState state = this.key.getRootValue();
-		if(state.getBlock() != Blocks.CAULDRON) {
+		int level = this.getLevel(state);
+		if(level == -1 || level == 0) {
 			return;
 		}
 
 		try(Transaction action = Transaction.create()) {
-			int level = state.get(CauldronBlock.LEVEL);
-			int insert = insertable.insert(action, Fluids.WATER, level * Droplet.BOTTLE);
-			if(insert % Droplet.BOTTLE != 0) {
+			Fluid from = this.getFluid(state);
+			int insert = insertable.insert(action, from, level * Droplet.BOTTLE);
+			if(insert % this.unit(from) != 0) {
 				action.abort();
 				return;
 			}
 
 			int subtracted = insert / Droplet.BOTTLE;
-			this.key.set(action, state.with(CauldronBlock.LEVEL, level - subtracted));
+			this.key.set(action, this.from(from, level - subtracted));
 		}
+	}
+
+	protected BlockState from(Fluid fluid, int level) {
+		if(fluid == Fluids.LAVA) {
+			return Blocks.LAVA_CAULDRON.getDefaultState();
+		} else {
+			return Blocks.WATER_CAULDRON.getDefaultState().with(LeveledCauldronBlock.LEVEL, level);
+		}
+	}
+
+	protected Fluid getFluid(BlockState state) {
+		Block block = state.getBlock();
+		if(block instanceof LavaCauldronBlock) {
+			return Fluids.LAVA;
+		} else if(block instanceof LeveledCauldronBlock) {
+			return Fluids.WATER;
+		}
+		return Fluids.EMPTY;
+	}
+
+	protected int unit(Fluid fluid) {
+		if(fluid == Fluids.WATER) {
+			return Droplet.BOTTLE;
+		} else {
+			return Droplet.BUCKET;
+		}
+	}
+
+	protected int getLevel(BlockState state) {
+		Block block = state.getBlock();
+		if(block instanceof LavaCauldronBlock) {
+			return 3;
+		} else if(block instanceof LeveledCauldronBlock) {
+			return state.get(LeveledCauldronBlock.LEVEL);
+		} else if(block instanceof CauldronBlock) {
+			return 0;
+		}
+		return -1;
 	}
 
 	@Override
 	public int insert(@Nullable Transaction transaction, @NotNull Fluid type, int quantity) {
 		BlockState state = this.key.getRootValue();
-		if(state.getBlock() != Blocks.CAULDRON) {
-			return 0;
-		}
-
-		int level = state.get(CauldronBlock.LEVEL);
-		if(type == Fluids.WATER) {
+		int level = this.getLevel(state);
+		if(level == -1) return 0;
+		Fluid fluid = this.getFluid(state);
+		if(type == fluid || fluid == Fluids.EMPTY) {
 			int deltaLevel = Math.min(3 - level, quantity / Droplet.BOTTLE);
-			if(deltaLevel == 0) {
+			if(deltaLevel == 0 || (deltaLevel + level) % (this.unit(fluid) / Droplet.BOTTLE) != 0) {
 				return 0;
 			}
-			this.key.set(transaction, state.with(CauldronBlock.LEVEL, deltaLevel + level));
+			this.key.set(transaction, this.from(fluid, deltaLevel + level));
 			return deltaLevel * Droplet.BOTTLE;
 		}
 		return 0;

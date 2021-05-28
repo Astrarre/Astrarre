@@ -36,14 +36,14 @@ public class ModPacketHandlerImpl implements ModPacketHandler {
 	@Environment(EnvType.CLIENT)
 	public void sendToServer(Id id, NBTagView output) {
 		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-		buf.writeCompoundTag(output.toTag());
+		buf.writeNbt(output.toTag());
 		Objects.requireNonNull(MinecraftClient.getInstance().getNetworkHandler(), "No Active Server!").sendPacket(new CustomPayloadC2SPacket(id.to(), buf));
 	}
 
 	@Override
 	public void sendToClient(ServerPlayerEntity entity, Id id, NBTagView out) {
 		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-		buf.writeCompoundTag(out.toTag());
+		buf.writeNbt(out.toTag());
 		entity.networkHandler.sendPacket(new CustomPayloadS2CPacket((Identifier) id, buf));
 	}
 
@@ -129,7 +129,7 @@ public class ModPacketHandlerImpl implements ModPacketHandler {
 		boolean iter = false;
 		NBTagView view = null;
 		for (ClientReceiver receiver : listeners) {
-			if(view == null) view = FabricViews.view(data.readCompoundTag());
+			if(view == null) view = FabricViews.view(data.readNbt());
 			receiver.accept(identifier, view);
 			iter = true;
 		}

@@ -7,19 +7,17 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-
+import net.minecraft.nbt.NbtElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.nbt.Tag;
-
-public class NBTagUnmodifiableMap implements Map<String, Tag> {
-	private final Map<String, Tag> delegate;
+public class NBTagUnmodifiableMap implements Map<String, NbtElement> {
+	private final Map<String, NbtElement> delegate;
 	private Set<String> keys;
-	private Collection<Tag> values;
-	private Set<Entry<String, Tag>> entrySet;
+	private Collection<NbtElement> values;
+	private Set<Entry<String, NbtElement>> entrySet;
 
-	public NBTagUnmodifiableMap(Map<String, Tag> delegate) {this.delegate = delegate;}
+	public NBTagUnmodifiableMap(Map<String, NbtElement> delegate) {this.delegate = delegate;}
 
 	private IllegalStateException unsupported() {
 		return new IllegalStateException("cannot modify immutable compound tag!");
@@ -46,23 +44,23 @@ public class NBTagUnmodifiableMap implements Map<String, Tag> {
 	}
 
 	@Override
-	public Tag get(Object key) {
+	public NbtElement get(Object key) {
 		return this.delegate.get(key);
 	}
 
 	@Nullable
 	@Override
-	public Tag put(String key, Tag value) {
+	public NbtElement put(String key, NbtElement value) {
 		throw this.unsupported();
 	}
 
 	@Override
-	public Tag remove(Object key) {
+	public NbtElement remove(Object key) {
 		throw this.unsupported();
 	}
 
 	@Override
-	public void putAll(@NotNull Map<? extends String, ? extends Tag> m) {
+	public void putAll(@NotNull Map<? extends String, ? extends NbtElement> m) {
 		throw this.unsupported();
 	}
 
@@ -82,7 +80,7 @@ public class NBTagUnmodifiableMap implements Map<String, Tag> {
 
 	@NotNull
 	@Override
-	public Collection<Tag> values() {
+	public Collection<NbtElement> values() {
 		if(this.values == null) {
 			this.values = Collections.unmodifiableCollection(this.delegate.values());
 		}
@@ -91,7 +89,7 @@ public class NBTagUnmodifiableMap implements Map<String, Tag> {
 
 	@NotNull
 	@Override
-	public Set<Entry<String, Tag>> entrySet() {
+	public Set<Entry<String, NbtElement>> entrySet() {
 		if(this.entrySet == null) {
 			this.entrySet = Collections.unmodifiableSet(this.delegate.entrySet());
 		}
@@ -109,23 +107,23 @@ public class NBTagUnmodifiableMap implements Map<String, Tag> {
 	}
 
 	@Override
-	public Tag getOrDefault(Object key, Tag defaultValue) {
+	public NbtElement getOrDefault(Object key, NbtElement defaultValue) {
 		return this.delegate.getOrDefault(key, defaultValue);
 	}
 
 	@Override
-	public void forEach(BiConsumer<? super String, ? super Tag> action) {
+	public void forEach(BiConsumer<? super String, ? super NbtElement> action) {
 		this.delegate.forEach(action);
 	}
 
 	@Override
-	public void replaceAll(BiFunction<? super String, ? super Tag, ? extends Tag> function) {
+	public void replaceAll(BiFunction<? super String, ? super NbtElement, ? extends NbtElement> function) {
 		throw this.unsupported();
 	}
 
 	@Nullable
 	@Override
-	public Tag putIfAbsent(String key, Tag value) {
+	public NbtElement putIfAbsent(String key, NbtElement value) {
 		throw this.unsupported();
 	}
 
@@ -135,33 +133,33 @@ public class NBTagUnmodifiableMap implements Map<String, Tag> {
 	}
 
 	@Override
-	public boolean replace(String key, Tag oldValue, Tag newValue) {
+	public boolean replace(String key, NbtElement oldValue, NbtElement newValue) {
 		throw this.unsupported();
 	}
 
 	@Nullable
 	@Override
-	public Tag replace(String key, Tag value) {
+	public NbtElement replace(String key, NbtElement value) {
 		throw this.unsupported();
 	}
 
 	@Override
-	public Tag computeIfAbsent(String key, Function<? super String, ? extends Tag> mappingFunction) {
+	public NbtElement computeIfAbsent(String key, Function<? super String, ? extends NbtElement> mappingFunction) {
 		throw this.unsupported();
 	}
 
 	@Override
-	public Tag computeIfPresent(String key, BiFunction<? super String, ? super Tag, ? extends Tag> remappingFunction) {
+	public NbtElement computeIfPresent(String key, BiFunction<? super String, ? super NbtElement, ? extends NbtElement> remappingFunction) {
 		throw this.unsupported();
 	}
 
 	@Override
-	public Tag compute(String key, BiFunction<? super String, ? super Tag, ? extends Tag> remappingFunction) {
+	public NbtElement compute(String key, BiFunction<? super String, ? super NbtElement, ? extends NbtElement> remappingFunction) {
 		throw this.unsupported();
 	}
 
 	@Override
-	public Tag merge(String key, Tag value, BiFunction<? super Tag, ? super Tag, ? extends Tag> remappingFunction) {
+	public NbtElement merge(String key, NbtElement value, BiFunction<? super NbtElement, ? super NbtElement, ? extends NbtElement> remappingFunction) {
 		throw this.unsupported();
 	}
 }

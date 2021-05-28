@@ -7,6 +7,8 @@ import io.github.astrarre.access.internal.access.BlockEntityAccess;
 import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.access.v0.fabric.func.WorldFunction;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
@@ -28,7 +30,7 @@ public final class BlockCache {
 		return ((WorldChunkAccess)chunk).astrarre_getOrCreate(pos, ((world1, pos1) -> {
 			BlockState state = chunk.getBlockState(pos1);
 			BlockEntity entity = null;
-			if(state.getBlock().hasBlockEntity()) {
+			if(state.hasBlockEntity()) {
 				entity = chunk.getBlockEntity(pos1);
 			}
 			return new BlockCache(world1, pos1, state, entity);
@@ -68,7 +70,7 @@ public final class BlockCache {
 	}
 
 	public BlockEntity getBlockEntity() {
-		if((this.reference == null || this.reference.get() == null) && this.getBlockState().getBlock().hasBlockEntity()) {
+		if((this.reference == null || this.reference.get() == null) && this.getBlockState().hasBlockEntity()) {
 			BlockEntity entity = this.world.getBlockEntity(this.pos);
 			if(entity != null) {
 				this.reference = new WeakReference<>(entity);

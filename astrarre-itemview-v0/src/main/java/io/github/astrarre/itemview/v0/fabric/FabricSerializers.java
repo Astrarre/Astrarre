@@ -11,7 +11,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -19,9 +19,9 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 public interface FabricSerializers {
-	Serializer<ItemStack> ITEM_STACK = Serializer.of(tag -> ItemStack.fromTag(tag.asTag().toTag()), (stack) -> {
-		CompoundTag tag = new CompoundTag();
-		stack.toTag(tag);
+	Serializer<ItemStack> ITEM_STACK = Serializer.of(tag -> ItemStack.fromNbt(tag.asTag().toTag()), (stack) -> {
+		NbtCompound tag = new NbtCompound();
+		stack.writeNbt(tag);
 		return FabricViews.view(tag);
 	});
 	Serializer<Identifier> IDENTIFIER = Serializer.of(tag -> new Identifier(tag.asString()),
@@ -34,10 +34,10 @@ public interface FabricSerializers {
 	Serializer<Fluid> FLUID = of(Registry.FLUID);
 
 	static Serializer<Entity> entity(World world) {
-		return Serializer.of((s) -> EntityType.getEntityFromTag(Objects.requireNonNull(s.asTag().toTag(), "no entry found!"), world)
+		return Serializer.of((s) -> EntityType.getEntityFromNbt(Objects.requireNonNull(s.asTag().toTag(), "no entry found!"), world)
 				                            .orElseThrow(NullPointerException::new), (entity) -> {
-			CompoundTag tag = new CompoundTag();
-			entity.saveToTag(tag);
+			NbtCompound tag = new NbtCompound();
+			entity.saveNbt(tag);
 			return FabricViews.view(tag);
 		});
 	}

@@ -1,10 +1,11 @@
 {
   "required": true,
   "package": "io.github.astrarre.gui.internal.mixin",
-  "compatibilityLevel": "JAVA_8",
+  "compatibilityLevel": "JAVA_16",
   "mixins": [
     "HandledScreenMixin",
     "HandledScreensAccess",
+    "ItemRendererMixin_CustomMatrixStack",
     "MinecraftClientMixin",
     "ScreenAccess",
     "ScreenHandlerAccess",

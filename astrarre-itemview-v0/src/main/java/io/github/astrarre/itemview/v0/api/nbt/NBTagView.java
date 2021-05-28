@@ -3,15 +3,13 @@ package io.github.astrarre.itemview.v0.api.nbt;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-
+import net.minecraft.nbt.NbtCompound;
 import com.google.common.collect.Iterables;
 import io.github.astrarre.itemview.v0.api.Serializable;
 import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.itemview.v0.fabric.FabricViews;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import net.minecraft.nbt.CompoundTag;
 
 /**
  * an unmodifiable view of an nbt tag, the underlying object is not guaranteed to be immutable and may change.
@@ -20,10 +18,10 @@ import net.minecraft.nbt.CompoundTag;
  */
 @NotNull
 public interface NBTagView extends Iterable<String>, NbtValue {
-	NBTagView EMPTY = (NBTagView) new CompoundTag();
+	NBTagView EMPTY = (NBTagView) new NbtCompound();
 
 	static Builder builder() {
-		return (Builder) new CompoundTag();
+		return (Builder) new NbtCompound();
 	}
 
 	NbtValue getValue(String path);
@@ -256,8 +254,8 @@ public interface NBTagView extends Iterable<String>, NbtValue {
 	NBTagView copy();
 
 	@Nullable
-	default CompoundTag copyTag() {
-		CompoundTag tag = this.toTag();
+	default NbtCompound copyTag() {
+		NbtCompound tag = this.toTag();
 		return tag == null ? null : tag.copy();
 	}
 
@@ -268,8 +266,8 @@ public interface NBTagView extends Iterable<String>, NbtValue {
 	 */
 	@Nullable
 	@Deprecated
-	default CompoundTag toTag() {
-		return (CompoundTag) this;
+	default NbtCompound toTag() {
+		return (NbtCompound) this;
 	}
 
 	default Builder toBuilder() {

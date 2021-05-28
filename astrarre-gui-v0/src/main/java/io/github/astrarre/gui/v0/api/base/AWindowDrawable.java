@@ -2,7 +2,7 @@ package io.github.astrarre.gui.v0.api.base;
 
 import java.util.Collection;
 import java.util.HashSet;
-
+import net.minecraft.util.math.Vector4f;
 import io.github.astrarre.gui.v0.api.ADrawable;
 import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
@@ -12,8 +12,6 @@ import io.github.astrarre.rendering.v0.api.util.Polygon;
 import io.github.astrarre.rendering.v0.edge.Stencil;
 import io.github.astrarre.util.v0.api.Id;
 import org.jetbrains.annotations.Nullable;
-
-import net.minecraft.client.util.math.Vector4f;
 
 /**
  * Everything outside the window is culled and not drawn onto the screen

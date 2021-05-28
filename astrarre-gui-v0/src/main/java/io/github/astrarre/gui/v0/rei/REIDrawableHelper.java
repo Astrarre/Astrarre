@@ -28,6 +28,11 @@ public class REIDrawableHelper {
 		}
 
 		@Override
+		public void tick(RootContainer container) {
+
+		}
+
+		@Override
 		protected void write0(RootContainer container, NBTagView.Builder output) {
 			// client-only
 		}

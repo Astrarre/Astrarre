@@ -2,12 +2,11 @@ package io.github.astrarre.itemview.internal.mixin.nbt.list;
 
 import io.github.astrarre.itemview.internal.access.AbstractListTagAccess;
 import io.github.astrarre.itemview.v0.api.nbt.NBTType;
+import net.minecraft.nbt.NbtIntArray;
 import io.github.astrarre.itemview.internal.nbt.list.IntArrayView;
 import org.spongepowered.asm.mixin.Mixin;
 
-import net.minecraft.nbt.IntArrayTag;
-
-@Mixin(IntArrayTag.class)
+@Mixin(NbtIntArray.class)
 public class IntArrayTagMixin implements AbstractListTagAccess {
 	private Object view;
 
@@ -19,7 +18,7 @@ public class IntArrayTagMixin implements AbstractListTagAccess {
 
 		Object view = this.view;
 		if (view == null) {
-			this.view = view = IntArrayView.create((IntArrayTag) (Object) this);
+			this.view = view = IntArrayView.create((NbtIntArray) (Object) this);
 		}
 		return view;
 	}

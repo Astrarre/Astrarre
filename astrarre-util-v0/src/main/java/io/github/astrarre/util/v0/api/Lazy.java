@@ -144,7 +144,7 @@ public final class Lazy<T> implements Supplier<T> {
 	public net.minecraft.util.Lazy<T> toMC() {
 		if(this.supplier == null) {
 			net.minecraft.util.Lazy<T> lazy = new net.minecraft.util.Lazy<>(null);
-			((LazyAccess)lazy).setValue(this.instance);
+			((LazyAccess)lazy).setSupplier(() -> this.instance);
 			return lazy;
 		} else {
 			// has to be `this`/`this::get`, because we don't want to evaluate the supplier twice on accident

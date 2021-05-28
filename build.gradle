@@ -90,9 +90,8 @@ static def nanoevents(Project proj) {
 static def dependsOn(Project proj, Iterable<Project> projs) {
     proj.dependencies {
         projs.each {
-            compile it
+            api it
             testmodCompile it.sourceSets.main.output
-            proj.tasks.compileJava.dependsOn(it.tasks.compileJava)
         }
     }
     proj.publishing {

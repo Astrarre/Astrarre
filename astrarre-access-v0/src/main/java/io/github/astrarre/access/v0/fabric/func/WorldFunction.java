@@ -47,7 +47,7 @@ public interface WorldFunction<T> {
 
 	@Nullable
 	default T get(@Nullable Direction direction, BlockState state, World world, BlockPos pos) {
-		if (state.getBlock().hasBlockEntity()) {
+		if (state.hasBlockEntity()) {
 			return this.get(direction, state, world, pos, world.getBlockEntity(pos));
 		}
 		return this.get(direction, state, world, pos, null);
@@ -174,7 +174,7 @@ public interface WorldFunction<T> {
 		@Override
 		@Nullable
 		default T get(@Nullable Direction direction, BlockState state, World world, BlockPos pos) {
-			if (state.getBlock().hasBlockEntity()) {
+			if (state.hasBlockEntity()) {
 				return this.get(direction, world, pos, world.getBlockEntity(pos));
 			}
 			return this.get(direction, world, pos, null);

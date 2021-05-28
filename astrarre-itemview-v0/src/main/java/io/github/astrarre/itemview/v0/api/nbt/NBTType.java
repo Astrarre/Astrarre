@@ -1,15 +1,13 @@
 package io.github.astrarre.itemview.v0.api.nbt;
 
 import java.util.List;
-
+import net.minecraft.nbt.NbtElement;
 import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.itemview.v0.fabric.FabricViews;
 import it.unimi.dsi.fastutil.bytes.ByteList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.longs.LongList;
 import org.jetbrains.annotations.Nullable;
-
-import net.minecraft.nbt.Tag;
 
 @SuppressWarnings ({
 		"unchecked",
@@ -114,7 +112,7 @@ public final class NBTType<T> implements Serializer<T> {
 
 	@Override
 	public T read(NbtValue value) {
-		return FabricViews.view((Tag) value, this);
+		return FabricViews.view((NbtElement) value, this);
 	}
 
 	@Override

@@ -72,7 +72,7 @@ public abstract class ContainerGUI {
 	 */
 	protected List<ASlot> addPlayerInventory(AAggregateDrawable mainPanel) {
 		int inventoryStartX = this.getContainerWidth() / 2 - (INVENTORY_ROW_LENGTH * SLOT_WIDTH) / 2, inventoryStartY = this.getContainerHeight() - (PIXELS_TO_INVENTORY_BOTTOM + (4 * SLOT_WIDTH) + 4);
-		PlayerInventory inventory = this.member.to().inventory;
+		PlayerInventory inventory = this.member.to().getInventory();
 
 		List<ASlot> mainInventorySlots = new ArrayList<>(27);
 		for (int slotRow = 0; slotRow < 3; slotRow++) {

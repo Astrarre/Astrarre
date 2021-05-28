@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 
 /**
  * an Item and it's NBT data (guaranteed immutable)
@@ -53,7 +53,7 @@ public interface ItemKey {
 	@NotNull
 	NBTagView getTag();
 
-	default CompoundTag getCompoundTag() {
+	default NbtCompound getCompoundTag() {
 		return this.getTag().copyTag();
 	}
 

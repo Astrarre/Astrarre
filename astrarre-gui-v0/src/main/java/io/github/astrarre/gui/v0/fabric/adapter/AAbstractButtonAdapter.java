@@ -4,10 +4,9 @@ import io.github.astrarre.gui.v0.api.DrawableRegistry;
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.rendering.v0.api.util.Polygon;
+import net.minecraft.client.gui.widget.ClickableWidget;
 
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
-
-public abstract class AAbstractButtonAdapter<T extends AbstractButtonWidget> extends AElementAdapter<T> {
+public abstract class AAbstractButtonAdapter<T extends ClickableWidget> extends AElementAdapter<T> {
 	public static final int LOCK = 0;
 	protected boolean enabled = true;
 	private final int width, height;

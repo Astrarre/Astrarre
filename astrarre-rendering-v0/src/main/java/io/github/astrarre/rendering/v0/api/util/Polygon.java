@@ -21,8 +21,7 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Vector4f;
-
+import net.minecraft.util.math.Vector4f;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
@@ -244,7 +243,7 @@ public final class Polygon implements Serializable {
 	@Environment (EnvType.CLIENT)
 	public BufferBuilder triangleBuffer(MatrixStack stack, VertexFormat format, UnaryOperator<VertexConsumer> consumer) {
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
-		buffer.begin(GL11.GL_TRIANGLES, format);
+		buffer.begin(VertexFormat.DrawMode.TRIANGLES, format);
 		IntList triangles = this.triangulate();
 		for (int i = triangles.size() - 1; i >= 0; i--) {
 			int vertex = triangles.getInt(i);

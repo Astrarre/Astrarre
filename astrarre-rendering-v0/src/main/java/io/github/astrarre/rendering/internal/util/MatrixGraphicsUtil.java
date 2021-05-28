@@ -1,11 +1,10 @@
 package io.github.astrarre.rendering.internal.util;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Matrix4f;
@@ -37,7 +36,7 @@ public class MatrixGraphicsUtil {
 		float g = (float) (color >> 8 & 255) / 255.0F;
 		float b = (float) (color & 255) / 255.0F;
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR);
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 		bufferBuilder.vertex(matrix, x1, y1, z1).color(r, g, b, a).next();
 		bufferBuilder.vertex(matrix, x2, y2, z2).color(r, g, b, a).next();
 		bufferBuilder.vertex(matrix, x3, y3, z3).color(r, g, b, a).next();
@@ -64,13 +63,11 @@ public class MatrixGraphicsUtil {
 			float z4,
 			int colorStart,
 			int colorEnd) {
-		RenderSystem.shadeModel(7425);
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR);
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 		fillGradient(matrices.peek().getModel(), bufferBuilder, x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4, colorStart, colorEnd);
 		tessellator.draw();
-		RenderSystem.shadeModel(7424);
 	}
 
 	protected static void fillGradient(Matrix4f matrix,
@@ -105,13 +102,12 @@ public class MatrixGraphicsUtil {
 
 	public static void drawTexturedQuad(Matrix4f matrices, float x0, float x1, float y0, float y1, float z, float u0, float u1, float v0, float v1) {
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-		bufferBuilder.begin(7, VertexFormats.POSITION_TEXTURE);
+		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
 		bufferBuilder.vertex(matrices, x0, y1, z).texture(u0, v1).next();
 		bufferBuilder.vertex(matrices, x1, y1, z).texture(u1, v1).next();
 		bufferBuilder.vertex(matrices, x1, y0, z).texture(u1, v0).next();
 		bufferBuilder.vertex(matrices, x0, y0, z).texture(u0, v0).next();
 		bufferBuilder.end();
-		RenderSystem.enableAlphaTest();
 		BufferRenderer.draw(bufferBuilder);
 	}
 }

@@ -13,10 +13,10 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Vector4f;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.Vector4f;
 
 public class FabricGUIGraphics extends FabricGraphics3d implements GuiGraphics {
 	public final Screen screen;
@@ -30,11 +30,12 @@ public class FabricGUIGraphics extends FabricGraphics3d implements GuiGraphics {
 	public void drawItem(ItemKey stack) {
 		this.pushStage(null);
 		this.getItemRenderer().zOffset = 0;
-		RenderSystem.pushMatrix();
-		RenderSystem.multMatrix(this.matrices.peek().getModel());
-		RenderSystem.translatef(0, 0, -150);
+		MatrixStack matrixStack = RenderSystem.getModelViewStack();
+		matrixStack.push();
+		matrixStack.method_34425(this.matrices.peek().getModel());
+		matrixStack.translate(0, 0, -140);
 		this.getItemRenderer().renderInGui(stack.createItemStack(1), 1, 1);
-		RenderSystem.popMatrix();
+		matrixStack.pop();
 		RenderSystem.enableDepthTest();
 	}
 
@@ -43,12 +44,13 @@ public class FabricGUIGraphics extends FabricGraphics3d implements GuiGraphics {
 		//this.renderGuiItemModel(itemStack, x, y, this.getHeldItemModel(itemStack, (World)null, entity)) 1.17 stuff
 		this.pushStage(null);
 		this.getItemRenderer().zOffset = 0;
-		RenderSystem.pushMatrix();
-		RenderSystem.multMatrix(this.matrices.peek().getModel());
-		RenderSystem.translatef(0, 0, -140);
+		MatrixStack matrixStack = RenderSystem.getModelViewStack();
+		matrixStack.push();
+		matrixStack.method_34425(this.matrices.peek().getModel());
+		matrixStack.translate(0, 0, -140);
 		this.getItemRenderer().renderInGui(stack, 1, 1);
 		this.getItemRenderer().renderGuiItemOverlay(this.getTextRenderer(), stack, 1, 1);
-		RenderSystem.popMatrix();
+		matrixStack.pop();
 		RenderSystem.enableDepthTest();
 	}
 

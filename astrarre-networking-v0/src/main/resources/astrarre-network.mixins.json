@@ -1,7 +1,7 @@
 {
   "required": true,
   "package": "io.github.astrarre.networking.mixin",
-  "compatibilityLevel": "JAVA_8",
+  "compatibilityLevel": "JAVA_16",
   "mixins": [
     "BlockEntityMixin_SyncedProperty",
     "CustomPayloadC2SPacketAccess",

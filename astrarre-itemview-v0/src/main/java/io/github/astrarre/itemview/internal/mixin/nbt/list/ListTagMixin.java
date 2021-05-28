@@ -2,13 +2,12 @@ package io.github.astrarre.itemview.internal.mixin.nbt.list;
 
 import io.github.astrarre.itemview.internal.access.AbstractListTagAccess;
 import io.github.astrarre.itemview.v0.api.nbt.NBTType;
+import net.minecraft.nbt.NbtList;
 import io.github.astrarre.itemview.internal.nbt.list.ListTagView;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-import net.minecraft.nbt.ListTag;
-
-@Mixin(ListTag.class)
+@Mixin(NbtList.class)
 public abstract class ListTagMixin implements AbstractListTagAccess {
 	@Shadow public abstract byte getType();
 	@Shadow public abstract byte getElementType();
@@ -26,7 +25,7 @@ public abstract class ListTagMixin implements AbstractListTagAccess {
 
 		Object view = this.view;
 		if (view == null) {
-			this.view = view = ListTagView.create((ListTag) (Object) this, component);
+			this.view = view = ListTagView.create((NbtList) (Object) this, component);
 		}
 		return view;
 	}

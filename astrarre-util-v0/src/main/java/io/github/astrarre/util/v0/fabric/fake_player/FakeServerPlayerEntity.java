@@ -16,7 +16,7 @@ import net.minecraft.util.math.Vec3d;
 public class FakeServerPlayerEntity extends ServerPlayerEntity {
 	private static final UUID FAKE_PLAYER_UUID = new UUID(-1L, -1L);
 	public FakeServerPlayerEntity(MinecraftServer server, ServerWorld world, Vec3d pos) {
-		super(server, world, new GameProfile(FAKE_PLAYER_UUID, "indrev_fake_player"), new ServerPlayerInteractionManager(world));
+		super(server, world, new GameProfile(FAKE_PLAYER_UUID, "indrev_fake_player"));
 		this.setPos(pos.x, pos.y, pos.z);
 		this.networkHandler = new FakeServerPlayNetworkHandler(server, this);
 	}

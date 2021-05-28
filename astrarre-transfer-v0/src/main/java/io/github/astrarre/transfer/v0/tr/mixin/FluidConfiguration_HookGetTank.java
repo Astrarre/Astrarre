@@ -22,7 +22,6 @@ import net.minecraft.world.World;
 
 @Mixin(value = FluidConfiguration.class, remap = false)
 public class FluidConfiguration_HookGetTank {
-
 	@Inject(method = "getTank", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
 	public void print(MachineBaseBlockEntity machine, Direction facing, CallbackInfoReturnable<Tank> cir, BlockPos pos, BlockEntity blockEntity) {
 		BlockState state;
@@ -31,8 +30,9 @@ public class FluidConfiguration_HookGetTank {
 			state = blockEntity.getCachedState();
 			world = blockEntity.getWorld();
 		} else {
-			state = machine.getCachedState();
-			world = machine.getWorld();
+			// todo uncomment
+			world = null; //machine.getWorld();
+			state = world.getBlockState(pos);
 		}
 		Participant<Fluid> participant = FabricParticipants.FLUID_WORLD.get().get(facing.getOpposite(), state, world, pos, blockEntity);
 		if(participant == (Object)Participants.EMPTY) {

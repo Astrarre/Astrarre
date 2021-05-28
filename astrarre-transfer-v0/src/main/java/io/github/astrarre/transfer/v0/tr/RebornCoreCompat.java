@@ -21,7 +21,7 @@ public class RebornCoreCompat implements ModInitializer {
 			FabricParticipants.FLUID_WORLD.andThen((direction, state, world, pos, entity) -> {
 				if (entity instanceof MachineBaseBlockEntity) {
 					// todo call FluidConfiguration#getTank
-					Tank tank = ((MachineBaseBlockEntity) entity).getTank();
+					Tank tank = null; //((MachineBaseBlockEntity) entity).getTank();
 					if (tank != null) {
 						return new TankParticipant(tank);
 					}

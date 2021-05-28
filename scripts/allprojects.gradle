@@ -1,3 +1,4 @@
+import java.nio.file.Files
 
 allprojects {
     sourceCompatibility = JavaVersion.VERSION_16
@@ -42,6 +43,17 @@ allprojects {
 
     jar {
         from "$rootProject.projectDir/LICENSE"
+    }
+
+    task moveMigrates {
+        doLast {
+            file("src/main/java").deleteDir()
+            Files.move(file("remappedSrc").toPath(), file("src/main/java").toPath())
+        }
+    }
+
+    migrateMappings {
+        mappings("1.17-pre1+build.4")
     }
 
     dependencies {

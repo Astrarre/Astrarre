@@ -28,7 +28,7 @@ public class ItemStackSerializer implements JsonDeserializer<ItemStack> {
 			}
 			return new ItemStack(item);
 		} else if(json.isJsonObject()) {
-			return ShapedRecipe.getItemStack((JsonObject) json);
+			return ShapedRecipe.outputFromJson((JsonObject) json);
 		}
 		throw new JsonParseException("Invalid ItemStack " + json);
 	}

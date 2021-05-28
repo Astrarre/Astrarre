@@ -7,8 +7,7 @@ import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
 import io.github.astrarre.recipe.v0.api.InternalRecipeAccess;
 import io.github.astrarre.recipe.v0.api.Recipe;
-
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.recipe.RecipeSerializer;
@@ -35,7 +34,7 @@ public class CustomRecipeSerializer<T extends Recipe> implements RecipeSerialize
 
 	@Override
 	public RecipeWrapper<T> read(Identifier id, PacketByteBuf buf) {
-		JsonElement object = Dynamic.convert(NbtOps.INSTANCE, JsonOps.INSTANCE, buf.readCompoundTag());
+		JsonElement object = Dynamic.convert(NbtOps.INSTANCE, JsonOps.INSTANCE, buf.readNbt());
 		T instance = this.gson.fromJson(object, this.type);
 		InternalRecipeAccess.set(instance, id);
 		return new RecipeWrapper<>(id, instance, this.recipeType, this);
@@ -44,6 +43,6 @@ public class CustomRecipeSerializer<T extends Recipe> implements RecipeSerialize
 	@Override
 	public void write(PacketByteBuf buf, RecipeWrapper<T> recipe) {
 		JsonElement element = this.gson.toJsonTree(recipe.instance);
-		buf.writeCompoundTag((CompoundTag) Dynamic.convert(JsonOps.INSTANCE, NbtOps.INSTANCE, element));
+		buf.writeNbt((NbtCompound) Dynamic.convert(JsonOps.INSTANCE, NbtOps.INSTANCE, element));
 	}
 }

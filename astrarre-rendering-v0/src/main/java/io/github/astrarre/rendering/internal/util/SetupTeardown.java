@@ -5,6 +5,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.DiffuseLighting;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 
 public enum SetupTeardown {
@@ -14,23 +15,13 @@ public enum SetupTeardown {
 			RenderSystem.enableBlend();
 			RenderSystem.disableTexture();
 			RenderSystem.defaultBlendFunc();
+			RenderSystem.setShader(GameRenderer::getPositionColorShader);
 		}
 
 		@Override
 		public void teardown() {
 			RenderSystem.enableTexture();
 			RenderSystem.disableBlend();
-		}
-	},
-	GRADIENT(FILL) {
-		@Override
-		public void setup() {
-			RenderSystem.shadeModel(7425);
-		}
-
-		@Override
-		public void teardown() {
-			RenderSystem.shadeModel(7424);
 		}
 	},
 	ITEM(null) {
@@ -42,9 +33,6 @@ public enum SetupTeardown {
 		@Override
 		public void teardown() {
 			RenderSystem.enableDepthTest();
-			RenderSystem.disableAlphaTest();
-			RenderSystem.disableRescaleNormal();
-			RenderSystem.popMatrix();
 		}
 	};
 

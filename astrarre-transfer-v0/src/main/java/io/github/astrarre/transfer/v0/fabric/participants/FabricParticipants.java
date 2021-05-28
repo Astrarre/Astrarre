@@ -2,7 +2,6 @@ package io.github.astrarre.transfer.v0.fabric.participants;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -25,7 +24,6 @@ import io.github.astrarre.transfer.internal.compat.CauldronParticipant;
 import io.github.astrarre.transfer.internal.compat.FishBucketItemParticipant;
 import io.github.astrarre.transfer.internal.compat.InventoryParticipant;
 import io.github.astrarre.transfer.internal.compat.PlayerInventoryParticipant;
-import io.github.astrarre.transfer.internal.compat.ProperPlayerInventory;
 import io.github.astrarre.transfer.internal.compat.ShulkerboxItemParticipant;
 import io.github.astrarre.transfer.internal.compat.WaterBottleParticipant;
 import io.github.astrarre.transfer.internal.participantInventory.ArrayParticipantInventory;
@@ -58,7 +56,7 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.BucketItem;
-import net.minecraft.item.FishBucketItem;
+import net.minecraft.item.EntityBucketItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.PotionItem;
 import net.minecraft.potion.Potion;
@@ -81,7 +79,6 @@ public final class FabricParticipants {
 	public static final WorldAccess<Participant<Fluid>> FLUID_WORLD = new WorldAccess<>(id("fluid_world"), Participants.EMPTY.cast());
 	public static final EntityAccess<Participant<ItemKey>> ITEM_ENTITY = new EntityAccess<>(id("item_entity"), Participants.EMPTY.cast());
 	public static final EntityAccess<Participant<Fluid>> FLUID_ENTITY = new EntityAccess<>(id("fluid_entity"), Participants.EMPTY.cast());
-
 	/**
 	 * get item container from item in an item container
 	 */
@@ -136,7 +133,7 @@ public final class FabricParticipants {
 		});
 
 		FLUID_ITEM.forItemClassExact(BucketItem.class, (direction, key, count, participant) -> new BucketItemParticipant(key, count, participant));
-		FLUID_ITEM.forItemClassExact(FishBucketItem.class, (direction, key, count, participant) -> new FishBucketItemParticipant(key, count, participant));
+		FLUID_ITEM.forItemClassExact(EntityBucketItem.class, (direction, key, count, participant) -> new FishBucketItemParticipant(key, count, participant));
 		FLUID_ITEM.forItemClassExact(PotionItem.class, (direction, key, count, participant) -> {
 			Potion potion = PotionUtil.getPotion(key.getTag().toTag());
 			if(potion == Potions.WATER) {
@@ -146,6 +143,10 @@ public final class FabricParticipants {
 		});
 
 		FLUID_WORLD.forBlock(Blocks.CAULDRON, (WorldFunction.NoBlockEntity<Participant<Fluid>>) (direction, state, world, pos) -> new CauldronParticipant(state, world, pos));
+		FLUID_WORLD.forBlock(Blocks.LAVA_CAULDRON, (WorldFunction.NoBlockEntity<Participant<Fluid>>) (direction, state, world, pos) -> new CauldronParticipant(state, world, pos));
+		FLUID_WORLD.forBlock(Blocks.WATER_CAULDRON, (WorldFunction.NoBlockEntity<Participant<Fluid>>) (direction, state, world, pos) -> new CauldronParticipant(state, world, pos));
+		FLUID_WORLD.forBlock(Blocks.POWDER_SNOW_CAULDRON, (WorldFunction.NoBlockEntity<Participant<Fluid>>) (direction, state, world, pos) -> new CauldronParticipant(state, world, pos));
+
 		TO_INVENTORY.forInstance(Participants.EMPTY.cast(), participant -> EmptyInventory.INSTANCE);
 		TO_INVENTORY.forInstance(Participants.VOIDING.cast(), participant -> VoidingInventory.INSTANCE);
 
@@ -250,7 +251,7 @@ public final class FabricParticipants {
 			state = world.getBlockState(pos);
 		}
 
-		if (entity == null && state.getBlock().hasBlockEntity()) {
+		if (entity == null && state.hasBlockEntity()) {
 			entity = world.getBlockEntity(pos);
 		}
 

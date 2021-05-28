@@ -12,6 +12,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.ScreenHandlerProvider;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.Packet;
+import net.minecraft.network.packet.s2c.play.KeepAliveS2CPacket;
 import net.minecraft.network.packet.s2c.play.OpenScreenS2CPacket;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
@@ -24,7 +26,7 @@ import net.fabricmc.loader.api.FabricLoader;
 
 public class AstrarreInitializer implements ModInitializer {
 	public static final Id CHANNEL = Id.create("astrarre-gui-v0", "open_screen_handler");
-	public static final OpenScreenS2CPacket FAKE = new OpenScreenS2CPacket();
+	public static final Packet<?> FAKE = new KeepAliveS2CPacket(Long.MIN_VALUE);
 	public static final ScreenHandlerType<DefaultScreenHandler> PANEL_SCREEN =
 			ScreenHandlerTypeAccess.createScreenHandlerType((syncId, inventory) -> new DefaultScreenHandler(syncId));
 
@@ -35,9 +37,10 @@ public class AstrarreInitializer implements ModInitializer {
 			ModPacketHandler.INSTANCE.registerSynchronizedClient(CHANNEL, (id, tag) -> {
 				MinecraftClient client = MinecraftClient.getInstance();
 				PlayerEntity player = client.player;
-				DefaultScreenHandler handler = PANEL_SCREEN.create(tag.getInt("syncId"), player.inventory);
+				if(player == null) return;
+				DefaultScreenHandler handler = PANEL_SCREEN.create(tag.getInt("syncId"), player.getInventory());
 				Screen screen = new DefaultHandledScreen(handler,
-						player.inventory,
+						player.getInventory(),
 						FabricSerializers.TEXT.read(tag, "name"));
 				((ScreenRootAccess)handler).readRoot(tag);
 				player.currentScreenHandler = ((ScreenHandlerProvider<?>) screen).getScreenHandler();
