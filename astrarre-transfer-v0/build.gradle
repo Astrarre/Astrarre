@@ -3,7 +3,7 @@ dependsOn(project, 'astrarre-itemview-v0', 'astrarre-util-v0', 'astrarre-access-
 
 repositories {
     maven {
-        url = 'http://maven.modmuss50.me'
+        url = 'https://maven.fabricmc.net'
         content {
             includeGroup "RebornCore"
             includeGroup "TechReborn"
@@ -24,6 +24,7 @@ repositories {
     }
     maven {
         url 'http://server.bbkr.space:8081/artifactory/libs-release'
+        allowInsecureProtocol = true
         content {
             includeGroup "io.github.cottonmc"
         }
