@@ -21,7 +21,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -37,16 +37,10 @@ public class MyTankBlock extends Block implements BlockEntityProvider {
 		super(settings);
 	}
 
-	@Nullable
-	@Override
-	public BlockEntity createBlockEntity(BlockView world) {
-		return new Tile();
-	}
-
 	@Override
 	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
 		ItemStack inHand = player.getStackInHand(hand);
-		PlayerParticipant participant = FabricParticipants.forPlayerInventory(player.inventory);
+		PlayerParticipant participant = FabricParticipants.forPlayerInventory(player.getInventory());
 		Participant<Fluid> bucket = FabricParticipants.FLUID_ITEM.get().get(null, ItemKey.of(inHand), inHand.getCount(), participant.getHandReplacingParticipant(hand));
 		if(player.isSneaking()) {
 			int inserted = bucket.insert(Transaction.GLOBAL, Fluids.WATER, Droplet.BUCKET);
@@ -59,22 +53,28 @@ public class MyTankBlock extends Block implements BlockEntityProvider {
 		return ActionResult.CONSUME;
 	}
 
+	@Nullable
+	@Override
+	public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+		return new Tile(pos, state);
+	}
+
 	public static class Tile extends BlockEntity implements io.github.astrarre.access.v0.fabric.provider.BlockEntityProvider {
 		public FixedObjectVolume<Fluid> volume = new FixedObjectVolume<>(Fluids.EMPTY, Droplet.BUCKET);
-		public Tile() {
-			super(TestModMain.TANK_TYPE);
+		public Tile(BlockPos pos, BlockState state) {
+			super(TestModMain.TANK_TYPE, pos, state);
 		}
 
 		@Override
-		public CompoundTag toTag(CompoundTag tag) {
+		public NbtCompound writeNbt(NbtCompound tag) {
 			FixedObjectVolume.fixedSerializer(Fluids.EMPTY, FabricSerializers.FLUID).save((NBTagView.Builder) tag, "tank", this.volume);
-			return super.toTag(tag);
+			return super.writeNbt(tag);
 		}
 
 		@Override
-		public void fromTag(BlockState state, CompoundTag tag) {
+		public void readNbt(NbtCompound tag) {
 			this.volume = FixedObjectVolume.fixedSerializer(Fluids.EMPTY, FabricSerializers.FLUID).read(FabricViews.view(tag), "tank");
-			super.fromTag(state, tag);
+			super.readNbt(tag);
 		}
 
 		@Override

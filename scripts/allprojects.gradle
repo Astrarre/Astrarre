@@ -26,7 +26,7 @@ allprojects {
 
     sourceSets {
         testmod {
-            compileClasspath += sourceSets.main.compileClasspath
+            compileClasspath += sourceSets.main.runtimeClasspath
             runtimeClasspath += sourceSets.main.runtimeClasspath
         }
 
@@ -34,11 +34,6 @@ allprojects {
             compileClasspath += sourceSets.main.compileClasspath
             runtimeClasspath += sourceSets.main.compileClasspath
         }
-    }
-
-    configurations {
-        testmodImplementation.extendsFrom implementation
-        testmodCompile.extendsFrom compile
     }
 
     jar {
@@ -56,6 +51,8 @@ allprojects {
         mappings("1.17-pre1+build.4")
     }
 
+    tasks.moveMigrates.dependsOn(tasks.migrateMappings)
+
     dependencies {
         minecraft "com.mojang:minecraft:${minecraft_version}"
         mappings "net.fabricmc:yarn:${yarn_mappings}:v2"
@@ -66,10 +63,27 @@ allprojects {
         testImplementation('net.devtech:PotatoUnit:1.0.3') {
             exclude module: 'fabric-loader'
         }
-        testmodCompile sourceSets.main.output
+        //testmodImplementation sourceSets.main.output
         testmodImplementation('com.github.astei:lazydfu:0.1.1') {
             exclude module: 'fabric-loader'
             exclude module: 'fabric-api'
+        }
+    }
+
+    loom {
+        runs {
+            testmodClient {
+                client()
+                ideConfigGenerated project.rootProject == project
+                name = "Testmod Client"
+                source sourceSets.testmod
+            }
+            testmodServer {
+                server()
+                ideConfigGenerated project.rootProject == project
+                name = "Testmod Server"
+                source sourceSets.testmod
+            }
         }
     }
 

@@ -91,7 +91,6 @@ static def dependsOn(Project proj, Iterable<Project> projs) {
     proj.dependencies {
         projs.each {
             api it
-            testmodCompile it.sourceSets.main.output
         }
     }
     proj.publishing {
