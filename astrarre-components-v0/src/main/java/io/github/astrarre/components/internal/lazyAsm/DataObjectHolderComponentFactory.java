@@ -4,7 +4,6 @@ import io.github.astrarre.components.internal.access.CopyAccess;
 import io.github.astrarre.components.internal.access.DataObjectHolder;
 
 public class DataObjectHolderComponentFactory<C> extends AbstractComponentFactory<C> {
-
 	public DataObjectHolderComponentFactory(String modid, String path) {
 		super(modid, path);
 	}

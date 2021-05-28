@@ -67,39 +67,48 @@ public abstract class AbstractComponentFactory<C> extends ComponentFactory<C> im
 	}
 
 	@Deprecated
-	public Object getDataHolder(C context, int componentVersion) throws IllegalAccessException, InstantiationException {
+	public Object getDataHolder(C context, int componentVersion) {
 		int version = this.getVersion(context);
 		CopyAccess oldData = this.getData(context);
 		if(componentVersion > version) {
 			if(this.activeClass.compiled == null) {
 				this.activeClass.compiled = this.generateDataHolderClass(this.activeClass);
 			}
-			Object newData = this.activeClass.compiled.newInstance();
+			CopyAccess newData = this.createNewDataHolder();
 			if(oldData != null) {
 				oldData.copyTo(newData);
 			}
-			this.setData(context, (CopyAccess) newData, this.activeClass.version);
+			this.setData(context, newData, this.activeClass.version);
 			return newData;
 		} else {
 			return oldData;
 		}
 	}
 
+	protected CopyAccess createNewDataHolder() {
+		try {
+			return (CopyAccess) this.activeClass.compiled.newInstance();
+		} catch (InstantiationException | IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	protected Class<?> generateComponentClass(Class<?> componentType, String dataHolderName, FieldPrototype prototype, String id) {
 		ClassWriter visitor = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+		String superClass = this.componentClassSuper();
 		String internalName = "astrarre-components-v0/generated/component/" + id.replace(':', '/');
 		visitor.visit(V1_8,
 				ACC_PUBLIC,
 				internalName,
 				null,
-				"java/lang/Object",
-				new String[] {Type.getInternalName(componentType)});
+				superClass,
+				this.componentClassInterface(componentType, prototype));
 		FieldVisitor factory = visitor.visitField(ACC_PUBLIC | ACC_FINAL, "factory", FACTORY_DESC, null, null);
 		FieldVisitor version = visitor.visitField(ACC_PUBLIC | ACC_FINAL, "version", "I", null, null);
 
 		MethodVisitor constructor = visitor.visitMethod(ACC_PUBLIC, "<init>", "(L"+FACTORY+";I)V", null, null);
 		constructor.visitVarInsn(ALOAD, 0);
-		constructor.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
+		constructor.visitMethodInsn(INVOKESPECIAL, superClass, "<init>", "()V", false);
 
 		constructor.visitVarInsn(ALOAD, 0);
 		constructor.visitVarInsn(ALOAD, 1);
@@ -138,9 +147,20 @@ public abstract class AbstractComponentFactory<C> extends ComponentFactory<C> im
 		set.visitInsn(RETURN);
 		set.visitMaxs(2, 3);
 
+		this.postProcessComponentClass(visitor, componentType, dataHolderName, prototype, id);
 		byte[] code = visitor.toByteArray();
 		return LOADER.define(internalName.replace('/', '.'), code, 0, code.length);
 	}
+
+	protected String componentClassSuper() {
+		return "java/lang/Object";
+	}
+
+	protected String[] componentClassInterface(Class<?> componentType, FieldPrototype prototype) {
+		return new String[] {Type.getInternalName(componentType)};
+	}
+
+	protected void postProcessComponentClass(ClassWriter writer, Class<?> componentType, String dataHolderName, FieldPrototype prototype, String id) {}
 
 	protected Class<?> generateDataHolderClass(DataHolderClass current) {
 		ClassWriter visitor = new ClassWriter(0);
@@ -150,7 +170,7 @@ public abstract class AbstractComponentFactory<C> extends ComponentFactory<C> im
 				current.name,
 				null,
 				parent,
-				new String[] {COPY_ACCESS});
+				this.dataHolderInterfaces());
 
 		MethodVisitor constructor = visitor.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
 		constructor.visitVarInsn(ALOAD, 0);
@@ -178,9 +198,16 @@ public abstract class AbstractComponentFactory<C> extends ComponentFactory<C> im
 		}
 		copy.visitInsn(RETURN);
 		copy.visitMaxs(2, 2);
-
+		this.postProcessDataHolderClass(visitor, current);
 		byte[] code = visitor.toByteArray();
 		return LOADER.define(current.name.replace('/', '.'), code, 0, code.length);
+	}
+
+	protected String[] dataHolderInterfaces() {
+		return new String[] {COPY_ACCESS};
+	}
+
+	protected void postProcessDataHolderClass(ClassWriter writer, DataHolderClass cls) {
 	}
 
 	public static final class Loader extends ClassLoader {
