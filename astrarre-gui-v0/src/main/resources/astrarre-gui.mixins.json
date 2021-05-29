@@ -5,11 +5,10 @@
   "mixins": [
     "HandledScreenMixin",
     "HandledScreensAccess",
-    "ItemRendererMixin_CustomMatrixStack",
     "MinecraftClientMixin",
     "ScreenAccess",
     "ScreenHandlerAccess",
-    "ScreenHandlerMixin",
+    "ScreenHandlerMixin_ScreenRootAccessImpl",
     "ScreenHandlerTypeAccess",
     "ScreenMixin",
     "ServerPlayerEntityMixin_CustomPacket",

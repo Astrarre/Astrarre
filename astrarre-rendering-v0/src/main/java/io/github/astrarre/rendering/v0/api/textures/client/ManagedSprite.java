@@ -18,9 +18,13 @@ public interface ManagedSprite extends Sprite {
 	}
 	
 	Sprite getTexture(int frame);
+
+	/**
+	 * @return the number of unique frames
+	 */
 	int frames();
+
 	int width(int frame);
+
 	int height(int frame);
-
-
 }

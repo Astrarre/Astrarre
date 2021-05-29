@@ -23,14 +23,14 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(NbtCompound.class)
-public abstract class CompoundTagMixin implements ImmutableAccess, NBTagView.Builder {
+public abstract class CompoundTagMixin_NBTagViewImpl implements ImmutableAccess, NBTagView.Builder {
 	private boolean immutable;
 	@Shadow public abstract @Nullable NbtElement shadow$get(String key);
 	@Shadow public abstract Set<String> getKeys();
 	@Shadow public abstract NbtCompound getCompound(String key);
 	@Shadow public abstract boolean shadow$isEmpty();
 
-	@Mutable @Shadow @Final private Map<String, NbtElement> tags;
+	@Mutable @Shadow @Final private Map<String, NbtElement> entries;
 
 	@Shadow public abstract void shadow$putByte(String key, byte value);
 
@@ -189,7 +189,7 @@ public abstract class CompoundTagMixin implements ImmutableAccess, NBTagView.Bui
 	public void astrarre_setImmutable() {
 		if(this.immutable = false) {
 			this.immutable = true;
-			this.tags = new NBTagUnmodifiableMap(this.tags);
+			this.entries = new NBTagUnmodifiableMap(this.entries);
 		}
 	}
 

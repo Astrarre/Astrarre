@@ -24,8 +24,8 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.collection.DefaultedList;
 
 @Mixin(ScreenHandler.class)
-public abstract class ScreenHandlerMixin implements ScreenRootAccess {
-	@Shadow @Final public List<Slot> slots;
+public abstract class ScreenHandlerMixin_ScreenRootAccessImpl implements ScreenRootAccess {
+	@Shadow @Final public DefaultedList<Slot> slots;
 	@Shadow @Final private DefaultedList<ItemStack> trackedStacks;
 	private RootContainerInternal internal;
 

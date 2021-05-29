@@ -10,10 +10,10 @@ import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import net.minecraft.client.gl.Framebuffer;
 
 @Mixin (Framebuffer.class)
-public class FramebufferMixin {
+public class FramebufferMixin_EnableStencil {
 	@ModifyArgs (method = "initFbo",
 			at = @At (value = "INVOKE",
-					target = "Lcom/mojang/blaze3d/platform/GlStateManager;texImage2D(IIIIIIIILjava/nio/IntBuffer;)V",
+					target = "Lcom/mojang/blaze3d/platform/GlStateManager;_texImage2D(IIIIIIIILjava/nio/IntBuffer;)V",
 					ordinal = 0))
 	public void init(Args args) {
 		args.set(2, GL30.GL_DEPTH32F_STENCIL8);
@@ -22,7 +22,7 @@ public class FramebufferMixin {
 	}
 
 	@ModifyArgs (method = "initFbo",
-			at = @At (value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/GlStateManager;framebufferTexture2D(IIIII)V", ordinal = 1))
+			at = @At (value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/GlStateManager;_glFramebufferTexture2D(IIIII)V", ordinal = 1))
 	public void init2(Args args) {
 		args.set(1, GL30.GL_DEPTH_STENCIL_ATTACHMENT);
 	}

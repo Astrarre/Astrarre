@@ -2,7 +2,6 @@ package testmod;
 
 import io.github.astrarre.gui.v0.api.RootContainer;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
-import sun.nio.ch.Net;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemUsageContext;

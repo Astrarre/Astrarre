@@ -4,6 +4,9 @@ package io.github.astrarre.gui.v0.api;
 import io.github.astrarre.rendering.v0.api.textures.Sprite;
 import io.github.astrarre.util.v0.api.Id;
 
+/**
+ * only works with fapi so mod resources can load
+ */
 public class AstrarreIcons {
 	private static final Sprite ICON = Sprite.of(Id.create("astrarre-gui-v0", "textures/gui/icons.png"));
 

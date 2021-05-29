@@ -97,7 +97,7 @@ public final class FabricParticipants {
 		return combined;
 	});
 
-	public static final FunctionAccess<Insertable<ItemKey>, Set<Fluid>> FLUID_FILTERS = FunctionAccess.newInstance(id("fluid_filters"), sets -> {
+	public static final FunctionAccess<Insertable<Fluid>, Set<Fluid>> FLUID_FILTERS = FunctionAccess.newInstance(id("fluid_filters"), sets -> {
 		Set<Fluid> combined = new HashSet<>();
 		sets.forEach(combined::addAll);
 		return combined;
@@ -185,13 +185,13 @@ public final class FabricParticipants {
 		FLUID_FILTERS.addProviderFunction();
 		// todo optimize, this should stop at the first wrapper that actually implements the access
 		FLUID_FILTERS.dependsOn(Participants.AGGREGATE_WRAPPERS_INSERTABLE, function -> insertable -> {
-			Collection<Insertable<ItemKey>> wrapped = Participants.unwrapInternal((Function) function, insertable, true);
+			Collection<Insertable<Fluid>> wrapped = Participants.unwrapInternal((Function) function, insertable, true);
 			if (wrapped == null) {
 				return Collections.emptySet();
 			}
 
 			Set<Fluid> combined = null;
-			for (Insertable<ItemKey> delegate : wrapped) {
+			for (Insertable<Fluid> delegate : wrapped) {
 				combined = NUtil.addAll(combined, FLUID_FILTERS.get().apply(delegate));
 			}
 			return combined;

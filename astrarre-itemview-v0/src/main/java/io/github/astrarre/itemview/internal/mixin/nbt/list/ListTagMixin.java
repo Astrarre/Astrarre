@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(NbtList.class)
 public abstract class ListTagMixin implements AbstractListTagAccess {
 	@Shadow public abstract byte getType();
-	@Shadow public abstract byte getElementType();
+	@Shadow public abstract byte getHeldType();
 
 	private Object view;
 
@@ -18,7 +18,7 @@ public abstract class ListTagMixin implements AbstractListTagAccess {
 	public Object itemview_getListTag(NBTType<?> type) {
 		NBTType<?> component = type == null ? null : type.getComponent();
 		if(type != null) {
-			if (component == null || !(type.internalTypeEquals(this.getType()) && component.internalTypeEquals(this.getElementType()))) {
+			if (component == null || !(type.internalTypeEquals(this.getType()) && component.internalTypeEquals(this.getHeldType()))) {
 				throw new IllegalArgumentException("NbtType does not reflect list type!");
 			}
 		}

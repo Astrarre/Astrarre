@@ -18,6 +18,9 @@ loom {
 apply from: 'scripts/allprojects.gradle'
 
 static def fapi(Project proj, String... modules) {
+    fapi(true, proj, modules)
+}
+static def fapi(boolean addToMaven, Project proj, String... modules) {
     proj.extensions.add("fapi_deps", modules)
     proj.configure(proj) {
         dependencies {
@@ -34,19 +37,21 @@ static def fapi(Project proj, String... modules) {
             }
         }
 
-        modules.each {
-            def str = it
-            publishing {
-                publications {
-                    mavenJava2(MavenPublication) {
-                        pom.withXml {
-                            def depsNode = getOrCreateNode(asNode(), "dependencies")
-                            proj.each {
-                                def depNode = depsNode.appendNode("dependency")
-                                depNode.appendNode("groupId", "net.fabricmc.fabric-api")
-                                depNode.appendNode("artifactId", str)
-                                depNode.appendNode("version", fabricApi.moduleVersion(str, fabric_version))
-                                depNode.appendNode("scope", "compile")
+        if(addToMaven) {
+            modules.each {
+                def str = it
+                publishing {
+                    publications {
+                        mavenJava2(MavenPublication) {
+                            pom.withXml {
+                                def depsNode = getOrCreateNode(asNode(), "dependencies")
+                                proj.each {
+                                    def depNode = depsNode.appendNode("dependency")
+                                    depNode.appendNode("groupId", "net.fabricmc.fabric-api")
+                                    depNode.appendNode("artifactId", str)
+                                    depNode.appendNode("version", fabricApi.moduleVersion(str, fabric_version))
+                                    depNode.appendNode("scope", "compile")
+                                }
                             }
                         }
                     }

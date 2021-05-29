@@ -4,7 +4,7 @@
   "compatibilityLevel": "JAVA_16",
   "client": [
     "BufferBuilderAccess",
-    "FramebufferMixin",
+    "FramebufferMixin_EnableStencil",
     "SpriteAtlasHolderMixin",
     "SpriteAtlasTextureMixin",
     "SpriteMixin"
