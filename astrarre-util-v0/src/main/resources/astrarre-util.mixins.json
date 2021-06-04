@@ -1,6 +1,7 @@
 {
   "required": true,
   "package": "io.github.astrarre.util.internal.mixin",
+  "plugin": "io.github.astrarre.util.v0.fabric.ModDependentMixin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
     "IdentifierMixin",
@@ -8,6 +9,7 @@
     "LivingEntityMixin_FakePlayerEntity",
     "MinecraftServerMixin",
     "SetTagAccess",
+    "TagDelegateAccess",
     "TagWrapperAccess"
   ],
   "injectors": {

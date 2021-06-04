@@ -1,16 +1,14 @@
 package io.github.astrarre.util.v0.fabric;
 
 import java.util.AbstractSet;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 
-import io.github.astrarre.util.internal.FapiMixinPlugin;
-import io.github.astrarre.util.internal.fapimixin.TagDelegateAccess;
+import io.github.astrarre.util.internal.mixin.TagDelegateAccess;
 import io.github.astrarre.util.internal.mixin.SetTagAccess;
 import io.github.astrarre.util.internal.mixin.TagWrapperAccess;
+import io.github.astrarre.util.v0.api.Validate;
 
-import net.minecraft.item.Item;
 import net.minecraft.tag.Tag;
 
 public class Tags {
@@ -37,7 +35,7 @@ public class Tags {
 		while (true) {
 			if (root instanceof TagWrapperAccess) {
 				root = ((TagWrapperAccess) root).callGet();
-			} else if (FapiMixinPlugin.FAPI && root instanceof TagDelegateAccess) {
+			} else if (Validate.LOADER.isModLoaded("fabric-tag-extensions-v0") && root instanceof TagDelegateAccess) {
 				root = ((TagDelegateAccess) root).callGetTag();
 			} else {
 				return root;

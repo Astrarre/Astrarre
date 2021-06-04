@@ -1,5 +1,6 @@
-package io.github.astrarre.util.internal.fapimixin;
+package io.github.astrarre.util.internal.mixin;
 
+import io.github.astrarre.util.v0.fabric.ModEnvironment;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
@@ -7,6 +8,7 @@ import net.minecraft.tag.Tag;
 
 import net.fabricmc.fabric.impl.tag.extension.TagDelegate;
 
+@ModEnvironment ("fabric-tag-extensions-v0")
 @Mixin (TagDelegate.class)
 public interface TagDelegateAccess {
 	@Invoker
