@@ -4,15 +4,16 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import com.google.common.collect.Iterators;
+import com.google.common.reflect.TypeToken;
 import io.github.astrarre.access.internal.MapFilter;
 import io.github.astrarre.util.v0.api.func.IterFunc;
 import io.github.astrarre.access.v0.api.provider.Provider;
 import io.github.astrarre.util.v0.api.Id;
 
 public class FunctionAccess<A, B> extends Access<Function<A, B>> {
-	private final MapFilter<A, Function<A, B>> instanceFunctions;
+	private final MapFilter<A, Function<A, B>> instanceFunctions, instanceFunctionsStrong;
 	private final MapFilter<Class<? extends A>, Function<A, B>> classFunctions;
-	private boolean addedProviderFunction;
+	private boolean addedProviderFunction, addedInstanceof;
 
 	/**
 	 * combines {@link FunctionAccess (AccessFunction)} and {@link FunctionAccess (BinaryOperator)}
@@ -36,6 +37,7 @@ public class FunctionAccess<A, B> extends Access<Function<A, B>> {
 		super(id, iterFunc);
 		this.instanceFunctions = new MapFilter<>(iterFunc, true);
 		this.classFunctions = new MapFilter<>(iterFunc, true);
+		this.instanceFunctionsStrong = new MapFilter<>(iterFunc, false);
 	}
 
 	/**
@@ -67,11 +69,39 @@ public class FunctionAccess<A, B> extends Access<Function<A, B>> {
 	}
 
 	/**
-	 * filters the access function for only objects that are {@link Object#equals(Object)} to the passed object
+	 * adds a function for if A instanceof B, return A
+	 */
+	public FunctionAccess<A, B> addInstanceOfFunction(TypeToken<B> type) {
+		if (this.addedInstanceof) {
+			return this;
+		}
+		this.addedInstanceof = true;
+		this.andThen(a -> {
+			if (a != null && type.isSupertypeOf(a.getClass())) {
+				return (B) a;
+			}
+			return null;
+		});
+		return this;
+	}
+
+	/**
+	 * filters the access function for only objects that are {@code a == b} to the passed object.
+	 * This holds a WEAK reference to the object
 	 */
 	public FunctionAccess<A, B> forInstance(A a, Function<A, B> function) {
 		if (this.instanceFunctions.add(a, function)) {
 			this.andThen(val -> this.instanceFunctions.get(val).apply(val));
+		}
+		return this;
+	}
+
+	/**
+	 * filters the access function for only objects that are {@link Object#equals(Object)} to the passed object.
+	 */
+	public FunctionAccess<A, B> forInstanceStrong(A a, Function<A, B> function) {
+		if (this.instanceFunctionsStrong.add(a, function)) {
+			this.andThen(val -> this.instanceFunctionsStrong.get(val).apply(val));
 		}
 		return this;
 	}

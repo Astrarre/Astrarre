@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
+import com.google.common.reflect.TypeToken;
 import io.github.astrarre.access.internal.MapFilter;
 import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.access.v0.api.FunctionAccess;
@@ -22,7 +23,7 @@ public class WorldAccess<T> extends Access<WorldFunction<T>> {
 	private final MapFilter<BlockEntityType<?>, WorldFunction<T>> blockEntityTypes;
 	private final MapFilter<BlockState, WorldFunction<T>> blockStateTypes;
 	private final MapFilter<Block, WorldFunction<T>> blockTypes;
-	private boolean addedProviderFunction;
+	private boolean addedProviderFunction, addedBlockEntityInstanceOfFunction;
 
 	public WorldAccess(Id id) {
 		this(id, (T) null);
@@ -70,6 +71,21 @@ public class WorldAccess<T> extends Access<WorldFunction<T>> {
 		this.andThen((direction, state, view, pos, entity) -> {
 			if (entity instanceof BlockEntityProvider) {
 				return (T) ((BlockEntityProvider) entity).get(this, direction);
+			}
+			return null;
+		});
+		return this;
+	}
+
+	/**
+	 * adds a function for if blockentity instanceof T, return blockentity
+	 */
+	public WorldAccess<T> addBlockEntityInstanceOfFunction(TypeToken<T> type) {
+		if(this.addedBlockEntityInstanceOfFunction) return this;
+		this.addedBlockEntityInstanceOfFunction = true;
+		this.andThen((direction, state, world, pos, entity) -> {
+			if(entity != null && type.isSupertypeOf(entity.getClass())) {
+				return (T) entity;
 			}
 			return null;
 		});

@@ -1,5 +1,6 @@
 package io.github.astrarre.access.v0.fabric;
 
+import com.google.common.reflect.TypeToken;
 import io.github.astrarre.access.internal.MapFilter;
 import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.access.v0.api.FunctionAccess;
@@ -53,7 +54,7 @@ public class EntityAccess<T> extends Access<EntityFunction<T>> {
 		});
 	}
 
-	private boolean addedProviderFunction;
+	private boolean addedProviderFunction, addedInstanceofFunction;
 
 	/**
 	 * adds an entity function for {@link EntityProvider}
@@ -66,6 +67,21 @@ public class EntityAccess<T> extends Access<EntityFunction<T>> {
 		this.andThen((direction, entity) -> {
 			if (entity instanceof EntityProvider) {
 				return (T) ((EntityProvider) entity).get(this, direction);
+			}
+			return null;
+		});
+		return this;
+	}
+
+	/**
+	 * adds a function for if entity instanceof B, return entity
+	 */
+	public EntityAccess<T> addInstanceOfFunction(TypeToken<T> type) {
+		if(this.addedInstanceofFunction) return this;
+		this.addedInstanceofFunction = true;
+		this.andThen((direction, entity) -> {
+			if (entity != null && type.isSupertypeOf(entity.getClass())) {
+				return (T) entity;
 			}
 			return null;
 		});
