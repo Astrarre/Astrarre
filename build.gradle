@@ -7,13 +7,13 @@ plugins {
     id "fabric-loom" version "0.8.9"
 }
 
-version '1.1.1'
 group = 'io.github.astrarre'
 
 loom {
     shareCaches = true
     //runDir = "run"
 }
+
 
 apply from: 'scripts/allprojects.gradle'
 
@@ -62,7 +62,6 @@ static def fapi(boolean addToMaven, Project proj, String... modules) {
 }
 
 dependencies {
-    dependsOn(project, subprojects)
     modImplementation("me.shedaniel:RoughlyEnoughItems:5.11.188") {
         exclude module: 'fabric-api'
         exclude module: 'fabric-loader'
@@ -90,48 +89,6 @@ static def nanoevents(Project proj) {
             }
         }
     }
-}
-
-static def dependsOn(Project proj, Iterable<Project> projs) {
-    proj.dependencies {
-        projs.each {
-            api it
-        }
-    }
-    proj.publishing {
-        publications {
-            mavenJava(MavenPublication) {
-                pom.withXml {
-                    def depsNode = getOrCreateNode(asNode(), "dependencies")
-                    projs.each {
-                        def depNode = depsNode.appendNode("dependency")
-                        depNode.appendNode("groupId", it.group)
-                        depNode.appendNode("artifactId", "$it.name-fabric")
-                        depNode.appendNode("version", it.version)
-                        depNode.appendNode("scope", "compile")
-                    }
-                }
-            }
-
-            mavenJava2(MavenPublication) {
-                pom.withXml {
-                    def depsNode = asNode().appendNode("dependencies")
-                    projs.each {
-                        def depNode = depsNode.appendNode("dependency")
-                        depNode.appendNode("groupId", it.group)
-                        depNode.appendNode("artifactId", "$it.name-fabric-lite")
-                        depNode.appendNode("version", it.version)
-                        depNode.appendNode("scope", "compile")
-                    }
-                }
-            }
-        }
-    }
-}
-
-static def dependsOn(Project proj, String... projects) {
-    List<Project> projs = projects.collect { proj.rootProject.project(it) }
-    dependsOn(proj, projs)
 }
 
 static Node getOrCreateNode(Node node, String name) {

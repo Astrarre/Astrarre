@@ -1,5 +1,3 @@
-version '0.0.1'
-dependsOn(project, 'astrarre-util-v0', 'astrarre-access-v0')
 fapi(project, 'fabric-resource-loader-v0', 'fabric-tag-extensions-v0', 'fabric-api-base')
 
 dependencies {

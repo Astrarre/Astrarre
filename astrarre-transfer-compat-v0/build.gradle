@@ -1,6 +1,3 @@
-version '0.0.0'
-
-dependsOn(project, 'astrarre-transfer-v0')
 dependencies {
     implementation 'com.github.Chocohead:fabric-asm:v2.1'
     include 'com.github.Chocohead:fabric-asm:v2.1'

@@ -145,7 +145,7 @@ public final class FabricParticipants {
 		FLUID_WORLD.forBlock(Blocks.CAULDRON, (WorldFunction.NoBlockEntity<Participant<Fluid>>) (direction, state, world, pos) -> new CauldronParticipant(state, world, pos));
 		FLUID_WORLD.forBlock(Blocks.LAVA_CAULDRON, (WorldFunction.NoBlockEntity<Participant<Fluid>>) (direction, state, world, pos) -> new CauldronParticipant(state, world, pos));
 		FLUID_WORLD.forBlock(Blocks.WATER_CAULDRON, (WorldFunction.NoBlockEntity<Participant<Fluid>>) (direction, state, world, pos) -> new CauldronParticipant(state, world, pos));
-		FLUID_WORLD.forBlock(Blocks.POWDER_SNOW_CAULDRON, (WorldFunction.NoBlockEntity<Participant<Fluid>>) (direction, state, world, pos) -> new CauldronParticipant(state, world, pos));
+		// todo FLUID_WORLD.forBlock(Blocks.POWDER_SNOW_CAULDRON, (WorldFunction.NoBlockEntity<Participant<Fluid>>) (direction, state, world, pos) -> new CauldronParticipant(state, world, pos));
 
 		TO_INVENTORY.forInstance(Participants.EMPTY.cast(), participant -> EmptyInventory.INSTANCE);
 		TO_INVENTORY.forInstance(Participants.VOIDING.cast(), participant -> VoidingInventory.INSTANCE);

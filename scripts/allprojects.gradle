@@ -1,5 +1,23 @@
 import java.nio.file.Files
 
+static String computeVersion(Project project) {
+    if(project.hasProperty("deps") || project == project.rootProject) {
+        def projects = project == project.rootProject ? project.subprojects : project.deps.split(",").collect { project.rootProject.project(it) }
+        def curr = project.vers.split("\\.")
+        int major = Integer.parseInt(curr[0]), minor = Integer.parseInt(curr[1]), build = Integer.parseInt(curr[2])
+        projects.each {
+            def depVers = computeVersion(it)
+            def str = depVers.split("\\.")
+            major += Math.max(Integer.parseInt(str[0])-1, 0)
+            minor += Integer.parseInt(str[1])
+            build += Integer.parseInt(str[2])
+        }
+        return major + "." + minor + "." + build
+    } else {
+        return project.vers
+    }
+}
+
 allprojects {
     sourceCompatibility = JavaVersion.VERSION_16
     targetCompatibility = JavaVersion.VERSION_16
@@ -11,6 +29,46 @@ allprojects {
         plugins.apply 'java-library'
         plugins.apply 'maven-publish'
         plugins.apply "fabric-loom"
+    }
+
+    version = computeVersion(project)
+    println name + ":" + version
+    afterEvaluate {
+        if (project.hasProperty("deps") || project == rootProject) {
+            def projs = project == project.rootProject ? project.subprojects : project.deps.split(",").collect { project.rootProject.project(it) }
+            projs.each {
+                project.tasks.publish.dependsOn(it.tasks.publish)
+            }
+            publishing {
+                publications {
+                    mavenJava(MavenPublication) {
+                        pom.withXml {
+                            def depsNode = getOrCreateNode(asNode(), "dependencies")
+                            projs.each {
+                                def depNode = depsNode.appendNode("dependency")
+                                depNode.appendNode("groupId", it.group)
+                                depNode.appendNode("artifactId", "$it.name-fabric")
+                                depNode.appendNode("version", it.version)
+                                depNode.appendNode("scope", "compile")
+                            }
+                        }
+                    }
+
+                    mavenJava2(MavenPublication) {
+                        pom.withXml {
+                            def depsNode = getOrCreateNode(asNode(), "dependencies")
+                            projs.each {
+                                def depNode = depsNode.appendNode("dependency")
+                                depNode.appendNode("groupId", it.group)
+                                depNode.appendNode("artifactId", "$it.name-fabric-lite")
+                                depNode.appendNode("version", it.version)
+                                depNode.appendNode("scope", "compile")
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     minecraft {}
@@ -36,23 +94,6 @@ allprojects {
         }
     }
 
-    jar {
-        from "$rootProject.projectDir/LICENSE"
-    }
-
-    task moveMigrates {
-        doLast {
-            file("src/main/java").deleteDir()
-            Files.move(file("remappedSrc").toPath(), file("src/main/java").toPath())
-        }
-    }
-
-    migrateMappings {
-        mappings("1.17-pre1+build.4")
-    }
-
-    tasks.moveMigrates.dependsOn(tasks.migrateMappings)
-
     dependencies {
         minecraft "com.mojang:minecraft:${minecraft_version}"
         mappings "net.fabricmc:yarn:${yarn_mappings}:v2"
@@ -67,6 +108,14 @@ allprojects {
         testmodImplementation('com.github.astei:lazydfu:0.1.1') {
             exclude module: 'fabric-loader'
             exclude module: 'fabric-api'
+        }
+
+        if (project.hasProperty("deps") || project == rootProject) {
+            def projs = project == project.rootProject ? project.subprojects : project.deps.split(",").collect { project.rootProject.project(it) }
+            projs.each {
+                println "\t|- " + it.name
+                api it
+            }
         }
     }
 
@@ -109,7 +158,7 @@ allprojects {
             jarRemapper = remapJar.jarRemapper
             input = remapJar.input
         }
-        remapJar2.dependsOn(jar)
+        remapJar2.dependsOn(remapJar)
 
         publishing {
             publications {
@@ -150,4 +199,23 @@ allprojects {
             }
         }
     }
+
+    jar {
+        from "$rootProject.projectDir/LICENSE"
+    }
+
+    task moveMigrates {
+        doLast {
+            file("src/main/java").deleteDir()
+            Files.move(file("remappedSrc").toPath(), file("src/main/java").toPath())
+        }
+    }
+
+    migrateMappings {
+        mappings("1.17-pre1+build.4")
+    }
+
+    tasks.moveMigrates.dependsOn(tasks.migrateMappings)
+
+    task doNothing {}
 }
