@@ -4,7 +4,9 @@
   "compatibilityLevel": "JAVA_16",
   "mixins": [
     "BlockEntityMixin",
-    "EntityMixin"
+    "EntityMixin_ObjectHolder_Serialization",
+    "PlayerEntityMixin_ObjectHolder_Serialization",
+    "ServerPlayerEntityMixin_Copy"
   ],
   "injectors": {
     "defaultRequire": 1

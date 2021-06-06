@@ -1,5 +1,6 @@
 package io.github.astrarre.access.v0.fabric;
 
+import java.lang.invoke.LambdaMetafactory;
 import java.util.Objects;
 
 import com.google.common.collect.Iterables;

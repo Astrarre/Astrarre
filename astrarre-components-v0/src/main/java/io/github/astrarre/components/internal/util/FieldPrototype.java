@@ -1,4 +1,4 @@
-package io.github.astrarre.components.internal.lazyAsm;
+package io.github.astrarre.components.internal.util;
 
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.ClassVisitor;

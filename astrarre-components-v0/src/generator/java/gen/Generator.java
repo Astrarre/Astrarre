@@ -3,13 +3,13 @@ package gen;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 
-import sun.misc.IOUtils;
 
 public class Generator {
 	public static void main(String[] args) throws IOException {
 		InputStream stream = Generator.class.getResourceAsStream("/template.java");
-		String str = new String(IOUtils.readNBytes(stream, Integer.MAX_VALUE));
+		String str = new String(stream.readAllBytes());
 		writeTo(str, "BoolComponent.java", "Bool", "Boolean", "boolean");
 		writeTo(str, "ByteComponent.java", "Byte", "Byte", "byte");
 		writeTo(str, "CharComponent.java", "Char", "Character", "char");

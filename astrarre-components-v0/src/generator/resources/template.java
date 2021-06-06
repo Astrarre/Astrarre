@@ -1,6 +1,6 @@
 package io.github.astrarre.components.v0.api.components;
 
-public interface %1$sComponent<C> extends Component<C, %2$s> {
+public interface %1$sComponent<C> extends PrimitiveComponent<C, %2$s> {
 	@Override
 	default %2$s get(C context) {
 		return this.get%1$s(context);
