@@ -5,8 +5,8 @@ import io.github.astrarre.components.internal.lazyAsm.standard.CopyAccess;
 
 import net.minecraft.entity.player.PlayerEntity;
 
-public class PlayerDataObjectHolderComponentFactory extends DataObjectHolderComponentFactory<PlayerEntity> {
-	public PlayerDataObjectHolderComponentFactory(String modid, String path) {
+public class PlayerDataObjectHolderComponentManager extends DataObjectHolderComponentManager<PlayerEntity> {
+	public PlayerDataObjectHolderComponentManager(String modid, String path) {
 		super(modid, path);
 	}
 

@@ -4,7 +4,9 @@
   "compatibilityLevel": "JAVA_16",
   "mixins": [
     "BlockEntityMixin",
+    "ClientPlayNetworkHandlerMixin_SyncAccept",
     "EntityMixin_ObjectHolder_Serialization",
+    "EntityTrackerEntryMixin_Sync",
     "PlayerEntityMixin_ObjectHolder_Serialization",
     "ServerPlayerEntityMixin_Copy"
   ],

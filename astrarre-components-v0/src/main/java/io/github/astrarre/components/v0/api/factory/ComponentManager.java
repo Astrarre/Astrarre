@@ -1,7 +1,7 @@
 package io.github.astrarre.components.v0.api.factory;
 
-import io.github.astrarre.components.internal.lazyAsm.DataObjectHolderComponentFactory;
-import io.github.astrarre.components.internal.lazyAsm.PlayerDataObjectHolderComponentFactory;
+import io.github.astrarre.components.internal.lazyAsm.DataObjectHolderComponentManager;
+import io.github.astrarre.components.internal.lazyAsm.PlayerDataObjectHolderComponentManager;
 import io.github.astrarre.components.v0.api.components.Component;
 
 import net.minecraft.entity.player.PlayerEntity;
@@ -13,7 +13,7 @@ public interface ComponentManager<C> {
 	 * @see #newPlayerManager(String, String)
 	 */
 	static <C> ComponentManager<C> newManager(String modid, String path) {
-		return new DataObjectHolderComponentFactory<>(modid, path);
+		return new DataObjectHolderComponentManager<>(modid, path);
 	}
 
 	/**
@@ -22,7 +22,7 @@ public interface ComponentManager<C> {
 	 * PlayerEntity-specific behavior requires a seperate data object holder, which this uses
 	 */
 	static ComponentManager<PlayerEntity> newPlayerManager(String modid, String path) {
-		return new PlayerDataObjectHolderComponentFactory(modid, path);
+		return new PlayerDataObjectHolderComponentManager(modid, path);
 	}
 
 

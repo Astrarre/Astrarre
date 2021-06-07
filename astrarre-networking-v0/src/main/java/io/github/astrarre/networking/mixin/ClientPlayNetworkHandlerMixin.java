@@ -1,6 +1,7 @@
 package io.github.astrarre.networking.mixin;
 
 import io.github.astrarre.networking.internal.ModPacketHandlerImpl;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,7 +18,7 @@ import net.fabricmc.api.Environment;
 @Environment (EnvType.CLIENT)
 @Mixin (ClientPlayNetworkHandler.class)
 public class ClientPlayNetworkHandlerMixin {
-	@Shadow private MinecraftClient client;
+	@Final @Shadow private MinecraftClient client;
 
 	@Inject (method = "onCustomPayload", at = @At ("HEAD"), cancellable = true)
 	private void onCustomPayloadAsync(CustomPayloadS2CPacket packet, CallbackInfo ci) {

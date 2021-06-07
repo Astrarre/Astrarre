@@ -15,7 +15,7 @@ import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 @Mixin (ServerPlayNetworkHandler.class)
-public class ServerPlayNetworkHandlerMixin {
+public abstract class ServerPlayNetworkHandlerMixin implements ServerPlayPacketListener {
 	@Shadow public ServerPlayerEntity player;
 
 	@Inject (method = "onCustomPayload", at = @At ("HEAD"))
@@ -24,7 +24,7 @@ public class ServerPlayNetworkHandlerMixin {
 			ModPacketHandlerImpl.INSTANCE.onReceive(this.player, packet);
 		} else {
 			ModPacketHandlerImpl.INSTANCE.onReceiveAsync(this.player, packet);
-			NetworkThreadUtils.forceMainThread(packet, (ServerPlayPacketListener)this, this.player.getServerWorld());
+			NetworkThreadUtils.forceMainThread(packet, this, this.player.getServerWorld());
 		}
 	}
 }

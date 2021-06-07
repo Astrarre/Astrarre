@@ -1,5 +1,6 @@
 package io.github.astrarre.components.v0.fabric;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +19,7 @@ import net.minecraft.nbt.NbtFloat;
 import net.minecraft.nbt.NbtInt;
 import net.minecraft.nbt.NbtLong;
 import net.minecraft.nbt.NbtShort;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Pair;
 
 /**
@@ -108,6 +110,60 @@ public final class FabricComponents {
 			}
 		} else {
 			component.set(toContext, copier.copy(component.get(fromContext)));
+		}
+	}
+
+	public static <C, V, T extends Component<C, V>> void serialize(PacketByteBuf buf, C context, T component, FabricByteSerializer<V> serializer)
+			throws IOException {
+		if(serializer == null) {
+			if(component instanceof BoolComponent) {
+				buf.writeBoolean(((BoolComponent<C>) component).getBool(context));
+			} else if(component instanceof ByteComponent) {
+				buf.writeByte(((ByteComponent<C>) component).getByte(context));
+			} else if(component instanceof CharComponent) {
+				buf.writeChar((short) ((CharComponent<C>) component).getChar(context));
+			} else if(component instanceof DoubleComponent) {
+				buf.writeDouble(((DoubleComponent<C>)component).getDouble(context));
+			} else if(component instanceof FloatComponent) {
+				buf.writeFloat(((FloatComponent<C>)component).getFloat(context));
+			} else if(component instanceof IntComponent) {
+				buf.writeInt(((IntComponent<C>)component).getInt(context));
+			} else if(component instanceof LongComponent) {
+				buf.writeLong(((LongComponent<C>)component).getLong(context));
+			} else if(component instanceof ShortComponent) {
+				buf.writeShort(((ShortComponent<C>)component).getShort(context));
+			} else {
+				throw new IllegalArgumentException("copier cannot be null!");
+			}
+		} else {
+			serializer.toBytes(component.get(context), buf);
+		}
+	}
+
+	public static <C, V, T extends Component<C, V>> void deserialize(PacketByteBuf buf, C context, T component, FabricByteSerializer<V> serializer)
+			throws IOException {
+		if(serializer == null) {
+			if(component instanceof BoolComponent) {
+				((BoolComponent<C>)component).setBool(context, buf.readBoolean());
+			} else if(component instanceof ByteComponent) {
+				((ByteComponent<C>)component).setByte(context, buf.readByte());
+			} else if(component instanceof CharComponent) {
+				((CharComponent<C>)component).setChar(context, buf.readChar());
+			} else if(component instanceof DoubleComponent) {
+				((DoubleComponent<C>)component).setDouble(context, buf.readDouble());
+			} else if(component instanceof FloatComponent) {
+				((FloatComponent<C>)component).setFloat(context, buf.readFloat());
+			} else if(component instanceof IntComponent) {
+				((IntComponent<C>)component).setInt(context, buf.readInt());
+			} else if(component instanceof LongComponent) {
+				((LongComponent<C>)component).setLong(context, buf.readLong());
+			} else if(component instanceof ShortComponent) {
+				((ShortComponent<C>)component).setShort(context, buf.readShort());
+			} else {
+				throw new IllegalArgumentException("copier cannot be null!");
+			}
+		} else {
+			serializer.toBytes(component.get(context), buf);
 		}
 	}
 

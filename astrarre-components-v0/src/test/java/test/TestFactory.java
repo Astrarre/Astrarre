@@ -3,7 +3,6 @@ package test;
 import io.github.astrarre.components.internal.lazyAsm.standard.CopyAccess;
 import io.github.astrarre.components.v0.api.factory.ComponentManager;
 import io.github.astrarre.components.v0.api.factory.DataObjectHolder;
-import io.github.astrarre.components.internal.lazyAsm.DataObjectHolderComponentFactory;
 import io.github.astrarre.components.v0.api.components.BoolComponent;
 
 public class TestFactory {

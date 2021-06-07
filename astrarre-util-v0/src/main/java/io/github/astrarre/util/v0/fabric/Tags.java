@@ -24,6 +24,11 @@ public class Tags {
 				}
 
 				@Override
+				public boolean contains(Object o) {
+					return tag.contains((T) o);
+				}
+
+				@Override
 				public int size() {
 					return root.values().size();
 				}

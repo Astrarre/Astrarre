@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "id": "astrarre-components-v0-testmod",
+  "version": "${version}",
+  "entrypoints": {
+    "main": [
+      "io.github.astrarre.components.v0.testmod.TestMod"
+    ]
+  }
+}

@@ -110,6 +110,11 @@ allprojects {
             exclude module: 'fabric-api'
         }
 
+        // check for conflicts
+        modRuntime("net.fabricmc.fabric-api:fabric-api:${fabric_version}") {
+            exclude module: 'fabric-loader'
+        }
+
         if (project.hasProperty("deps") || project == rootProject) {
             def projs = project == project.rootProject ? project.subprojects : project.deps.split(",").collect { project.rootProject.project(it) }
             projs.each {

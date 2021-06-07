@@ -1,8 +1,10 @@
 package io.github.astrarre.components.internal.lazyAsm.standard;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 
-import io.github.astrarre.components.internal.lazyAsm.DataObjectHolderComponentFactory;
+import io.github.astrarre.components.internal.lazyAsm.DataObjectHolderComponentManager;
 import io.github.astrarre.components.internal.util.PublicLoader;
 import io.github.astrarre.components.v0.api.components.Component;
 import io.github.astrarre.components.v0.api.factory.ComponentManager;
@@ -15,18 +17,17 @@ import org.objectweb.asm.commons.InstructionAdapter;
 
 @SuppressWarnings ("unused")
 public class DefaultComponentClassFactory implements Opcodes {
-	public static final DefaultComponentClassFactory INSTANCE = new DefaultComponentClassFactory();
 	protected final String factoryDesc, factoryName;
 	protected final Class<?> factoryType;
 
-	protected DefaultComponentClassFactory() {
-		Class<?> factoryType = DataObjectHolderComponentFactory.class;
+	public DefaultComponentClassFactory() {
+		Class<?> factoryType = DataObjectHolderComponentManager.class;
 		this.factoryDesc = Type.getDescriptor(factoryType);
 		this.factoryName = Type.getInternalName(factoryType);
 		this.factoryType = factoryType;
 	}
 
-	public <V, T extends Component<?, V>> T createComponent(DataObjectHolderComponentFactory<?> manager,
+	public <V, T extends Component<?, V>> T createComponent(DataObjectHolderComponentManager<?> manager,
 			String modid,
 			String value,
 			PublicLoader access,
@@ -175,7 +176,7 @@ public class DefaultComponentClassFactory implements Opcodes {
 				interfaces);
 	}
 
-	protected void postMethodVisit(DataObjectHolderComponentFactory<?> manager,
+	protected void postMethodVisit(DataObjectHolderComponentManager<?> manager,
 			ClassWriter visitor,
 			String modid,
 			String value,
@@ -191,7 +192,7 @@ public class DefaultComponentClassFactory implements Opcodes {
 
 	}
 
-	protected String internalName(DataObjectHolderComponentFactory<?> manager,
+	protected String internalName(DataObjectHolderComponentManager<?> manager,
 			String modid,
 			String value,
 			PublicLoader access,
@@ -202,7 +203,7 @@ public class DefaultComponentClassFactory implements Opcodes {
 		return "astrarre-components-v0/generated/component/" + modid + "/" + value;
 	}
 
-	protected String superName(DataObjectHolderComponentFactory<?> manager,
+	protected String superName(DataObjectHolderComponentManager<?> manager,
 			String modid,
 			String value,
 			PublicLoader access,
@@ -213,7 +214,7 @@ public class DefaultComponentClassFactory implements Opcodes {
 		return "java/lang/Object";
 	}
 
-	protected String[] interfaces(DataObjectHolderComponentFactory<?> manager,
+	protected String[] interfaces(DataObjectHolderComponentManager<?> manager,
 			String modid,
 			String value,
 			PublicLoader access,
@@ -224,7 +225,7 @@ public class DefaultComponentClassFactory implements Opcodes {
 		return new String[] {Type.getInternalName(componentType)};
 	}
 
-	protected ClassWriter createHeader(DataObjectHolderComponentFactory<?> manager,
+	protected ClassWriter createHeader(DataObjectHolderComponentManager<?> manager,
 			String modid,
 			String value,
 			PublicLoader access,
@@ -240,7 +241,7 @@ public class DefaultComponentClassFactory implements Opcodes {
 		return visitor;
 	}
 
-	protected void createConstructor(DataObjectHolderComponentFactory<?> manager,
+	protected void createConstructor(DataObjectHolderComponentManager<?> manager,
 			ClassWriter visitor,
 			String modid,
 			String value,
@@ -256,6 +257,8 @@ public class DefaultComponentClassFactory implements Opcodes {
 		FieldVisitor listeners = visitor.visitField(ACC_PUBLIC | ACC_FINAL, "listeners", "Ljava/util/List;", null, null);
 
 		MethodVisitor constructor = visitor.visitMethod(ACC_PUBLIC, "<init>", "(L" + this.factoryName + ";)V", null, null);
+		constructor.visitParameter("factory", 0);
+
 		constructor.visitVarInsn(ALOAD, 0);
 		constructor.visitMethodInsn(INVOKESPECIAL, superClass, "<init>", "()V", false);
 
@@ -271,9 +274,10 @@ public class DefaultComponentClassFactory implements Opcodes {
 
 		constructor.visitInsn(RETURN);
 		constructor.visitMaxs(2, 3);
+
 	}
 
-	protected void createGetterMethod(DataObjectHolderComponentFactory<?> manager,
+	protected void createGetterMethod(DataObjectHolderComponentManager<?> manager,
 			ClassWriter visitor,
 			String modid,
 			String value,
@@ -300,7 +304,7 @@ public class DefaultComponentClassFactory implements Opcodes {
 		get.visitMaxs(2, 2);
 	}
 
-	protected void createSetterMethod(DataObjectHolderComponentFactory<?> manager,
+	protected void createSetterMethod(DataObjectHolderComponentManager<?> manager,
 			ClassWriter visitor,
 			String modid,
 			String value,
@@ -352,7 +356,7 @@ public class DefaultComponentClassFactory implements Opcodes {
 		set.visitMaxs(2, 3);
 	}
 
-	protected void postSetterMethod(DataObjectHolderComponentFactory<?> manager,
+	protected void postSetterMethod(DataObjectHolderComponentManager<?> manager,
 			ClassWriter visitor,
 			MethodVisitor method,
 			String modid,
@@ -369,7 +373,7 @@ public class DefaultComponentClassFactory implements Opcodes {
 
 	}
 
-	protected void createModidMethod(DataObjectHolderComponentFactory<?> manager,
+	protected void createModidMethod(DataObjectHolderComponentManager<?> manager,
 			ClassWriter visitor,
 			String modid,
 			String value,
@@ -388,7 +392,7 @@ public class DefaultComponentClassFactory implements Opcodes {
 		modMethod.visitMaxs(1, 1);
 	}
 
-	protected void createIdMethod(DataObjectHolderComponentFactory<?> manager,
+	protected void createIdMethod(DataObjectHolderComponentManager<?> manager,
 			ClassWriter visitor,
 			String modid,
 			String value,
@@ -408,7 +412,7 @@ public class DefaultComponentClassFactory implements Opcodes {
 	}
 
 	private static final String COMPONENT_MANAGER = Type.getDescriptor(ComponentManager.class);
-	protected void createGetComponentManagerMethod(DataObjectHolderComponentFactory<?> manager,
+	protected void createGetComponentManagerMethod(DataObjectHolderComponentManager<?> manager,
 			ClassWriter visitor,
 			String modid,
 			String value,
@@ -428,7 +432,7 @@ public class DefaultComponentClassFactory implements Opcodes {
 		compManagerMethod.visitMaxs(2, 1);
 	}
 
-	protected void createOnChangeMethod(DataObjectHolderComponentFactory<?> manager,
+	protected void createOnChangeMethod(DataObjectHolderComponentManager<?> manager,
 			ClassWriter visitor,
 			String modid,
 			String value,
@@ -449,7 +453,7 @@ public class DefaultComponentClassFactory implements Opcodes {
 		change.visitMaxs(2, 2);
 	}
 
-	protected <V, T extends Component<?, V>> T createComponent(DataObjectHolderComponentFactory<?> manager,
+	protected <V, T extends Component<?, V>> T createComponent(DataObjectHolderComponentManager<?> manager,
 			ClassWriter visitor,
 			String modid,
 			String value,
@@ -479,7 +483,7 @@ public class DefaultComponentClassFactory implements Opcodes {
 				interfaces);
 	}
 
-	protected <V, T extends Component<?, V>> T instantiate(DataObjectHolderComponentFactory<?> manager,
+	protected <V, T extends Component<?, V>> T instantiate(DataObjectHolderComponentManager<?> manager,
 			Class<? extends T> componentClass,
 			String modid,
 			String value,
@@ -493,8 +497,11 @@ public class DefaultComponentClassFactory implements Opcodes {
 			String superClass,
 			String[] interfaces) {
 		try {
-			return componentClass.getConstructor(this.factoryType).newInstance(manager);
-		} catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+			// io.github.astrarre.components.internal.lazyAsm.DataObjectHolderComponentFactory
+			// io.github.astrarre.components.internal.lazyAsm.DataObjectHolderComponentFactory
+			Constructor<T> constructor = (Constructor<T>) componentClass.getConstructors()[0];
+			return (T) constructor.newInstance(manager);
+		} catch (ReflectiveOperationException | IllegalArgumentException e) {
 			throw new RuntimeException(e);
 		}
 	}

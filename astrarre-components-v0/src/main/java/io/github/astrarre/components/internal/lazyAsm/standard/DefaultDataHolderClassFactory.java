@@ -14,10 +14,9 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
 public class DefaultDataHolderClassFactory implements Opcodes {
-	public static final DefaultDataHolderClassFactory INSTANCE = new DefaultDataHolderClassFactory();
+	protected final PublicLoader loader;
 
-	protected DefaultDataHolderClassFactory() {
-	}
+	public DefaultDataHolderClassFactory(PublicLoader loader) {this.loader = loader;}
 
 	public Supplier<Object> createDataClassCreator(ComponentManager<?> manager, DataHolderClass current) {
 		ClassWriter visitor = new ClassWriter(0);
@@ -29,7 +28,7 @@ public class DefaultDataHolderClassFactory implements Opcodes {
 		this.createCopyMethod(current, visitor, parent);
 
 		byte[] code = visitor.toByteArray();
-		Class<?> cls = PublicLoader.INSTANCE.defineCls(current.name.replace('/', '.'), code, 0, code.length, null);
+		Class<?> cls = this.loader.defineCls(current.name.replace('/', '.'), code, 0, code.length, null);
 		return this.create(manager, current, cls);
 	}
 

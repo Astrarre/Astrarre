@@ -22,32 +22,34 @@ import io.github.astrarre.components.v0.api.components.LongComponent;
 import io.github.astrarre.components.v0.api.components.ShortComponent;
 import io.github.astrarre.components.internal.util.FieldPrototype;
 import io.github.astrarre.components.internal.util.PublicLoader;
-import org.apache.logging.log4j.util.TriConsumer;
 import org.objectweb.asm.Type;
 
-public class DataObjectHolderComponentFactory<C>
+public class DataObjectHolderComponentManager<C>
 		implements org.objectweb.asm.Opcodes, io.github.astrarre.components.v0.api.factory.ComponentManager<C> {
 	public static final Map<Class<?>, Class<?>> COMPONENT_TYPE_MAP;
 
 	static {
 		Map<Class<?>, Class<?>> map = new HashMap<>();
 		map.put(BoolComponent.class, boolean.class);
-		map.put(ByteComponent.class, boolean.class);
-		map.put(CharComponent.class, boolean.class);
-		map.put(Component.class, boolean.class);
-		map.put(DoubleComponent.class, boolean.class);
-		map.put(FloatComponent.class, boolean.class);
-		map.put(IntComponent.class, boolean.class);
-		map.put(LongComponent.class, boolean.class);
-		map.put(ShortComponent.class, boolean.class);
+		map.put(ByteComponent.class, byte.class);
+		map.put(CharComponent.class, char.class);
+		map.put(Component.class, Object.class);
+		map.put(DoubleComponent.class, double.class);
+		map.put(FloatComponent.class, float.class);
+		map.put(IntComponent.class, int.class);
+		map.put(LongComponent.class, long.class);
+		map.put(ShortComponent.class, short.class);
 		COMPONENT_TYPE_MAP = Collections.unmodifiableMap(map);
 	}
 
 	protected final List<Component<C, ?>> components = new ArrayList<>();
 	protected final String name;
 	protected DataHolderClass activeClass;
+	protected final PublicLoader classLoader = new PublicLoader(this.getClass().getClassLoader());
+	protected final DefaultDataHolderClassFactory dataFactory = new DefaultDataHolderClassFactory(this.classLoader);
+	protected final DefaultComponentClassFactory componentFactory = new DefaultComponentClassFactory();
 
-	public DataObjectHolderComponentFactory(
+	public DataObjectHolderComponentManager(
 			String modid,
 			String path) {
 		this.name = modid + "__" + path;
@@ -80,10 +82,9 @@ public class DataObjectHolderComponentFactory<C>
 		FieldPrototype prototype = new FieldPrototype(Type.getDescriptor(COMPONENT_TYPE_MAP.get(componentType)), fieldName, null);
 		this.activeClass.fields.add(prototype);
 		int version = this.activeClass.version;
-		return DefaultComponentClassFactory.INSTANCE.createComponent(this,
+		return this.componentFactory.createComponent(this,
 				modid,
-				path,
-				PublicLoader.INSTANCE,
+				path, this.classLoader,
 				componentType,
 				this.activeClass.name,
 				prototype.name,
@@ -100,7 +101,7 @@ public class DataObjectHolderComponentFactory<C>
 		Object oldData = this.getData(context);
 		if (componentVersion > version) {
 			if (this.activeClass.compiled == null) {
-				this.activeClass.compiled = DefaultDataHolderClassFactory.INSTANCE.createDataClassCreator(this, this.activeClass);
+				this.activeClass.compiled = this.dataFactory.createDataClassCreator(this, this.activeClass);
 			}
 			Object newData = this.createNewDataHolder();
 			if (oldData != null) {
