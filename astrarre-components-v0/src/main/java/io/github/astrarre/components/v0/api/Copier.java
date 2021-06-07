@@ -3,7 +3,7 @@ package io.github.astrarre.components.v0.api;
 public interface Copier<T> {
 	Copier<String> STRING = immutable();
 
-	static <T> Copier<T> clonable(ClonableAdapter<T> adapter) {
+	static <T> Copier<T> clonable(CloneableAdapter<T> adapter) {
 		return adapter;
 	}
 

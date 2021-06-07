@@ -1,19 +1,19 @@
 package io.github.astrarre.access.v0.fabric;
 
-import java.lang.invoke.LambdaMetafactory;
 import java.util.Objects;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.reflect.TypeToken;
-import io.github.astrarre.access.internal.MapFilter;
 import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.access.v0.api.FunctionAccess;
-import io.github.astrarre.util.v0.api.func.IterFunc;
 import io.github.astrarre.access.v0.fabric.func.WorldFunction;
+import io.github.astrarre.access.v0.fabric.helper.BlockEntityAccessHelper;
+import io.github.astrarre.access.v0.fabric.helper.BlockStateAccessHelper;
 import io.github.astrarre.access.v0.fabric.provider.BlockEntityProvider;
 import io.github.astrarre.access.v0.fabric.provider.BlockProvider;
 import io.github.astrarre.util.v0.api.Id;
+import io.github.astrarre.util.v0.api.func.IterFunc;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -21,9 +21,8 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.util.math.Box;
 
 public class WorldAccess<T> extends Access<WorldFunction<T>> {
-	private final MapFilter<BlockEntityType<?>, WorldFunction<T>> blockEntityTypes;
-	private final MapFilter<BlockState, WorldFunction<T>> blockStateTypes;
-	private final MapFilter<Block, WorldFunction<T>> blockTypes;
+	private final BlockEntityAccessHelper<WorldFunction<T>> blockEntityHelper;
+	private final BlockStateAccessHelper<WorldFunction<T>> blockStateHelper;
 	private boolean addedProviderFunction, addedBlockEntityInstanceOfFunction;
 
 	public WorldAccess(Id id) {
@@ -42,14 +41,27 @@ public class WorldAccess<T> extends Access<WorldFunction<T>> {
 	public WorldAccess(Id id, IterFunc<WorldFunction<T>> iterFunc) {
 		super(id, iterFunc);
 		IterFunc<WorldFunction<T>> comb = WorldFunction.skipIfNull(null);
-		this.blockEntityTypes = new MapFilter<>(comb);
-		this.blockStateTypes = new MapFilter<>(comb);
-		this.blockTypes = new MapFilter<>(comb);
+		this.blockEntityHelper = new BlockEntityAccessHelper<>(comb, function -> {
+			this.andThen((direction, state, world, pos, entity) -> {
+				if (entity == null) {
+					return null;
+				}
+				var f = function.apply(entity);
+				return f != null ? f.get(direction, state, world, pos, entity) : null;
+			});
+		});
+		this.blockStateHelper = new BlockStateAccessHelper<>(comb, function -> {
+			this.andThen((direction, state, world, pos, entity) -> {
+				var f = function.apply(state);
+				return f != null ? f.get(direction, state, world, pos, entity) : null;
+			});
+		});
 	}
 
 	public static <T> WorldAccess<T> newInstance(Id id, IterFunc<T> combiner) {
-		return new WorldAccess<>(id, (functions) -> (direction, state, world, pos, entity) -> combiner.combine(() -> Iterators.transform(functions.iterator(),
-				input -> input.get(direction, state, world, pos, entity))));
+		return new WorldAccess<>(id,
+				(functions) -> (direction, state, world, pos, entity) -> combiner.combine(() -> Iterators.transform(functions.iterator(),
+						input -> input.get(direction, state, world, pos, entity))));
 	}
 
 	/**
@@ -82,10 +94,12 @@ public class WorldAccess<T> extends Access<WorldFunction<T>> {
 	 * adds a function for if blockentity instanceof T, return blockentity
 	 */
 	public WorldAccess<T> addBlockEntityInstanceOfFunction(TypeToken<T> type) {
-		if(this.addedBlockEntityInstanceOfFunction) return this;
+		if (this.addedBlockEntityInstanceOfFunction) {
+			return this;
+		}
 		this.addedBlockEntityInstanceOfFunction = true;
 		this.andThen((direction, state, world, pos, entity) -> {
-			if(entity != null && type.isSupertypeOf(entity.getClass())) {
+			if (entity != null && type.isSupertypeOf(entity.getClass())) {
 				return (T) entity;
 			}
 			return null;
@@ -93,27 +107,44 @@ public class WorldAccess<T> extends Access<WorldFunction<T>> {
 		return this;
 	}
 
-	public WorldAccess<T> forBlock(Block block, WorldFunction<T> function) {
-		if (this.blockTypes.add(block, function)) {
-			this.andThen((WorldFunction.NoBlockEntity<T>) (direction, state, view, pos) -> this.blockTypes.get(state.getBlock())
-			                                                                                              .get(direction, state, view, pos));
-		}
-		return this;
+	/**
+	 * The block advanced filtering helper. It is recommended you use these for performance's sake
+	 */
+	public BlockStateAccessHelper<WorldFunction<T>> getBlockStateHelper() {
+		return this.blockStateHelper;
 	}
 
+	/**
+	 * The block entity advanced filtering helper. It is recommended you use these for performance's sake
+	 */
+	public BlockEntityAccessHelper<WorldFunction<T>> getBlockEntityHelper() {
+		return this.blockEntityHelper;
+	}
+
+	/**
+	 * Utility method and example on how to use helpers
+	 * @see #getBlockStateHelper()
+	 */
 	public WorldAccess<T> forBlockState(BlockState block, WorldFunction<T> function) {
-		if (this.blockStateTypes.add(block, function)) {
-			this.andThen((WorldFunction.NoBlockEntity<T>) (direction, state, view, pos) -> this.blockStateTypes.get(state)
-			                                                                                                   .get(direction, state, view, pos));
-		}
+		this.getBlockStateHelper().getBlockstate().forInstanceWeak(block, function);
 		return this;
 	}
 
+	/**
+	 * Utility method and example on how to use helpers
+	 * @see #getBlockStateHelper()
+	 */
+	public WorldAccess<T> forBlock(Block block, WorldFunction<T> function) {
+		this.getBlockStateHelper().getBlock().getBlock().forInstanceWeak(block, function);
+		return this;
+	}
+
+	/**
+	 * Utility method and example on how to use helpers
+	 * @see #getBlockEntityHelper()
+	 */
 	public WorldAccess<T> forBlockEntity(BlockEntityType<?> block, WorldFunction<T> function) {
-		if (this.blockEntityTypes.add(block, function)) {
-			this.andThen((direction, state, view, pos, entity) -> entity != null ? this.blockEntityTypes.get(entity.getType())
-			                                                                                            .get(direction, state, view, pos) : null);
-		}
+		this.getBlockEntityHelper().getBlockEntityType().forInstanceWeak(block, function);
 		return this;
 	}
 
@@ -121,10 +152,8 @@ public class WorldAccess<T> extends Access<WorldFunction<T>> {
 	 * @param combiner if there are more than one valid entities within the same block, the values should be combined
 	 */
 	public WorldAccess<T> dependsOn(EntityAccess<T> entity, IterFunc<T> combiner) {
-		super.dependsOn(
-				entity,
-				function -> (WorldFunction.NoBlock) (d, w, p) -> combiner.combine(Iterables.filter(Iterables.transform(w.getOtherEntities(
-						null,
+		super.dependsOn(entity,
+				function -> (WorldFunction.NoBlock) (d, w, p) -> combiner.combine(Iterables.filter(Iterables.transform(w.getOtherEntities(null,
 						new Box(p)), e -> function.get(d, e)), Objects::nonNull)));
 		return this;
 	}

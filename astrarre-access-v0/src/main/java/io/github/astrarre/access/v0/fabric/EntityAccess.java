@@ -1,9 +1,13 @@
 package io.github.astrarre.access.v0.fabric;
 
+import java.util.Objects;
+
+import com.google.common.collect.Iterables;
 import com.google.common.reflect.TypeToken;
-import io.github.astrarre.access.internal.MapFilter;
 import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.access.v0.api.FunctionAccess;
+import io.github.astrarre.access.v0.api.helper.FunctionAccessHelper;
+import io.github.astrarre.access.v0.fabric.helper.EntityAccessHelper;
 import io.github.astrarre.util.v0.api.func.IterFunc;
 import io.github.astrarre.access.v0.fabric.func.EntityFunction;
 import io.github.astrarre.access.v0.fabric.provider.EntityProvider;
@@ -11,14 +15,10 @@ import io.github.astrarre.util.v0.api.Id;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 
-import net.minecraft.util.Pair;
-
 public class EntityAccess<T> extends Access<EntityFunction<T>> {
-	private final MapFilter<EntityType<?>, EntityFunction<T>> entityTypes;
-	private final MapFilter<Pair<EquipmentSlot, Item>, EntityFunction<T>> equipmentFilters;
+	public final EntityAccessHelper<EntityFunction<T>> helper;
 
 	public EntityAccess(Id id) {
 		this(id, (T) null);
@@ -35,26 +35,26 @@ public class EntityAccess<T> extends Access<EntityFunction<T>> {
 	public EntityAccess(Id id, IterFunc<EntityFunction<T>> iterFunc) {
 		super(id, iterFunc);
 		IterFunc<EntityFunction<T>> comb = EntityFunction.skipIfNull(null);
-		this.entityTypes = new MapFilter<>(comb);
-		this.equipmentFilters = new MapFilter<>(comb);
-	}
-
-	/**
-	 * @param combiner combines the return value of the function
-	 */
-	public static <T> EntityAccess<T> newInstance(Id id, IterFunc<T> combiner) {
-		return new EntityAccess<>(id, (functions) -> (d, e) -> {
-			for (EntityFunction<T> function : functions) {
-				T val = function.get(d, e);
-				if (val != null) {
-					return val;
-				}
-			}
-			return null;
+		this.helper = new EntityAccessHelper<>(comb, function -> {
+			this.andThen((d, e) -> {
+				var f = function.apply(e);
+				return f != null ? f.get(d, e) : null;
+			});
 		});
 	}
 
+	public static <T> EntityAccess<T> newInstance(Id id, IterFunc<T> combiner) {
+		return new EntityAccess<>(id, (functions) -> (d, e) -> combiner.combine(Iterables.filter(Iterables.transform(functions, f -> f.get(d, e)), Objects::nonNull)));
+	}
+
 	private boolean addedProviderFunction, addedInstanceofFunction;
+
+	/**
+	 * The entity advanced filtering helper. It is recommended you use these for performance's sake
+	 */
+	public EntityAccessHelper<EntityFunction<T>> getEntityHelper() {
+		return this.helper;
+	}
 
 	/**
 	 * adds an entity function for {@link EntityProvider}
@@ -90,28 +90,22 @@ public class EntityAccess<T> extends Access<EntityFunction<T>> {
 
 	/**
 	 * filters for entities of the given entity type
+	 * @see #getEntityHelper()
+	 * @see EntityAccessHelper#getEntityType()
+	 * @see FunctionAccessHelper#forInstanceWeak(Object, Object)
 	 */
 	public EntityAccess<T> forType(EntityType<?> type, EntityFunction<T> function) {
-		if(this.entityTypes.add(type, function)) {
-			this.andThen((d, e) -> this.entityTypes.get(e.getType()).get(d, e));
-		}
+		this.getEntityHelper().getEntityType().forInstanceWeak(type, function);
 		return this;
 	}
 
 	/**
 	 * filters for entities that have a specific item in the specified equipment slot
+	 * @see #getEntityHelper()
 	 */
 	public EntityAccess<T> ifHas(EquipmentSlot slot, Item key, EntityFunction<T> function) {
-		if (this.equipmentFilters.add(new Pair<>(slot, key), function)) {
-			for (EquipmentSlot value : EquipmentSlot.values()) {
-				this.andThen((d, e) -> {
-					if(e instanceof LivingEntity) {
-						return this.equipmentFilters.get(new Pair<>(value, ((LivingEntity)e).getEquippedStack(slot).getItem())).get(d, e);
-					}
-					return null;
-				});
-			}
-		}
+		this.getEntityHelper().getForEquipment(slot).getItem().forInstanceWeak(key, function);
 		return this;
 	}
+
 }

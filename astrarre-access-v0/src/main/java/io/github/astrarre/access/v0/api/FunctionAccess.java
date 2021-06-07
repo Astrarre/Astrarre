@@ -5,14 +5,14 @@ import java.util.function.Function;
 
 import com.google.common.collect.Iterators;
 import com.google.common.reflect.TypeToken;
-import io.github.astrarre.access.internal.MapFilter;
+import io.github.astrarre.access.v0.api.helper.FunctionAccessHelper;
+import io.github.astrarre.util.v0.api.Validate;
 import io.github.astrarre.util.v0.api.func.IterFunc;
 import io.github.astrarre.access.v0.api.provider.Provider;
 import io.github.astrarre.util.v0.api.Id;
 
 public class FunctionAccess<A, B> extends Access<Function<A, B>> {
-	private final MapFilter<A, Function<A, B>> instanceFunctions, instanceFunctionsStrong;
-	private final MapFilter<Class<? extends A>, Function<A, B>> classFunctions;
+	private final FunctionAccessHelper<A, A, Function<A, B>> accessHelper;
 	private boolean addedProviderFunction, addedInstanceof;
 
 	/**
@@ -35,9 +35,7 @@ public class FunctionAccess<A, B> extends Access<Function<A, B>> {
 	 */
 	public FunctionAccess(Id id, IterFunc<Function<A, B>> iterFunc) {
 		super(id, iterFunc);
-		this.instanceFunctions = new MapFilter<>(iterFunc, true);
-		this.classFunctions = new MapFilter<>(iterFunc, true);
-		this.instanceFunctionsStrong = new MapFilter<>(iterFunc, false);
+		this.accessHelper = new FunctionAccessHelper<>(iterFunc, f -> this.andThen(a -> Validate.transform(f.apply(a), a, Function::apply)), Function.identity());
 	}
 
 	/**
@@ -90,9 +88,7 @@ public class FunctionAccess<A, B> extends Access<Function<A, B>> {
 	 * This holds a WEAK reference to the object
 	 */
 	public FunctionAccess<A, B> forInstance(A a, Function<A, B> function) {
-		if (this.instanceFunctions.add(a, function)) {
-			this.andThen(val -> this.instanceFunctions.get(val).apply(val));
-		}
+		this.accessHelper.forInstanceWeak(a, function);
 		return this;
 	}
 
@@ -100,9 +96,7 @@ public class FunctionAccess<A, B> extends Access<Function<A, B>> {
 	 * filters the access function for only objects that are {@link Object#equals(Object)} to the passed object.
 	 */
 	public FunctionAccess<A, B> forInstanceStrong(A a, Function<A, B> function) {
-		if (this.instanceFunctionsStrong.add(a, function)) {
-			this.andThen(val -> this.instanceFunctionsStrong.get(val).apply(val));
-		}
+		this.accessHelper.forInstanceStrong(a, function);
 		return this;
 	}
 
@@ -112,9 +106,7 @@ public class FunctionAccess<A, B> extends Access<Function<A, B>> {
 	 * @param type the type
 	 */
 	public <C extends A> FunctionAccess<A, B> forClassExact(Class<C> type, Function<C, B> function) {
-		if (this.classFunctions.add(type, (Function<A, B>) function)) {
-			this.andThen(val -> this.classFunctions.get((Class<? extends A>) val.getClass()).apply(val));
-		}
+		this.accessHelper.forClassExact(type, (Function<A, B>) function);
 		return this;
 	}
 }

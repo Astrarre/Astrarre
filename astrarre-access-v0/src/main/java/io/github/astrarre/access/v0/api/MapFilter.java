@@ -1,4 +1,4 @@
-package io.github.astrarre.access.internal;
+package io.github.astrarre.access.v0.api;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,7 +9,7 @@ import java.util.WeakHashMap;
 
 import io.github.astrarre.util.v0.api.func.IterFunc;
 
-public class MapFilter<T, A> {
+public final class MapFilter<T, A> {
 	private final IterFunc<A> combine;
 	private final A empty;
 	private final Map<T, A> cached = new HashMap<>();
@@ -17,12 +17,21 @@ public class MapFilter<T, A> {
 	public final boolean isWeak;
 
 	public MapFilter(IterFunc<A> then, boolean isWeak) {
+		this(then, then.combine(Collections.emptyList()), isWeak);
+	}
+
+	public MapFilter(IterFunc<A> then) {
+		this(then, then.combine(Collections.emptyList()), false);
+	}
+
+	public MapFilter(IterFunc<A> then, A empty, boolean isWeak) {
+		this.empty = empty;
 		this.isWeak = isWeak;
 		this.combine = then;
-		this.empty = then.combine(Collections.emptyList());
 	}
-	public MapFilter(IterFunc<A> then) {
-		this(then, false);
+
+	public MapFilter(IterFunc<A> then, A empty) {
+		this(then, empty, false);
 	}
 
 	public boolean add(T type, A func) {

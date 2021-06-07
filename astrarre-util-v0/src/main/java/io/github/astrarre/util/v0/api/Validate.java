@@ -1,5 +1,7 @@
 package io.github.astrarre.util.v0.api;
 
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -130,5 +132,15 @@ public class Validate {
 		if (index >= length) {
 			throw new IllegalArgumentException(s);
 		}
+	}
+
+	public static <A, B> B transform(A input, Function<A, B> transform) {
+		if(input == null) return null;
+		return transform.apply(input);
+	}
+
+	public static <A, B, C> C transform(A input, B context, BiFunction<A, B, C> transform) {
+		if(input == null) return null;
+		return transform.apply(input, context);
 	}
 }
