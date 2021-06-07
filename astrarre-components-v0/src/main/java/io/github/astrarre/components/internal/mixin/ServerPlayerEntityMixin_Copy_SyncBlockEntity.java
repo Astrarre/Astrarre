@@ -39,6 +39,9 @@ public class ServerPlayerEntityMixin_Copy_SyncBlockEntity extends PlayerEntityMi
 		for (Pair<Component<PlayerEntity, ?>, Copier<?>> pair : ComponentsInternal.COPY_PLAYER_ALIVE) {
 			FabricComponents.copy(oldPlayer, (Entity) (Object) this, (Component)pair.getFirst(), pair.getSecond());
 		}
+		for (Pair<Component<Entity, ?>, Copier<?>> pair : ComponentsInternal.COPY_ENTITY_INTENRAL) {
+			FabricComponents.copy(oldPlayer, (Entity) (Object) this, (Component)pair.getFirst(), pair.getSecond());
+		}
 	}
 
 	@Inject(method = "copyFrom", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;setScore(I)V", ordinal = 1))
