@@ -33,7 +33,7 @@ public class DefaultDataHolderClassFactory implements Opcodes {
 	}
 
 	@NotNull
-	private Supplier<Object> create(ComponentManager<?> manager, DataHolderClass current, Class<?> cls) {
+	protected Supplier<Object> create(ComponentManager<?> manager, DataHolderClass current, Class<?> cls) {
 		return () -> {
 			try {
 				return (Object) cls.newInstance();

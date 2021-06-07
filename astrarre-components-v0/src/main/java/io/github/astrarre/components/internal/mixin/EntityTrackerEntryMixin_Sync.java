@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 import com.mojang.datafixers.util.Pair;
 import io.github.astrarre.components.internal.ComponentsInternal;
 import io.github.astrarre.components.v0.api.components.Component;
-import io.github.astrarre.components.v0.fabric.EntityComponentBuilder;
+import io.github.astrarre.components.v0.fabric.builder.EntityComponentBuilder;
 import io.github.astrarre.components.v0.fabric.FabricByteSerializer;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;

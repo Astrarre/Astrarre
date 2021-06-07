@@ -4,11 +4,14 @@
   "compatibilityLevel": "JAVA_16",
   "mixins": [
     "BlockEntityMixin",
+    "ChunkDataS2CPacketMixin_SyncBlockEntity",
+    "ChunkHolderMixin_BlockEntitySync",
+    "ClientPlayerNetworkHandlerMixin_BlockEntityAccept",
     "ClientPlayNetworkHandlerMixin_SyncAccept",
     "EntityMixin_ObjectHolder_Serialization",
     "EntityTrackerEntryMixin_Sync",
     "PlayerEntityMixin_ObjectHolder_Serialization",
-    "ServerPlayerEntityMixin_Copy"
+    "ServerPlayerEntityMixin_Copy_SyncBlockEntity"
   ],
   "injectors": {
     "defaultRequire": 1

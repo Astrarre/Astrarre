@@ -75,7 +75,7 @@ public class DataObjectHolderComponentManager<C>
 	public <V, T extends Component<C, V>> T create(Class<T> componentType, String modid, String path) {
 		if (this.activeClass == null || this.activeClass.compiled != null) {
 			int version = this.activeClass == null ? 1 : (this.activeClass.version + 1);
-			this.activeClass = new DataHolderClass(this.activeClass, version, "astrarre-components-v0/generated/dataholder" + this.name + version);
+			this.activeClass = new DataHolderClass(this.activeClass, version, "astrarre-components-v0/generated/dataholder/" + this.name + version);
 		}
 
 		String fieldName = modid + "__" + path;

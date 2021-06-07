@@ -1,16 +1,16 @@
-package io.github.astrarre.components.v0.fabric;
+package io.github.astrarre.components.v0.fabric.builder;
 
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.reflect.TypeToken;
 import com.mojang.datafixers.util.Pair;
 import io.github.astrarre.components.internal.ComponentsInternal;
 import io.github.astrarre.components.v0.api.Copier;
 import io.github.astrarre.components.v0.api.components.Component;
 import io.github.astrarre.components.v0.api.factory.ComponentManager;
+import io.github.astrarre.components.v0.fabric.FabricByteSerializer;
+import io.github.astrarre.components.v0.fabric.FabricSerializer;
 
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 

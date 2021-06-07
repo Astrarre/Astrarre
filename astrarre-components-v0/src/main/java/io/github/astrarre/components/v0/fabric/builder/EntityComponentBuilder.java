@@ -1,16 +1,18 @@
-package io.github.astrarre.components.v0.fabric;
+package io.github.astrarre.components.v0.fabric.builder;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.reflect.TypeToken;
 import com.mojang.datafixers.util.Pair;
 import io.github.astrarre.components.internal.ComponentsInternal;
 import io.github.astrarre.components.v0.api.Copier;
 import io.github.astrarre.components.v0.api.components.Component;
 import io.github.astrarre.components.v0.api.components.PrimitiveComponent;
 import io.github.astrarre.components.v0.api.factory.ComponentManager;
+import io.github.astrarre.components.v0.fabric.FabricByteSerializer;
+import io.github.astrarre.components.v0.fabric.FabricComponents;
+import io.github.astrarre.components.v0.fabric.FabricSerializer;
 import io.netty.buffer.Unpooled;
 
 import net.minecraft.entity.Entity;
@@ -36,7 +38,7 @@ public class EntityComponentBuilder<C extends Entity, V, T extends Component<C, 
 
 	public static <V, T extends Component<Entity, V>> EntityComponentBuilder<Entity, V, T> entity() {
 		return new EntityComponentBuilder<>(
-				ComponentsInternal.MANAGER,
+				ComponentsInternal.ENTITY_MANAGER,
 				ComponentsInternal.SYNC_ENTITY_INTERNAL,
 				ComponentsInternal.SERIALIZE_ENTITY_INTERNAL,
 				ComponentsInternal.COPY_ENTITY_INTENRAL);

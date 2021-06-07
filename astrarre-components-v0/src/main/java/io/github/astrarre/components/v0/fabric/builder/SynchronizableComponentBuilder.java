@@ -1,4 +1,4 @@
-package io.github.astrarre.components.v0.fabric;
+package io.github.astrarre.components.v0.fabric.builder;
 
 import java.util.Map;
 
@@ -14,6 +14,7 @@ import io.github.astrarre.components.v0.api.components.LongComponent;
 import io.github.astrarre.components.v0.api.components.PrimitiveComponent;
 import io.github.astrarre.components.v0.api.components.ShortComponent;
 import io.github.astrarre.components.v0.api.factory.ComponentManager;
+import io.github.astrarre.components.v0.fabric.FabricByteSerializer;
 
 import net.minecraft.util.Identifier;
 
@@ -36,39 +37,39 @@ public abstract class SynchronizableComponentBuilder<C, V, T extends Component<C
 	}
 
 	public BoolComponent<C> buildBool(Identifier id) {
-		return (BoolComponent<C>) this.build(id, (Class<T>) BoolComponent.class);
+		return (BoolComponent<C>) this.build(id, (Class) BoolComponent.class);
 	}
 
 	public ByteComponent<C> buildByte(Identifier id) {
-		return (ByteComponent<C>) this.build(id, (Class<T>) ByteComponent.class);
+		return (ByteComponent<C>) this.build(id, (Class) ByteComponent.class);
 	}
 
 	public ShortComponent<C> buildShort(Identifier id) {
-		return (ShortComponent<C>) this.build(id, (Class<T>) ShortComponent.class);
+		return (ShortComponent<C>) this.build(id, (Class) ShortComponent.class);
 	}
 
 	public CharComponent<C> buildChar(Identifier id) {
-		return (CharComponent<C>) this.build(id, (Class<T>) CharComponent.class);
+		return (CharComponent<C>) this.build(id, (Class) CharComponent.class);
 	}
 
 	public IntComponent<C> buildInt(Identifier id) {
-		return (IntComponent<C>) this.build(id, (Class<T>) IntComponent.class);
+		return (IntComponent<C>) this.build(id, (Class) IntComponent.class);
 	}
 
 	public FloatComponent<C> buildFloat(Identifier id) {
-		return (FloatComponent<C>) this.build(id, (Class<T>) FloatComponent.class);
+		return (FloatComponent<C>) this.build(id, (Class) FloatComponent.class);
 	}
 
 	public LongComponent<C> buildLong(Identifier id) {
-		return (LongComponent<C>) this.build(id, (Class<T>) LongComponent.class);
+		return (LongComponent<C>) this.build(id, (Class) LongComponent.class);
 	}
 
 	public DoubleComponent<C> buildDouble(Identifier id) {
-		return (DoubleComponent<C>) this.build(id, (Class<T>) DoubleComponent.class);
+		return (DoubleComponent<C>) this.build(id, (Class) DoubleComponent.class);
 	}
 
 	public T buildObj(Identifier id) {
-		return this.build(id, (Class<T>) Component.class);
+		return (T) this.build(id, (Class) Component.class);
 	}
 
 	/**

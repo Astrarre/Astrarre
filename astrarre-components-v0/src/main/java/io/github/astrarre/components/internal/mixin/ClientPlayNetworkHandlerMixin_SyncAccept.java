@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.entity.Entity;
@@ -22,6 +23,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 import net.fabricmc.api.EnvType;
@@ -57,6 +60,15 @@ public class ClientPlayNetworkHandlerMixin_SyncAccept {
 				if (entity != null) {
 					context = entity;
 					map = (Map) ComponentsInternal.SYNC_ENTITY_INTERNAL;
+				}
+				ci.cancel();
+			} else if(ComponentsInternal.SYNC_BLOCK_ENTITY.equals(channel)) {
+				String registryEntry = data.readString();
+				BlockPos position = data.readBlockPos();
+				BlockEntity entity = currentWorld.getBlockEntity(position);
+				if(entity != null && registryEntry.equals(Registry.BLOCK_ENTITY_TYPE.getId(entity.getType()).toString())) {
+					context = entity;
+					map = (Map) ComponentsInternal.SYNC_BLOCK_ENTITY_INTERNAL;
 				}
 				ci.cancel();
 			}

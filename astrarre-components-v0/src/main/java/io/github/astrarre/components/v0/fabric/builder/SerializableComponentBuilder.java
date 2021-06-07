@@ -1,4 +1,4 @@
-package io.github.astrarre.components.v0.fabric;
+package io.github.astrarre.components.v0.fabric.builder;
 
 import java.util.Map;
 
@@ -7,8 +7,9 @@ import io.github.astrarre.components.v0.api.Copier;
 import io.github.astrarre.components.v0.api.components.Component;
 import io.github.astrarre.components.v0.api.components.PrimitiveComponent;
 import io.github.astrarre.components.v0.api.factory.ComponentManager;
+import io.github.astrarre.components.v0.fabric.FabricByteSerializer;
+import io.github.astrarre.components.v0.fabric.FabricSerializer;
 
-import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
 
 public abstract class SerializableComponentBuilder<C, V, T extends Component<C, V>> extends SynchronizableComponentBuilder<C, V, T> {
