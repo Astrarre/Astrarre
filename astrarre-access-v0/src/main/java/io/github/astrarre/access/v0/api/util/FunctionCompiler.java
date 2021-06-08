@@ -25,6 +25,10 @@ public final class FunctionCompiler<F> {
 		this.compiled = null;
 	}
 
+	public boolean isEmpty() {
+		return this.functions == null;
+	}
+
 	public F get() {
 		if (this.functions == null) {
 			return this.empty;

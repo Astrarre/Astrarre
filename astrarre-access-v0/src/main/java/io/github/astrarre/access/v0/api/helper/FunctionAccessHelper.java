@@ -3,7 +3,9 @@ package io.github.astrarre.access.v0.api.helper;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import io.github.astrarre.access.internal.CompiledFunctionClassValue;
 import io.github.astrarre.access.v0.api.MapFilter;
+import io.github.astrarre.access.v0.api.util.FunctionCompiler;
 import io.github.astrarre.util.v0.api.Id;
 import io.github.astrarre.util.v0.api.func.IterFunc;
 
@@ -15,7 +17,7 @@ import io.github.astrarre.util.v0.api.func.IterFunc;
  */
 public class FunctionAccessHelper<I, T, F> {
 	protected final MapFilter<T, F> filterStrong, filterWeak;
-	protected final MapFilter<Class<?>, F> filterClassExact;
+	protected final CompiledFunctionClassValue<F> filterClassExact;
 	protected final Consumer<Function<I, F>> functionAdder;
 	protected final Function<I, T> extract;
 
@@ -30,7 +32,7 @@ public class FunctionAccessHelper<I, T, F> {
 	public FunctionAccessHelper(IterFunc<F> func, Consumer<Function<I, F>> adder, Function<I, T> extract, F empty) {
 		this.filterStrong = new MapFilter<>(func, empty, false);
 		this.filterWeak = new MapFilter<>(func, empty, true);
-		this.filterClassExact = new MapFilter<>(func, empty, true);
+		this.filterClassExact = new CompiledFunctionClassValue<>(func, empty);
 		this.functionAdder = adder;
 		this.extract = extract;
 	}
@@ -63,9 +65,11 @@ public class FunctionAccessHelper<I, T, F> {
 	 * The reason instanceof is not provided, is because it is O(N) access and can't be optimized.
 	 */
 	public FunctionAccessHelper<I, T, F> forClassExact(Class<? extends T> instance, F function) {
-		if(this.filterClassExact.add(instance, function)) {
-			this.functionAdder.accept(t -> this.filterClassExact.get(this.extract.apply(t).getClass()));
+		FunctionCompiler<F> compiler = this.filterClassExact.get(instance);
+		if(compiler.isEmpty()) {
+			this.functionAdder.accept(t -> this.filterClassExact.get(this.extract.apply(t).getClass()).get());
 		}
+		compiler.add(function);
 		return this;
 	}
 }
