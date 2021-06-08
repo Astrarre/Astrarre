@@ -24,6 +24,17 @@ public enum SetupTeardown {
 			RenderSystem.disableBlend();
 		}
 	},
+	SPRITE(null) {
+		@Override
+		public void setup() {
+			RenderSystem.enableTexture();
+			RenderSystem.setShader(GameRenderer::getPositionTexShader);
+		}
+
+		@Override
+		public void teardown() {
+		}
+	},
 	ITEM(null) {
 		@Override
 		public void setup() {

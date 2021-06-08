@@ -87,7 +87,7 @@ public class FabricGraphics2d implements Graphics2d, FabricGraphics {
 
 	@Override
 	public void drawSprite(Sprite sprite, float width, float height) {
-		this.pushStage(null);
+		this.pushStage(SetupTeardown.SPRITE);
 		this.textureManager.bindTexture(sprite.textureId().to());
 		MatrixGraphicsUtil.drawTexturedQuad(
 				this.matrices.peek().getModel(),
