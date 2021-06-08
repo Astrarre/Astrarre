@@ -14,7 +14,7 @@ public interface RecipePostReloadEvent {
 		for (RecipePostReloadEvent event : arr) {
 			event.onReload(manager, recipes);
 		}
-	});
+	}, RecipePostReloadEvent.class);
 
 	/**
 	 * @param manager the recipe manager that is reloading

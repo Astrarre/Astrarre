@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import net.minecraft.util.Identifier;
 
 @Mixin(Identifier.class)
-public abstract class IdentifierMixin implements Id {
+public abstract class IdentifierMixin_Id implements Id {
 	@Shadow public abstract String getNamespace();
 	@Shadow public abstract String getPath();
 

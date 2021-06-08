@@ -14,7 +14,7 @@ import net.minecraft.server.integrated.IntegratedServer;
 @Mixin({IntegratedServer.class,
         MinecraftDedicatedServer.class
 })
-public abstract class MinecraftServerMixin {
+public abstract class MinecraftServerMixin_ActiveServer {
 	@Inject(method = "setupServer", at = @At("HEAD"))
 	private void onSetup(CallbackInfoReturnable<Boolean> cir) {
 		MinecraftServers.activeServer = (MinecraftServer) (Object) this;

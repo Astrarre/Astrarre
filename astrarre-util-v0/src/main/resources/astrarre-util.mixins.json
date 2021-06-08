@@ -4,10 +4,10 @@
   "plugin": "io.github.astrarre.util.v0.fabric.ModDependentMixin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
-    "IdentifierMixin",
+    "IdentifierMixin_Id",
     "LazyAccess",
     "LivingEntityMixin_FakePlayerEntity",
-    "MinecraftServerMixin",
+    "MinecraftServerMixin_ActiveServer",
     "SetTagAccess",
     "TagDelegateAccess",
     "TagWrapperAccess"
