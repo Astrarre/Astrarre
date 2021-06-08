@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 
 import io.github.astrarre.access.internal.access.BlockEntityAccess;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -19,7 +20,7 @@ import net.minecraft.world.World;
 @Mixin (BlockEntity.class)
 public class BlockEntityMixin implements BlockEntityAccess {
 	@Shadow @Nullable protected World world;
-	@Shadow protected BlockPos pos;
+	@Final @Shadow protected BlockPos pos;
 	@Unique private Consumer<BlockEntity> astrarre_listener;
 
 	@Override
@@ -32,17 +33,9 @@ public class BlockEntityMixin implements BlockEntityAccess {
 	}
 
 
-	@Inject (method = "setLocation", at = @At ("HEAD"))
-	public void onMove(World world, BlockPos pos, CallbackInfo ci) {
-		if (this.astrarre_listener != null && !(world == this.world && Objects.equals(pos, this.pos))) {
-			this.astrarre_listener.accept((BlockEntity) (Object) this);
-			this.astrarre_listener = null;
-		}
-	}
-
-	@Inject (method = "setPos", at = @At ("HEAD"))
-	public void onMove(BlockPos pos, CallbackInfo ci) {
-		if (this.astrarre_listener != null && !(Objects.equals(pos, this.pos))) {
+	@Inject (method = "setWorld", at = @At ("HEAD"))
+	public void onMove(World world, CallbackInfo ci) {
+		if (this.astrarre_listener != null && !(world == this.world)) {
 			this.astrarre_listener.accept((BlockEntity) (Object) this);
 			this.astrarre_listener = null;
 		}
