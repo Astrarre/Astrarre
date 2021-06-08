@@ -10,8 +10,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(TestRunner.Client.class)
-public class AccessTest {
+public class BasicTest {
 	public Access<Function<String, Integer>> testAccess;
+
 	@Before
 	public void setup() {
 		this.testAccess = new Access<>(Id.create("access-test", "test"), IterFunc.NON_NULL);

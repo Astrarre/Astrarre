@@ -37,6 +37,7 @@ allprojects {
         if (project.hasProperty("deps") || project == rootProject) {
             def projs = project == project.rootProject ? project.subprojects : project.deps.split(",").collect { project.rootProject.project(it) }
             projs.each {
+                it.tasks.publish.doLast(() -> project.tasks.publish)
                 project.tasks.publish.dependsOn(it.tasks.publish)
             }
             publishing {

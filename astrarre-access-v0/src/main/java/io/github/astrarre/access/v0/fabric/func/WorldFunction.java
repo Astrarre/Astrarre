@@ -3,6 +3,8 @@ package io.github.astrarre.access.v0.fabric.func;
 import java.util.function.BinaryOperator;
 import java.util.function.Predicate;
 
+import io.github.astrarre.access.internal.AndThenWorldFunction;
+import io.github.astrarre.access.internal.MergedAndThenWorldFunction;
 import io.github.astrarre.access.internal.SkippingWorldFunction;
 import io.github.astrarre.util.v0.api.func.IterFunc;
 import org.jetbrains.annotations.Nullable;
@@ -13,7 +15,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
-public interface WorldFunction<T> {
+public interface WorldFunction<T> extends BaseWorldFunction {
 	NoBlock<?> EMPTY = (direction, world, pos) -> null;
 	static <T> WorldFunction<T> empty() {
 		return (WorldFunction<T>) EMPTY;
@@ -31,6 +33,16 @@ public interface WorldFunction<T> {
 	 */
 	static <T> IterFunc<WorldFunction<T>> skipIf(Predicate<T> predicate, T defaultValue) {
 		return (functions) -> new SkippingWorldFunction<>(functions, predicate, defaultValue);
+	}
+
+	/**
+	 * @see BaseWorldFunction#optimizeQuery(BaseWorldFunction, boolean, boolean)
+	 */
+	static <T> WorldFunction<T> optimizeQuery(WorldFunction<T> function, boolean needsBlockState, boolean needsBlockEntity) {
+		if(needsBlockEntity && needsBlockState) return function;
+		if(needsBlockEntity) return (NoBlockState<T>) (dir, world, pos, entity) -> function.get(dir, null, world, pos, entity);
+		if(needsBlockState) return (NoBlockEntity<T>) (dir, state, world, pos) -> function.get(dir, state, world, pos, null);
+		return (NoBlock<T>) (dir, world, pos) -> function.get(dir, null, world, pos, null);
 	}
 
 	/**
@@ -54,69 +66,17 @@ public interface WorldFunction<T> {
 	}
 
 	/**
-	 *
 	 * @return a new function that combines this and the passed function, and merges the return type
 	 */
 	default WorldFunction<T> andThen(WorldFunction<T> function, BinaryOperator<T> merger) {
-		return new WorldFunction<T>() {
-			@Override
-			@Nullable
-			public T get(@Nullable Direction direction, BlockState state, World world, BlockPos pos, @Nullable BlockEntity entity) {
-				return merger.apply(WorldFunction.this.get(direction, state, world, pos, entity), function.get(direction, state, world, pos, entity));
-			}
-
-			@Override
-			@Nullable
-			public T get(@Nullable Direction direction, World world, BlockPos pos) {
-				return merger.apply(WorldFunction.this.get(direction, world, pos), function.get(direction, world, pos));
-			}
-
-			@Override
-			@Nullable
-			public T get(@Nullable Direction direction, BlockState state, World world, BlockPos pos) {
-				return merger.apply(WorldFunction.this.get(direction, state, world, pos), function.get(direction, state, world, pos));
-			}
-		};
+		return new MergedAndThenWorldFunction<>(merger, this, function);
 	}
 
 	/**
 	 * @return a new function that attempts to get the value from the passed function if this function returns `null`
 	 */
 	default WorldFunction<T> andThen(WorldFunction<T> function) {
-		return new WorldFunction<T>() {
-			@Override
-			@Nullable
-			public T get(@Nullable Direction direction, BlockState state, World world, BlockPos pos, @Nullable BlockEntity entity) {
-				T obj = WorldFunction.this.get(direction, state, world, pos, entity);
-				if (obj != null) {
-					return obj;
-				}
-
-				return function.get(direction, state, world, pos, entity);
-			}
-
-			@Override
-			@Nullable
-			public T get(@Nullable Direction direction, World world, BlockPos pos) {
-				T obj = WorldFunction.this.get(direction, world, pos);
-				if (obj != null) {
-					return obj;
-				}
-
-				return function.get(direction, world, pos);
-			}
-
-			@Override
-			@Nullable
-			public T get(@Nullable Direction direction, BlockState state, World world, BlockPos pos) {
-				T obj = WorldFunction.this.get(direction, state, world, pos);
-				if (obj != null) {
-					return obj;
-				}
-
-				return function.get(direction, state, world, pos);
-			}
-		};
+		return new AndThenWorldFunction<>(this, function);
 	}
 
 	interface NoBlock<T> extends WorldFunction<T> {
@@ -134,6 +94,16 @@ public interface WorldFunction<T> {
 		@Nullable
 		default T get(@Nullable Direction direction, BlockState state, World world, BlockPos pos) {
 			return this.get(direction, world, pos);
+		}
+
+		@Override
+		default boolean needsBlockState() {
+			return false;
+		}
+
+		@Override
+		default boolean needsBlockEntity() {
+			return false;
 		}
 	}
 
@@ -153,6 +123,16 @@ public interface WorldFunction<T> {
 		@Override
 		@Nullable
 		T get(@Nullable Direction direction, BlockState state, World world, BlockPos pos);
+
+		@Override
+		default boolean needsBlockState() {
+			return true;
+		}
+
+		@Override
+		default boolean needsBlockEntity() {
+			return false;
+		}
 	}
 
 	interface NoBlockState<T> extends WorldFunction<T> {
@@ -178,6 +158,16 @@ public interface WorldFunction<T> {
 				return this.get(direction, world, pos, world.getBlockEntity(pos));
 			}
 			return this.get(direction, world, pos, null);
+		}
+
+		@Override
+		default boolean needsBlockState() {
+			return false;
+		}
+
+		@Override
+		default boolean needsBlockEntity() {
+			return true;
 		}
 	}
 
