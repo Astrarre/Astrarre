@@ -15,8 +15,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 
 public class BiFunctionAccess<A, B, C> extends Access<BiFunction<A, B, C>> {
-	private final FunctionAccessHelper<A, A, BiFunction<A, B, C>> aHelper;
-	private final FunctionAccessHelper<B, B, BiFunction<A, B, C>> bHelper;
+	private final FunctionAccessHelper<A, BiFunction<A, B, C>> aHelper;
+	private final FunctionAccessHelper<B, BiFunction<A, B, C>> bHelper;
 
 	/**
 	 * combines {@link BiFunctionAccess (AccessFunction)} and {@link BiFunctionAccess (BinaryOperator)}
@@ -38,21 +38,21 @@ public class BiFunctionAccess<A, B, C> extends Access<BiFunction<A, B, C>> {
 	 */
 	public BiFunctionAccess(Id id, IterFunc<BiFunction<A, B, C>> iterFunc) {
 		super(id, iterFunc);
-		this.aHelper = new FunctionAccessHelper<>(iterFunc, function -> this.andThen((a, b) -> function.apply(a).apply(a, b)), Function.identity(), (a, b) -> null);
-		this.bHelper = new FunctionAccessHelper<>(iterFunc, function -> this.andThen((a, b) -> function.apply(b).apply(a, b)), Function.identity(), (a, b) -> null);
+		this.aHelper = new FunctionAccessHelper<>(this, function -> (a, b) -> function.apply(a).apply(a, b));
+		this.bHelper = new FunctionAccessHelper<>(this, function -> (a, b) -> function.apply(b).apply(a, b));
 	}
 
 	/**
 	 * advanced filtering for the first passed instance
 	 */
-	public FunctionAccessHelper<A, A, BiFunction<A, B, C>> getAHelper() {
+	public FunctionAccessHelper<A, BiFunction<A, B, C>> getAHelper() {
 		return this.aHelper;
 	}
 
 	/**
 	 * advanced filtering for the second passed instance
 	 */
-	public FunctionAccessHelper<B, B, BiFunction<A, B, C>> getBHelper() {
+	public FunctionAccessHelper<B, BiFunction<A, B, C>> getBHelper() {
 		return this.bHelper;
 	}
 

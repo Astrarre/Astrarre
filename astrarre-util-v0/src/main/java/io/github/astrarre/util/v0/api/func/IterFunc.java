@@ -24,5 +24,5 @@ public interface IterFunc<A> extends ArrayFunc<A> {
 		return this.combine(Arrays.asList(array));
 	}
 
-	A combine(Iterable<A> arr);
+	A combine(Iterable<A> iter);
 }

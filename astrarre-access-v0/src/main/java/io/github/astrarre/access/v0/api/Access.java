@@ -13,6 +13,7 @@ import java.util.function.Supplier;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import io.github.astrarre.access.v0.api.entry.AccessAPIEntrypoint;
+import io.github.astrarre.util.v0.api.func.ArrayFunc;
 import io.github.astrarre.util.v0.api.func.IterFunc;
 import io.github.astrarre.access.v0.fabric.EntityAccess;
 import io.github.astrarre.access.v0.fabric.ItemAccess;
@@ -34,6 +35,10 @@ import net.fabricmc.loader.entrypoint.minecraft.hooks.EntrypointUtils;
  * @see WorldAccess
  * @see ItemAccess
  */
+@SuppressWarnings ({
+		"unchecked",
+		"rawtypes"
+})
 public class Access<F> {
 	/**
 	 * fired when a new access is created
@@ -47,14 +52,21 @@ public class Access<F> {
 		EntrypointUtils.invoke("astrarre-transfer-v0:access_entrypoint", AccessAPIEntrypoint.class, AccessAPIEntrypoint::onAccessAPIInit);
 	}
 
-	protected final IterFunc<F> combiner;
-	protected List<Object> delegates = new ArrayList<>();
+	public final IterFunc<F> combiner;
+	protected final List<Object> delegates = new ArrayList<>();
 	protected List<Consumer<Access<F>>> listener;
 	protected F compiledFunction;
 	/**
 	 * the id of this access
 	 */
 	public final Id id;
+
+	/**
+	 * @param combiner andThen
+	 */
+	public Access(Id id, ArrayFunc<F> combiner) {
+		this(id, combiner.asIter());
+	}
 
 	/**
 	 * @param combiner andThen
@@ -66,6 +78,13 @@ public class Access<F> {
 		if(ON_ACCESS_INIT != null) {
 			ON_ACCESS_INIT.get().accept(this);
 		}
+	}
+
+	/**
+	 * @param combiner andThen
+	 */
+	public Access(Id id, ArrayFunc<F> combiner, Class<F> function) {
+		this(id, combiner.asIter(function));
 	}
 
 	@NotNull
@@ -253,5 +272,14 @@ public class Access<F> {
 			return ((Func<?, F>) o).delegate;
 		}
 		return (F) o;
+	}
+
+	/**
+	 * creates a new access with an array combiner, infers the class type. This wont always work, it only really works when the type is directly known
+	 * @param type type-reification
+	 */
+	@SafeVarargs
+	public static <F> Access<F> create(Id id, ArrayFunc<F> combiner, F...type) {
+		return new Access<>(id, combiner, (Class)type.getClass().componentType());
 	}
 }

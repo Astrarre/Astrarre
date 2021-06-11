@@ -17,7 +17,7 @@ import net.minecraft.item.Item;
 
 public class ItemAccess<T, C> extends Access<ItemFunction<T, C>> {
 	private final MapFilter<ItemKey, ItemFunction<T, C>> itemKeyTypes;
-	private final ItemAccessHelper<ItemKey, ItemFunction<T, C>> items;
+	private final ItemAccessHelper<ItemFunction<T, C>> items;
 	private boolean addedProviderFunction;
 
 	public ItemAccess(Id id) {
@@ -37,7 +37,7 @@ public class ItemAccess<T, C> extends Access<ItemFunction<T, C>> {
 	public ItemAccess(Id id, IterFunc<ItemFunction<T, C>> combiner) {
 		super(id, combiner);
 		IterFunc<ItemFunction<T, C>> comb = ItemFunction.skipIfNull(null);
-		this.items = new ItemAccessHelper<>(comb, function -> this.andThen((direction, key, count, c) -> {
+		this.items = ItemAccessHelper.create(comb, function -> this.andThen((direction, key, count, c) -> {
 			var func = function.apply(key);
 			return func != null ? func.get(direction, key, count, c) : null;
 		}), ItemKey::getItem);
@@ -72,7 +72,7 @@ public class ItemAccess<T, C> extends Access<ItemFunction<T, C>> {
 	/**
 	 * The item advanced filtering helper. It is recommended you use these for performance's sake
 	 */
-	public ItemAccessHelper<ItemKey, ItemFunction<T, C>> getItemHelper() {
+	public ItemAccessHelper<ItemFunction<T, C>> getItemHelper() {
 		return this.items;
 	}
 

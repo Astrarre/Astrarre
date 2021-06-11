@@ -16,19 +16,19 @@ import net.minecraft.tag.Tag;
 
 public class EntityAccessHelper<F> {
 	private static final EquipmentSlot[] EQUIPMENT_SLOTS = EquipmentSlot.values();
-	protected final FunctionAccessHelper<Entity, Entity, F> entity;
-	protected final FunctionAccessHelper<Entity, EntityType<?>, F> entityType;
-	protected final TaggedAccessHelper<Entity, EntityType<?>, F> entityTag;
-	protected final ItemAccessHelper<Entity, F>[] equipment = new ItemAccessHelper[EQUIPMENT_SLOTS.length];
+	protected final FunctionAccessHelper<Entity, F> entity;
+	protected final FunctionAccessHelper<EntityType<?>, F> entityType;
+	protected final TaggedAccessHelper<EntityType<?>, F> entityTag;
+	protected final ItemAccessHelper<F>[] equipment = new ItemAccessHelper[EQUIPMENT_SLOTS.length];
 
 	public EntityAccessHelper(IterFunc<F> func, Consumer<Function<Entity, F>> adder) {
 		this(func, adder, null);
 	}
 
 	public EntityAccessHelper(IterFunc<F> func, Consumer<Function<Entity, F>> adder, F empty) {
-		this.entity = new FunctionAccessHelper<>(func, adder, Function.identity(), empty);
-		this.entityType = new FunctionAccessHelper<>(func, adder, Entity::getType, empty);
-		this.entityTag = new TaggedAccessHelper<>(func, adder, Entity::getType, empty);
+		this.entity = new FunctionAccessHelper<>(func, adder, empty);
+		this.entityType = FunctionAccessHelper.create(func, adder, Entity::getType, empty);
+		this.entityTag = TaggedAccessHelper.create(func, adder, Entity::getType, empty);
 		Function<EquipmentSlot, Function<Entity, Item>> slotFunc = s -> e -> {
 			if (e instanceof LivingEntity) {
 				return ((LivingEntity) e).getEquippedStack(s).getItem();
@@ -38,23 +38,23 @@ public class EntityAccessHelper<F> {
 		};
 
 		for (EquipmentSlot slot : EQUIPMENT_SLOTS) {
-			this.equipment[slot.ordinal()] = new ItemAccessHelper<>(func, adder, slotFunc.apply(slot), empty);
+			this.equipment[slot.ordinal()] = ItemAccessHelper.create(func, adder, slotFunc.apply(slot), empty);
 		}
 	}
 
-	public ItemAccessHelper<Entity, F> getForEquipment(EquipmentSlot slot) {
+	public ItemAccessHelper<F> getForEquipment(EquipmentSlot slot) {
 		return this.equipment[slot.ordinal()];
 	}
 
-	public FunctionAccessHelper<Entity, Entity, F> getEntity() {
+	public FunctionAccessHelper<Entity, F> getEntity() {
 		return this.entity;
 	}
 
-	public FunctionAccessHelper<Entity, EntityType<?>, F> getEntityType() {
+	public FunctionAccessHelper<EntityType<?>, F> getEntityType() {
 		return this.entityType;
 	}
 
-	public TaggedAccessHelper<Entity, EntityType<?>, F> getEntityTag() {
+	public TaggedAccessHelper<EntityType<?>, F> getEntityTag() {
 		return this.entityTag;
 	}
 }

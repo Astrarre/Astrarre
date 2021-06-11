@@ -58,11 +58,6 @@ public class WorldAccess<T> extends Access<WorldFunction<T>> {
 		});
 	}
 
-	public static <T> WorldAccess<T> newInstance(Id id, IterFunc<T> combiner) {
-		return new WorldAccess<>(id,
-				(functions) -> (direction, state, world, pos, entity) -> combiner.combine(() -> Iterators.transform(functions.iterator(),
-						input -> input.get(direction, state, world, pos, entity))));
-	}
 
 	/**
 	 * adds functions for {@link BlockProvider} and {@link BlockEntityProvider}
@@ -156,5 +151,11 @@ public class WorldAccess<T> extends Access<WorldFunction<T>> {
 				function -> (WorldFunction.NoBlock) (d, w, p) -> combiner.combine(Iterables.filter(Iterables.transform(w.getOtherEntities(null,
 						new Box(p)), e -> function.get(d, e)), Objects::nonNull)));
 		return this;
+	}
+
+	public static <T> WorldAccess<T> newInstance(Id id, IterFunc<T> combiner) {
+		return new WorldAccess<>(id,
+				(functions) -> (direction, state, world, pos, entity) -> combiner.combine(() -> Iterators.transform(functions.iterator(),
+						input -> input.get(direction, state, world, pos, entity))));
 	}
 }

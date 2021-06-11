@@ -35,12 +35,7 @@ public class EntityAccess<T> extends Access<EntityFunction<T>> {
 	public EntityAccess(Id id, IterFunc<EntityFunction<T>> iterFunc) {
 		super(id, iterFunc);
 		IterFunc<EntityFunction<T>> comb = EntityFunction.skipIfNull(null);
-		this.helper = new EntityAccessHelper<>(comb, function -> {
-			this.andThen((d, e) -> {
-				var f = function.apply(e);
-				return f != null ? f.get(d, e) : null;
-			});
-		});
+		this.helper = new EntityAccessHelper<>(comb, function -> this.andThen((d, e) -> function.apply(e).get(d, e)), (d, e) -> null);
 	}
 
 	public static <T> EntityAccess<T> newInstance(Id id, IterFunc<T> combiner) {

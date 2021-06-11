@@ -7,12 +7,13 @@ import com.google.common.collect.Iterators;
 import com.google.common.reflect.TypeToken;
 import io.github.astrarre.access.v0.api.helper.FunctionAccessHelper;
 import io.github.astrarre.util.v0.api.Validate;
+import io.github.astrarre.util.v0.api.func.ArrayFunc;
 import io.github.astrarre.util.v0.api.func.IterFunc;
 import io.github.astrarre.access.v0.api.provider.Provider;
 import io.github.astrarre.util.v0.api.Id;
 
 public class FunctionAccess<A, B> extends Access<Function<A, B>> {
-	private final FunctionAccessHelper<A, A, Function<A, B>> accessHelper;
+	private final FunctionAccessHelper<A, Function<A, B>> accessHelper;
 	private boolean addedProviderFunction, addedInstanceof;
 
 	/**
@@ -30,12 +31,17 @@ public class FunctionAccess<A, B> extends Access<Function<A, B>> {
 		});
 	}
 
+	public FunctionAccess(Id id, ArrayFunc<Function<A, B>> iterFunc) {
+		this(id, iterFunc.asIter());
+	}
+
+
 	/**
 	 * {@inheritDoc}
 	 */
 	public FunctionAccess(Id id, IterFunc<Function<A, B>> iterFunc) {
 		super(id, iterFunc);
-		this.accessHelper = new FunctionAccessHelper<>(iterFunc, f -> this.andThen(a -> Validate.transform(f.apply(a), a, Function::apply)), Function.identity());
+		this.accessHelper = new FunctionAccessHelper<>(iterFunc, f -> this.andThen(a -> Validate.transform(f.apply(a), a, Function::apply)));
 	}
 
 	/**

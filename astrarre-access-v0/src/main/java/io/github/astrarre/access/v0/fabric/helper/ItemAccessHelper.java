@@ -12,19 +12,33 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.tag.Tag;
 
-public class ItemAccessHelper<I, F> {
-	protected final FunctionAccessHelper<I, Item, F> item;
-	protected final TaggedAccessHelper<I, Item, F> itemTag;
-	protected final BlockAccessHelper<Item, F> blockItem;
+public class ItemAccessHelper<F> {
+	protected final FunctionAccessHelper<Item, F> item;
+	protected final TaggedAccessHelper<Item, F> itemTag;
+	protected final BlockAccessHelper<F> blockItem;
 
-	public ItemAccessHelper(IterFunc<F> func, Consumer<Function<I, F>> adder, Function<I, Item> extract) {
-		this(func, adder, extract, null);
+	/**
+	 * creates a new function helper who's incoming type is not the same as the type being filtered
+	 */
+	public static <I, F> ItemAccessHelper<F> create(IterFunc<F> func, Consumer<Function<I, F>> adder, Function<I, Item> mapper, F empty) {
+		return new ItemAccessHelper<>(func, function -> adder.accept(i -> function.apply(mapper.apply(i))), empty);
 	}
 
-	public ItemAccessHelper(IterFunc<F> func, Consumer<Function<I, F>> adder, Function<I, Item> extract, F empty) {
-		this.item = new FunctionAccessHelper<>(func, adder, extract, empty);
-		this.itemTag = new TaggedAccessHelper<>(func, adder, extract, empty);
-		this.blockItem = new BlockAccessHelper<>(func, function -> adder.accept(i -> function.apply(extract.apply(i))), o -> {
+	/**
+	 * creates a new function helper who's incoming type is not the same as the type being filtered
+	 */
+	public static <I, F> ItemAccessHelper<F> create(IterFunc<F> func, Consumer<Function<I, F>> adder, Function<I, Item> mapper) {
+		return new ItemAccessHelper<>(func, function -> adder.accept(i -> function.apply(mapper.apply(i))), null);
+	}
+
+	public ItemAccessHelper(IterFunc<F> func, Consumer<Function<Item, F>> adder) {
+		this(func, adder, null);
+	}
+
+	public ItemAccessHelper(IterFunc<F> func, Consumer<Function<Item, F>> adder, F empty) {
+		this.item = new FunctionAccessHelper<>(func, adder, empty);
+		this.itemTag = new TaggedAccessHelper<>(func, adder, empty);
+		this.blockItem = BlockAccessHelper.create(func, function -> adder.accept(i -> function.apply(i)), o -> {
 			if ((o instanceof BlockItem)) {
 				return ((BlockItem) o).getBlock();
 			} else {
@@ -33,18 +47,18 @@ public class ItemAccessHelper<I, F> {
 		}, empty);
 	}
 
-	public FunctionAccessHelper<I, Item, F> getItem() {
+	public FunctionAccessHelper<Item, F> getItem() {
 		return this.item;
 	}
 
-	public TaggedAccessHelper<I, Item, F> getItemTag() {
+	public TaggedAccessHelper<Item, F> getItemTag() {
 		return this.itemTag;
 	}
 
 	/**
 	 * advanced filters based on block items
 	 */
-	public BlockAccessHelper<Item, F> getBlockItem() {
+	public BlockAccessHelper<F> getBlockItem() {
 		return this.blockItem;
 	}
 }

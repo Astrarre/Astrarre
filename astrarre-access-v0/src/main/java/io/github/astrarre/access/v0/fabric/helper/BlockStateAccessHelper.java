@@ -10,23 +10,23 @@ import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.BlockState;
 
 public class BlockStateAccessHelper<F> {
-	protected final FunctionAccessHelper<BlockState, BlockState, F> blockstate;
-	protected final BlockAccessHelper<BlockState, F> block;
+	protected final FunctionAccessHelper<BlockState, F> blockstate;
+	protected final BlockAccessHelper<F> block;
 
 	public BlockStateAccessHelper(IterFunc<F> func, Consumer<Function<BlockState, F>> adder) {
 		this(func, adder, null);
 	}
 
 	public BlockStateAccessHelper(IterFunc<F> func, Consumer<Function<BlockState, F>> adder, F empty) {
-		this.blockstate = new FunctionAccessHelper<>(func, adder, Function.identity(), empty);
-		this.block = new BlockAccessHelper<>(func, adder, AbstractBlock.AbstractBlockState::getBlock, empty);
+		this.blockstate = new FunctionAccessHelper<>(func, adder, empty);
+		this.block = BlockAccessHelper.create(func, adder, AbstractBlock.AbstractBlockState::getBlock, empty);
 	}
 
-	public FunctionAccessHelper<BlockState, BlockState, F> getBlockstate() {
+	public FunctionAccessHelper<BlockState, F> getBlockstate() {
 		return this.blockstate;
 	}
 
-	public BlockAccessHelper<BlockState, F> getBlock() {
+	public BlockAccessHelper<F> getBlock() {
 		return this.block;
 	}
 }

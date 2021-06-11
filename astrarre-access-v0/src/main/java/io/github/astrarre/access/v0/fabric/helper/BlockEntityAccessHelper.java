@@ -13,29 +13,29 @@ import net.minecraft.block.entity.BlockEntityType;
  * Advanced filtering for BlockEntity
  */
 public class BlockEntityAccessHelper<F> {
-	protected final FunctionAccessHelper<BlockEntity, BlockEntity, F> blockEntity;
-	protected final FunctionAccessHelper<BlockEntity, BlockEntityType<?>, F> blockEntityType;
-	protected final TaggedAccessHelper<BlockEntity, BlockEntityType<?>, F> blockEntityTag;
+	protected final FunctionAccessHelper<BlockEntity, F> blockEntity;
+	protected final FunctionAccessHelper<BlockEntityType<?>, F> blockEntityType;
+	protected final TaggedAccessHelper<BlockEntityType<?>, F> blockEntityTag;
 
 	public BlockEntityAccessHelper(IterFunc<F> func, Consumer<Function<BlockEntity, F>> adder) {
 		this(func, adder, null);
 	}
 
 	public BlockEntityAccessHelper(IterFunc<F> func, Consumer<Function<BlockEntity, F>> adder, F empty) {
-		this.blockEntity = new FunctionAccessHelper<>(func, adder, Function.identity(), empty);
-		this.blockEntityType = new FunctionAccessHelper<>(func, adder, BlockEntity::getType, empty);
-		this.blockEntityTag = new TaggedAccessHelper<>(func, adder, BlockEntity::getType, empty);
+		this.blockEntity = new FunctionAccessHelper<>(func, adder, empty);
+		this.blockEntityType = FunctionAccessHelper.create(func, adder, BlockEntity::getType, empty);
+		this.blockEntityTag = TaggedAccessHelper.create(func, adder, BlockEntity::getType, empty);
 	}
 
-	public FunctionAccessHelper<BlockEntity, BlockEntity, F> getBlockEntity() {
+	public FunctionAccessHelper<BlockEntity, F> getBlockEntity() {
 		return this.blockEntity;
 	}
 
-	public FunctionAccessHelper<BlockEntity, BlockEntityType<?>, F> getBlockEntityType() {
+	public FunctionAccessHelper<BlockEntityType<?>, F> getBlockEntityType() {
 		return this.blockEntityType;
 	}
 
-	public TaggedAccessHelper<BlockEntity, BlockEntityType<?>, F> getBlockEntityTag() {
+	public TaggedAccessHelper<BlockEntityType<?>, F> getBlockEntityTag() {
 		return this.blockEntityTag;
 	}
 }
