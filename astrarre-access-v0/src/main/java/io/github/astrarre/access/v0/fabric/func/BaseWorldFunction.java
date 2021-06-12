@@ -29,7 +29,7 @@ public interface BaseWorldFunction {
 	@SuppressWarnings ("unchecked")
 	static <T extends BaseWorldFunction> T optimizeQuery(T function, boolean needsBlockState, boolean needsBlockEntity) {
 		Class<?> cls = function.getClass();
-		return (T) Proxy.newProxyInstance(cls.getClassLoader(), new Class[] {cls}, (proxy, method, args) -> {
+		return (T) Proxy.newProxyInstance(cls.getClassLoader(), cls.getInterfaces(), (proxy, method, args) -> {
 			if (method.getReturnType() == boolean.class && method.getParameterCount() == 0) {
 				switch (method.getName()) {
 				case "needsBlockState":
