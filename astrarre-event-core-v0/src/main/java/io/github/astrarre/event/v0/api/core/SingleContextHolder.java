@@ -1,6 +1,6 @@
 package io.github.astrarre.event.v0.api.core;
 
-import io.github.astrarre.event.impl.core.SingleContextHolderImpl;
+import io.github.astrarre.event.internal.core.SingleContextHolderImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

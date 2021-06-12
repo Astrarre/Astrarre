@@ -1,4 +1,4 @@
-package io.github.astrarre.networking.mixin;
+package io.github.astrarre.networking.internal.mixin;
 
 import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.networking.v0.api.SyncedProperty;

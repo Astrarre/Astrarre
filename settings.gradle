@@ -22,4 +22,4 @@ include 'astrarre-recipe-v0'
 include 'astrarre-transfer-compat-v0'
 include 'astrarre-components-v0'
 include 'astrarre-event-core-v0'
-
+include 'astrarre-event-player-v0'

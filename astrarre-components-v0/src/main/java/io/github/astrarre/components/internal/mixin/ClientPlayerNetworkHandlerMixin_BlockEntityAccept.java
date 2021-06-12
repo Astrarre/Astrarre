@@ -1,18 +1,14 @@
 package io.github.astrarre.components.internal.mixin;
 
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.Map;
 
 import com.mojang.datafixers.util.Pair;
 import io.github.astrarre.components.internal.ComponentsInternal;
 import io.github.astrarre.components.v0.api.components.Component;
 import io.github.astrarre.components.v0.fabric.FabricByteSerializer;
 import io.github.astrarre.components.v0.fabric.FabricComponents;
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -20,7 +16,6 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.nbt.NbtByteArray;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;

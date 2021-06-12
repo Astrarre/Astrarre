@@ -3,9 +3,9 @@ package io.github.astrarre.components.internal.lazyAsm.standard;
 import java.util.function.Supplier;
 
 import io.github.astrarre.components.internal.lazyAsm.DataHolderClass;
-import io.github.astrarre.components.v0.api.factory.ComponentManager;
 import io.github.astrarre.components.internal.util.FieldPrototype;
 import io.github.astrarre.components.internal.util.PublicLoader;
+import io.github.astrarre.components.v0.api.factory.ComponentManager;
 import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;

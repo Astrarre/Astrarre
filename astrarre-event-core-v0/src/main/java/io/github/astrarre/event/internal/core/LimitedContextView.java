@@ -1,4 +1,4 @@
-package io.github.astrarre.event.impl.core;
+package io.github.astrarre.event.internal.core;
 
 import io.github.astrarre.event.v0.api.core.ContextView;
 import org.jetbrains.annotations.Nullable;

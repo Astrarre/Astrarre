@@ -1,8 +1,6 @@
 package io.github.astrarre.components.internal.lazyAsm.standard;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 
 import io.github.astrarre.components.internal.lazyAsm.DataObjectHolderComponentManager;
 import io.github.astrarre.components.internal.util.PublicLoader;

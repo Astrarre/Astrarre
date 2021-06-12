@@ -4,12 +4,11 @@ import java.util.Map;
 
 import com.mojang.datafixers.util.Pair;
 import io.github.astrarre.components.internal.ComponentsInternal;
-import io.github.astrarre.components.v0.api.Copier;
 import io.github.astrarre.components.v0.api.components.Component;
 import io.github.astrarre.components.v0.fabric.FabricByteSerializer;
 import io.github.astrarre.components.v0.fabric.FabricComponents;
 import io.github.astrarre.components.v0.fabric.builder.BlockEntityComponentBuilder;
-import io.github.astrarre.components.v0.fabric.builder.EntityComponentBuilder;
+import io.github.astrarre.util.v0.api.func.Copier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;

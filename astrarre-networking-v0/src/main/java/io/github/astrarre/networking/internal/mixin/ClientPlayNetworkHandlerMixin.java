@@ -1,4 +1,4 @@
-package io.github.astrarre.networking.mixin;
+package io.github.astrarre.networking.internal.mixin;
 
 import io.github.astrarre.networking.internal.ModPacketHandlerImpl;
 import org.spongepowered.asm.mixin.Final;

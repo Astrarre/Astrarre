@@ -7,7 +7,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import io.github.astrarre.itemview.v0.fabric.FabricViews;
-import io.github.astrarre.networking.mixin.CustomPayloadC2SPacketAccess;
+import io.github.astrarre.networking.internal.mixin.CustomPayloadC2SPacketAccess;
 import io.github.astrarre.networking.v0.api.ModPacketHandler;
 import io.github.astrarre.networking.v0.api.network.NetworkMember;
 import io.github.astrarre.util.v0.api.Id;

@@ -3,7 +3,6 @@
   "package": "io.github.astrarre.recipe.internal.mixin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
-    "FluidTagsAccess",
     "RecipeManagerAccess",
     "SinglePreperationResourceReloadListenerMixin_RecipePostReloadEvent"
   ],

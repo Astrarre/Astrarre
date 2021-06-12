@@ -1,4 +1,4 @@
-package io.github.astrarre.event.impl.core;
+package io.github.astrarre.event.internal.core;
 
 import java.util.Objects;
 

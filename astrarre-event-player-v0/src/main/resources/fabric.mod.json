@@ -1,8 +1,7 @@
 {
   "schemaVersion": 1,
-  "id": "astrarre-itemview-v0",
-  "name": "Astrarre ItemView v0 Fabric",
-  "description": "Astrarre's abstractions over itemstack and nbt",
+  "id": "astrarre-event-player-v0",
+  "name": "Astrarre Event Player v0",
   "version": "${version}",
   "environment": "*",
   "license": "LGPL-3.0",
@@ -15,11 +14,5 @@
   ],
   "depends": {
     "fabricloader": ">=0.8.9"
-  },
-  "mixins": [
-    "astrarre-itemview.mixins.json"
-  ],
-  "provides": [
-
-  ]
+  }
 }

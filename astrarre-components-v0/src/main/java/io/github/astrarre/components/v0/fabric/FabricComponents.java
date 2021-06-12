@@ -1,16 +1,22 @@
 package io.github.astrarre.components.v0.fabric;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
-import io.github.astrarre.components.v0.api.Copier;
-import io.github.astrarre.components.v0.api.components.*;
+import io.github.astrarre.components.v0.api.components.BoolComponent;
+import io.github.astrarre.components.v0.api.components.ByteComponent;
+import io.github.astrarre.components.v0.api.components.CharComponent;
 import io.github.astrarre.components.v0.api.components.Component;
+import io.github.astrarre.components.v0.api.components.DoubleComponent;
+import io.github.astrarre.components.v0.api.components.FloatComponent;
+import io.github.astrarre.components.v0.api.components.IntComponent;
+import io.github.astrarre.components.v0.api.components.LongComponent;
+import io.github.astrarre.components.v0.api.components.ShortComponent;
 import io.github.astrarre.components.v0.api.factory.ComponentManager;
+import io.github.astrarre.itemview.v0.api.Serializer;
+import io.github.astrarre.itemview.v0.api.nbt.NbtValue;
+import io.github.astrarre.util.v0.api.func.Copier;
 
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.Entity;
 import net.minecraft.nbt.AbstractNbtNumber;
 import net.minecraft.nbt.NbtByte;
 import net.minecraft.nbt.NbtDouble;
@@ -20,7 +26,6 @@ import net.minecraft.nbt.NbtInt;
 import net.minecraft.nbt.NbtLong;
 import net.minecraft.nbt.NbtShort;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.util.Pair;
 
 /**
  * @implNote separating the component factories by behavior instead of telling the factory behavior wasn't just an API decision, it's also better
@@ -34,33 +39,33 @@ public final class FabricComponents {
 	 */
 	public static final ComponentManager<BlockEntity> BLOCK_ENTITY_NO_SERIALIZE = ComponentManager.newManager("astrarre-components-v0", "blockentity");
 
-	public static <C, V, T extends Component<C, V>, E extends NbtElement> E serialize(C context, T component, FabricSerializer<V, E> serializer) {
+	public static <C, V, T extends Component<C, V>> NbtElement serialize(C context, T component, Serializer<V> serializer) {
 		if(serializer == null) {
 			if(component instanceof BoolComponent) {
-				return (E) NbtByte.of(((BoolComponent<C>) component).getBool(context));
+				return NbtByte.of(((BoolComponent<C>) component).getBool(context));
 			} else if(component instanceof ByteComponent) {
-				return (E) NbtByte.of(((ByteComponent<C>) component).getByte(context));
+				return NbtByte.of(((ByteComponent<C>) component).getByte(context));
 			} else if(component instanceof CharComponent) {
-				return (E) NbtShort.of((short) ((CharComponent<C>) component).getChar(context));
+				return NbtShort.of((short) ((CharComponent<C>) component).getChar(context));
 			} else if(component instanceof DoubleComponent) {
-				return (E) NbtDouble.of(((DoubleComponent<C>)component).getDouble(context));
+				return NbtDouble.of(((DoubleComponent<C>)component).getDouble(context));
 			} else if(component instanceof FloatComponent) {
-				return (E) NbtFloat.of(((FloatComponent<C>)component).getFloat(context));
+				return NbtFloat.of(((FloatComponent<C>)component).getFloat(context));
 			} else if(component instanceof IntComponent) {
-				return (E) NbtInt.of(((IntComponent<C>)component).getInt(context));
+				return NbtInt.of(((IntComponent<C>)component).getInt(context));
 			} else if(component instanceof LongComponent) {
-				return (E) NbtLong.of(((LongComponent<C>)component).getLong(context));
+				return NbtLong.of(((LongComponent<C>)component).getLong(context));
 			} else if(component instanceof ShortComponent) {
-				return (E) NbtShort.of(((ShortComponent<C>)component).getShort(context));
+				return NbtShort.of(((ShortComponent<C>)component).getShort(context));
 			} else {
 				throw new IllegalArgumentException("copier cannot be null!");
 			}
 		} else {
-			return serializer.toTag(component.get(context));
+			return serializer.save(component.get(context)).asMinecraft();
 		}
 	}
 
-	public static <C, V, T extends Component<C, V>, E extends NbtElement> void deserialize(E element, C context, T component, FabricSerializer<V, E> serializer) {
+	public static <C, V, T extends Component<C, V>> void deserialize(NbtElement element, C context, T component, Serializer<V> serializer) {
 		if(serializer == null) {
 			if(component instanceof BoolComponent) {
 				((BoolComponent<C>)component).setBool(context, ((AbstractNbtNumber)element).byteValue() != 0);
@@ -82,7 +87,7 @@ public final class FabricComponents {
 				throw new IllegalArgumentException("copier cannot be null!");
 			}
 		} else {
-			component.set(context, serializer.fromTag(element));
+			component.set(context, serializer.read((NbtValue) element));
 		}
 	}
 

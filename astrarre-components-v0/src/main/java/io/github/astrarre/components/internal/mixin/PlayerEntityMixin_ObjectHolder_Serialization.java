@@ -8,12 +8,11 @@ import io.github.astrarre.components.internal.access.PlayerDataObjectHolder;
 import io.github.astrarre.components.internal.lazyAsm.standard.CopyAccess;
 import io.github.astrarre.components.v0.api.components.Component;
 import io.github.astrarre.components.v0.fabric.FabricComponents;
-import io.github.astrarre.components.v0.fabric.FabricSerializer;
+import io.github.astrarre.itemview.v0.api.Serializer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -43,8 +42,8 @@ public class PlayerEntityMixin_ObjectHolder_Serialization implements PlayerDataO
 	@Inject (method = "writeCustomDataToNbt", at = @At ("RETURN"))
 	public void writeNbt(NbtCompound nbt, CallbackInfo ci) {
 		NbtCompound componentData = new NbtCompound();
-		for (Map.Entry<String, Pair<Component<PlayerEntity, ?>, FabricSerializer<?, ?>>> entry : ComponentsInternal.SERIALIZE_PLAYER_INTERNAL.entrySet()) {
-			Pair<Component<PlayerEntity, ?>, FabricSerializer<?, ?>> value = entry.getValue();
+		for (Map.Entry<String, Pair<Component<PlayerEntity, ?>, Serializer<?>>> entry : ComponentsInternal.SERIALIZE_PLAYER_INTERNAL.entrySet()) {
+			Pair<Component<PlayerEntity, ?>, Serializer<?>> value = entry.getValue();
 			componentData.put(entry.getKey(), FabricComponents.serialize((Entity) (Object) this, (Component)value.getFirst(), value.getSecond()));
 		}
 		nbt.put("astrarre_components", componentData);
@@ -54,9 +53,9 @@ public class PlayerEntityMixin_ObjectHolder_Serialization implements PlayerDataO
 	public void readNbt(NbtCompound nbt, CallbackInfo ci) {
 		NbtCompound componentData = nbt.getCompound("astrarre_components");
 		for (String key : componentData.getKeys()) {
-			Pair<Component<PlayerEntity, ?>, FabricSerializer<?, ?>> pair = ComponentsInternal.SERIALIZE_PLAYER_INTERNAL.get(key);
+			Pair<Component<PlayerEntity, ?>, Serializer<?>> pair = ComponentsInternal.SERIALIZE_PLAYER_INTERNAL.get(key);
 			if(pair != null) {
-				FabricComponents.deserialize(componentData.get(key), (Entity) (Object) this, (Component) pair.getFirst(), (FabricSerializer) pair.getSecond());
+				FabricComponents.deserialize(componentData.get(key), (Entity) (Object) this, (Component) pair.getFirst(), (Serializer) pair.getSecond());
 			}
 			// name changed, perhaps some DFU stuff later(?)
 		}

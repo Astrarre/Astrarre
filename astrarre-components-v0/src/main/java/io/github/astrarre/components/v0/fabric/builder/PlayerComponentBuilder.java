@@ -5,11 +5,11 @@ import java.util.Map;
 
 import com.mojang.datafixers.util.Pair;
 import io.github.astrarre.components.internal.ComponentsInternal;
-import io.github.astrarre.components.v0.api.Copier;
 import io.github.astrarre.components.v0.api.components.Component;
 import io.github.astrarre.components.v0.api.factory.ComponentManager;
 import io.github.astrarre.components.v0.fabric.FabricByteSerializer;
-import io.github.astrarre.components.v0.fabric.FabricSerializer;
+import io.github.astrarre.itemview.v0.api.Serializer;
+import io.github.astrarre.util.v0.api.func.Copier;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
@@ -35,7 +35,7 @@ public class PlayerComponentBuilder<V, T extends Component<PlayerEntity, V>> ext
 
 	protected PlayerComponentBuilder(ComponentManager<PlayerEntity> manager,
 			Map<String, Pair<Component<PlayerEntity, ?>, FabricByteSerializer<?>>> synchronize,
-			Map<String, Pair<Component<PlayerEntity, ?>, FabricSerializer<?, ?>>> internal,
+			Map<String, Pair<Component<PlayerEntity, ?>, Serializer<?>>> internal,
 			List<Pair<Component<PlayerEntity, ?>, Copier<?>>> copyInternal,
 			List<Pair<Component<PlayerEntity, ?>, Copier<?>>> copyPlayerInventory,
 			List<Pair<Component<PlayerEntity, ?>, Copier<?>>> copyPlayerAlways) {
@@ -86,7 +86,7 @@ public class PlayerComponentBuilder<V, T extends Component<PlayerEntity, V>> ext
 	}
 
 	@Override
-	public PlayerComponentBuilder<V, T> serialize(FabricSerializer<V, ?> serializer) {
+	public PlayerComponentBuilder<V, T> serialize(Serializer<V> serializer) {
 		PlayerComponentBuilder<V, T> serialize = (PlayerComponentBuilder<V, T>) super.serialize(serializer);
 		this.set = false;
 		return serialize;

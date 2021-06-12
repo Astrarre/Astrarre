@@ -1,4 +1,4 @@
-package io.github.astrarre.components.v0.api;
+package io.github.astrarre.util.v0.api.func;
 
 public interface CloneableAdapter<T> extends Copier<T> {
 	@Override

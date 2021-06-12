@@ -1,8 +1,6 @@
-package io.github.astrarre.components.v0.api;
+package io.github.astrarre.util.v0.api.func;
 
 public interface Copier<T> {
-	Copier<String> STRING = immutable();
-
 	static <T> Copier<T> clonable(CloneableAdapter<T> adapter) {
 		return adapter;
 	}

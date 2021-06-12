@@ -9,11 +9,10 @@ import io.github.astrarre.components.v0.api.components.Component;
 import io.github.astrarre.components.v0.api.factory.ComponentManager;
 import io.github.astrarre.components.v0.fabric.FabricByteSerializer;
 import io.github.astrarre.components.v0.fabric.FabricComponents;
-import io.github.astrarre.components.v0.fabric.FabricSerializer;
+import io.github.astrarre.itemview.v0.api.Serializer;
 import io.netty.buffer.Unpooled;
 
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.world.ServerChunkManager;
@@ -25,7 +24,7 @@ import net.minecraft.world.World;
 public class BlockEntityComponentBuilder<V, T extends Component<BlockEntity, V>> extends SerializableComponentBuilder<BlockEntity, V, T> {
 	protected BlockEntityComponentBuilder(ComponentManager<BlockEntity> manager,
 			Map<String, Pair<Component<BlockEntity, ?>, FabricByteSerializer<?>>> synchronize,
-			Map<String, Pair<Component<BlockEntity, ?>, FabricSerializer<?, ?>>> internal) {
+			Map<String, Pair<Component<BlockEntity, ?>, Serializer<?>>> internal) {
 		super(manager, synchronize, internal);
 	}
 

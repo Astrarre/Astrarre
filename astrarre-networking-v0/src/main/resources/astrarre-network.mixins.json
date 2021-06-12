@@ -1,6 +1,6 @@
 {
   "required": true,
-  "package": "io.github.astrarre.networking.mixin",
+  "package": "io.github.astrarre.networking.internal.mixin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
     "BlockEntityMixin_SyncedProperty",

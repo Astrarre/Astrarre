@@ -6,13 +6,13 @@ import java.util.Map;
 
 import com.mojang.datafixers.util.Pair;
 import io.github.astrarre.components.internal.ComponentsInternal;
-import io.github.astrarre.components.v0.api.Copier;
 import io.github.astrarre.components.v0.api.components.Component;
 import io.github.astrarre.components.v0.api.components.PrimitiveComponent;
 import io.github.astrarre.components.v0.api.factory.ComponentManager;
 import io.github.astrarre.components.v0.fabric.FabricByteSerializer;
 import io.github.astrarre.components.v0.fabric.FabricComponents;
-import io.github.astrarre.components.v0.fabric.FabricSerializer;
+import io.github.astrarre.itemview.v0.api.Serializer;
+import io.github.astrarre.util.v0.api.func.Copier;
 import io.netty.buffer.Unpooled;
 
 import net.minecraft.entity.Entity;
@@ -30,7 +30,7 @@ public class EntityComponentBuilder<C extends Entity, V, T extends Component<C, 
 
 	protected EntityComponentBuilder(ComponentManager<C> manager,
 			Map<String, Pair<Component<C, ?>, FabricByteSerializer<?>>> synchronize,
-			Map<String, Pair<Component<C, ?>, FabricSerializer<?, ?>>> internal,
+			Map<String, Pair<Component<C, ?>, Serializer<?>>> internal,
 			List<Pair<Component<C, ?>, Copier<?>>> copyInternal) {
 		super(manager, synchronize, internal);
 		this.copyInternal = copyInternal;
@@ -46,7 +46,7 @@ public class EntityComponentBuilder<C extends Entity, V, T extends Component<C, 
 
 	/**
 	 * @see #copy(Copier)
-	 * @see #serialize(FabricSerializer)
+	 * @see #serialize(Serializer)
 	 */
 	@Override
 	public T build(Identifier id, Class<T> type) {
@@ -72,7 +72,7 @@ public class EntityComponentBuilder<C extends Entity, V, T extends Component<C, 
 	}
 
 	@Override
-	public EntityComponentBuilder<C, V, T> serialize(FabricSerializer<V, ?> serializer) {
+	public EntityComponentBuilder<C, V, T> serialize(Serializer<V> serializer) {
 		return (EntityComponentBuilder<C, V, T>) super.serialize(serializer);
 	}
 

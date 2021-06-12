@@ -1,6 +1,7 @@
 package io.github.astrarre.itemview.v0.fabric;
 
 import java.util.Objects;
+import java.util.function.Function;
 
 import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.itemview.v0.api.nbt.NBTType;
@@ -12,6 +13,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -40,6 +42,11 @@ public interface FabricSerializers {
 			entity.saveNbt(tag);
 			return FabricViews.view(tag);
 		});
+	}
+
+	@SuppressWarnings ("all")
+	static <N extends NbtElement, T> Serializer<T> of(Function<N, T> reader, Function<T, N> writer) {
+		return Serializer.of((Function) reader, (Function)writer);
 	}
 
 	static <T> Serializer<T> of(Registry<T> registry) {

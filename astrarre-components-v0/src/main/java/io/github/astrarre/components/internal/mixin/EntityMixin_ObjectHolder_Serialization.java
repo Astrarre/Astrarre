@@ -5,11 +5,11 @@ import java.util.Map;
 import com.mojang.datafixers.util.Pair;
 import io.github.astrarre.components.internal.ComponentsInternal;
 import io.github.astrarre.components.internal.lazyAsm.standard.CopyAccess;
-import io.github.astrarre.components.v0.api.Copier;
 import io.github.astrarre.components.v0.api.components.Component;
 import io.github.astrarre.components.v0.api.factory.DataObjectHolder;
 import io.github.astrarre.components.v0.fabric.FabricComponents;
-import io.github.astrarre.components.v0.fabric.FabricSerializer;
+import io.github.astrarre.itemview.v0.api.Serializer;
+import io.github.astrarre.util.v0.api.func.Copier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -43,8 +43,8 @@ public class EntityMixin_ObjectHolder_Serialization implements DataObjectHolder 
 	@Inject(method = "writeNbt", at = @At("RETURN"))
 	public void writeNbt(NbtCompound nbt, CallbackInfoReturnable<NbtCompound> cir) {
 		NbtCompound componentData = new NbtCompound();
-		for (Map.Entry<String, Pair<Component<Entity, ?>, FabricSerializer<?, ?>>> entry : ComponentsInternal.SERIALIZE_ENTITY_INTERNAL.entrySet()) {
-			Pair<Component<Entity, ?>, FabricSerializer<?, ?>> value = entry.getValue();
+		for (Map.Entry<String, Pair<Component<Entity, ?>, Serializer<?>>> entry : ComponentsInternal.SERIALIZE_ENTITY_INTERNAL.entrySet()) {
+			Pair<Component<Entity, ?>, Serializer<?>> value = entry.getValue();
 			componentData.put(entry.getKey(), FabricComponents.serialize((Entity) (Object) this, (Component)value.getFirst(), value.getSecond()));
 		}
 		nbt.put("astrarre_components", componentData);
@@ -54,9 +54,9 @@ public class EntityMixin_ObjectHolder_Serialization implements DataObjectHolder 
 	public void readNbt(NbtCompound nbt, CallbackInfo ci) {
 		NbtCompound componentData = nbt.getCompound("astrarre_components");
 		for (String key : componentData.getKeys()) {
-			Pair<Component<Entity, ?>, FabricSerializer<?, ?>> pair = ComponentsInternal.SERIALIZE_ENTITY_INTERNAL.get(key);
+			Pair<Component<Entity, ?>, Serializer<?>> pair = ComponentsInternal.SERIALIZE_ENTITY_INTERNAL.get(key);
 			if(pair != null) {
-				FabricComponents.deserialize(componentData.get(key), (Entity) (Object) this, (Component) pair.getFirst(), (FabricSerializer) pair.getSecond());
+				FabricComponents.deserialize(componentData.get(key), (Entity) (Object) this, (Component) pair.getFirst(), (Serializer) pair.getSecond());
 			}
 			// name changed, perhaps some DFU stuff later(?)
 		}

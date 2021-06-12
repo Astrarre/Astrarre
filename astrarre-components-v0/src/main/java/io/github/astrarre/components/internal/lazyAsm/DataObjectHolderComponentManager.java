@@ -7,10 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-import io.github.astrarre.components.v0.api.factory.DataObjectHolder;
 import io.github.astrarre.components.internal.lazyAsm.standard.CopyAccess;
 import io.github.astrarre.components.internal.lazyAsm.standard.DefaultComponentClassFactory;
 import io.github.astrarre.components.internal.lazyAsm.standard.DefaultDataHolderClassFactory;
+import io.github.astrarre.components.internal.util.FieldPrototype;
+import io.github.astrarre.components.internal.util.PublicLoader;
 import io.github.astrarre.components.v0.api.components.BoolComponent;
 import io.github.astrarre.components.v0.api.components.ByteComponent;
 import io.github.astrarre.components.v0.api.components.CharComponent;
@@ -20,8 +21,7 @@ import io.github.astrarre.components.v0.api.components.FloatComponent;
 import io.github.astrarre.components.v0.api.components.IntComponent;
 import io.github.astrarre.components.v0.api.components.LongComponent;
 import io.github.astrarre.components.v0.api.components.ShortComponent;
-import io.github.astrarre.components.internal.util.FieldPrototype;
-import io.github.astrarre.components.internal.util.PublicLoader;
+import io.github.astrarre.components.v0.api.factory.DataObjectHolder;
 import org.objectweb.asm.Type;
 
 public class DataObjectHolderComponentManager<C>

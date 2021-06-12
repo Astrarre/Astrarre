@@ -8,6 +8,8 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.longs.LongList;
 import org.jetbrains.annotations.ApiStatus;
 
+import net.minecraft.nbt.NbtElement;
+
 @ApiStatus.NonExtendable
 public interface NbtValue {
 	/**
@@ -38,4 +40,12 @@ public interface NbtValue {
 	default IntList asIntList() {return this.get(NBTType.INT_ARRAY);}
 	default LongList asLongList() {return this.get(NBTType.LONG_ARRAY);}
 	default Number asNumber() {return this.get(NBTType.NUMBER);}
+
+	/**
+	 * @deprecated unsafe
+	 */
+	@Deprecated
+	default NbtElement asMinecraft() {
+		return (NbtElement) this;
+	}
 }

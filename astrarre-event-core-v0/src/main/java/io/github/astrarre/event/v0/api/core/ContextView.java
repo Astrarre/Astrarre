@@ -2,8 +2,8 @@ package io.github.astrarre.event.v0.api.core;
 
 import java.util.Optional;
 
-import io.github.astrarre.event.impl.core.CombinedContextView;
-import io.github.astrarre.event.impl.core.LimitedContextView;
+import io.github.astrarre.event.internal.core.CombinedContextView;
+import io.github.astrarre.event.internal.core.LimitedContextView;
 import org.jetbrains.annotations.Nullable;
 
 public interface ContextView<T> {
