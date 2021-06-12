@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.function.Supplier;
 
 import io.github.astrarre.util.v0.api.func.IterFunc;
 
@@ -14,7 +15,7 @@ public final class MapFilter<T, A> {
 	private final A empty;
 	private final Map<T, A> cached = new HashMap<>();
 	private Map<T, List<A>> map;
-	public final boolean isWeak;
+	private final Supplier<Map<T, List<A>>> mapSupplier;
 
 	public MapFilter(IterFunc<A> then, boolean isWeak) {
 		this(then, then.combine(Collections.emptyList()), isWeak);
@@ -25,9 +26,13 @@ public final class MapFilter<T, A> {
 	}
 
 	public MapFilter(IterFunc<A> then, A empty, boolean isWeak) {
+		this(then, empty, isWeak ? WeakHashMap::new : HashMap::new);
+	}
+
+	public MapFilter(IterFunc<A> combine, A empty, Supplier<Map<T, List<A>>> mapSupplier) {
+		this.combine = combine;
 		this.empty = empty;
-		this.isWeak = isWeak;
-		this.combine = then;
+		this.mapSupplier = mapSupplier;
 	}
 
 	public MapFilter(IterFunc<A> then, A empty) {
@@ -37,7 +42,7 @@ public final class MapFilter<T, A> {
 	public boolean add(T type, A func) {
 		boolean val = false;
 		if (this.map == null) {
-			this.map = this.isWeak ? new WeakHashMap<>() : new HashMap<>();
+			this.map = this.mapSupplier.get();
 			val = true;
 		}
 

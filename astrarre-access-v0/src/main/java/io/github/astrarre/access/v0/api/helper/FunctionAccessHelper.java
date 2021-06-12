@@ -3,13 +3,13 @@ package io.github.astrarre.access.v0.api.helper;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import com.google.common.collect.MapMaker;
+import com.google.common.reflect.TypeToken;
 import io.github.astrarre.access.internal.CompiledFunctionClassValue;
 import io.github.astrarre.access.v0.api.Access;
-import io.github.astrarre.access.v0.api.FunctionAccess;
 import io.github.astrarre.access.v0.api.MapFilter;
 import io.github.astrarre.access.v0.api.util.FunctionCompiler;
 import io.github.astrarre.util.v0.api.Id;
-import io.github.astrarre.util.v0.api.func.ArrayFunc;
 import io.github.astrarre.util.v0.api.func.IterFunc;
 
 /**
@@ -18,9 +18,11 @@ import io.github.astrarre.util.v0.api.func.IterFunc;
  * @param <F> the function type
  */
 public class FunctionAccessHelper<T, F> {
-	protected final MapFilter<T, F> filterStrong, filterWeak;
+	protected final MapFilter<T, F> filterStrong, filterWeak, filterExact;
 	protected final CompiledFunctionClassValue<F> filterClassExact;
 	protected final Consumer<Function<T, F>> functionAdder;
+	protected final F empty;
+	protected boolean addedDirectImplementation;
 
 	/**
 	 * creates a new function helper who's incoming type is not the same as the type being filtered
@@ -51,8 +53,40 @@ public class FunctionAccessHelper<T, F> {
 	public FunctionAccessHelper(IterFunc<F> func, Consumer<Function<T, F>> adder, F empty) {
 		this.filterStrong = new MapFilter<>(func, empty, false);
 		this.filterWeak = new MapFilter<>(func, empty, true);
+		this.filterExact = new MapFilter<>(func, empty, () -> new MapMaker().weakKeys().makeMap());
 		this.filterClassExact = new CompiledFunctionClassValue<>(func, empty);
 		this.functionAdder = adder;
+		this.empty = empty;
+	}
+
+	/**
+	 * if {@link T} instance of {@link F}, returns {@code (F) t}.
+	 * @param functionType the exact type of the function, used to filter.
+	 *  This is a type token to allow the helper to differentiate between {@link Consumer<Integer>} and {@link Consumer<String>} for example.
+	 */
+	public FunctionAccessHelper<T, F> forDirectImplementation(TypeToken<F> functionType) {
+		if(!this.addedDirectImplementation) {
+			this.addedDirectImplementation = true;
+			this.functionAdder.accept(t -> {
+				if(functionType.isSupertypeOf(t.getClass())) {
+					return (F) t;
+				} else {
+					return this.empty;
+				}
+			});
+		}
+		return this;
+	}
+
+	/**
+	 * The access holds a weak reference to the object, if the incoming object is {@code ==}, then applies the passed function.
+	 * This is useful for classes that shouldn't implement {@link Object#equals(Object)}.
+	 */
+	public FunctionAccessHelper<T, F> forInstanceExact(T instance, F function) {
+		if(this.filterExact.add(instance, function)) {
+			this.functionAdder.accept(this.filterExact::get);
+		}
+		return this;
 	}
 
 	/**

@@ -35,7 +35,6 @@ public class FunctionAccess<A, B> extends Access<Function<A, B>> {
 		this(id, iterFunc.asIter());
 	}
 
-
 	/**
 	 * {@inheritDoc}
 	 */
@@ -74,6 +73,7 @@ public class FunctionAccess<A, B> extends Access<Function<A, B>> {
 
 	/**
 	 * adds a function for if A instanceof B, return A
+	 * @param type the instance
 	 */
 	public FunctionAccess<A, B> addInstanceOfFunction(TypeToken<B> type) {
 		if (this.addedInstanceof) {
