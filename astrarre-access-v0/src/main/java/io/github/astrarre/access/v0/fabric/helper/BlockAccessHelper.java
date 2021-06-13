@@ -4,11 +4,13 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import io.github.astrarre.access.internal.AccessInternal;
+import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.access.v0.api.helper.FunctionAccessHelper;
 import io.github.astrarre.util.v0.api.func.IterFunc;
 
 import net.minecraft.block.Block;
 import net.minecraft.fluid.Fluid;
+import net.minecraft.item.Item;
 
 /**
  * Advanced filtering for Blocks
@@ -30,6 +32,22 @@ public class BlockAccessHelper<F> {
 	 */
 	public static <I, F> BlockAccessHelper<F> create(IterFunc<F> func, Consumer<Function<I, F>> adder, Function<I, Block> mapper) {
 		return new BlockAccessHelper<>(func, function -> adder.accept(i -> function.apply(mapper.apply(i))), null);
+	}
+
+	public static <I, F> BlockAccessHelper<F> create(Access<F> func, Function<Function<I, F>, F> and, Function<I, Block> mapper, F empty) {
+		return new BlockAccessHelper<>(func, function -> and.apply(i -> function.apply(mapper.apply(i))), empty);
+	}
+
+	public static <I, F> BlockAccessHelper<F> create(Access<F> func, Function<Function<I, F>, F> and, Function<I, Block> mapper) {
+		return create(func, and, mapper, null);
+	}
+
+	public BlockAccessHelper(Access<F> func, Function<Function<Block, F>, F> and, F empty) {
+		this(func.combiner, f -> func.andThen(and.apply(f)), empty);
+	}
+
+	public BlockAccessHelper(Access<F> func, Function<Function<Block, F>, F> adder) {
+		this(func, adder, null);
 	}
 
 	public BlockAccessHelper(IterFunc<F> func, Consumer<Function<Block, F>> adder) {

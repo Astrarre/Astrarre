@@ -31,11 +31,12 @@ public class InternalContexts {
 	 * @see Block#onSyncedBlockEvent(BlockState, World, BlockPos, int, int)
 	 */
 	public static final List<CopyEntry<?>> SYNC = new ArrayList<>();
+	public static final List<CopyEntry<?>> COPY_SCHEDULED = new ArrayList<>();
 
-	public record SerializeEntry<T>(ContextView<T> view, Serializer<T> serializer, ContextView<T> put) {
+	public record SerializeEntry<T>(ContextView<T> view, Serializer<T> serializer) {
 	}
 
-	public record CopyEntry<T>(ContextView<T> view, Copier<T> copier, ContextView<T> put) {
+	public record CopyEntry<T>(ContextView<T> view, Copier<T> copier) {
 	}
 
 	public static <T> T put(ContextView<T> view, T val) {

@@ -34,7 +34,7 @@ public class BlockEventUtil {
 		for (TempPair<InternalContexts.CopyEntry<?>, List<?>, List<?>> datum : data) {
 			List<Object> replacement = new ArrayList<>();
 			for (Object o : datum.b) {
-				replacement.add(InternalContexts.put((ContextView) datum.a.put(), o));
+				replacement.add(InternalContexts.put((ContextView) datum.a.view(), o));
 			}
 			datum.c = replacement;
 		}

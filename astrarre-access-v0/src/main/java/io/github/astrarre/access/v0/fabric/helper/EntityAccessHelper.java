@@ -3,6 +3,7 @@ package io.github.astrarre.access.v0.fabric.helper;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.access.v0.api.helper.FunctionAccessHelper;
 import io.github.astrarre.util.v0.api.func.IterFunc;
 
@@ -20,6 +21,14 @@ public class EntityAccessHelper<F> {
 	protected final FunctionAccessHelper<EntityType<?>, F> entityType;
 	protected final TaggedAccessHelper<EntityType<?>, F> entityTag;
 	protected final ItemAccessHelper<F>[] equipment = new ItemAccessHelper[EQUIPMENT_SLOTS.length];
+
+	public EntityAccessHelper(Access<F> func, Function<Function<Entity, F>, F> adder, F empty) {
+		this(func.combiner, f -> func.andThen(adder.apply(f)), empty);
+	}
+
+	public EntityAccessHelper(Access<F> func, Function<Function<Entity, F>, F> adder) {
+		this(func, adder, null);
+	}
 
 	public EntityAccessHelper(IterFunc<F> func, Consumer<Function<Entity, F>> adder) {
 		this(func, adder, null);

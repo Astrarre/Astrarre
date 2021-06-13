@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "io.github.astrarre.event.internal.player.mixin",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+    "io.github.astrarre.event.internal.entity.mixin.ServerPlayerInteractionManagerMixin_Push",
+    "io.github.astrarre.event.internal.entity.mixin.ServerPlayerInteractionManagerMixin_Pop"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

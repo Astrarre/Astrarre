@@ -5,10 +5,12 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.access.v0.api.helper.FunctionAccessHelper;
 import io.github.astrarre.access.v0.api.util.FunctionCompiler;
 import io.github.astrarre.util.v0.api.func.IterFunc;
 
+import net.minecraft.item.Item;
 import net.minecraft.tag.Tag;
 
 public class TaggedAccessHelper<T, F> {
@@ -29,7 +31,23 @@ public class TaggedAccessHelper<T, F> {
 	 * creates a new function helper who's incoming type is not the same as the type being filtered
 	 */
 	public static <I, T, F> TaggedAccessHelper<T, F> create(IterFunc<F> func, Consumer<Function<I, F>> adder, Function<I, T> mapper) {
-		return new TaggedAccessHelper<>(func, function -> adder.accept(i -> function.apply(mapper.apply(i))), null);
+		return create(func, adder, mapper, null);
+	}
+
+	public static <I, T, F> TaggedAccessHelper<T, F> create(Access<F> func, Function<Function<I, F>, F> and, Function<I, T> mapper, F empty) {
+		return new TaggedAccessHelper<>(func, function -> and.apply(i -> function.apply(mapper.apply(i))), empty);
+	}
+
+	public static <I, T, F> TaggedAccessHelper<T, F> create(Access<F> func, Function<Function<I, F>, F> and, Function<I, T> mapper) {
+		return create(func, and, mapper, null);
+	}
+
+	public TaggedAccessHelper(Access<F> func, Function<Function<T, F>, F> and, F empty) {
+		this(func.combiner, f -> func.andThen(and.apply(f)), empty);
+	}
+
+	public TaggedAccessHelper(Access<F> func, Function<Function<T, F>, F> adder) {
+		this(func, adder, null);
 	}
 
 	public TaggedAccessHelper(IterFunc<F> func, Consumer<Function<T, F>> functionAdder, F empty) {
