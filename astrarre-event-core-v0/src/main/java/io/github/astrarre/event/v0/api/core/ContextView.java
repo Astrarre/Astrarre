@@ -1,12 +1,14 @@
 package io.github.astrarre.event.v0.api.core;
 
+import java.util.Iterator;
 import java.util.Optional;
 
 import io.github.astrarre.event.internal.core.CombinedContextView;
 import io.github.astrarre.event.internal.core.LimitedContextView;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ContextView<T> {
+public interface ContextView<T> extends Iterable<T> {
 	/**
 	 * combine multiple views into one
 	 */
@@ -45,4 +47,21 @@ public interface ContextView<T> {
 		return new LimitedContextView<>(offset, limit, this);
 	}
 
+	@NotNull
+	@Override
+	default Iterator<T> iterator() {
+		return new Iterator<>() {
+			int i = 0;
+
+			@Override
+			public boolean hasNext() {
+				return ContextView.this.getNth(this.i) != null;
+			}
+
+			@Override
+			public T next() {
+				return ContextView.this.getNth(this.i++);
+			}
+		};
+	}
 }

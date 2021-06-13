@@ -23,16 +23,9 @@ public interface SingleContextHolder<T> extends ContextView<T> {
 
 	/**
 	 * swap the top value on the stack for the passed value. This can be used to temporary change the value in the holder.
-	 *
 	 */
 	@Nullable
-	T swap(@NotNull T value);
-
-	/**
-	 * forcefully sets the top value on the stack.
-	 * @see #swap(Object)
-	 */
-	void override(@NotNull T value);
+	T swap(@Nullable T value);
 
 	/**
 	 * If the stack is empty, throws an exception

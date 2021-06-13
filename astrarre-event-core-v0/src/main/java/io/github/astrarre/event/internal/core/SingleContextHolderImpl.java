@@ -36,17 +36,10 @@ public class SingleContextHolderImpl<T> implements SingleContextHolder<T> {
 	}
 
 	@Override
-	public T swap(@NotNull T value) {
-		Validate.notNull(value, "value cannot be null!");
+	public T swap(T value) {
 		T active = this.active.get();
 		this.active.set(value);
 		return active;
-	}
-
-	@Override
-	public void override(@NotNull T value) {
-		Validate.notNull(value, "value cannot be null!");
-		this.active.set(value);
 	}
 
 	@Override

@@ -14,5 +14,8 @@
   ],
   "depends": {
     "fabricloader": ">=0.8.9"
-  }
+  },
+  "mixins": [
+    "astrarre-event-player.mixins.json"
+  ]
 }

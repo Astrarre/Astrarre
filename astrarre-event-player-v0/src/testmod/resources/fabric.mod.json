@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "id": "astrarre-event-player-testmod-v0",
+  "version": "${version}",
+  "entrypoints": {
+    "main": [
+      "io.github.astrarre.event.testmod.player.TestMod"
+    ]
+  }
+}

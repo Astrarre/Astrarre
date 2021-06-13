@@ -47,7 +47,7 @@ public interface WorldFunction<T> extends BaseWorldFunction {
 
 	/**
 	 * @param state the BlockState at the given world and position
-	 * @param entity if {@code state.getBlock().hasBlockEntity()} then it is expected BlockEntity was already queried for
+	 * @param entity if {@link BlockState#hasBlockEntity()} then it is expected BlockEntity was already queried for
 	 */
 	@Nullable
 	T get(@Nullable Direction direction, BlockState state, World world, BlockPos pos, @Nullable BlockEntity entity);
