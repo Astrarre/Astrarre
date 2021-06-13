@@ -9,8 +9,8 @@ import io.github.astrarre.event.v0.api.core.ContextView;
 import net.minecraft.server.world.BlockEvent;
 
 @SuppressWarnings ("unchecked")
-public class BlockEventUtil {
-	public static void initContext(BlockEvent event) {
+public class CopyingContextUtil {
+	public static void initContext(ContextProvider event) {
 		List<TempPair<InternalContexts.CopyEntry<?>, List<?>, List<?>>> eventData = new ArrayList<>();
 		for (InternalContexts.CopyEntry<?> copy : InternalContexts.SYNC) {
 			List<?> lst = extracted(copy);
@@ -18,7 +18,7 @@ public class BlockEventUtil {
 				eventData.add(new TempPair<>(copy, lst));
 			}
 		}
-		((ContextProvider) event).set(eventData);
+		event.set(eventData);
 	}
 
 	static <T> List<T> extracted(InternalContexts.CopyEntry<T> copy) {
@@ -29,8 +29,8 @@ public class BlockEventUtil {
 		return lst;
 	}
 
-	public static void loadContext(BlockEvent event) {
-		var data = (List<TempPair<InternalContexts.CopyEntry<?>, List<?>, List<?>>>) ((ContextProvider) event).get();
+	public static void loadContext(ContextProvider event) {
+		var data = (List<TempPair<InternalContexts.CopyEntry<?>, List<?>, List<?>>>) event.get();
 		for (TempPair<InternalContexts.CopyEntry<?>, List<?>, List<?>> datum : data) {
 			List<Object> replacement = new ArrayList<>();
 			for (Object o : datum.b) {
@@ -40,8 +40,8 @@ public class BlockEventUtil {
 		}
 	}
 
-	public static void pop(BlockEvent event) {
-		var data = (List<TempPair<InternalContexts.CopyEntry<?>, List<?>, List<?>>>) ((ContextProvider) event).get();
+	public static void pop(ContextProvider event) {
+		var data = (List<TempPair<InternalContexts.CopyEntry<?>, List<?>, List<?>>>) event.get();
 		if (data != null) {
 			for (TempPair<InternalContexts.CopyEntry<?>, List<?>, List<?>> datum : data) {
 				List<?> c = datum.c;

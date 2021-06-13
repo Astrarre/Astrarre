@@ -4,6 +4,8 @@
   "compatibilityLevel": "JAVA_16",
   "mixins": [
     "BlockEventMixin_ContextProviderImpl",
+    "ScheduledTickMixin_ContextProviderImpl",
+    "ServerTickScheduler_ScheduledTickContext",
     "ServerWorldMixin_BlockEventContext"
   ],
   "injectors": {
