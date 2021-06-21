@@ -1,17 +1,24 @@
 package io.github.astrarre.itemview.v0.api.nbt;
 
+import java.util.Iterator;
 import java.util.List;
 
+import io.github.astrarre.itemview.internal.util.ImmutableIterable;
 import io.github.astrarre.itemview.v0.fabric.FabricViews;
 import it.unimi.dsi.fastutil.bytes.ByteList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.longs.LongList;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.nbt.NbtElement;
 
+@SuppressWarnings({
+		"unchecked",
+		"rawtypes"
+})
 @ApiStatus.NonExtendable
-public interface NbtValue {
+public interface NbtValue extends Comparable<NbtValue> {
 	/**
 	 * @return a new tag value
 	 */
@@ -47,5 +54,19 @@ public interface NbtValue {
 	@Deprecated
 	default NbtElement asMinecraft() {
 		return (NbtElement) this;
+	}
+
+	@Override
+	default int compareTo(@NotNull NbtValue o) {
+		int compare = Integer.compare(this.asMinecraft().getType(), o.asMinecraft().getType());
+		if(compare == 0) {
+			Object a = this.asAny(), b = o.asAny();
+			if(a instanceof Comparable ca && b instanceof Comparable<?> cb) {
+				return ca.compareTo(cb);
+			} else if(a instanceof Iterable<?> ia && b instanceof Iterable<?> ib) {
+				return ImmutableIterable.compare(ia.iterator(), (Iterator) ib.iterator(), null);
+			}
+		}
+		return compare;
 	}
 }

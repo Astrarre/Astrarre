@@ -5,6 +5,8 @@ import net.minecraft.nbt.NbtElement;
 import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.itemview.v0.fabric.FabricViews;
 import it.unimi.dsi.fastutil.bytes.ByteList;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.longs.LongList;
 import org.jetbrains.annotations.Nullable;
@@ -14,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 		"rawtypes"
 })
 public final class NBTType<T> implements Serializer<T> {
+	private static final Int2ObjectMap<NBTType<?>> BY_INTERNAL_ID = new Int2ObjectOpenHashMap<>();
 	public static final NBTType<Object> ANY = new NBTType<>(Object.class, 0, -1);
 	public static final NBTType<List> ANY_LIST = (NBTType) NBTType.listOf(NBTType.ANY);
 
@@ -48,6 +51,7 @@ public final class NBTType<T> implements Serializer<T> {
 		this.type = type;
 		this.component = component;
 		this.internalType = internalType;
+		BY_INTERNAL_ID.put(internalType, this);
 	}
 
 	private NBTType(Class<T> cls, int type, int internalType) {
@@ -118,5 +122,13 @@ public final class NBTType<T> implements Serializer<T> {
 	@Override
 	public NbtValue save(T instance) {
 		return (NbtValue) FabricViews.from(instance);
+	}
+
+	/**
+	 * @deprecated internal
+	 */
+	@Deprecated
+	public static <T> NBTType<T> forInternal(int internalType) {
+		return (NBTType<T>) BY_INTERNAL_ID.get(internalType);
 	}
 }

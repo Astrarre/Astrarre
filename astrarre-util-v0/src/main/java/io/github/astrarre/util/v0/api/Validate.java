@@ -12,22 +12,36 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.launch.common.FabricLauncherBase;
 
 public class Validate {
-	public static final FabricLoader LOADER = FabricLoader.getInstance();
+	public static final FabricLoader LOADER;
 	public static final boolean IS_DEV;
+	public static final boolean IS_CLIENT;
+
 	static {
-		boolean isDev = (FabricLauncherBase.getLauncher() == null || LOADER.isDevelopmentEnvironment());
-		if(Boolean.getBoolean("astrarre-disable-debug")) {
-			isDev = false;
-		}
+		boolean isDev, isClient;
+		FabricLoader loader;
+		try {
+			loader = FabricLoader.getInstance();
+			isClient = loader.getEnvironmentType() == EnvType.CLIENT;
+			isDev = (FabricLauncherBase.getLauncher() == null || loader.isDevelopmentEnvironment());
+			if(Boolean.getBoolean("astrarre-disable-debug")) {
+				isDev = false;
+			}
 
-		if(Boolean.getBoolean("astrarre-enable-debug")) {
+			if(Boolean.getBoolean("astrarre-enable-debug")) {
+				isDev = true;
+			}
+		} catch(Throwable t) {
 			isDev = true;
+			isClient = true;
+			loader = null;
+			System.out.println("[astrarre:Validate.java] Failed to");
 		}
-
 		IS_DEV = isDev;
+		LOADER = loader;
+		IS_CLIENT = isClient;
 	}
 
-	public static final boolean IS_CLIENT = FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
+
 
 	public static void ifModPresent(String mod, Runnable toRun) {
 		if(FabricLoader.getInstance().isModLoaded(mod)) {

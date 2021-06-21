@@ -1,11 +1,12 @@
 package io.github.astrarre.event.testmod.player;
 
-import io.github.astrarre.event.v0.fabric.entity.PlayerContexts;
+import io.github.astrarre.event.v0.fabric.entity.EntityContexts;
 
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.ActionResult;
@@ -24,15 +25,17 @@ public class TestMod implements ModInitializer {
 		Registry.register(Registry.BLOCK, new Identifier("testmod:testblock"), new Block(AbstractBlock.Settings.copy(Blocks.STONE)) {
 			@Override
 			public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-				System.out.println(PlayerContexts.INTERACT_BLOCK.getFirst());
+				System.out.println(EntityContexts.INTERACT_BLOCK.getFirst());
 				return ActionResult.CONSUME;
 			}
 
 			@Override
 			public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-				PlayerContexts.INTERACT_BLOCK.getFirstOpt().ifPresent(entity -> {
-					entity.sendMessage(new LiteralText("I know you moved me, you cannot hide. Resistance is futile."), false);
-				});
+				for (Entity entity : EntityContexts.ENTITY) {
+					if(entity instanceof PlayerEntity p) {
+						p.sendMessage(new LiteralText("I know you moved me "+p.getEntityName()+", you cannot hide. Resistance is futile."), false);
+					}
+				}
 			}
 		});
 	}

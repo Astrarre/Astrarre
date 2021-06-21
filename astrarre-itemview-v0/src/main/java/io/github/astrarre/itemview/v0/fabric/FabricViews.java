@@ -8,6 +8,7 @@ import io.github.astrarre.itemview.internal.access.ImmutableAccess;
 import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.itemview.v0.api.nbt.NBTType;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
+import io.github.astrarre.itemview.v0.api.nbt.NbtValue;
 import it.unimi.dsi.fastutil.bytes.ByteList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.longs.LongList;
@@ -89,7 +90,6 @@ public class FabricViews {
 			throw new IllegalArgumentException("unknown tag type " + tag + "(" + tag.getClass() + ")");
 		}
 
-
 		if (type == null || Primitives.wrap(type.getClassType()).isInstance(ret)) {
 			return (T) ret;
 		} else {
@@ -97,6 +97,9 @@ public class FabricViews {
 		}
 	}
 
+	public static <T> NBTType<T> defaultType(NbtElement value) {
+		return NBTType.forInternal(value.getType());
+	}
 
 	public static NbtElement from(Object object) {
 		if(object instanceof Boolean) {

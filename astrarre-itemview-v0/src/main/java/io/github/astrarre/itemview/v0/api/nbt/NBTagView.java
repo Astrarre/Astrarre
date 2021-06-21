@@ -1,9 +1,15 @@
 package io.github.astrarre.itemview.v0.api.nbt;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.StreamSupport;
+
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+
 import com.google.common.collect.Iterables;
 import io.github.astrarre.itemview.v0.api.Serializable;
 import io.github.astrarre.itemview.v0.api.Serializer;
@@ -25,6 +31,8 @@ public interface NBTagView extends Iterable<String>, NbtValue {
 	}
 
 	NbtValue getValue(String path);
+
+	Collection<Map.Entry<String, NbtValue>> entries();
 
 	/**
 	 * equivalent to
@@ -248,6 +256,8 @@ public interface NBTagView extends Iterable<String>, NbtValue {
 	@Override
 	Iterator<String> iterator();
 
+	int size();
+
 	/**
 	 * NBTagView is Unmodifiable, but copying it will prevent it's backer's mutations from affecting the returned instance, making it immutable
 	 */
@@ -306,5 +316,4 @@ public interface NBTagView extends Iterable<String>, NbtValue {
 
 		NBTagView build();
 	}
-
 }

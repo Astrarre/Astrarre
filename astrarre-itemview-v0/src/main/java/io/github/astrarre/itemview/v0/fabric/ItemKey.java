@@ -9,11 +9,13 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 /**
  * an Item and it's NBT data (guaranteed immutable)
  */
-public interface ItemKey {
+public interface ItemKey extends Comparable<ItemKey> {
 	Serializer<ItemKey> SERIALIZER = Serializer.of(input -> of(FabricSerializers.ITEM_STACK.read(input)), (instance) -> FabricSerializers.ITEM_STACK.save(instance.createItemStack(1)));
 
 	static ItemKey of(ItemStack stack) {
@@ -87,5 +89,15 @@ public interface ItemKey {
 		}
 
 		return new TaggedItemImpl(this.getItem(), FabricViews.immutableView(n.toTag()));
+	}
+
+	@Override
+	default int compareTo(@NotNull ItemKey o) {
+		Identifier idA = Registry.ITEM.getId(this.getItem()), idB = Registry.ITEM.getId(o.getItem());
+		int i = idA.compareTo(idB);
+		if(i == 0) {
+			return this.getTag().compareTo(o.getTag());
+		}
+		return i;
 	}
 }
