@@ -32,6 +32,16 @@ public interface ContextView<T> extends Iterable<T> {
 	 */
 	@Nullable T getNth(int index);
 
+	@Nullable
+	default <C extends T> C findFirst(Class<C> type) {
+		for (T t : this) {
+			if(type.isInstance(t)) {
+				return (C) t;
+			}
+		}
+		return null;
+	}
+
 	default Optional<T> getFirstOpt() {
 		return this.getNthOpt(0);
 	}

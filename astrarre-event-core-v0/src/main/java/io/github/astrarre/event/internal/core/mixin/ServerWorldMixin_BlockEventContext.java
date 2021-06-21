@@ -1,6 +1,7 @@
 package io.github.astrarre.event.internal.core.mixin;
 
 import io.github.astrarre.event.internal.core.CopyingContextUtil;
+import io.github.astrarre.event.internal.core.InternalContexts;
 import io.github.astrarre.event.internal.core.access.ContextProvider;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,7 +18,7 @@ import net.minecraft.world.World;
 public class ServerWorldMixin_BlockEventContext {
 	@ModifyArg (method = "addSyncedBlockEvent", at = @At(value = "INVOKE", target = "Lit/unimi/dsi/fastutil/objects/ObjectLinkedOpenHashSet;add(Ljava/lang/Object;)Z"))
 	public Object onSync(Object added) {
-		CopyingContextUtil.initContext((ContextProvider) added);
+		CopyingContextUtil.initContext(InternalContexts.BLOCK_EVENT,(ContextProvider) added);
 		return added;
 	}
 

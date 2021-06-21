@@ -1,6 +1,6 @@
 package io.github.astrarre.event.internal.entity.mixin;
 
-import io.github.astrarre.event.v0.fabric.entity.PlayerContexts;
+import io.github.astrarre.event.v0.fabric.entity.EntityContexts;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -30,16 +30,16 @@ public class ServerPlayerInteractionManagerMixin_Pop {
 			Hand hand,
 			BlockHitResult hitResult,
 			CallbackInfoReturnable<ActionResult> cir) {
-		PlayerContexts.INTERACT_BLOCK.pop(player);
+		EntityContexts.INTERACT_BLOCK.pop(player);
 	}
 
 	@Inject(method = "interactItem", at = @At("RETURN"))
 	public void onInteract(ServerPlayerEntity player, World world, ItemStack stack, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
-		PlayerContexts.INTERACT_ITEM.pop(player);
+		EntityContexts.INTERACT_ITEM.pop(player);
 	}
 
 	@Inject(method = "tryBreakBlock", at = @At("RETURN"))
 	public void onBreakBlock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-		PlayerContexts.BREAK_BLOCK.pop(this.player);
+		EntityContexts.BREAK_BLOCK.pop(this.player);
 	}
 }

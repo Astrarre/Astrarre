@@ -3,10 +3,14 @@
   "package": "io.github.astrarre.event.internal.core.mixin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
+    "BlockEntityMixin_CopyCreateContext",
     "BlockEventMixin_ContextProviderImpl",
+    "DirectBlockEntityTickInvokerAccess",
     "ScheduledTickMixin_ContextProviderImpl",
     "ServerTickScheduler_ScheduledTickContext",
-    "ServerWorldMixin_BlockEventContext"
+    "ServerWorldMixin_BlockEventContext",
+    "WorldMixin_LoadBlockEntityContext",
+    "WrappedBlockEntityTickInvokerAccess"
   ],
   "injectors": {
     "defaultRequire": 1

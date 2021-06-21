@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import io.github.astrarre.event.internal.core.CopyingContextUtil;
+import io.github.astrarre.event.internal.core.InternalContexts;
 import io.github.astrarre.event.internal.core.access.ContextProvider;
+import org.apache.logging.log4j.core.ContextDataInjector;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -33,7 +35,7 @@ public class ServerTickScheduler_ScheduledTickContext {
 
 	@ModifyArg (method = "schedule", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerTickScheduler;addScheduledTick(Lnet/minecraft/world/ScheduledTick;)V"))
 	public ScheduledTick<?> onSchedule(ScheduledTick<?> tick) {
-		CopyingContextUtil.initContext((ContextProvider) tick);
+		CopyingContextUtil.initContext(InternalContexts.COPY_SCHEDULED, (ContextProvider) tick);
 		return tick;
 	}
 

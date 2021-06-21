@@ -6,13 +6,11 @@ import java.util.List;
 import io.github.astrarre.event.internal.core.access.ContextProvider;
 import io.github.astrarre.event.v0.api.core.ContextView;
 
-import net.minecraft.server.world.BlockEvent;
-
 @SuppressWarnings ("unchecked")
 public class CopyingContextUtil {
-	public static void initContext(ContextProvider event) {
+	public static void initContext(List<InternalContexts.CopyEntry<?>> sers, ContextProvider event) {
 		List<TempPair<InternalContexts.CopyEntry<?>, List<?>, List<?>>> eventData = new ArrayList<>();
-		for (InternalContexts.CopyEntry<?> copy : InternalContexts.SYNC) {
+		for (InternalContexts.CopyEntry<?> copy : sers) {
 			List<?> lst = extracted(copy);
 			if (!lst.isEmpty()) {
 				eventData.add(new TempPair<>(copy, lst));
@@ -31,12 +29,14 @@ public class CopyingContextUtil {
 
 	public static void loadContext(ContextProvider event) {
 		var data = (List<TempPair<InternalContexts.CopyEntry<?>, List<?>, List<?>>>) event.get();
-		for (TempPair<InternalContexts.CopyEntry<?>, List<?>, List<?>> datum : data) {
-			List<Object> replacement = new ArrayList<>();
-			for (Object o : datum.b) {
-				replacement.add(InternalContexts.put((ContextView) datum.a.view(), o));
+		if (data != null) {
+			for (TempPair<InternalContexts.CopyEntry<?>, List<?>, List<?>> datum : data) {
+				List<Object> replacement = new ArrayList<>();
+				for (Object o : datum.b) {
+					replacement.add(InternalContexts.put((ContextView) datum.a.view(), o));
+				}
+				datum.c = replacement;
 			}
-			datum.c = replacement;
 		}
 	}
 

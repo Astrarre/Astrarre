@@ -3,8 +3,10 @@
   "package": "io.github.astrarre.event.internal.entity.mixin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
+    "EntityMixin_Move",
+    "ServerPlayerInteractionManagerMixin_Pop",
     "ServerPlayerInteractionManagerMixin_Push",
-    "ServerPlayerInteractionManagerMixin_Pop"
+    "ServerWorldMixin_EntityTick"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -1,5 +1,6 @@
 package io.github.astrarre.event.v0.api.core;
 
+import io.github.astrarre.event.internal.core.OrContextView;
 import io.github.astrarre.event.internal.core.SingleContextHolderImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -8,6 +9,10 @@ import org.jetbrains.annotations.Nullable;
  * Essentially a glorified ThreadLocal
  */
 public interface SingleContextHolder<T> extends ContextView<T> {
+	static <T> ContextView<T> or(SingleContextHolder<? extends T> a, SingleContextHolder<? extends T> b) {
+		return new OrContextView<>(a, b);
+	}
+
 	/**
 	 * Create a new context holder that can only store 1 value.
 	 * @param name the name of this context, used for debugging (exceptions)
@@ -42,4 +47,5 @@ public interface SingleContextHolder<T> extends ContextView<T> {
 	default int size() {
 		return this.isEmpty() ? 0 : 1;
 	}
+
 }
