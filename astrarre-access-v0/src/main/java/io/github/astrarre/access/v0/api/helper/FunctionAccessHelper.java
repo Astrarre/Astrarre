@@ -1,7 +1,5 @@
 package io.github.astrarre.access.v0.api.helper;
 
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Proxy;
 import java.util.function.Consumer;
 import java.util.function.Function;
 

@@ -14,12 +14,14 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.tag.Tag;
+import net.minecraft.util.registry.Registry;
 
 public class EntityAccessHelper<F> {
 	private static final EquipmentSlot[] EQUIPMENT_SLOTS = EquipmentSlot.values();
 	protected final FunctionAccessHelper<Entity, F> entity;
 	protected final FunctionAccessHelper<EntityType<?>, F> entityType;
 	protected final TaggedAccessHelper<EntityType<?>, F> entityTag;
+	protected final RegistryAccessHelper<EntityType<?>, F> entityTypeRegistry;
 	protected final ItemAccessHelper<F>[] equipment = new ItemAccessHelper[EQUIPMENT_SLOTS.length];
 
 	public EntityAccessHelper(Access<F> func, Function<Function<Entity, F>, F> adder, F empty) {
@@ -38,6 +40,8 @@ public class EntityAccessHelper<F> {
 		this.entity = new FunctionAccessHelper<>(func, adder, empty);
 		this.entityType = FunctionAccessHelper.create(func, adder, Entity::getType, empty);
 		this.entityTag = TaggedAccessHelper.create(func, adder, Entity::getType, empty);
+		this.entityTypeRegistry = RegistryAccessHelper.create(Registry.ENTITY_TYPE, func, adder, Entity::getType, empty);
+
 		Function<EquipmentSlot, Function<Entity, Item>> slotFunc = s -> e -> {
 			if (e instanceof LivingEntity) {
 				return ((LivingEntity) e).getEquippedStack(s).getItem();

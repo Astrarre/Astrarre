@@ -11,11 +11,14 @@ import io.github.astrarre.util.v0.api.func.IterFunc;
 import net.minecraft.block.Block;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
+import net.minecraft.util.registry.Registry;
 
 /**
  * Advanced filtering for Blocks
  */
 public class BlockAccessHelper<F> {
+	protected final RegistryAccessHelper<Block, F> blockRegistry;
+	protected final RegistryAccessHelper<Fluid, F> fluidRegistry;
 	protected final FunctionAccessHelper<Block, F> block;
 	protected final FunctionAccessHelper<Fluid, F> fluid;
 	protected final TaggedAccessHelper<Block, F> blockTag;
@@ -59,6 +62,8 @@ public class BlockAccessHelper<F> {
 		this.fluid = FunctionAccessHelper.create(func, adder, AccessInternal::from, empty);
 		this.blockTag = new TaggedAccessHelper<>(func, adder, empty);
 		this.fluidTag = TaggedAccessHelper.create(func, adder, AccessInternal::from, empty);
+		this.blockRegistry = new RegistryAccessHelper<>(Registry.BLOCK, func, adder, empty);
+		this.fluidRegistry = RegistryAccessHelper.create(Registry.FLUID, func, adder, AccessInternal::from, empty);
 	}
 
 	/**
@@ -87,5 +92,13 @@ public class BlockAccessHelper<F> {
 	 */
 	public FunctionAccessHelper<Fluid, F> getFluid() {
 		return this.fluid;
+	}
+
+	public RegistryAccessHelper<Block, F> getBlockRegistry() {
+		return this.blockRegistry;
+	}
+
+	public RegistryAccessHelper<Fluid, F> getFluidRegistry() {
+		return this.fluidRegistry;
 	}
 }

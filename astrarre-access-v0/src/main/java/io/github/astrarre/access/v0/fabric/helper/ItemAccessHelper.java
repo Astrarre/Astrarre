@@ -13,9 +13,11 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.tag.Tag;
+import net.minecraft.util.registry.Registry;
 
 public class ItemAccessHelper<F> {
 	protected final FunctionAccessHelper<Item, F> item;
+	protected final RegistryAccessHelper<Item, F> itemRegistry;
 	protected final TaggedAccessHelper<Item, F> itemTag;
 	protected final BlockAccessHelper<F> blockItem;
 
@@ -56,13 +58,14 @@ public class ItemAccessHelper<F> {
 	public ItemAccessHelper(IterFunc<F> func, Consumer<Function<Item, F>> adder, F empty) {
 		this.item = new FunctionAccessHelper<>(func, adder, empty);
 		this.itemTag = new TaggedAccessHelper<>(func, adder, empty);
-		this.blockItem = BlockAccessHelper.create(func, function -> adder.accept(i -> function.apply(i)), o -> {
+		this.blockItem = BlockAccessHelper.create(func, function -> adder.accept(function::apply), o -> {
 			if ((o instanceof BlockItem)) {
 				return ((BlockItem) o).getBlock();
 			} else {
 				return null;
 			}
 		}, empty);
+		this.itemRegistry = new RegistryAccessHelper<>(Registry.ITEM, func, adder, empty);
 	}
 
 	public FunctionAccessHelper<Item, F> getItem() {
@@ -78,5 +81,9 @@ public class ItemAccessHelper<F> {
 	 */
 	public BlockAccessHelper<F> getBlockItem() {
 		return this.blockItem;
+	}
+
+	public RegistryAccessHelper<Item, F> getItemRegistry() {
+		return this.itemRegistry;
 	}
 }
