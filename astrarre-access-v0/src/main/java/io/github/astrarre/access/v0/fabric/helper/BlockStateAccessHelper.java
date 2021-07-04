@@ -4,6 +4,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import io.github.astrarre.access.v0.api.Access;
+import io.github.astrarre.access.v0.api.helper.AbstractInputAccessHelper;
 import io.github.astrarre.access.v0.api.helper.FunctionAccessHelper;
 import io.github.astrarre.util.v0.api.func.IterFunc;
 
@@ -11,9 +12,13 @@ import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 
-public class BlockStateAccessHelper<F> {
+public class BlockStateAccessHelper<F> extends AbstractInputAccessHelper<BlockState, F> {
 	protected final FunctionAccessHelper<BlockState, F> blockstate;
 	protected final BlockAccessHelper<F> block;
+
+	public BlockStateAccessHelper(AbstractInputAccessHelper<BlockState, F> copyFrom) {
+		this(copyFrom.iterFunc, copyFrom.andThen, copyFrom.empty);
+	}
 
 	public BlockStateAccessHelper(Access<F> func, Function<Function<BlockState, F>, F> adder, F empty) {
 		this(func.combiner, f -> func.andThen(adder.apply(f)), empty);
@@ -28,8 +33,9 @@ public class BlockStateAccessHelper<F> {
 	}
 
 	public BlockStateAccessHelper(IterFunc<F> func, Consumer<Function<BlockState, F>> adder, F empty) {
-		this.blockstate = new FunctionAccessHelper<>(func, adder, empty);
-		this.block = BlockAccessHelper.create(func, adder, AbstractBlock.AbstractBlockState::getBlock, empty);
+		super(func, adder, empty);
+		this.blockstate = new FunctionAccessHelper<>(this);
+		this.block = BlockAccessHelper.create(this, AbstractBlock.AbstractBlockState::getBlock);
 	}
 
 	public FunctionAccessHelper<BlockState, F> getBlockstate() {

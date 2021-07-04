@@ -95,6 +95,27 @@ public class Access<F> {
 		this(id, combiner.asIter(function));
 	}
 
+	/**
+	 * @see #Access(Id, ArrayFunc)
+	 */
+	public Access(String modid, String path, ArrayFunc<F> combiner) {
+		this(Id.create(modid, path), combiner);
+	}
+
+	/**
+	 * @see #Access(Id, IterFunc)
+	 */
+	public Access(String modid, String path, IterFunc<F> combiner) {
+		this(Id.create(modid, path), combiner);
+	}
+
+	/**
+	 * @see #Access(Id, ArrayFunc, Class)
+	 */
+	public Access(String modid, String path, ArrayFunc<F> combiner, Class<F> function) {
+		this(Id.create(modid, path), combiner, function);
+	}
+
 	@NotNull
 	public F get() {
 		return this.compiledFunction;

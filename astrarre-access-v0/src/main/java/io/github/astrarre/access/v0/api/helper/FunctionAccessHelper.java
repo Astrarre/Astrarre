@@ -18,12 +18,14 @@ import io.github.astrarre.util.v0.api.func.IterFunc;
  * @param <T> the type to filter (eg. Block)
  * @param <F> the function type
  */
-public class FunctionAccessHelper<T, F> {
+public class FunctionAccessHelper<T, F> extends AbstractInputAccessHelper<T, F> {
 	protected final MapFilter<T, F> filterStrong, filterWeak, filterExact;
 	protected final CompiledFunctionClassValue<F> filterClassExact;
-	protected final Consumer<Function<T, F>> functionAdder;
-	protected final F empty;
 	protected boolean addedDirectImplementation;
+
+	public FunctionAccessHelper(AbstractInputAccessHelper<T, F> copyFrom) {
+		this(copyFrom.iterFunc, copyFrom.andThen, copyFrom.empty);
+	}
 
 	public FunctionAccessHelper(Access<F> func, Function<Function<T, F>, F> adder) {
 		this(func.combiner, f -> func.andThen(adder.apply(f)), null);
@@ -35,16 +37,22 @@ public class FunctionAccessHelper<T, F> {
 	 * 		return null.
 	 */
 	public FunctionAccessHelper(IterFunc<F> func, Consumer<Function<T, F>> adder, F empty) {
+		super(func, adder, empty);
 		this.filterStrong = new MapFilter<>(func, empty, false);
 		this.filterWeak = new MapFilter<>(func, empty, true);
 		this.filterExact = new MapFilter<>(func, empty, () -> new MapMaker().weakKeys().makeMap());
 		this.filterClassExact = new CompiledFunctionClassValue<>(func, empty);
-		this.functionAdder = adder;
-		this.empty = empty;
 	}
 
 	public FunctionAccessHelper(IterFunc<F> func, Consumer<Function<T, F>> adder) {
 		this(func, adder, null);
+	}
+
+	/**
+	 * creates a new function helper who's incoming type is not the same as the type being filtered
+	 */
+	public static <I, T, F> FunctionAccessHelper<T, F> create(AbstractInputAccessHelper<I, F> copyFrom, Function<I, T> mapper) {
+		return new FunctionAccessHelper<>(copyFrom.iterFunc, function -> copyFrom.andThen.accept(i -> function.apply(mapper.apply(i))), copyFrom.empty);
 	}
 
 	/**
@@ -70,7 +78,7 @@ public class FunctionAccessHelper<T, F> {
 	public FunctionAccessHelper<T, F> forDirectImplementation(TypeToken<F> functionType) {
 		if(!this.addedDirectImplementation) {
 			this.addedDirectImplementation = true;
-			this.functionAdder.accept(t -> {
+			this.andThen.accept(t -> {
 				if(functionType.isSupertypeOf(t.getClass())) {
 					return (F) t;
 				} else {
@@ -87,7 +95,7 @@ public class FunctionAccessHelper<T, F> {
 	 */
 	public FunctionAccessHelper<T, F> forInstanceExact(T instance, F function) {
 		if(this.filterExact.add(instance, function)) {
-			this.functionAdder.accept(this.filterExact::get);
+			this.andThen.accept(this.filterExact::get);
 		}
 		return this;
 	}
@@ -99,7 +107,7 @@ public class FunctionAccessHelper<T, F> {
 	 */
 	public FunctionAccessHelper<T, F> forInstanceWeak(T instance, F function) {
 		if(this.filterWeak.add(instance, function)) {
-			this.functionAdder.accept(this.filterWeak::get);
+			this.andThen.accept(this.filterWeak::get);
 		}
 		return this;
 	}
@@ -112,7 +120,7 @@ public class FunctionAccessHelper<T, F> {
 	 */
 	public FunctionAccessHelper<T, F> forInstanceStrong(T instance, F function) {
 		if(this.filterStrong.add(instance, function)) {
-			this.functionAdder.accept(this.filterStrong::get);
+			this.andThen.accept(this.filterStrong::get);
 		}
 		return this;
 	}
@@ -124,7 +132,7 @@ public class FunctionAccessHelper<T, F> {
 	public FunctionAccessHelper<T, F> forClassExact(Class<? extends T> instance, F function) {
 		FunctionCompiler<F> compiler = this.filterClassExact.get(instance);
 		if(compiler.isEmpty()) {
-			this.functionAdder.accept(t -> this.filterClassExact.get(t.getClass()).get());
+			this.andThen.accept(t -> this.filterClassExact.get(t.getClass()).get());
 		}
 		compiler.add(function);
 		return this;

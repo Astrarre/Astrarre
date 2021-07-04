@@ -4,10 +4,12 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import io.github.astrarre.access.v0.api.Access;
+import io.github.astrarre.access.v0.api.helper.AbstractInputAccessHelper;
 import io.github.astrarre.access.v0.api.helper.FunctionAccessHelper;
 import io.github.astrarre.util.v0.api.func.IterFunc;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.BlockItem;
@@ -15,7 +17,7 @@ import net.minecraft.item.Item;
 import net.minecraft.tag.Tag;
 import net.minecraft.util.registry.Registry;
 
-public class ItemAccessHelper<F> {
+public class ItemAccessHelper<F> extends AbstractInputAccessHelper<Item, F> {
 	protected final FunctionAccessHelper<Item, F> item;
 	protected final RegistryAccessHelper<Item, F> itemRegistry;
 	protected final TaggedAccessHelper<Item, F> itemTag;
@@ -43,6 +45,17 @@ public class ItemAccessHelper<F> {
 		return create(func, and, mapper, null);
 	}
 
+	/**
+	 * creates a new function helper who's incoming type is not the same as the type being filtered
+	 */
+	public static <I, F> ItemAccessHelper<F> create(AbstractInputAccessHelper<I, F> copyFrom, Function<I, Item> mapper) {
+		return new ItemAccessHelper<>(copyFrom.iterFunc, function -> copyFrom.andThen.accept(i -> function.apply(mapper.apply(i))), copyFrom.empty);
+	}
+
+	public ItemAccessHelper(AbstractInputAccessHelper<Item, F> copyFrom) {
+		this(copyFrom.iterFunc, copyFrom.andThen, copyFrom.empty);
+	}
+
 	public ItemAccessHelper(Access<F> func, Function<Function<Item, F>, F> and, F empty) {
 		this(func.combiner, f -> func.andThen(and.apply(f)), empty);
 	}
@@ -56,6 +69,7 @@ public class ItemAccessHelper<F> {
 	}
 
 	public ItemAccessHelper(IterFunc<F> func, Consumer<Function<Item, F>> adder, F empty) {
+		super(func, adder, empty);
 		this.item = new FunctionAccessHelper<>(func, adder, empty);
 		this.itemTag = new TaggedAccessHelper<>(func, adder, empty);
 		this.blockItem = BlockAccessHelper.create(func, function -> adder.accept(function::apply), o -> {

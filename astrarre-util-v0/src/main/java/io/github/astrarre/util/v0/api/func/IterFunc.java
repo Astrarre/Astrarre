@@ -1,6 +1,7 @@
 package io.github.astrarre.util.v0.api.func;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * combines a list of items into one item
@@ -22,6 +23,10 @@ public interface IterFunc<A> extends ArrayFunc<A> {
 	@Override
 	default A combine(A[] array) {
 		return this.combine(Arrays.asList(array));
+	}
+
+	default A empty() {
+		return this.combine(Collections.emptyList());
 	}
 
 	A combine(Iterable<A> iter);
