@@ -2,6 +2,7 @@ package io.github.astrarre.transfer.v0.lba.fluid;
 
 import java.math.RoundingMode;
 
+import alexiil.mc.lib.attributes.ItemAttributeAdder;
 import alexiil.mc.lib.attributes.SearchOptions;
 import alexiil.mc.lib.attributes.fluid.FluidAttributes;
 import alexiil.mc.lib.attributes.fluid.FluidExtractable;
@@ -9,6 +10,7 @@ import alexiil.mc.lib.attributes.fluid.FluidInsertable;
 import alexiil.mc.lib.attributes.fluid.amount.FluidAmount;
 import alexiil.mc.lib.attributes.fluid.volume.FluidKeys;
 import alexiil.mc.lib.attributes.fluid.volume.FluidVolume;
+import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.access.v0.fabric.func.WorldFunction;
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import io.github.astrarre.transfer.v0.api.Droplet;
@@ -17,6 +19,7 @@ import io.github.astrarre.transfer.v0.api.util.Quantity;
 import io.github.astrarre.transfer.v0.fabric.participants.FabricParticipants;
 import io.github.astrarre.transfer.v0.lba.RefAndConsumerParticipant;
 import io.github.astrarre.transfer.v0.lba.adapters.LBAItemApiApiContext;
+import io.github.astrarre.util.v0.api.Id;
 
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ItemStack;

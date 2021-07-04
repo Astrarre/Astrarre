@@ -18,7 +18,6 @@ import org.jetbrains.annotations.Nullable;
  * This Provider is implemented on {@link Block}, and serves as a provider interface for {@link WorldAccess}
  *
  * For more information on what Providers are see the {@link Provider} interface javadocs
- * Use raw types if the same provider supports multiple `Access`es
  * @see Provider
  * @see WorldAccess
  */

@@ -49,27 +49,6 @@ public class FunctionAccessHelper<T, F> extends AbstractAccessHelper<T, F> {
 	}
 
 	/**
-	 * creates a new function helper who's incoming type is not the same as the type being filtered
-	 */
-	public static <I, T, F> FunctionAccessHelper<T, F> create(AbstractAccessHelper<I, F> copyFrom, Function<I, T> mapper) {
-		return new FunctionAccessHelper<>(copyFrom.iterFunc, function -> copyFrom.andThen.accept(i -> function.apply(mapper.apply(i))), copyFrom.empty);
-	}
-
-	/**
-	 * creates a new function helper who's incoming type is not the same as the type being filtered
-	 */
-	public static <I, T, F> FunctionAccessHelper<T, F> create(IterFunc<F> func, Consumer<Function<I, F>> adder, Function<I, T> mapper, F empty) {
-		return new FunctionAccessHelper<>(func, function -> adder.accept(i -> function.apply(mapper.apply(i))), empty);
-	}
-
-	/**
-	 * creates a new function helper who's incoming type is not the same as the type being filtered
-	 */
-	public static <I, T, F> FunctionAccessHelper<T, F> create(IterFunc<F> func, Consumer<Function<I, F>> adder, Function<I, T> mapper) {
-		return new FunctionAccessHelper<>(func, function -> adder.accept(i -> function.apply(mapper.apply(i))), null);
-	}
-
-	/**
 	 * if {@link T} instance of {@link F}, returns {@code (F) t}.
 	 *
 	 * @param functionType the exact type of the function, used to filter. This is a type token to allow the helper to differentiate between {@link
@@ -136,5 +115,26 @@ public class FunctionAccessHelper<T, F> extends AbstractAccessHelper<T, F> {
 		}
 		compiler.add(function);
 		return this;
+	}
+
+	/**
+	 * creates a new function helper who's incoming type is not the same as the type being filtered
+	 */
+	public static <I, T, F> FunctionAccessHelper<T, F> create(AbstractAccessHelper<I, F> copyFrom, Function<I, T> mapper) {
+		return new FunctionAccessHelper<>(copyFrom.iterFunc, Access.map(copyFrom.andThen, mapper), copyFrom.empty);
+	}
+
+	/**
+	 * creates a new function helper who's incoming type is not the same as the type being filtered
+	 */
+	public static <I, T, F> FunctionAccessHelper<T, F> create(IterFunc<F> func, Consumer<Function<I, F>> adder, Function<I, T> mapper, F empty) {
+		return new FunctionAccessHelper<>(func, Access.map(adder, mapper), empty);
+	}
+
+	/**
+	 * creates a new function helper who's incoming type is not the same as the type being filtered
+	 */
+	public static <I, T, F> FunctionAccessHelper<T, F> create(IterFunc<F> func, Consumer<Function<I, F>> adder, Function<I, T> mapper) {
+		return new FunctionAccessHelper<>(func, Access.map(adder, mapper), null);
 	}
 }

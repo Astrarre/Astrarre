@@ -40,7 +40,7 @@ public class FunctionAccess<A, B> extends Access<Function<A, B>> {
 	 */
 	public FunctionAccess(Id id, IterFunc<Function<A, B>> iterFunc) {
 		super(id, iterFunc);
-		this.accessHelper = new FunctionAccessHelper<>(iterFunc, f -> this.andThen(a -> Validate.transform(f.apply(a), a, Function::apply)));
+		this.accessHelper = new FunctionAccessHelper<>(this, f -> a -> Validate.transform(f.apply(a), a, Function::apply));
 	}
 
 	/**
@@ -87,6 +87,10 @@ public class FunctionAccess<A, B> extends Access<Function<A, B>> {
 			return null;
 		});
 		return this;
+	}
+
+	public FunctionAccess<A, B> addInstanceOfFunction(Class<B> type) {
+		return this.addInstanceOfFunction(TypeToken.of(type));
 	}
 
 	/**

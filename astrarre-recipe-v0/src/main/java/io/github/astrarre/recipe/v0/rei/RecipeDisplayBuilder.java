@@ -52,13 +52,14 @@ public class RecipeDisplayBuilder<T extends Recipe> {
 	}
 
 	public static <T> List<EntryStack> of(Tag<T> tag, Function<T, EntryStack> stackFunction) {
-		return new ForwardingList<EntryStack>() {
+		return new ForwardingList<>() {
 			protected List<EntryStack> delegate;
+
 			@Override
 			protected List<EntryStack> delegate() {
 				if(this.delegate == null) {
 					List<EntryStack> stacks = new ArrayList<>();
-					for (T item : Tags.get(tag)) {
+					for(T item : Tags.get(tag)) {
 						stacks.add(stackFunction.apply(item));
 					}
 					this.delegate = stacks;

@@ -18,35 +18,6 @@ public class ItemAccessHelper<F> extends AbstractAccessHelper<Item, F> {
 	protected final TaggedAccessHelper<Item, F> itemTag;
 	protected final BlockAccessHelper<F> blockItem;
 
-	/**
-	 * creates a new function helper who's incoming type is not the same as the type being filtered
-	 */
-	public static <I, F> ItemAccessHelper<F> create(IterFunc<F> func, Consumer<Function<I, F>> adder, Function<I, Item> mapper, F empty) {
-		return new ItemAccessHelper<>(func, function -> adder.accept(i -> function.apply(mapper.apply(i))), empty);
-	}
-
-	/**
-	 * creates a new function helper who's incoming type is not the same as the type being filtered
-	 */
-	public static <I, F> ItemAccessHelper<F> create(IterFunc<F> func, Consumer<Function<I, F>> adder, Function<I, Item> mapper) {
-		return create(func, adder, mapper, null);
-	}
-
-	public static <I, F> ItemAccessHelper<F> create(Access<F> func, Function<Function<I, F>, F> and, Function<I, Item> mapper, F empty) {
-		return new ItemAccessHelper<>(func, function -> and.apply(i -> function.apply(mapper.apply(i))), empty);
-	}
-
-	public static <I, F> ItemAccessHelper<F> create(Access<F> func, Function<Function<I, F>, F> and, Function<I, Item> mapper) {
-		return create(func, and, mapper, null);
-	}
-
-	/**
-	 * creates a new function helper who's incoming type is not the same as the type being filtered
-	 */
-	public static <I, F> ItemAccessHelper<F> create(AbstractAccessHelper<I, F> copyFrom, Function<I, Item> mapper) {
-		return new ItemAccessHelper<>(copyFrom.iterFunc, function -> copyFrom.andThen.accept(i -> function.apply(mapper.apply(i))), copyFrom.empty);
-	}
-
 	public ItemAccessHelper(AbstractAccessHelper<Item, F> copyFrom) {
 		this(copyFrom.iterFunc, copyFrom.andThen, copyFrom.empty);
 	}
@@ -94,5 +65,31 @@ public class ItemAccessHelper<F> extends AbstractAccessHelper<Item, F> {
 
 	public RegistryAccessHelper<Item, F> getItemRegistry() {
 		return this.itemRegistry;
+	}
+
+	public static <I, F> ItemAccessHelper<F> create(IterFunc<F> func, Consumer<Function<I, F>> adder, Function<I, Item> mapper, F empty) {
+		return new ItemAccessHelper<>(func, Access.map(adder, mapper), empty);
+	}
+
+	/**
+	 * creates a new function helper who's incoming type is not the same as the type being filtered
+	 */
+	public static <I, F> ItemAccessHelper<F> create(IterFunc<F> func, Consumer<Function<I, F>> adder, Function<I, Item> mapper) {
+		return create(func, adder, mapper, null);
+	}
+
+	public static <I, F> ItemAccessHelper<F> create(Access<F> func, Function<Function<I, F>, F> and, Function<I, Item> mapper, F empty) {
+		return new ItemAccessHelper<>(func, Access.map(and, mapper), empty);
+	}
+
+	public static <I, F> ItemAccessHelper<F> create(Access<F> func, Function<Function<I, F>, F> and, Function<I, Item> mapper) {
+		return create(func, and, mapper, null);
+	}
+
+	/**
+	 * creates a new function helper who's incoming type is not the same as the type being filtered
+	 */
+	public static <I, F> ItemAccessHelper<F> create(AbstractAccessHelper<I, F> copyFrom, Function<I, Item> mapper) {
+		return new ItemAccessHelper<>(copyFrom.iterFunc, function -> copyFrom.andThen.accept(i -> function.apply(mapper.apply(i))), copyFrom.empty);
 	}
 }

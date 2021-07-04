@@ -138,6 +138,13 @@ public class Access<F> {
 	}
 
 	/**
+	 * @see #getExcluding(Collection)
+	 */
+	public Supplier<F> getExcluding(Access<?>... accesses) {
+		return this.getExcluding(List.of(accesses));
+	}
+
+	/**
 	 * adds a access dependency
 	 * @param access the function to depend on
 	 * @return this
@@ -310,5 +317,13 @@ public class Access<F> {
 	@SafeVarargs
 	public static <F> Access<F> create(Id id, ArrayFunc<F> combiner, F...type) {
 		return new Access<>(id, combiner, (Class)type.getClass().componentType());
+	}
+
+	public static <I, T, F> Consumer<Function<T, F>> map(Consumer<Function<I, F>> adder, Function<I, T> mapper) {
+		return function -> adder.accept(i -> function.apply(mapper.apply(i)));
+	}
+
+	public static <I, T, F> Function<Function<T, F>, F> map(Function<Function<I, F>, F> adder, Function<I, T> mapper) {
+		return function -> adder.apply(i -> function.apply(mapper.apply(i)));
 	}
 }

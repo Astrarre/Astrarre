@@ -8,9 +8,6 @@ import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.util.math.Direction;
 
-/**
- * Use raw types if the same provider supports multiple `Access`es
- */
 public interface ItemProvider {
 	/**
 	 * @param access the provider accessing this block

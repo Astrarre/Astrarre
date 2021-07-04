@@ -27,18 +27,18 @@ public class BlockAccessHelper<F> extends AbstractAccessHelper<Block, F> {
 	 * creates a new function helper who's incoming type is not the same as the type being filtered
 	 */
 	public static <I, F> BlockAccessHelper<F> create(IterFunc<F> func, Consumer<Function<I, F>> adder, Function<I, Block> mapper, F empty) {
-		return new BlockAccessHelper<>(func, function -> adder.accept(i -> function.apply(mapper.apply(i))), empty);
+		return new BlockAccessHelper<>(func, Access.map(adder, mapper), empty);
 	}
 
 	/**
 	 * creates a new function helper who's incoming type is not the same as the type being filtered
 	 */
 	public static <I, F> BlockAccessHelper<F> create(IterFunc<F> func, Consumer<Function<I, F>> adder, Function<I, Block> mapper) {
-		return new BlockAccessHelper<>(func, function -> adder.accept(i -> function.apply(mapper.apply(i))), null);
+		return new BlockAccessHelper<>(func, Access.map(adder, mapper), null);
 	}
 
 	public static <I, F> BlockAccessHelper<F> create(Access<F> func, Function<Function<I, F>, F> and, Function<I, Block> mapper, F empty) {
-		return new BlockAccessHelper<>(func, function -> and.apply(i -> function.apply(mapper.apply(i))), empty);
+		return new BlockAccessHelper<>(func, Access.map(and, mapper), empty);
 	}
 
 	public static <I, F> BlockAccessHelper<F> create(Access<F> func, Function<Function<I, F>, F> and, Function<I, Block> mapper) {
@@ -49,7 +49,7 @@ public class BlockAccessHelper<F> extends AbstractAccessHelper<Block, F> {
 	 * creates a new function helper who's incoming type is not the same as the type being filtered
 	 */
 	public static <I, F> BlockAccessHelper<F> create(AbstractAccessHelper<I, F> copyFrom, Function<I, Block> mapper) {
-		return new BlockAccessHelper<>(copyFrom.iterFunc, function -> copyFrom.andThen.accept(i -> function.apply(mapper.apply(i))), copyFrom.empty);
+		return new BlockAccessHelper<>(copyFrom.iterFunc, Access.map(copyFrom.andThen, mapper), copyFrom.empty);
 	}
 
 	public BlockAccessHelper(Access<F> func, Function<Function<Block, F>, F> and, F empty) {
