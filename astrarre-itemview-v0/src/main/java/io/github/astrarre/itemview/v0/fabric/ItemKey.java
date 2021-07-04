@@ -18,6 +18,10 @@ import net.minecraft.util.registry.Registry;
 public interface ItemKey extends Comparable<ItemKey> {
 	Serializer<ItemKey> SERIALIZER = Serializer.of(input -> of(FabricSerializers.ITEM_STACK.read(input)), (instance) -> FabricSerializers.ITEM_STACK.save(instance.createItemStack(1)));
 
+	static ItemKey ofStack(ItemStack stack) {
+		return of(stack);
+	}
+
 	static ItemKey of(ItemStack stack) {
 		if (stack.isEmpty()) {
 			return EMPTY;

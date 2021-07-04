@@ -41,8 +41,6 @@ public class Validate {
 		IS_CLIENT = isClient;
 	}
 
-
-
 	public static void ifModPresent(String mod, Runnable toRun) {
 		if(FabricLoader.getInstance().isModLoaded(mod)) {
 			toRun.run();

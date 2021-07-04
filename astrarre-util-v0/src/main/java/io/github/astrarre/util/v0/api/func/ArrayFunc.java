@@ -2,15 +2,20 @@ package io.github.astrarre.util.v0.api.func;
 
 import java.io.Serializable;
 import java.lang.invoke.SerializedLambda;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import com.google.common.collect.Iterables;
 import com.google.common.reflect.TypeToken;
 import org.objectweb.asm.Type;
 
+// todo asm generated things
 @SuppressWarnings ({
 		"unchecked",
 		"UnstableApiUsage"

@@ -1,5 +1,7 @@
 package io.github.astrarre.access.v0.api.helper;
 
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Proxy;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -14,6 +16,7 @@ import io.github.astrarre.util.v0.api.func.IterFunc;
 
 /**
  * Aspect-Oriented version of FunctionAccess.
+ *
  * @param <T> the type to filter (eg. Block)
  * @param <F> the function type
  */
@@ -23,6 +26,28 @@ public class FunctionAccessHelper<T, F> {
 	protected final Consumer<Function<T, F>> functionAdder;
 	protected final F empty;
 	protected boolean addedDirectImplementation;
+
+	public FunctionAccessHelper(Access<F> func, Function<Function<T, F>, F> adder) {
+		this(func.combiner, f -> func.andThen(adder.apply(f)), null);
+	}
+
+	/**
+	 * @param func the iter func passed in the constructor
+	 * @param adder Registers a function in the access. The passed function provides the method to find the function with the given value, may
+	 * 		return null.
+	 */
+	public FunctionAccessHelper(IterFunc<F> func, Consumer<Function<T, F>> adder, F empty) {
+		this.filterStrong = new MapFilter<>(func, empty, false);
+		this.filterWeak = new MapFilter<>(func, empty, true);
+		this.filterExact = new MapFilter<>(func, empty, () -> new MapMaker().weakKeys().makeMap());
+		this.filterClassExact = new CompiledFunctionClassValue<>(func, empty);
+		this.functionAdder = adder;
+		this.empty = empty;
+	}
+
+	public FunctionAccessHelper(IterFunc<F> func, Consumer<Function<T, F>> adder) {
+		this(func, adder, null);
+	}
 
 	/**
 	 * creates a new function helper who's incoming type is not the same as the type being filtered
@@ -38,31 +63,11 @@ public class FunctionAccessHelper<T, F> {
 		return new FunctionAccessHelper<>(func, function -> adder.accept(i -> function.apply(mapper.apply(i))), null);
 	}
 
-	public FunctionAccessHelper(Access<F> func, Function<Function<T, F>, F> adder) {
-		this(func.combiner, f -> func.andThen(adder.apply(f)), null);
-	}
-
-	public FunctionAccessHelper(IterFunc<F> func, Consumer<Function<T, F>> adder) {
-		this(func, adder, null);
-	}
-
-	/**
-	 * @param func the iter func passed in the constructor
-	 * @param adder Registers a function in the access. The passed function provides the method to find the function with the given value, may return null.
-	 */
-	public FunctionAccessHelper(IterFunc<F> func, Consumer<Function<T, F>> adder, F empty) {
-		this.filterStrong = new MapFilter<>(func, empty, false);
-		this.filterWeak = new MapFilter<>(func, empty, true);
-		this.filterExact = new MapFilter<>(func, empty, () -> new MapMaker().weakKeys().makeMap());
-		this.filterClassExact = new CompiledFunctionClassValue<>(func, empty);
-		this.functionAdder = adder;
-		this.empty = empty;
-	}
-
 	/**
 	 * if {@link T} instance of {@link F}, returns {@code (F) t}.
-	 * @param functionType the exact type of the function, used to filter.
-	 *  This is a type token to allow the helper to differentiate between {@link Consumer<Integer>} and {@link Consumer<String>} for example.
+	 *
+	 * @param functionType the exact type of the function, used to filter. This is a type token to allow the helper to differentiate between {@link
+	 *        Consumer<Integer>} and {@link Consumer<String>} for example.
 	 */
 	public FunctionAccessHelper<T, F> forDirectImplementation(TypeToken<F> functionType) {
 		if(!this.addedDirectImplementation) {
@@ -79,8 +84,8 @@ public class FunctionAccessHelper<T, F> {
 	}
 
 	/**
-	 * The access holds a weak reference to the object, if the incoming object is {@code ==}, then applies the passed function.
-	 * This is useful for classes that shouldn't implement {@link Object#equals(Object)}.
+	 * The access holds a weak reference to the object, if the incoming object is {@code ==}, then applies the passed function. This is useful for
+	 * classes that shouldn't implement {@link Object#equals(Object)}.
 	 */
 	public FunctionAccessHelper<T, F> forInstanceExact(T instance, F function) {
 		if(this.filterExact.add(instance, function)) {
@@ -91,7 +96,8 @@ public class FunctionAccessHelper<T, F> {
 
 	/**
 	 * The access holds a weak reference to the object, if the incoming object is {@link Object#equals(Object)}, then applies the passed function.
-	 * This is useful for classes that don't implement {@link Object#equals(Object)}, as when they are GCed, they're unreachable by the filter anyways.
+	 * This is useful for classes that don't implement {@link Object#equals(Object)}, as when they are GCed, they're unreachable by the filter
+	 * anyways.
 	 */
 	public FunctionAccessHelper<T, F> forInstanceWeak(T instance, F function) {
 		if(this.filterWeak.add(instance, function)) {
@@ -101,8 +107,9 @@ public class FunctionAccessHelper<T, F> {
 	}
 
 	/**
-	 * Holds a strong reference to the object, if the incoming object is {@link Object#equals(Object)}, then applies the passed function.
-	 * This is useful for classes that implement {@link Object#equals(Object)} such as {@link Id}.
+	 * Holds a strong reference to the object, if the incoming object is {@link Object#equals(Object)}, then applies the passed function. This is
+	 * useful for classes that implement {@link Object#equals(Object)} such as {@link Id}.
+	 *
 	 * @see #forInstanceWeak(Object, Object)
 	 */
 	public FunctionAccessHelper<T, F> forInstanceStrong(T instance, F function) {
