@@ -2,6 +2,7 @@ package io.github.astrarre.access.v0.fabric.func;
 
 import java.lang.reflect.Proxy;
 
+import io.github.astrarre.access.internal.AccessInternal;
 import io.github.astrarre.access.internal.SkippingWorldFunction;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,6 +47,10 @@ public interface BaseWorldFunction {
 
 	default boolean needsBlockEntity() {return true;}
 
+	default Type getType() {
+		return Type.of(this.needsBlockState(), this.needsBlockEntity());
+	}
+
 	/**
 	 * utility function to assist in implementing world queries.
 	 * @see SkippingWorldFunction#get(Direction, BlockState, World, BlockPos, BlockEntity, boolean)
@@ -74,5 +79,17 @@ public interface BaseWorldFunction {
 			}
 		}
 		return state;
+	}
+
+	enum Type {
+		NEEDS_NONE,
+		NEEDS_BLOCK,
+		NEEDS_ENTITY,
+		NEEDS_BLOCK_AND_ENTITY;
+
+		static Type of(boolean needsBlock, boolean needsEntity) {
+			int i = (needsBlock ? 1 : 0) + (needsEntity ? 2 : 0);
+			return AccessInternal.BASE_WORLD_FUNCTION_TYPES[i];
+		}
 	}
 }

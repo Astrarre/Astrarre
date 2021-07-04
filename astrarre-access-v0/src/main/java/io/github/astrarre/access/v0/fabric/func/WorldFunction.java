@@ -6,6 +6,7 @@ import java.util.function.Predicate;
 import io.github.astrarre.access.internal.AndThenWorldFunction;
 import io.github.astrarre.access.internal.MergedAndThenWorldFunction;
 import io.github.astrarre.access.internal.SkippingWorldFunction;
+import io.github.astrarre.access.v0.fabric.cache.BlockData;
 import io.github.astrarre.util.v0.api.func.IterFunc;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,6 +44,19 @@ public interface WorldFunction<T> extends BaseWorldFunction {
 		if(needsBlockEntity) return (NoBlockState<T>) (dir, world, pos, entity) -> function.get(dir, null, world, pos, entity);
 		if(needsBlockState) return (NoBlockEntity<T>) (dir, state, world, pos) -> function.get(dir, state, world, pos, null);
 		return (NoBlock<T>) (dir, world, pos) -> function.get(dir, null, world, pos, null);
+	}
+
+	@Nullable
+	default T get(@Nullable Direction direction, BlockData data) {
+		if(this.needsBlockState() && this.needsBlockEntity()) {
+			return this.get(direction, data.getState(), data.getWorld(), data.getPos(), data.getEntity());
+		} else if(this.needsBlockEntity()) {
+			return this.get(direction, null, data.getWorld(), data.getPos(), data.getEntity());
+		} else if(this.needsBlockState()) {
+			return this.get(direction, data.getState(), data.getWorld(), data.getPos(), null);
+		} else {
+			return this.get(direction, null, data.getWorld(), data.getPos(), null);
+		}
 	}
 
 	/**

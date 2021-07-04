@@ -4,20 +4,15 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import io.github.astrarre.access.v0.api.Access;
-import io.github.astrarre.access.v0.api.helper.AbstractInputAccessHelper;
+import io.github.astrarre.access.v0.api.helper.AbstractAccessHelper;
 import io.github.astrarre.access.v0.api.helper.FunctionAccessHelper;
 import io.github.astrarre.util.v0.api.func.IterFunc;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.fluid.Fluid;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
-import net.minecraft.tag.Tag;
 import net.minecraft.util.registry.Registry;
 
-public class ItemAccessHelper<F> extends AbstractInputAccessHelper<Item, F> {
+public class ItemAccessHelper<F> extends AbstractAccessHelper<Item, F> {
 	protected final FunctionAccessHelper<Item, F> item;
 	protected final RegistryAccessHelper<Item, F> itemRegistry;
 	protected final TaggedAccessHelper<Item, F> itemTag;
@@ -48,11 +43,11 @@ public class ItemAccessHelper<F> extends AbstractInputAccessHelper<Item, F> {
 	/**
 	 * creates a new function helper who's incoming type is not the same as the type being filtered
 	 */
-	public static <I, F> ItemAccessHelper<F> create(AbstractInputAccessHelper<I, F> copyFrom, Function<I, Item> mapper) {
+	public static <I, F> ItemAccessHelper<F> create(AbstractAccessHelper<I, F> copyFrom, Function<I, Item> mapper) {
 		return new ItemAccessHelper<>(copyFrom.iterFunc, function -> copyFrom.andThen.accept(i -> function.apply(mapper.apply(i))), copyFrom.empty);
 	}
 
-	public ItemAccessHelper(AbstractInputAccessHelper<Item, F> copyFrom) {
+	public ItemAccessHelper(AbstractAccessHelper<Item, F> copyFrom) {
 		this(copyFrom.iterFunc, copyFrom.andThen, copyFrom.empty);
 	}
 

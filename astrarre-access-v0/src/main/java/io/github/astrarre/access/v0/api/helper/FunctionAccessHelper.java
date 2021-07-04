@@ -18,12 +18,12 @@ import io.github.astrarre.util.v0.api.func.IterFunc;
  * @param <T> the type to filter (eg. Block)
  * @param <F> the function type
  */
-public class FunctionAccessHelper<T, F> extends AbstractInputAccessHelper<T, F> {
+public class FunctionAccessHelper<T, F> extends AbstractAccessHelper<T, F> {
 	protected final MapFilter<T, F> filterStrong, filterWeak, filterExact;
 	protected final CompiledFunctionClassValue<F> filterClassExact;
 	protected boolean addedDirectImplementation;
 
-	public FunctionAccessHelper(AbstractInputAccessHelper<T, F> copyFrom) {
+	public FunctionAccessHelper(AbstractAccessHelper<T, F> copyFrom) {
 		this(copyFrom.iterFunc, copyFrom.andThen, copyFrom.empty);
 	}
 
@@ -51,7 +51,7 @@ public class FunctionAccessHelper<T, F> extends AbstractInputAccessHelper<T, F> 
 	/**
 	 * creates a new function helper who's incoming type is not the same as the type being filtered
 	 */
-	public static <I, T, F> FunctionAccessHelper<T, F> create(AbstractInputAccessHelper<I, F> copyFrom, Function<I, T> mapper) {
+	public static <I, T, F> FunctionAccessHelper<T, F> create(AbstractAccessHelper<I, F> copyFrom, Function<I, T> mapper) {
 		return new FunctionAccessHelper<>(copyFrom.iterFunc, function -> copyFrom.andThen.accept(i -> function.apply(mapper.apply(i))), copyFrom.empty);
 	}
 

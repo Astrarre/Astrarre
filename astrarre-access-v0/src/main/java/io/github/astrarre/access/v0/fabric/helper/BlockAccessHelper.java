@@ -5,7 +5,7 @@ import java.util.function.Function;
 
 import io.github.astrarre.access.internal.AccessInternal;
 import io.github.astrarre.access.v0.api.Access;
-import io.github.astrarre.access.v0.api.helper.AbstractInputAccessHelper;
+import io.github.astrarre.access.v0.api.helper.AbstractAccessHelper;
 import io.github.astrarre.access.v0.api.helper.FunctionAccessHelper;
 import io.github.astrarre.util.v0.api.func.IterFunc;
 
@@ -16,7 +16,7 @@ import net.minecraft.util.registry.Registry;
 /**
  * Advanced filtering for Blocks
  */
-public class BlockAccessHelper<F> extends AbstractInputAccessHelper<Block, F> {
+public class BlockAccessHelper<F> extends AbstractAccessHelper<Block, F> {
 	protected final RegistryAccessHelper<Block, F> blockRegistry;
 	protected final RegistryAccessHelper<Fluid, F> fluidRegistry;
 	protected final FunctionAccessHelper<Block, F> block;
@@ -48,7 +48,7 @@ public class BlockAccessHelper<F> extends AbstractInputAccessHelper<Block, F> {
 	/**
 	 * creates a new function helper who's incoming type is not the same as the type being filtered
 	 */
-	public static <I, F> BlockAccessHelper<F> create(AbstractInputAccessHelper<I, F> copyFrom, Function<I, Block> mapper) {
+	public static <I, F> BlockAccessHelper<F> create(AbstractAccessHelper<I, F> copyFrom, Function<I, Block> mapper) {
 		return new BlockAccessHelper<>(copyFrom.iterFunc, function -> copyFrom.andThen.accept(i -> function.apply(mapper.apply(i))), copyFrom.empty);
 	}
 
@@ -64,7 +64,7 @@ public class BlockAccessHelper<F> extends AbstractInputAccessHelper<Block, F> {
 		this(func, adder, null);
 	}
 
-	public BlockAccessHelper(AbstractInputAccessHelper<Block, F> copyFrom) {
+	public BlockAccessHelper(AbstractAccessHelper<Block, F> copyFrom) {
 		this(copyFrom.iterFunc, copyFrom.andThen, copyFrom.empty);
 	}
 

@@ -4,21 +4,18 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import io.github.astrarre.access.v0.api.Access;
-import io.github.astrarre.access.v0.api.helper.AbstractInputAccessHelper;
+import io.github.astrarre.access.v0.api.helper.AbstractAccessHelper;
 import io.github.astrarre.access.v0.api.helper.FunctionAccessHelper;
 import io.github.astrarre.util.v0.api.func.IterFunc;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.Items;
-import net.minecraft.tag.Tag;
 import net.minecraft.util.registry.Registry;
 
-public class EntityAccessHelper<F> extends AbstractInputAccessHelper<Entity, F> {
+public class EntityAccessHelper<F> extends AbstractAccessHelper<Entity, F> {
 	private static final EquipmentSlot[] EQUIPMENT_SLOTS = EquipmentSlot.values();
 	protected final FunctionAccessHelper<Entity, F> entity;
 	protected final FunctionAccessHelper<EntityType<?>, F> entityType;
@@ -26,7 +23,7 @@ public class EntityAccessHelper<F> extends AbstractInputAccessHelper<Entity, F> 
 	protected final RegistryAccessHelper<EntityType<?>, F> entityTypeRegistry;
 	protected final ItemAccessHelper<F>[] equipment = new ItemAccessHelper[EQUIPMENT_SLOTS.length];
 
-	public EntityAccessHelper(AbstractInputAccessHelper<Entity, F> copyFrom) {
+	public EntityAccessHelper(AbstractAccessHelper<Entity, F> copyFrom) {
 		this(copyFrom.iterFunc, copyFrom.andThen, copyFrom.empty);
 	}
 

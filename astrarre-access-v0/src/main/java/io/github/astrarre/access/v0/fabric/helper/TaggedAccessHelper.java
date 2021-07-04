@@ -6,16 +6,13 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import io.github.astrarre.access.v0.api.Access;
-import io.github.astrarre.access.v0.api.helper.AbstractInputAccessHelper;
-import io.github.astrarre.access.v0.api.helper.FunctionAccessHelper;
+import io.github.astrarre.access.v0.api.helper.AbstractAccessHelper;
 import io.github.astrarre.access.v0.api.util.FunctionCompiler;
 import io.github.astrarre.util.v0.api.func.IterFunc;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
 import net.minecraft.tag.Tag;
 
-public class TaggedAccessHelper<T, F> extends AbstractInputAccessHelper<T, F> {
+public class TaggedAccessHelper<T, F> extends AbstractAccessHelper<T, F> {
 	protected final Map<Tag<T>, FunctionCompiler<F>> functions = new HashMap<>();
 	protected final Function<Tag<T>, FunctionCompiler<F>> init = this::getCompiler;
 
@@ -23,7 +20,7 @@ public class TaggedAccessHelper<T, F> extends AbstractInputAccessHelper<T, F> {
 		return new TaggedAccessHelper<>(func, function -> adder.accept(i -> function.apply(mapper.apply(i))), empty);
 	}
 
-	public static <I, T, F> TaggedAccessHelper<T, F> create(AbstractInputAccessHelper<I, F> copyFrom, Function<I, T> mapper) {
+	public static <I, T, F> TaggedAccessHelper<T, F> create(AbstractAccessHelper<I, F> copyFrom, Function<I, T> mapper) {
 		return new TaggedAccessHelper<>(copyFrom.iterFunc, function -> copyFrom.andThen.accept(i -> function.apply(mapper.apply(i))), copyFrom.empty);
 	}
 
@@ -39,7 +36,7 @@ public class TaggedAccessHelper<T, F> extends AbstractInputAccessHelper<T, F> {
 		return create(func, and, mapper, null);
 	}
 
-	public TaggedAccessHelper(AbstractInputAccessHelper<T, F> copyFrom) {
+	public TaggedAccessHelper(AbstractAccessHelper<T, F> copyFrom) {
 		this(copyFrom.iterFunc, copyFrom.andThen, copyFrom.empty);
 	}
 

@@ -4,19 +4,18 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import io.github.astrarre.access.v0.api.Access;
-import io.github.astrarre.access.v0.api.helper.AbstractInputAccessHelper;
+import io.github.astrarre.access.v0.api.helper.AbstractAccessHelper;
 import io.github.astrarre.access.v0.api.helper.FunctionAccessHelper;
 import io.github.astrarre.util.v0.api.func.IterFunc;
 
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
 
-public class BlockStateAccessHelper<F> extends AbstractInputAccessHelper<BlockState, F> {
+public class BlockStateAccessHelper<F> extends AbstractAccessHelper<BlockState, F> {
 	protected final FunctionAccessHelper<BlockState, F> blockstate;
 	protected final BlockAccessHelper<F> block;
 
-	public BlockStateAccessHelper(AbstractInputAccessHelper<BlockState, F> copyFrom) {
+	public BlockStateAccessHelper(AbstractAccessHelper<BlockState, F> copyFrom) {
 		this(copyFrom.iterFunc, copyFrom.andThen, copyFrom.empty);
 	}
 

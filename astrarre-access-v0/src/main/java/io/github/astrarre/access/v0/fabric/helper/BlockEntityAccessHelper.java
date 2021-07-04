@@ -4,26 +4,24 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import io.github.astrarre.access.v0.api.Access;
-import io.github.astrarre.access.v0.api.helper.AbstractInputAccessHelper;
+import io.github.astrarre.access.v0.api.helper.AbstractAccessHelper;
 import io.github.astrarre.access.v0.api.helper.FunctionAccessHelper;
 import io.github.astrarre.util.v0.api.func.IterFunc;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.Entity;
 import net.minecraft.util.registry.Registry;
 
 /**
  * Advanced filtering for BlockEntity
  */
-public class BlockEntityAccessHelper<F> extends AbstractInputAccessHelper<BlockEntity, F> {
+public class BlockEntityAccessHelper<F> extends AbstractAccessHelper<BlockEntity, F> {
 	protected final FunctionAccessHelper<BlockEntity, F> blockEntity;
 	protected final FunctionAccessHelper<BlockEntityType<?>, F> blockEntityType;
 	protected final TaggedAccessHelper<BlockEntityType<?>, F> blockEntityTag;
 	protected final RegistryAccessHelper<BlockEntityType<?>, F> blockEntityTypeRegistry;
 
-	public BlockEntityAccessHelper(AbstractInputAccessHelper<BlockEntity, F> copyFrom) {
+	public BlockEntityAccessHelper(AbstractAccessHelper<BlockEntity, F> copyFrom) {
 		this(copyFrom.iterFunc, copyFrom.andThen, copyFrom.empty);
 	}
 
