@@ -13,6 +13,7 @@ import java.util.function.Supplier;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import io.github.astrarre.access.v0.api.entry.AccessAPIEntrypoint;
+import io.github.astrarre.access.v0.api.entry.AccessInitEntrypoint;
 import io.github.astrarre.util.v0.api.func.ArrayFunc;
 import io.github.astrarre.util.v0.api.func.IterFunc;
 import io.github.astrarre.access.v0.fabric.EntityAccess;
@@ -42,12 +43,15 @@ import net.fabricmc.loader.entrypoint.minecraft.hooks.EntrypointUtils;
 public class Access<F> {
 	/**
 	 * fired when a new access is created
+	 * @deprecated {@link AccessInitEntrypoint}
 	 */
+	@Deprecated
 	public static final Access<Consumer<Access<?>>> ON_ACCESS_INIT = new Access<>(Id.create("astrarre-access-v0", "on_access_init"), arr -> access -> {
 		for (Consumer<Access<?>> consumer : arr) {
 			consumer.accept(access);
 		}
 	});
+
 	static {
 		EntrypointUtils.invoke("astrarre-transfer-v0:access_entrypoint", AccessAPIEntrypoint.class, AccessAPIEntrypoint::onAccessAPIInit);
 	}
@@ -75,9 +79,13 @@ public class Access<F> {
 		this.id = id;
 		this.combiner = combiner;
 		this.recompile();
+
 		if(ON_ACCESS_INIT != null) {
 			ON_ACCESS_INIT.get().accept(this);
 		}
+
+		EntrypointUtils.invoke("astrarre:access", AccessInitEntrypoint.Generic.class, generic -> generic.onInit(this.id.mod(), this.id.path(), this));
+		EntrypointUtils.invoke("astrarre:access{"+id+"}", AccessInitEntrypoint.class, init -> init.onInit(this.id.mod(), this.id.path(), this));
 	}
 
 	/**
