@@ -56,6 +56,10 @@ public class ObjectKeyImpl<T> extends Key.Object<T> {
 			return this.getRootValue();
 		}
 
+		return this.top(transaction);
+	}
+
+	protected T top(Transaction transaction) {
 		return this.values.top();
 	}
 
@@ -70,6 +74,14 @@ public class ObjectKeyImpl<T> extends Key.Object<T> {
 	 * This method sets the backing object of this key
 	 */
 	protected void setRootValue(T val) {
-		this.values.set(0, val);
+		if(this.handler.inactive()) {
+			if(this.values.isEmpty()) {
+				this.values.add(0, val);
+			} else {
+				this.values.set(0, val);
+			}
+		} else {
+			throw new IllegalStateException("Cannot set root value when in transaction!");
+		}
 	}
 }

@@ -3,7 +3,7 @@ package io.github.astrarre.access.v0.fabric.func;
 import java.lang.reflect.Proxy;
 
 import io.github.astrarre.access.internal.AccessInternal;
-import io.github.astrarre.access.internal.SkippingWorldFunction;
+import io.github.astrarre.access.internal.world_function.SkippingWorldFunction;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.block.BlockState;

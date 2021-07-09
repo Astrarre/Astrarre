@@ -1,4 +1,4 @@
-package io.github.astrarre.access.internal;
+package io.github.astrarre.access.internal.world_function;
 
 import io.github.astrarre.access.v0.fabric.func.WorldFunction;
 import org.jetbrains.annotations.Nullable;

@@ -1,4 +1,4 @@
-package io.github.astrarre.access.internal;
+package io.github.astrarre.access.internal.world_function;
 
 import java.util.function.BinaryOperator;
 
@@ -11,16 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
-public class MergedAndThenWorldFunction<T> implements WorldFunction<T> {
-	private final BinaryOperator<T> merger;
-	private final WorldFunction<T> current, function;
-
-	public MergedAndThenWorldFunction(BinaryOperator<T> merger, WorldFunction<T> current, WorldFunction<T> function) {
-		this.merger = merger;
-		this.current = current;
-		this.function = function;
-	}
-
+public record MergedAndThenWorldFunction<T>(BinaryOperator<T> merger, WorldFunction<T> current, WorldFunction<T> function) implements WorldFunction<T> {
 	@Override
 	@Nullable
 	public T get(@Nullable Direction direction, BlockState state, World world, BlockPos pos, @Nullable BlockEntity entity) {

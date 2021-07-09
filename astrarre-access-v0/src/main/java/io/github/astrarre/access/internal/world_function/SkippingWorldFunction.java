@@ -1,4 +1,4 @@
-package io.github.astrarre.access.internal;
+package io.github.astrarre.access.internal.world_function;
 
 import java.util.function.Predicate;
 

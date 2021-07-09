@@ -1,9 +1,11 @@
 package io.github.astrarre.transfer.internal.compat;
 
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
+import io.github.astrarre.transfer.internal.CloneableRandom;
 import io.github.astrarre.transfer.internal.mixin.FishBucketItemAccess_EntityTypeAccess;
 import io.github.astrarre.transfer.v0.api.ReplacingParticipant;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
+import io.github.astrarre.transfer.v0.api.transaction.keys.MutableObjectKeyImpl;
 import io.github.astrarre.util.v0.fabric.MinecraftServers;
 
 import net.minecraft.entity.Entity;
@@ -21,8 +23,11 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
 
 public class FishBucketItemParticipant extends BucketItemParticipant {
+	private final MutableObjectKeyImpl<CloneableRandom> rand;
+
 	public FishBucketItemParticipant(ItemKey key, int quantity, ReplacingParticipant<ItemKey> container) {
 		super(key, quantity, container);
+		this.rand = MutableObjectKeyImpl.random(key.hashCode() + (((long)container.hashCode()) << 32) + quantity);
 	}
 
 	@Override
@@ -42,7 +47,7 @@ public class FishBucketItemParticipant extends BucketItemParticipant {
 					}
 					fish.setPos(this.origin().x, this.origin().y, this.origin().z);
 					LootContext context = new LootContext.Builder(overworld)
-							.random(overworld.random)
+							.random(this.rand.get(transaction))
 							.parameter(LootContextParameters.THIS_ENTITY, fish)
 							.parameter(LootContextParameters.DAMAGE_SOURCE, DamageSource.OUT_OF_WORLD)
 							.parameter(LootContextParameters.ORIGIN, this.origin())

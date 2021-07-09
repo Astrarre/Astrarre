@@ -104,4 +104,16 @@ public interface ItemKey extends Comparable<ItemKey> {
 		}
 		return i;
 	}
+
+	/**
+	 * all implementations implement hashcode
+	 */
+	@Override
+	int hashCode();
+
+	/**
+	 * all implementations implement equals
+	 */
+	@Override
+	boolean equals(Object other);
 }

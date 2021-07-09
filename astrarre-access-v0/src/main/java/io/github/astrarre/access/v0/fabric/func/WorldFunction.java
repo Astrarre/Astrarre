@@ -3,9 +3,9 @@ package io.github.astrarre.access.v0.fabric.func;
 import java.util.function.BinaryOperator;
 import java.util.function.Predicate;
 
-import io.github.astrarre.access.internal.AndThenWorldFunction;
-import io.github.astrarre.access.internal.MergedAndThenWorldFunction;
-import io.github.astrarre.access.internal.SkippingWorldFunction;
+import io.github.astrarre.access.internal.world_function.AndThenWorldFunction;
+import io.github.astrarre.access.internal.world_function.MergedAndThenWorldFunction;
+import io.github.astrarre.access.internal.world_function.SkippingWorldFunction;
 import io.github.astrarre.access.v0.fabric.cache.BlockData;
 import io.github.astrarre.util.v0.api.func.IterFunc;
 import org.jetbrains.annotations.Nullable;

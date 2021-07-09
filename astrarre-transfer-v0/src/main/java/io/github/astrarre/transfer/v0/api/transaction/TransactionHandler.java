@@ -32,4 +32,8 @@ public class TransactionHandler {
 		int nest = transaction.getNestLevel();
 		return !this.transactions.isEmpty() && this.transactions.topInt() == nest;
 	}
+
+	public boolean inactive() {
+		return this.transactions.isEmpty();
+	}
 }
