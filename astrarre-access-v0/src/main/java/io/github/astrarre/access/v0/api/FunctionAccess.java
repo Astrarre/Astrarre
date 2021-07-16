@@ -68,6 +68,7 @@ public class FunctionAccess<A, B> extends Access<Function<A, B>> {
 			}
 			return null;
 		});
+		this.accessHelper.forGenericProvider(this);
 		return this;
 	}
 

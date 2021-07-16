@@ -66,6 +66,9 @@ public class ItemAccess<T, C> extends Access<ItemFunction<T, C>> {
 			}
 			return null;
 		});
+		this.items.getItem().forGenericProvider(this);
+		this.items.getBlockItem().getBlock().forGenericProvider(this);
+		this.items.getBlockItem().getFluid().forGenericProvider(this);
 		return this;
 	}
 

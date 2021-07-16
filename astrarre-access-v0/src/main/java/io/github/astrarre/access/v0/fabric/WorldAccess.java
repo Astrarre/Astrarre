@@ -82,6 +82,9 @@ public class WorldAccess<T> extends Access<WorldFunction<T>> {
 			}
 			return null;
 		});
+		this.getBlockStateHelper().getBlock().getBlock().forGenericProvider(this);
+		this.getBlockStateHelper().getBlock().getFluid().forGenericProvider(this);
+		this.getBlockEntityHelper().getBlockEntity().forGenericProvider(this);
 		return this;
 	}
 

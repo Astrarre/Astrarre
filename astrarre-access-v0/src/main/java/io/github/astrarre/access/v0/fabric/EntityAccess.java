@@ -65,6 +65,7 @@ public class EntityAccess<T> extends Access<EntityFunction<T>> {
 			}
 			return null;
 		});
+		this.helper.getEntity().forGenericProvider(this);
 		return this;
 	}
 

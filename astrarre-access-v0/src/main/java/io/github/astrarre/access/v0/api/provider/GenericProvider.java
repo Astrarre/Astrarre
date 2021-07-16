@@ -29,4 +29,5 @@ public interface GenericProvider<F> {
 	 * @return whatever value the access is supposed to want
 	 */
 	@Nullable F get(Access<F> access);
+
 }

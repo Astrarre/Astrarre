@@ -42,6 +42,12 @@ public class BiFunctionAccess<A, B, C> extends Access<BiFunction<A, B, C>> {
 		this.bHelper = new FunctionAccessHelper<>(this, function -> (a, b) -> function.apply(b).apply(a, b));
 	}
 
+	public BiFunctionAccess<A, B, C> addProviderFunction() {
+		this.aHelper.forGenericProvider(this);
+		this.bHelper.forGenericProvider(this);
+		return this;
+	}
+
 	/**
 	 * advanced filtering for the first passed instance
 	 */
