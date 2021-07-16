@@ -13,7 +13,7 @@ import io.github.astrarre.access.v0.api.provider.Provider;
 import io.github.astrarre.util.v0.api.Id;
 
 public class FunctionAccess<A, B> extends Access<Function<A, B>> {
-	private final FunctionAccessHelper<A, Function<A, B>> accessHelper;
+	public final FunctionAccessHelper<A, Function<A, B>> accessHelper;
 	private boolean addedProviderFunction, addedInstanceof;
 
 	/**
@@ -119,4 +119,6 @@ public class FunctionAccess<A, B> extends Access<Function<A, B>> {
 		this.accessHelper.forClassExact(type, (Function<A, B>) function);
 		return this;
 	}
+
+
 }

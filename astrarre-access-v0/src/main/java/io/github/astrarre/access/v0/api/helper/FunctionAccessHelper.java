@@ -8,6 +8,7 @@ import com.google.common.reflect.TypeToken;
 import io.github.astrarre.access.internal.CompiledFunctionClassValue;
 import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.access.v0.api.MapFilter;
+import io.github.astrarre.access.v0.api.provider.GenericProvider;
 import io.github.astrarre.access.v0.api.util.FunctionCompiler;
 import io.github.astrarre.util.v0.api.Id;
 import io.github.astrarre.util.v0.api.func.IterFunc;
@@ -21,14 +22,10 @@ import io.github.astrarre.util.v0.api.func.IterFunc;
 public class FunctionAccessHelper<T, F> extends AbstractAccessHelper<T, F> {
 	protected final MapFilter<T, F> filterStrong, filterWeak, filterExact;
 	protected final CompiledFunctionClassValue<F> filterClassExact;
-	protected boolean addedDirectImplementation;
+	protected boolean addedDirectImplementation, addedGenericProvider;
 
 	public FunctionAccessHelper(AbstractAccessHelper<T, F> copyFrom) {
 		this(copyFrom.iterFunc, copyFrom.andThen, copyFrom.empty);
-	}
-
-	public FunctionAccessHelper(Access<F> func, Function<Function<T, F>, F> adder) {
-		this(func.combiner, f -> func.andThen(adder.apply(f)), null);
 	}
 
 	/**
@@ -44,8 +41,33 @@ public class FunctionAccessHelper<T, F> extends AbstractAccessHelper<T, F> {
 		this.filterClassExact = new CompiledFunctionClassValue<>(func, empty);
 	}
 
+	public FunctionAccessHelper(Access<F> func, Function<Function<T, F>, F> adder) {
+		this(func.combiner, f -> func.andThen(adder.apply(f)), null);
+	}
+
 	public FunctionAccessHelper(IterFunc<F> func, Consumer<Function<T, F>> adder) {
 		this(func, adder, null);
+	}
+
+	/**
+	 * creates a new function helper who's incoming type is not the same as the type being filtered
+	 */
+	public static <I, T, F> FunctionAccessHelper<T, F> create(AbstractAccessHelper<I, F> copyFrom, Function<I, T> mapper) {
+		return new FunctionAccessHelper<>(copyFrom.iterFunc, Access.map(copyFrom.andThen, mapper), copyFrom.empty);
+	}
+
+	/**
+	 * creates a new function helper who's incoming type is not the same as the type being filtered
+	 */
+	public static <I, T, F> FunctionAccessHelper<T, F> create(IterFunc<F> func, Consumer<Function<I, F>> adder, Function<I, T> mapper, F empty) {
+		return new FunctionAccessHelper<>(func, Access.map(adder, mapper), empty);
+	}
+
+	/**
+	 * creates a new function helper who's incoming type is not the same as the type being filtered
+	 */
+	public static <I, T, F> FunctionAccessHelper<T, F> create(IterFunc<F> func, Consumer<Function<I, F>> adder, Function<I, T> mapper) {
+		return new FunctionAccessHelper<>(func, Access.map(adder, mapper), null);
 	}
 
 	/**
@@ -63,6 +85,27 @@ public class FunctionAccessHelper<T, F> extends AbstractAccessHelper<T, F> {
 				} else {
 					return this.empty;
 				}
+			});
+		}
+		return this;
+	}
+
+	/**
+	 * adds support for {@link GenericProvider}
+	 *
+	 * @param access the access this function helper
+	 * @see GenericProvider
+	 */
+	@SuppressWarnings("ALL")
+	public FunctionAccessHelper<T, F> forGenericProvider(Access<F> access) {
+		if(!this.addedGenericProvider) {
+			this.addedGenericProvider = true;
+			this.andThen.accept(t -> {
+				F func;
+				if(t instanceof GenericProvider<?> g && (func = (F) g.get((Access) access)) != null) {
+					return func;
+				}
+				return this.empty;
 			});
 		}
 		return this;
@@ -115,26 +158,5 @@ public class FunctionAccessHelper<T, F> extends AbstractAccessHelper<T, F> {
 		}
 		compiler.add(function);
 		return this;
-	}
-
-	/**
-	 * creates a new function helper who's incoming type is not the same as the type being filtered
-	 */
-	public static <I, T, F> FunctionAccessHelper<T, F> create(AbstractAccessHelper<I, F> copyFrom, Function<I, T> mapper) {
-		return new FunctionAccessHelper<>(copyFrom.iterFunc, Access.map(copyFrom.andThen, mapper), copyFrom.empty);
-	}
-
-	/**
-	 * creates a new function helper who's incoming type is not the same as the type being filtered
-	 */
-	public static <I, T, F> FunctionAccessHelper<T, F> create(IterFunc<F> func, Consumer<Function<I, F>> adder, Function<I, T> mapper, F empty) {
-		return new FunctionAccessHelper<>(func, Access.map(adder, mapper), empty);
-	}
-
-	/**
-	 * creates a new function helper who's incoming type is not the same as the type being filtered
-	 */
-	public static <I, T, F> FunctionAccessHelper<T, F> create(IterFunc<F> func, Consumer<Function<I, F>> adder, Function<I, T> mapper) {
-		return new FunctionAccessHelper<>(func, Access.map(adder, mapper), null);
 	}
 }
