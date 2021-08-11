@@ -120,6 +120,4 @@ public class FunctionAccess<A, B> extends Access<Function<A, B>> {
 		this.accessHelper.forClassExact(type, (Function<A, B>) function);
 		return this;
 	}
-
-
 }

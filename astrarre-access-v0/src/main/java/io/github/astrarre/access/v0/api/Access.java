@@ -5,8 +5,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -16,21 +14,22 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import io.github.astrarre.access.v0.api.entry.AccessAPIEntrypoint;
 import io.github.astrarre.access.v0.api.entry.AccessInitEntrypoint;
-import io.github.astrarre.util.v0.api.func.ArrayFunc;
-import io.github.astrarre.util.v0.api.func.IterFunc;
 import io.github.astrarre.access.v0.fabric.EntityAccess;
 import io.github.astrarre.access.v0.fabric.ItemAccess;
 import io.github.astrarre.access.v0.fabric.WorldAccess;
 import io.github.astrarre.util.v0.api.Id;
+import io.github.astrarre.util.v0.api.func.ArrayFunc;
+import io.github.astrarre.util.v0.api.func.IterFunc;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import net.fabricmc.loader.entrypoint.minecraft.hooks.EntrypointUtils;
 
 /**
- * An access is essentially a list of functions, like an event handler. Like a function, it allows for any number of inputs and an output.
- * To create an access you must have some way of combining all the listeners into one, so the output can be easily accessed.
- * Accesses can be circularly dependent on other Accesses.
+ * An access is essentially a list of functions, like an event handler. Like a function, it allows for any number of inputs and an output. To create
+ * an access you must have some way of combining all the listeners into one, so the output can be easily accessed. Accesses can be circularly
+ * dependent on other Accesses.
+ *
  * @param <F> a function type
  * @see BiFunctionAccess
  * @see FunctionAccess
@@ -38,34 +37,35 @@ import net.fabricmc.loader.entrypoint.minecraft.hooks.EntrypointUtils;
  * @see WorldAccess
  * @see ItemAccess
  */
-@SuppressWarnings ({
+@SuppressWarnings({
 		"unchecked",
 		"rawtypes"
 })
 public class Access<F> {
 	/**
 	 * fired when a new access is created
+	 *
 	 * @deprecated {@link AccessInitEntrypoint}
 	 */
-	@Deprecated
-	public static final Access<Consumer<Access<?>>> ON_ACCESS_INIT = new Access<>(Id.create("astrarre-access-v0", "on_access_init"), arr -> access -> {
-		for (Consumer<Access<?>> consumer : arr) {
-			consumer.accept(access);
-		}
-	});
+	@Deprecated public static final Access<Consumer<Access<?>>> ON_ACCESS_INIT = new Access<>(Id.create("astrarre-access-v0", "on_access_init"),
+	                                                                                          arr -> access -> {
+		                                                                                          for(Consumer<Access<?>> consumer : arr) {
+			                                                                                          consumer.accept(access);
+		                                                                                          }
+	                                                                                          });
 
 	static {
 		EntrypointUtils.invoke("astrarre-transfer-v0:access_entrypoint", AccessAPIEntrypoint.class, AccessAPIEntrypoint::onAccessAPIInit);
 	}
 
 	public final IterFunc<F> combiner;
-	protected final List<Object> delegates = new ArrayList<>();
-	protected List<Consumer<Access<F>>> listener;
-	protected F compiledFunction;
 	/**
 	 * the id of this access
 	 */
 	public final Id id;
+	protected final List<Object> delegates = new ArrayList<>();
+	protected List<Consumer<Access<F>>> listener;
+	protected F compiledFunction;
 
 	/**
 	 * @param combiner andThen
@@ -86,8 +86,9 @@ public class Access<F> {
 			ON_ACCESS_INIT.get().accept(this);
 		}
 
-		EntrypointUtils.invoke("astrarre:access", AccessInitEntrypoint.Generic.class, generic -> generic.onInit(this.id.mod(), this.id.path(), this));
-		EntrypointUtils.invoke("astrarre:access{"+id+"}", AccessInitEntrypoint.class, init -> init.onInit(this.id.mod(), this.id.path(), this));
+		EntrypointUtils.invoke("astrarre:access", AccessInitEntrypoint.Generic.class, generic -> generic.onInit(this.id.mod(), this.id.path(),
+		                                                                                                        this));
+		EntrypointUtils.invoke("astrarre:access{" + id + "}", AccessInitEntrypoint.class, init -> init.onInit(this.id.mod(), this.id.path(), this));
 	}
 
 	/**
@@ -125,7 +126,9 @@ public class Access<F> {
 
 	/**
 	 * Calling this function multiple times is ill-advised, you should store the Supplier somewhere
-	 * @return an invoker that contains all functions except those from the passed registries (the supplier should be called each time for it to be updated
+	 *
+	 * @return an invoker that contains all functions except those from the passed registries (the supplier should be called each time for it to be
+	 * 		updated
 	 */
 	@Contract("_ -> new")
 	public Supplier<F> getExcluding(Collection<Access<?>> accesses) {
@@ -148,6 +151,7 @@ public class Access<F> {
 
 	/**
 	 * adds a access dependency
+	 *
 	 * @param access the function to depend on
 	 * @return this
 	 */
@@ -158,6 +162,7 @@ public class Access<F> {
 
 	/**
 	 * adds a access dependency
+	 *
 	 * @param access the function to depend on
 	 * @param function a converter function to map the other access to this one
 	 * @return this
@@ -181,6 +186,7 @@ public class Access<F> {
 
 	/**
 	 * adds a access dependency, however it adds it to the front of this list, which means the function is called first
+	 *
 	 * @param access the function to depend on
 	 * @param function a converter function to map the other access to this one
 	 * @return this
@@ -210,28 +216,60 @@ public class Access<F> {
 		return this;
 	}
 
-	private <SilenceGenerics> Iterable<Object> getWithout(Collection<Access<?>> accesses) {
-		return Iterables.transform(Iterables.filter(this.delegates, o -> !(o instanceof Func && accesses.contains(((Func<?, ?>) o).dep))), delegate -> {
-			if(delegate instanceof Func) {
-				// our own delegate
-				Func<SilenceGenerics, F> current = (Func<SilenceGenerics, F>) delegate;
-				Func<SilenceGenerics, F> copied = new Func<>(current.dep, current.mapping);
+	/**
+	 * creates a new access with an array combiner, infers the class type. This wont always work, it only really works when the type is directly
+	 * known
+	 *
+	 * @param type type-reification
+	 */
+	@SafeVarargs
+	public static <F> Access<F> create(Id id, ArrayFunc<F> combiner, F... type) {
+		return new Access<>(id, combiner, (Class) type.getClass().componentType());
+	}
 
-				HashSet<Access<?>> newAccesses = new HashSet<>(accesses);
-				newAccesses.add(this);
-				Iterable<Object> val = current.dep.getWithout(newAccesses);
-				copied.inputs = val;
-				copied.delegate = current.mapping.apply(compile(val, current.dep.combiner));
-				return copied;
+	public static <I, T, F> Consumer<Function<T, F>> map(Consumer<Function<I, F>> adder, Function<I, T> mapper) {
+		return function -> adder.accept(i -> function.apply(mapper.apply(i)));
+	}
+
+	public static <I, T, F> Function<Function<T, F>, F> map(Function<Function<I, F>, F> adder, Function<I, T> mapper) {
+		return function -> adder.apply(i -> function.apply(mapper.apply(i)));
+	}
+
+	private static <A> A compile(Iterable<Object> vals, IterFunc<A> combine) {
+		return combine.combine(Iterables.transform(vals, o -> {
+			if(o instanceof Func) {
+				return (A) ((Func<?, ?>) o).delegate;
 			}
-			return delegate;
-		});
+			return (A) o;
+		}));
+	}
+
+	private <SilenceGenerics> Iterable<Object> getWithout(Collection<Access<?>> accesses) {
+		return Iterables.transform(Iterables.filter(this.delegates, o -> !(o instanceof Func && accesses.contains(((Func<?, ?>) o).dep))),
+		                           delegate -> {
+			                           if(delegate instanceof Func) {
+				                           // our own delegate
+				                           Func<SilenceGenerics, F> current = (Func<SilenceGenerics, F>) delegate;
+				                           Func<SilenceGenerics, F> copied = new Func<>(current.dep, current.mapping);
+
+				                           HashSet<Access<?>> newAccesses = new HashSet<>(accesses);
+				                           newAccesses.add(this);
+				                           Iterable<Object> val = current.dep.getWithout(newAccesses);
+				                           copied.inputs = val;
+				                           copied.delegate = current.mapping.apply(compile(val, current.dep.combiner));
+				                           return copied;
+			                           }
+			                           return delegate;
+		                           });
 	}
 
 	private <E> Access<F> dependsOn(Access<E> access, Function<E, F> function, boolean end) {
 		Func<E, F> dependency = new Func<>(access, function);
-		if(end) this.delegates.add(dependency);
-		else this.delegates.add(0, dependency);
+		if(end) {
+			this.delegates.add(dependency);
+		} else {
+			this.delegates.add(0, dependency);
+		}
 		Consumer<Access<E>> consumer = a -> {
 			HashSet<Access<?>> accesses = new HashSet<>();
 			Iterable<Object> inputs = a.getWithout(accesses);
@@ -246,6 +284,25 @@ public class Access<F> {
 		return this;
 	}
 
+	/**
+	 * recombines the listeners into one function (should be called when the delegates list is updated)
+	 */
+	protected void recompile() {
+		this.compiledFunction = this.combiner.combine(() -> Iterators.transform(this.delegates.iterator(), this::get));
+		if(this.listener != null) {
+			for(Consumer<Access<F>> consumer : this.listener) {
+				consumer.accept(this);
+			}
+		}
+	}
+
+	protected F get(Object o) {
+		if(o instanceof Access.Func) {
+			return ((Func<?, F>) o).delegate;
+		}
+		return (F) o;
+	}
+
 	private static final class Func<Entries, Target> {
 		private final Access<Entries> dep;
 		private final Function<Entries, Target> mapping;
@@ -258,74 +315,31 @@ public class Access<F> {
 		}
 
 		@Override
-		public boolean equals(Object o) {
-			if (this == o) {
-				return true;
-			}
-			if (!(o instanceof Func)) {
-				return false;
-			}
-
-			Func<?, ?> func = (Func<?, ?>) o;
-
-			if (!Objects.equals(this.dep, func.dep)) {
-				return false;
-			}
-			if (!Objects.equals(this.mapping, func.mapping)) {
-				return false;
-			}
-			return Iterables.elementsEqual(this.inputs, func.inputs);
-		}
-
-		@Override
 		public int hashCode() {
 			int result = this.dep != null ? this.dep.hashCode() : 0;
 			result = 31 * result + (this.mapping != null ? this.mapping.hashCode() : 0);
 			result = 31 * result + (this.delegate != null ? this.delegate.hashCode() : 0);
 			return result;
 		}
-	}
 
-	private static <A> A compile(Iterable<Object> vals, IterFunc<A> combine) {
-		return combine.combine(Iterables.transform(vals, o -> {
-			if(o instanceof Func) return (A)((Func<?, ?>) o).delegate;
-			return (A)o;
-		}));
-	}
-
-	/**
-	 * recombines the listeners into one function (should be called when the delegates list is updated)
-	 */
-	protected void recompile() {
-		this.compiledFunction = this.combiner.combine(() -> Iterators.transform(this.delegates.iterator(), this::get));
-		if (this.listener != null) {
-			for (Consumer<Access<F>> consumer : this.listener) {
-				consumer.accept(this);
+		@Override
+		public boolean equals(Object o) {
+			if(this == o) {
+				return true;
 			}
+			if(!(o instanceof Func)) {
+				return false;
+			}
+
+			Func<?, ?> func = (Func<?, ?>) o;
+
+			if(!Objects.equals(this.dep, func.dep)) {
+				return false;
+			}
+			if(!Objects.equals(this.mapping, func.mapping)) {
+				return false;
+			}
+			return Iterables.elementsEqual(this.inputs, func.inputs);
 		}
-	}
-
-	protected F get(Object o) {
-		if (o instanceof Access.Func) {
-			return ((Func<?, F>) o).delegate;
-		}
-		return (F) o;
-	}
-
-	/**
-	 * creates a new access with an array combiner, infers the class type. This wont always work, it only really works when the type is directly known
-	 * @param type type-reification
-	 */
-	@SafeVarargs
-	public static <F> Access<F> create(Id id, ArrayFunc<F> combiner, F...type) {
-		return new Access<>(id, combiner, (Class)type.getClass().componentType());
-	}
-
-	public static <I, T, F> Consumer<Function<T, F>> map(Consumer<Function<I, F>> adder, Function<I, T> mapper) {
-		return function -> adder.accept(i -> function.apply(mapper.apply(i)));
-	}
-
-	public static <I, T, F> Function<Function<T, F>, F> map(Function<Function<I, F>, F> adder, Function<I, T> mapper) {
-		return function -> adder.apply(i -> function.apply(mapper.apply(i)));
 	}
 }

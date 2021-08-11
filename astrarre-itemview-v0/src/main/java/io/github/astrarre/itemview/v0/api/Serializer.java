@@ -66,6 +66,7 @@ public interface Serializer<T> extends Copier<T> {
 	 * @return a new instance read from the input
 	 */
 	T read(NbtValue value);
+
 	NbtValue save(T instance);
 
 	default void save(NBTagView.Builder tag, String value, T object) {

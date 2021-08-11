@@ -307,13 +307,10 @@ public interface NBTagView extends Iterable<String>, NbtValue {
 		default <T> Builder put(String path, Serializer<T> type, T object) {
 			return this.putValue(path, type.save(object));
 		}
-
 		default Builder putSerializable(String path, Serializable serializable) {
 			return this.putValue(path, serializable.save());
 		}
-
 		Builder putValue(String path, NbtValue value);
-
 		NBTagView build();
 	}
 }

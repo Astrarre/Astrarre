@@ -20,3 +20,5 @@ include 'astrarre-transfer-compat-v0'
 include 'astrarre-components-v0'
 include 'astrarre-event-core-v0'
 include 'astrarre-event-entity-v0'
+include 'astrarre-gui-v1'
+
