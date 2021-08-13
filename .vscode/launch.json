@@ -1,0 +1,35 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Minecraft Client",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/run",
+      "console": "internalConsole",
+      "stopOnEntry": false,
+      "mainClass": "net.fabricmc.devlaunchinjector.Main",
+      "vmArgs": "-Dfabric.dli.config\u003dC:\\Users\\devan\\Documents\\Java\\f2bb\\Astrarre\\.gradle\\loom-cache\\launch.cfg -Dfabric.dli.env\u003dclient -Dfabric.dli.main\u003dnet.minecraftforge.userdev.LaunchTesting",
+      "args": "",
+      "env": {
+        "MOD_CLASSES": "main_a0a68c0%%C:\\Users\\devan\\Documents\\Java\\f2bb\\Astrarre\\build\\resources\\main;main_a0a68c0%%C:\\Users\\devan\\Documents\\Java\\f2bb\\Astrarre\\build\\classes\\java\\main"
+      },
+      "projectName": ""
+    },
+    {
+      "type": "java",
+      "name": "Minecraft Server",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/run",
+      "console": "internalConsole",
+      "stopOnEntry": false,
+      "mainClass": "net.fabricmc.devlaunchinjector.Main",
+      "vmArgs": "-Dfabric.dli.config\u003dC:\\Users\\devan\\Documents\\Java\\f2bb\\Astrarre\\.gradle\\loom-cache\\launch.cfg -Dfabric.dli.env\u003dserver -Dfabric.dli.main\u003dnet.minecraftforge.userdev.LaunchTesting",
+      "args": "nogui",
+      "env": {
+        "MOD_CLASSES": "main_de62c0a%%C:\\Users\\devan\\Documents\\Java\\f2bb\\Astrarre\\build\\resources\\main;main_de62c0a%%C:\\Users\\devan\\Documents\\Java\\f2bb\\Astrarre\\build\\classes\\java\\main"
+      },
+      "projectName": ""
+    }
+  ]
+}

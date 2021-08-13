@@ -1,0 +1,3 @@
+loom {
+    accessWidener = file("$projectDir/src/main/resources/astrarre-rendering.accesswidener")
+}
