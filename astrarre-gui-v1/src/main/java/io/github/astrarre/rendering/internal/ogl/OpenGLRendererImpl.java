@@ -1,14 +1,13 @@
 package io.github.astrarre.rendering.internal.ogl;
 
 import java.util.Map;
-import java.util.WeakHashMap;
 import java.util.function.Function;
 
 import io.github.astrarre.rendering.internal.BufferAccess;
+import io.github.astrarre.rendering.internal.BufferData;
 import io.github.astrarre.rendering.v1.edge.OpenGLRenderer;
 import io.github.astrarre.rendering.v1.edge.Primitive;
 import io.github.astrarre.rendering.v1.edge.mem.BuiltDataStack;
-import io.github.astrarre.rendering.v1.edge.mem.DataStack;
 import io.github.astrarre.rendering.v1.edge.shader.Global;
 import io.github.astrarre.rendering.v1.edge.shader.ShaderSetting;
 import io.github.astrarre.rendering.v1.edge.shader.ShaderSettingInternal;
@@ -20,11 +19,12 @@ import io.github.astrarre.rendering.v1.edge.vertex.settings.VertexSettingInterna
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.VertexFormat.DrawMode;
+import net.minecraft.client.util.math.MatrixStack;
 
 @SuppressWarnings("unchecked")
 public class OpenGLRendererImpl implements OpenGLRenderer, BufferAccess, Function<VertexFormat<?>, Global> {
-	static final Map<VertexFormat<?>, Global> CONFIGS = new WeakHashMap<>();
-	static final DataStack CURRENT = new DataStack();
+	public final MatrixStack stack;
+	final Map<VertexFormat<?>, Global> config;
 	final BufferBuilder buffer;
 
 	VertexSetting<?> start = End.INSTANCE, current = End.INSTANCE;
@@ -33,8 +33,10 @@ public class OpenGLRendererImpl implements OpenGLRenderer, BufferAccess, Functio
 	BuiltDataStack oldStack;
 	DrawMode activeMode;
 
-	public OpenGLRendererImpl(BufferBuilder buffer) {
+	public OpenGLRendererImpl(MatrixStack stack, BufferBuilder buffer) {
+		this.stack = stack;
 		this.buffer = buffer;
+		this.config = ((BufferData) buffer).astrarre_configCache();
 	}
 
 	public void flush() {
@@ -43,7 +45,7 @@ public class OpenGLRendererImpl implements OpenGLRenderer, BufferAccess, Functio
 
 	@Override
 	public <F extends Global> F render(VertexFormat<F> format) {
-		return (F) CONFIGS.computeIfAbsent(format, this);
+		return (F) this.config.computeIfAbsent(format, this);
 	}
 
 	@Override

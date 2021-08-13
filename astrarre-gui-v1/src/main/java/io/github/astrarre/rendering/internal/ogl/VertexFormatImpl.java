@@ -4,13 +4,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.WeakHashMap;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import io.github.astrarre.rendering.internal.BufferAccess;
-import io.github.astrarre.rendering.v1.edge.Primitive;
 import io.github.astrarre.rendering.v1.edge.mem.BuiltDataStack;
+import io.github.astrarre.rendering.v1.edge.mem.DataStack;
 import io.github.astrarre.rendering.v1.edge.shader.Global;
 import io.github.astrarre.rendering.v1.edge.shader.ShaderSetting;
 import io.github.astrarre.rendering.v1.edge.vertex.VertexFormat;
@@ -19,13 +17,13 @@ import io.github.astrarre.rendering.v1.edge.vertex.settings.VertexSetting;
 import io.github.astrarre.rendering.v1.edge.vertex.settings.VertexSettingInternal;
 import io.github.astrarre.util.v0.api.Validate;
 
-import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.VertexFormatElement;
 
 public final class VertexFormatImpl<F extends Global> implements VertexFormat<F> {
-	private final List<ShaderSetting.Factory<?>> shader;
-	private final Map<String, VertexSetting.Type<?>> vertex;
 	final net.minecraft.client.render.VertexFormat format;
+	final DataStack stack = new DataStack();
+	final List<ShaderSetting.Factory<?>> shader;
+	final Map<String, VertexSetting.Type<?>> vertex;
 
 	public VertexFormatImpl(List<ShaderSetting.Factory<?>> shader, Map<String, VertexSetting.Type<?>> vertex) {
 		var elementMap = ImmutableMap.<String, VertexFormatElement>builder();
@@ -61,7 +59,8 @@ public final class VertexFormatImpl<F extends Global> implements VertexFormat<F>
 		this.shader = shader;
 	}
 
-	public static <T extends Global> VertexFormat<T> create(net.minecraft.client.render.VertexFormat element, ShaderSetting.Factory<?>... factories) {
+	public static <T extends Global> VertexFormat<T> create(net.minecraft.client.render.VertexFormat element,
+			ShaderSetting.Factory<?>... factories) {
 		return new VertexFormatImpl<>(Arrays.asList(factories), element);
 	}
 
@@ -72,17 +71,41 @@ public final class VertexFormatImpl<F extends Global> implements VertexFormat<F>
 			current = type.factory().create(impl, this, current);
 		}
 
-		var prim = new PrimitiveImpl<>(impl, this, current);
-		Global global = prim;
+		PrimitiveSupplierImpl supplier = new PrimitiveSupplierImpl(impl, current);
+		Global global = supplier;
 		for(ShaderSetting.Factory<?> factory : this.shader) {
 			global = factory.create(global);
 		}
-		prim.outest = global;
+		supplier.outest = global;
 		return (F) global;
 	}
 
 	@Override
 	public net.minecraft.client.render.VertexFormat asMinecraft() {
 		return this.format;
+	}
+
+	private class PrimitiveSupplierImpl implements PrimitiveSupplier {
+		private final OpenGLRendererImpl impl;
+		private final VertexSetting<?> next;
+		private Global outest;
+
+		public PrimitiveSupplierImpl(OpenGLRendererImpl impl, VertexSetting<?> next) {
+			this.impl = impl;
+			this.next = next;
+		}
+
+		@Override
+		public PrimitiveImpl<?> create() {
+			BuiltDataStack stack = VertexFormatImpl.this.stack.build();
+			PrimitiveImpl primitive = new PrimitiveImpl<>(this.impl, VertexFormatImpl.this, this.next, stack);
+			primitive.outest = this.outest;
+			return primitive;
+		}
+
+		@Override
+		public DataStack getActive() {
+			return VertexFormatImpl.this.stack;
+		}
 	}
 }

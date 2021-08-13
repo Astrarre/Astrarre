@@ -13,57 +13,47 @@ public final class PrimitiveImpl<T extends VertexSetting<?>> implements Primitiv
 	final OpenGLRendererImpl $;
 	final T next;
 	final VertexFormat<?> format;
+	final BuiltDataStack stack;
 	Global outest;
-	DataStack active = OpenGLRendererImpl.CURRENT;
-	BuiltDataStack built;
 
-	public PrimitiveImpl(OpenGLRendererImpl $, VertexFormat<?> format, T next) {
+	public PrimitiveImpl(OpenGLRendererImpl $, VertexFormat<?> format, T next, BuiltDataStack stack) {
 		this.$ = $;
 		this.next = next;
 		this.format = format;
+		this.stack = stack;
 	}
 
 	@Override
 	public T quad() {
 		// todo setup shader settings
-		this.$.swapTo(outest, this.getBuilt(), this.format, DrawMode.QUADS);
+		this.$.swapTo(this.outest, this.stack, this.format, DrawMode.QUADS);
 		return this.next;
 	}
 
 	@Override
 	public T line() {
-		this.$.swapTo(outest, this.getBuilt(), this.format, DrawMode.LINES);
+		this.$.swapTo(this.outest, this.stack, this.format, DrawMode.LINES);
 		return this.next;
 	}
 
 	@Override
 	public T continuousLine() {
-		this.$.swapTo(outest, this.getBuilt(), this.format, DrawMode.LINE_STRIP);
+		this.$.swapTo(this.outest, this.stack, this.format, DrawMode.LINE_STRIP);
 		return this.next;
 	}
 
 	@Override
 	public T triangle() {
-		this.$.swapTo(outest, this.getBuilt(), this.format, DrawMode.TRIANGLES);
+		this.$.swapTo(this.outest, this.stack, this.format, DrawMode.TRIANGLES);
 		return this.next;
 	}
 
 	@Override
 	public void close() {
-
-	}
-
-	public BuiltDataStack getBuilt() {
-		BuiltDataStack stack = this.built;
-		if(stack == null) {
-			this.built = stack = OpenGLRendererImpl.CURRENT.build();
-			this.active = null;
-		}
-		return stack;
 	}
 
 	@Override
 	public DataStack getActive() {
-		return this.active;
+		throw new UnsupportedOperationException();
 	}
 }
