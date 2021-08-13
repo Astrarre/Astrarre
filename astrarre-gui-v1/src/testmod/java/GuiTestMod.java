@@ -1,3 +1,4 @@
+import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.astrarre.rendering.internal.Renderer3DImpl;
 import io.github.astrarre.rendering.v1.api.util.AngleFormat;
 import io.github.astrarre.util.v0.api.SafeCloseable;
@@ -26,19 +27,19 @@ public class GuiTestMod implements ModInitializer {
 					@Override
 					public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 						super.render(matrices, mouseX, mouseY, delta);
-						Renderer3DImpl impl = new Renderer3DImpl(matrices, Tessellator.getInstance().getBuffer());
+						Renderer3DImpl impl = new Renderer3DImpl(this.textRenderer, matrices, Tessellator.getInstance().getBuffer());
 						try {
-							//impl.line(0xFFFFaaFF, 0, 0, 0, 100);
-							try(SafeCloseable ignore = impl.scale(2, .5f, 1)) {
-								impl.fill().rect(0xFFaaffaa, 10, 10, 100, 100);
-								impl.outline().rect(0xFFFFFFFF, 5, 5, 105, 105);
-							}
+							//RenderSystem.lineWidth(10);
 
-							/*try(SafeCloseable ignore1 = impl.translate(30, 30, 30)) {
-								try(SafeCloseable ignore = impl.rotate(AngleFormat.DEGREES, System.currentTimeMillis() / 100f)) {
-									impl.outline().rect(0xFFFFFFFF, 5, 5, 105, 105);
-								}
+							/*try(SafeCloseable ignore = impl.scale(2, .5f, 1)) {
+								impl.fill().rect(0xFFaaffaa, 10, 10, 100, 100);
+								impl.outline().rect(0xFFFaaFFF, 5, 5, 105, 105);
 							}*/
+
+							//impl.line(0xFFFFaaFF, 0, 0, 10, 100, 100, 10);
+
+							impl.fill().rect(0xffaaaaaa, 20, 8, 120, 13);
+							impl.text(0xffffffff, 30, 10, true).renderScrollingText(new LiteralText("bruh_moment"), (System.currentTimeMillis() % 10_000) / 100f, 100, false);
 						} finally {
 							impl.flush();
 						}

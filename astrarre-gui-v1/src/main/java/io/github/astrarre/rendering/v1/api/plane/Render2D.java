@@ -1,7 +1,13 @@
 package io.github.astrarre.rendering.v1.api.plane;
 
+import java.util.List;
+
 import io.github.astrarre.rendering.v1.api.util.AngleFormat;
+import io.github.astrarre.util.v0.api.Edge;
 import io.github.astrarre.util.v0.api.SafeCloseable;
+
+import net.minecraft.text.OrderedText;
+import net.minecraft.text.Text;
 
 /**
  * todo make a transform builder or something, since we need to allocate an object for the closeable anyways
@@ -29,10 +35,12 @@ public interface Render2D {
 
 	ShapeRenderer outline();
 
+	TextRenderer text(int color, float x, float y, boolean shadow);
+
 	/**
 	 * @param color argb color
 	 */
-	void line(int color, float x1, float y1, float x2, float y2);
+	void line(int color, float x1, float y1, float x2, float y2); // todo add width?
 
 	default void deltaLine(int color, float x1, float y1, float dX, float dY) {
 		this.line(color, x1, y1, x1 + dX, y1 + dY);

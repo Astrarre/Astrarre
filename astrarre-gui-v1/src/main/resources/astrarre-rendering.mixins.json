@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "io.github.astrarre.rendering.internal.mixin",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+    "BufferBuilderMixin_Validate",
+    "FramebufferMixin_EnableStencil"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

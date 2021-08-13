@@ -9,6 +9,7 @@ import io.github.astrarre.rendering.v1.api.util.Point3f;
 
 import net.minecraft.util.math.Matrix4f;
 
+// todo impl directly on Matrix4f for speed, and replace the Pos & Friend methods with Transform3D and Transform2D
 public record MatrixTransform3D(Matrix4f matrix) implements Transform3D {
 	@Override
 	public void transform(Point2D point) {

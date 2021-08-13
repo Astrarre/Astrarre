@@ -5,14 +5,15 @@ import io.github.astrarre.rendering.v1.api.space.Transform3D;
 import io.github.astrarre.rendering.v1.api.util.AngleFormat;
 import io.github.astrarre.util.v0.api.SafeCloseable;
 
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Matrix4f;
 
 public class Renderer3DImpl extends Renderer2DImpl implements Render3D {
-	public Renderer3DImpl(MatrixStack stack, BufferBuilder consumer) {
-		super(stack, consumer);
+	public Renderer3DImpl(TextRenderer renderer, MatrixStack stack, BufferBuilder consumer) {
+		super(renderer, stack, consumer);
 	}
 
 	@Override
@@ -39,17 +40,12 @@ public class Renderer3DImpl extends Renderer2DImpl implements Render3D {
 	// we can in theory used sine squared instead of angles, the matrix stuff requires squared angles anyways
 
 	@Override
-	public SafeCloseable rotate(Direction.Axis axis, AngleFormat format, float theta) {
+	public SafeCloseable rotate(float axisX, float axisY, float axisZ, AngleFormat format, float theta) {
 		theta = format.convert(AngleFormat.RADIAN, theta);
 		float f = (float) Math.sin(theta / 2.0F);
-		float x = 0;
-		float y = 0;
-		float z = 0;
-		switch(axis) {
-			case X -> x = f;
-			case Y -> y = f;
-			case Z -> z = f;
-		}
+		float x = axisX * f;
+		float y = axisY * f;
+		float z = axisZ * f;
 		float w = (float) Math.cos(theta / 2.0F);
 		this.stack.push();
 		MatrixStack.Entry entry = this.stack.peek();
@@ -58,10 +54,24 @@ public class Renderer3DImpl extends Renderer2DImpl implements Render3D {
 	}
 
 	@Override
+	public SafeCloseable rotate(Direction.Axis axis, AngleFormat format, float theta) {
+		float x = 0;
+		float y = 0;
+		float z = 0;
+		switch(axis) {
+			case X -> x = 1;
+			case Y -> y = 1;
+			case Z -> z = 1;
+		}
+		return this.rotate(x, y, z, format, theta);
+	}
+
+	@Override
 	public void line(int color, float x1, float y1, float z1, float x2, float y2, float z2) {
 		this.push(SetupImpl.LINE);
 		int r = color & 0xFF, g = (color >> 8) & 0xFF, b = (color >> 16) & 0xFF, a = (color >> 24) & 0xFF;
 		Matrix4f matrix = this.stack.peek().getModel();
+
 		this.buffer.vertex(matrix, x1, y1, z1).color(r, g, b, a).next();
 		this.buffer.vertex(matrix, x2, y2, z2).color(r, g, b, a).next();
 	}

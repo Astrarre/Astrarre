@@ -17,7 +17,8 @@
     "fabricloader": ">=0.8.9"
   },
   "mixins": [
-    "astrarre-gui.mixins.json"
+    "astrarre-gui.mixins.json",
+    "astrarre-rendering.mixins.json"
   ],
   "accessWidener": "astrarre-rendering.accesswidener"
 }

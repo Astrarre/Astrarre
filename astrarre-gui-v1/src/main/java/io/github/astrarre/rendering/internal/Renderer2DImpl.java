@@ -1,24 +1,35 @@
 package io.github.astrarre.rendering.internal;
 
+import java.util.List;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.astrarre.rendering.v1.api.plane.Render2D;
 import io.github.astrarre.rendering.v1.api.plane.ShapeRenderer;
+import io.github.astrarre.rendering.v1.api.plane.TextRenderer;
 import io.github.astrarre.rendering.v1.api.plane.Texture;
 import io.github.astrarre.rendering.v1.api.plane.Transform2D;
 import io.github.astrarre.rendering.v1.api.util.AngleFormat;
+import io.github.astrarre.rendering.v1.edge.Stencil;
 import io.github.astrarre.util.v0.api.SafeCloseable;
 import io.github.astrarre.util.v0.api.Validate;
 
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.OrderedText;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Matrix3f;
 import net.minecraft.util.math.Matrix4f;
 
 public class Renderer2DImpl implements Render2D {
+	static final Stencil STENCIL = Stencil.newInstance();
+
+	final net.minecraft.client.font.TextRenderer renderer;
 	final MatrixStack stack;
 	final BufferBuilder buffer;
 	final SafeCloseable pop;
@@ -26,7 +37,8 @@ public class Renderer2DImpl implements Render2D {
 	final ShapeRenderer fill = new ShapeRendererImpl(SetupImpl.QUAD, SetupImpl.TRIANGLE, false);
 	Setup active;
 
-	public Renderer2DImpl(MatrixStack stack, BufferBuilder consumer) {
+	public Renderer2DImpl(net.minecraft.client.font.TextRenderer renderer, MatrixStack stack, BufferBuilder consumer) {
+		this.renderer = renderer;
 		this.stack = stack;
 		this.pop = stack::pop;
 		this.buffer = consumer;
@@ -81,30 +93,6 @@ public class Renderer2DImpl implements Render2D {
 		return this.pop;
 	}
 
-	static void multiply(Matrix4f model, Matrix3f normal, float x, float y, float z, float w) {
-		float j = 2.0F * x * x;
-		float k = 2.0F * y * y;
-		float l = 2.0F * z * z;
-		model.a00 = normal.a00 = 1.0F - k - l;
-		model.a11 = normal.a11 = 1.0F - l - j;
-		model.a22 = normal.a22 = 1.0F - j - k;
-
-		float m = x * y;
-		float n = y * z;
-		float o = z * x;
-		float p = x * w;
-		float q = y * w;
-		float r = z * w;
-		model.a10 = normal.a10 = 2.0F * (m + r);
-		model.a01 = normal.a01 = 2.0F * (m - r);
-		model.a20 = normal.a20 = 2.0F * (o - q);
-		model.a02 = normal.a02 = 2.0F * (o + q);
-		model.a21 = normal.a21 = 2.0F * (n + p);
-		model.a12 = normal.a12 = 2.0F * (n - p);
-
-		model.a33 = 1.0F;
-	}
-
 	@Override
 	public ShapeRenderer fill() {
 		return this.fill;
@@ -113,6 +101,11 @@ public class Renderer2DImpl implements Render2D {
 	@Override
 	public ShapeRenderer outline() {
 		return this.outline;
+	}
+
+	@Override
+	public TextRenderer text(int color, float x, float y, boolean shadow) {
+		return new TextRendererImpl(this.renderer, color, x, y, shadow);
 	}
 
 	@Override
@@ -139,10 +132,31 @@ public class Renderer2DImpl implements Render2D {
 
 	@Override
 	public void flush() {
-		Setup active = this.active;
-		if(active != null) {
-			active.takedown(this.buffer);
-		}
+		this.push(null);
+	}
+
+	static void multiply(Matrix4f model, Matrix3f normal, float x, float y, float z, float w) {
+		float j = 2.0F * x * x;
+		float k = 2.0F * y * y;
+		float l = 2.0F * z * z;
+		model.a00 = normal.a00 = 1.0F - k - l;
+		model.a11 = normal.a11 = 1.0F - l - j;
+		model.a22 = normal.a22 = 1.0F - j - k;
+
+		float m = x * y;
+		float n = y * z;
+		float o = z * x;
+		float p = x * w;
+		float q = y * w;
+		float r = z * w;
+		model.a10 = normal.a10 = 2.0F * (m + r);
+		model.a01 = normal.a01 = 2.0F * (m - r);
+		model.a20 = normal.a20 = 2.0F * (o - q);
+		model.a02 = normal.a02 = 2.0F * (o + q);
+		model.a21 = normal.a21 = 2.0F * (n + p);
+		model.a12 = normal.a12 = 2.0F * (n - p);
+
+		model.a33 = 1.0F;
 	}
 
 	final void push(Setup setup) {
@@ -159,11 +173,10 @@ public class Renderer2DImpl implements Render2D {
 	}
 
 	enum SetupImpl implements Setup {
-		LINE {
+		DEFAULT {
 			@Override
 			public void setup(BufferBuilder builder) {
-				RenderSystem.setShader(GameRenderer::getPositionColorShader);
-				builder.begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR);
+
 			}
 
 			@Override
@@ -171,16 +184,32 @@ public class Renderer2DImpl implements Render2D {
 				builder.end();
 				BufferRenderer.draw(builder);
 			}
+		}, LINE {
+			@Override
+			public void setup(BufferBuilder builder) {
+				RenderSystem.disableTexture();
+				RenderSystem.setShader(GameRenderer::getPositionColorShader);
+				builder.begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR);
+			}
+
+			@Override
+			public void takedown(BufferBuilder builder) {
+				DEFAULT.takedown(builder);
+				RenderSystem.disableColorLogicOp();
+				RenderSystem.enableTexture();
+				RenderSystem.depthMask(true);
+			}
 		}, TEXTURE {
 			@Override
 			public void setup(BufferBuilder builder) {
+
 				RenderSystem.setShader(GameRenderer::getPositionTexShader);
 				builder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
 			}
 
 			@Override
 			public void takedown(BufferBuilder builder) {
-				LINE.takedown(builder);
+				DEFAULT.takedown(builder);
 			}
 		}, OUTLINE {
 			@Override
@@ -194,29 +223,44 @@ public class Renderer2DImpl implements Render2D {
 			public void takedown(BufferBuilder builder) {
 				LINE.takedown(builder);
 			}
+		}, POS_COLOR {
+			@Override
+			public void setup(BufferBuilder builder) {
+				RenderSystem.enableBlend();
+				RenderSystem.disableTexture();
+				RenderSystem.defaultBlendFunc();
+				RenderSystem.setShader(GameRenderer::getPositionColorShader);
+			}
+
+			@Override
+			public void takedown(BufferBuilder builder) {
+				DEFAULT.takedown(builder);
+				RenderSystem.enableTexture();
+				RenderSystem.disableBlend();
+			}
 		}, QUAD {
 			@Override
 			public void setup(BufferBuilder builder) {
-				RenderSystem.setShader(GameRenderer::getPositionColorShader);
+				POS_COLOR.setup(builder);
 				builder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 			}
 
 			@Override
 			public void takedown(BufferBuilder builder) {
-				LINE.takedown(builder);
+				POS_COLOR.takedown(builder);
 			}
 		}, TRIANGLE {
 			@Override
 			public void setup(BufferBuilder builder) {
-				RenderSystem.setShader(GameRenderer::getPositionColorShader);
+				POS_COLOR.setup(builder);
 				builder.begin(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR);
 			}
 
 			@Override
 			public void takedown(BufferBuilder builder) {
-				LINE.takedown(builder);
+				POS_COLOR.takedown(builder);
 			}
-		};
+		}
 	}
 
 	interface Setup {
@@ -262,6 +306,117 @@ public class Renderer2DImpl implements Render2D {
 			if(this.close) {
 				Renderer2DImpl.this.buffer.vertex(matrix, x1, y1, 1).color(r, g, b, a).next();
 				Renderer2DImpl.this.push(null);
+			}
+		}
+	}
+
+	class TextRendererImpl implements TextRenderer {
+		final net.minecraft.client.font.TextRenderer renderer;
+		final int color;
+		final float x;
+		final float y;
+		final boolean shadow;
+
+		TextRendererImpl(net.minecraft.client.font.TextRenderer renderer, int color, float x, float y, boolean shadow) {
+			this.renderer = renderer;
+			this.color = color;
+			this.x = x;
+			this.y = y;
+			this.shadow = shadow;
+		}
+
+		@Override
+		public int textHeight() {
+			return this.renderer.fontHeight;
+		}
+
+		@Override
+		public int width(Text text) {
+			return this.renderer.getWidth(text);
+		}
+
+		@Override
+		public int width(String text) {
+			return this.renderer.getWidth(text);
+		}
+
+		@Override
+		public int width(OrderedText text) {
+			return this.renderer.getWidth(text);
+		}
+
+		@Override
+		public List<OrderedText> wrap(Text text, int width) {
+			return this.renderer.wrapLines(text, width);
+		}
+
+		@Override
+		public void renderWrappedText(Text text, int width) {
+			float y = this.y;
+			for(OrderedText line : this.renderer.wrapLines(text, width)) {
+				VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Renderer2DImpl.this.buffer);
+				Matrix4f matrix = Renderer2DImpl.this.stack.peek().getModel();
+				this.renderer.draw(line, this.x, y, this.color, this.shadow, matrix, immediate, false, 0, 15728880);
+				immediate.draw();
+				y += this.textHeight();
+			}
+		}
+
+		@Override
+		public void renderScrollingText(Text text, float offsetX, float width, boolean loop) {
+			int textWidth = this.width(text);
+			offsetX %= textWidth;
+
+
+			int id = STENCIL.startStencil(Stencil.Type.TRACING);
+
+			Renderer2DImpl.this.fill().rect(0xFFFFFFFF, this.x, this.y, width, this.textHeight());
+			Renderer2DImpl.this.flush();
+
+			STENCIL.fill(id);
+
+			float start = this.x - offsetX;
+			Matrix4f matrix = Renderer2DImpl.this.stack.peek().getModel();
+			while(start < (this.x + width)) {
+				this.draw(text.asOrderedText(), start, this.y, this.color, matrix, this.shadow);
+				start += textWidth + 3; // we use the computed textWidth instead cus otherwise it jitters
+			}
+
+			STENCIL.endStencil(id);
+		}
+
+		@Override
+		public void render(Text text) {
+			this.render(text.asOrderedText());
+		}
+
+		@Override
+		public void render(OrderedText text) {
+			Matrix4f matrix = Renderer2DImpl.this.stack.peek().getModel();
+			this.draw(text, this.x, this.y, this.color, matrix, this.shadow);
+		}
+
+		@Override
+		public void render(String text) {
+			Matrix4f matrix = Renderer2DImpl.this.stack.peek().getModel();
+			this.draw(text, this.x, this.y, this.color, matrix, this.shadow, this.renderer.isRightToLeft());
+		}
+
+		private int draw(OrderedText text, float x, float y, int color, Matrix4f matrix, boolean shadow) {
+			VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Renderer2DImpl.this.buffer);
+			int i = this.renderer.draw(text, x, y, color, shadow, matrix, immediate, false, 0, 15728880);
+			immediate.draw();
+			return i;
+		}
+
+		private int draw(String text, float x, float y, int color, Matrix4f matrix, boolean shadow, boolean mirror) {
+			if (text == null) {
+				return 0;
+			} else {
+				VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Renderer2DImpl.this.buffer);
+				int i = this.renderer.draw(text, x, y, color, shadow, matrix, immediate, false, 0, 15728880, mirror);
+				immediate.draw();
+				return i;
 			}
 		}
 	}

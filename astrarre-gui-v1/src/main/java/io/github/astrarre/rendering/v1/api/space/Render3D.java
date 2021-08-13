@@ -20,6 +20,12 @@ public interface Render3D extends Render2D {
 	}
 
 	/**
+	 * rotate the renderer about a custom axis.
+	 * @see #rotate(Direction.Axis, AngleFormat, float)
+	 */
+	SafeCloseable rotate(float axisX, float axisY, float axisZ, AngleFormat format, float theta);
+
+	/**
 	 * To make sense of rotations, imagine an airplane who's nose is coming out of the screen.
 	 * Roll rotates the aircraft around, after a 90 degree rotation, looking up from the cockpit would give you a few of the horizon.
 	 * Pitch rotates the aircraft up or down, so a 90 degree rotation would have the plane going straight up or straight down.
