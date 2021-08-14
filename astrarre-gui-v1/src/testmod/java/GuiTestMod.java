@@ -59,9 +59,9 @@ public class GuiTestMod implements ModInitializer {
 		var icon = renderer.render(VertexFormat.POS_TEX).texture(DrawableHelper.GUI_ICONS_TEXTURE);
 		var stats = renderer.render(VertexFormat.POS_TEX).texture(DrawableHelper.STATS_ICON_TEXTURE);
 		icon.quad().pos(0, 0, 0).tex(0, 0);
-		icon.quad().pos(0, 25, 0).tex(0, 1); // 9th starting from 1
-		icon.quad().pos(25, 25, 0).tex(1, 1); // 10th
-		icon.quad().pos(25, 0, 0).tex(1, 0); // 9th
+		icon.quad().pos(0, 25, 0).tex(0, 1);
+		icon.quad().pos(25, 25, 0).tex(1, 1);
+		icon.quad().pos(25, 0, 0).tex(1, 0);
 
 		stats.quad().pos(25, 0, 0).tex(0, 0);
 		stats.quad().pos(25, 25, 0).tex(0, 1);
