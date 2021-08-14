@@ -20,17 +20,19 @@ public final class BuiltDataStack {
 	final ByteBuf primitives;
 	final List<Object> objects;
 	int objectsIndex;
-	
+
 	public BuiltDataStack(ByteBuf primitives, List<Object> objects) {
 		this.primitives = primitives;
 		this.objects = objects;
 	}
 
 	public void reset() {
-		this.primitives.readerIndex(0);
+		if(this.primitives != null) {
+			this.primitives.readerIndex(0);
+		}
 		this.objectsIndex = 0;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public <T> T pop() {
 		return (T) this.objects.get(this.objectsIndex++);

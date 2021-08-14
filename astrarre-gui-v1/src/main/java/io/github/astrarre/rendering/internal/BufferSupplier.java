@@ -5,6 +5,6 @@ import io.github.astrarre.rendering.v1.edge.vertex.settings.VertexSetting;
 
 import net.minecraft.client.render.BufferBuilder;
 
-public interface BufferAccess {
+public interface BufferSupplier {
 	BufferBuilder getBuffer(VertexSetting<?> setting, VertexFormat<?> settings);
 }

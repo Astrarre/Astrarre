@@ -119,7 +119,7 @@ public final class DataStack {
 	public BuiltDataStack build() {
 		ByteBuf prims = this.primitives;
 		List<Object> objs = this.objects;
-		if(prims.writerIndex() == 0 && objs.isEmpty()) {
+		if(prims == null && objs == null) {
 			return BuiltDataStack.EMPTY;
 		} else {
 			this.primitives = null;

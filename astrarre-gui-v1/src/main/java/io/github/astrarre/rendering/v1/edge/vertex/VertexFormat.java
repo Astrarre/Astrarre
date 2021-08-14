@@ -1,19 +1,13 @@
 package io.github.astrarre.rendering.v1.edge.vertex;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 import com.google.common.collect.ImmutableMap;
-import io.github.astrarre.rendering.internal.BufferAccess;
 import io.github.astrarre.rendering.internal.ogl.OpenGLRendererImpl;
 import io.github.astrarre.rendering.internal.ogl.VertexFormatImpl;
-import io.github.astrarre.rendering.v1.edge.OpenGLRenderer;
 import io.github.astrarre.rendering.v1.edge.Primitive;
 import io.github.astrarre.rendering.v1.edge.shader.Global;
 import io.github.astrarre.rendering.v1.edge.shader.Image;
@@ -28,9 +22,8 @@ import io.github.astrarre.rendering.v1.edge.vertex.settings.VertexSetting;
 import io.github.astrarre.util.v0.api.Edge;
 import org.jetbrains.annotations.ApiStatus;
 
-import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.util.Identifier;
 
 /**
@@ -39,9 +32,9 @@ import net.minecraft.util.Identifier;
  * @param <F>
  */
 public interface VertexFormat<F extends Global> {
-	VertexFormat<Primitive<Pos<Color<End>>>> POS_COLOR = VertexFormatImpl.create(VertexFormats.POSITION_COLOR);
-	VertexFormat<Image<Primitive<Pos<Tex<End>>>>> POS_TEX = VertexFormatImpl.create(VertexFormats.POSITION_TEXTURE, ShaderSetting.image());
-	VertexFormat<Primitive<Pos<Color<Normal<Pad<End>>>>>> LINES = VertexFormatImpl.create(VertexFormats.LINES);
+	VertexFormat<Primitive<Pos<Color<End>>>> POS_COLOR = VertexFormatImpl.create(GameRenderer::getPositionColorShader, VertexFormats.POSITION_COLOR);
+	VertexFormat<Image<Primitive<Pos<Tex<End>>>>> POS_TEX = VertexFormatImpl.create(GameRenderer::getPositionTexShader, VertexFormats.POSITION_TEXTURE, ShaderSetting.image());
+	VertexFormat<Primitive<Pos<Color<Normal<Pad<End>>>>>> LINES = VertexFormatImpl.create(GameRenderer::getRenderTypeLinesShader, VertexFormats.LINES);
 
 	static VertexSettingsBuilder<End> create() {
 		return new VertexSettingsBuilder<>();
@@ -55,6 +48,8 @@ public interface VertexFormat<F extends Global> {
 
 	@Edge
 	net.minecraft.client.render.VertexFormat asMinecraft();
+
+	void loadShader();
 
 	class VertexSettingsBuilder<F extends VertexSetting<?>> {
 		final Map<String, VertexSetting.Type<?>> vertex = new LinkedHashMap<>(); // order must be preserved
@@ -86,7 +81,10 @@ public interface VertexFormat<F extends Global> {
 		}
 
 		public VertexFormat<F> build(Identifier shaderId) {
-			return new VertexFormatImpl<>(this.shader, this.vertex);
+			if(!shaderId.equals(new Identifier(shaderId.getPath()))) {
+				throw new UnsupportedOperationException("mod-specific shader ids not yet supported!");
+			}
+			return new VertexFormatImpl<>(shaderId, this.shader, this.vertex);
 		}
 	}
 }

@@ -4,8 +4,9 @@
   "compatibilityLevel": "JAVA_16",
   "mixins": [
     "BufferBuilderMixin_BufferDataImpl",
-    "BufferBuilderMixin_Validate",
-    "FramebufferMixin_EnableStencil"
+    "FramebufferMixin_EnableStencil",
+    "GameRendererAccess",
+    "GameRendererMixin_LoadShaders"
   ],
   "client": [
   ],

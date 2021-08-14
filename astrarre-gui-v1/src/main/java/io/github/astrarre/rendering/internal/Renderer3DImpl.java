@@ -1,8 +1,10 @@
 package io.github.astrarre.rendering.internal;
 
+import io.github.astrarre.rendering.internal.ogl.OpenGLRendererImpl;
 import io.github.astrarre.rendering.v1.api.space.Render3D;
 import io.github.astrarre.rendering.v1.api.space.Transform3D;
 import io.github.astrarre.rendering.v1.api.util.AngleFormat;
+import io.github.astrarre.rendering.v1.edge.OpenGLRenderer;
 import io.github.astrarre.util.v0.api.SafeCloseable;
 
 import net.minecraft.client.font.TextRenderer;
@@ -12,8 +14,20 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Matrix4f;
 
 public class Renderer3DImpl extends Renderer2DImpl implements Render3D {
+	final OpenGLRendererImpl renderer;
 	public Renderer3DImpl(TextRenderer renderer, MatrixStack stack, BufferBuilder consumer) {
+		this(renderer, stack, consumer, ((BufferData)consumer).getRenderer());
+	}
+
+	protected Renderer3DImpl(TextRenderer renderer, MatrixStack stack, BufferBuilder consumer, OpenGLRendererImpl glRenderer) {
 		super(renderer, stack, consumer);
+		this.renderer = glRenderer;
+		glRenderer.stack = stack;
+	}
+
+	@Override
+	public OpenGLRenderer ogl() {
+		return this.renderer;
 	}
 
 	@Override
@@ -74,5 +88,11 @@ public class Renderer3DImpl extends Renderer2DImpl implements Render3D {
 
 		this.buffer.vertex(matrix, x1, y1, z1).color(r, g, b, a).next();
 		this.buffer.vertex(matrix, x2, y2, z2).color(r, g, b, a).next();
+	}
+
+	@Override
+	public void flush() {
+		this.ogl().flush();
+		super.flush();
 	}
 }

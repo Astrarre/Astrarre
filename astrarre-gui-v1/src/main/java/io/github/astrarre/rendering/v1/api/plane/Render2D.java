@@ -25,16 +25,34 @@ public interface Render2D {
 	 */
 	SafeCloseable transform(Transform2D transform);
 
+	/**
+	 * @see #transform(Transform2D)
+	 */
 	SafeCloseable translate(float offX, float offY);
 
+	/**
+	 * @see #transform(Transform2D)
+	 */
 	SafeCloseable scale(float scaleX, float scaleY);
 
+	/**
+	 * @see #transform(Transform2D)
+	 */
 	SafeCloseable rotate(AngleFormat format, float theta);
 
+	/**
+	 * @return a shape renderer that fills in shapes
+	 */
 	ShapeRenderer fill();
 
+	/**
+	 * @return a shape renderer that render outlines of shapes
+	 */
 	ShapeRenderer outline();
 
+	/**
+	 * returns a text renderer
+	 */
 	TextRenderer text(int color, float x, float y, boolean shadow);
 
 	/**
@@ -47,10 +65,14 @@ public interface Render2D {
 	}
 
 	/**
+	 * renders a texture
 	 * @param texture the texture
 	 * @param width how big to draw the texture itself
 	 */
 	void texture(Texture texture, float offX, float offY, float width, float height);
 
+	/**
+	 * immediately renders any remaining bits to the screen
+	 */
 	void flush();
 }

@@ -2,12 +2,17 @@ package io.github.astrarre.rendering.v1.api.space;
 
 import io.github.astrarre.rendering.v1.api.plane.Render2D;
 import io.github.astrarre.rendering.v1.api.util.AngleFormat;
+import io.github.astrarre.rendering.v1.edge.OpenGLRenderer;
 import io.github.astrarre.util.v0.api.Edge;
 import io.github.astrarre.util.v0.api.SafeCloseable;
 
 import net.minecraft.util.math.Direction;
 
 public interface Render3D extends Render2D {
+
+	@Edge
+	OpenGLRenderer ogl();
+
 	SafeCloseable transform(Transform3D transform);
 
 	SafeCloseable translate(float offX, float offY, float offZ);
