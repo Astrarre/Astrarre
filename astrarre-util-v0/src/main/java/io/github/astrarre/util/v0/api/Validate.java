@@ -155,4 +155,12 @@ public class Validate {
 		if(input == null) return null;
 		return transform.apply(input, context);
 	}
+
+	public static IllegalArgumentException invalidArg(String s) {
+		throw new IllegalArgumentException(s);
+	}
+
+	public static int b2i(boolean bool) {
+		return bool ? 1 : 0;
+	}
 }

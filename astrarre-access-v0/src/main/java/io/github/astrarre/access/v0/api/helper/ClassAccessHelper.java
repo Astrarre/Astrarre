@@ -1,4 +1,4 @@
-package io.github.astrarre.access.v0.fabric.helper;
+package io.github.astrarre.access.v0.api.helper;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -9,27 +9,26 @@ import java.util.function.Function;
 import com.google.common.reflect.TypeToken;
 import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.access.v0.api.MapFilter;
-import io.github.astrarre.access.v0.api.helper.AbstractAccessHelper;
 import io.github.astrarre.util.v0.api.func.IterFunc;
 
-public class TypeAccessHelper<T, F> extends AbstractAccessHelper<Class<? extends T>, F> {
+public class ClassAccessHelper<T, F> extends AbstractAccessHelper<Class<? extends T>, F> {
 	protected final MapFilter<Class<? extends T>, F> filterClassExact;
 	protected final MapFilter<Class<? super T>, F> filterSuperClass, filterInterfaces;
 	protected final MapFilter<ParameterizedType, F> filterSuperType;
 
-	public TypeAccessHelper(AbstractAccessHelper<Class<? extends T>, F> copyFrom) {
+	public ClassAccessHelper(AbstractAccessHelper<Class<? extends T>, F> copyFrom) {
 		this(copyFrom.iterFunc, copyFrom.andThen, copyFrom.empty);
 	}
 
-	public TypeAccessHelper(AbstractAccessHelper<?, F> copyFrom, Consumer<Function<Class<? extends T>, F>> adder) {
+	public ClassAccessHelper(AbstractAccessHelper<?, F> copyFrom, Consumer<Function<Class<? extends T>, F>> adder) {
 		this(copyFrom.iterFunc, adder, copyFrom.empty);
 	}
 
-	public TypeAccessHelper(Access<F> access, Function<Function<Class<? extends T>, F>, F> transformer) {
+	public ClassAccessHelper(Access<F> access, Function<Function<Class<? extends T>, F>, F> transformer) {
 		this(access.combiner, func -> access.andThen(transformer.apply(func)), access.combiner.empty());
 	}
 
-	public TypeAccessHelper(IterFunc<F> func, Consumer<Function<Class<? extends T>, F>> adder, F empty) {
+	public ClassAccessHelper(IterFunc<F> func, Consumer<Function<Class<? extends T>, F>> adder, F empty) {
 		super(func, adder, empty);
 		this.filterClassExact = new MapFilter<>(func, empty);
 		this.filterSuperClass = new MapFilter<>(func, empty);
@@ -37,14 +36,14 @@ public class TypeAccessHelper<T, F> extends AbstractAccessHelper<Class<? extends
 		this.filterSuperType = new MapFilter<>(func, empty);
 	}
 
-	public TypeAccessHelper<T, F> forClassExact(Class<? extends T> type, F func) {
+	public ClassAccessHelper<T, F> forClassExact(Class<? extends T> type, F func) {
 		if(this.filterClassExact.add(type, func)) {
 			this.andThen.accept(this.filterClassExact::get);
 		}
 		return this;
 	}
 
-	public TypeAccessHelper<T, F> forClass(Class<? super T> type, F func) {
+	public ClassAccessHelper<T, F> forClass(Class<? super T> type, F func) {
 		if(type.isInterface()) {
 			if(this.filterInterfaces.add(type, func)) {
 				this.andThen.accept(this::getInterfaceFunction);
@@ -67,7 +66,7 @@ public class TypeAccessHelper<T, F> extends AbstractAccessHelper<Class<? extends
 		return this;
 	}
 
-	public TypeAccessHelper<T, F> forTypeGeneric(TypeToken<? extends T> token, F func) {
+	public ClassAccessHelper<T, F> forTypeGeneric(TypeToken<? extends T> token, F func) {
 		Type type = token.getType();
 		if(type instanceof Class c) {
 			return this.forClass(c, func);
@@ -78,7 +77,7 @@ public class TypeAccessHelper<T, F> extends AbstractAccessHelper<Class<? extends
 		}
 	}
 
-	public TypeAccessHelper<T, F> forTypeGeneric(ParameterizedType type, F func) {
+	public ClassAccessHelper<T, F> forTypeGeneric(ParameterizedType type, F func) {
 		if(((Class<?>)type.getRawType()).isInterface()) {
 			TypeToken<?> token = TypeToken.of(type);
 			this.andThen.accept(c -> {
@@ -87,24 +86,22 @@ public class TypeAccessHelper<T, F> extends AbstractAccessHelper<Class<? extends
 				}
 				return this.empty;
 			});
-		} else {
-			if(this.filterSuperType.add(type, func)) {
-				this.andThen.accept(c -> {
-					Type current = c.getGenericSuperclass();
-					while(current != null) {
-						if(current instanceof ParameterizedType paramType) {
-							F found = this.filterSuperType.get(paramType);
-							if(found != this.empty) {
-								return found;
-							}
-
-						} else {
-							current = ((Class<?>) current).getSuperclass();
+		} else if(this.filterSuperType.add(type, func)) {
+			this.andThen.accept(c -> {
+				Type current = c.getGenericSuperclass();
+				while(current != null) {
+					if(current instanceof ParameterizedType paramType) {
+						F found = this.filterSuperType.get(paramType);
+						if(found != this.empty) {
+							return found;
 						}
+
+					} else {
+						current = ((Class<?>) current).getSuperclass();
 					}
-					return this.empty;
-				});
-			}
+				}
+				return this.empty;
+			});
 		}
 		return this;
 	}

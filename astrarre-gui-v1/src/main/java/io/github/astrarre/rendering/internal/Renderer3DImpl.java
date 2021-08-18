@@ -1,37 +1,73 @@
 package io.github.astrarre.rendering.internal;
 
-import io.github.astrarre.rendering.internal.ogl.OpenGLRendererImpl;
-import io.github.astrarre.rendering.v1.api.space.Render3D;
-import io.github.astrarre.rendering.v1.api.space.Transform3D;
+import io.github.astrarre.rendering.internal.access.BufferBuilderAccess;
+import io.github.astrarre.rendering.internal.ogl.VertexRendererImpl;
+import io.github.astrarre.rendering.v1.api.space.item.ItemRenderer;
+import io.github.astrarre.rendering.v1.api.space.Render3d;
+import io.github.astrarre.rendering.v1.api.space.Transform3d;
+import io.github.astrarre.rendering.v1.api.space.item.ModelTransformType;
 import io.github.astrarre.rendering.v1.api.util.AngleFormat;
-import io.github.astrarre.rendering.v1.edge.OpenGLRenderer;
+import io.github.astrarre.rendering.v1.edge.VertexRenderer;
 import io.github.astrarre.util.v0.api.SafeCloseable;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Matrix4f;
+import net.minecraft.world.World;
 
-public class Renderer3DImpl extends Renderer2DImpl implements Render3D {
-	final OpenGLRendererImpl renderer;
-	public Renderer3DImpl(TextRenderer renderer, MatrixStack stack, BufferBuilder consumer) {
-		this(renderer, stack, consumer, ((BufferData)consumer).getRenderer());
+public class Renderer3DImpl extends Renderer2DImpl implements Render3d, ItemRenderer {
+	final net.minecraft.client.render.item.ItemRenderer itemRenderer;
+	final VertexRendererImpl renderer;
+
+
+	public Renderer3DImpl(TextRenderer renderer,
+			MatrixStack stack,
+			BufferBuilder consumer,
+			net.minecraft.client.render.item.ItemRenderer itemRenderer) {
+		this(renderer, stack, consumer, itemRenderer, ((BufferBuilderAccess)consumer).getRenderer());
 	}
 
-	protected Renderer3DImpl(TextRenderer renderer, MatrixStack stack, BufferBuilder consumer, OpenGLRendererImpl glRenderer) {
+	protected Renderer3DImpl(TextRenderer renderer,
+			MatrixStack stack,
+			BufferBuilder consumer,
+			net.minecraft.client.render.item.ItemRenderer itemRenderer,
+			VertexRendererImpl glRenderer) {
 		super(renderer, stack, consumer);
+		this.itemRenderer = itemRenderer;
 		this.renderer = glRenderer;
 		glRenderer.stack = stack;
 	}
 
 	@Override
-	public OpenGLRenderer ogl() {
+	public ItemRenderer item() {
+		return this;
+	}
+
+	@Override
+	public void render(ModelTransformType type,
+			@Nullable LivingEntity entity,
+			@Nullable World world,
+			ItemStack stack,
+			int light,
+			int overlay,
+			long seed) {
+		boolean leftHanded = type instanceof ModelTransformType.Holding h && h.hand == ModelTransformType.Hand.LEFT;
+		this.itemRenderer.renderItem(entity, stack, type.getMode(), leftHanded, this.stack, VertexConsumerProvider.immediate(this.buffer), world, light, overlay, (int)seed);
+	}
+
+	@Override
+	public VertexRenderer edge() {
 		return this.renderer;
 	}
 
 	@Override
-	public SafeCloseable transform(Transform3D transform) {
+	public SafeCloseable transform(Transform3d transform) {
 		return super.transform(transform);
 	}
 
@@ -82,6 +118,7 @@ public class Renderer3DImpl extends Renderer2DImpl implements Render3D {
 
 	@Override
 	public void line(int color, float x1, float y1, float z1, float x2, float y2, float z2) {
+
 		this.push(SetupImpl.LINE);
 		int r = color & 0xFF, g = (color >> 8) & 0xFF, b = (color >> 16) & 0xFF, a = (color >> 24) & 0xFF;
 		Matrix4f matrix = this.stack.peek().getModel();
@@ -92,7 +129,8 @@ public class Renderer3DImpl extends Renderer2DImpl implements Render3D {
 
 	@Override
 	public void flush() {
-		this.ogl().flush();
+		this.edge().flush();
 		super.flush();
 	}
+
 }

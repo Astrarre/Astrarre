@@ -3,11 +3,11 @@ package io.github.astrarre.rendering.internal;
 import java.util.List;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import io.github.astrarre.rendering.v1.api.plane.Render2D;
+import io.github.astrarre.rendering.v1.api.plane.Render2d;
 import io.github.astrarre.rendering.v1.api.plane.ShapeRenderer;
 import io.github.astrarre.rendering.v1.api.plane.TextRenderer;
 import io.github.astrarre.rendering.v1.api.plane.Texture;
-import io.github.astrarre.rendering.v1.api.plane.Transform2D;
+import io.github.astrarre.rendering.v1.api.plane.Transform2d;
 import io.github.astrarre.rendering.v1.api.util.AngleFormat;
 import io.github.astrarre.rendering.v1.edge.Stencil;
 import io.github.astrarre.util.v0.api.SafeCloseable;
@@ -16,7 +16,6 @@ import io.github.astrarre.util.v0.api.Validate;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -26,7 +25,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.Matrix3f;
 import net.minecraft.util.math.Matrix4f;
 
-public class Renderer2DImpl implements Render2D {
+public class Renderer2DImpl implements Render2d {
 	static final Stencil STENCIL = Stencil.newInstance();
 
 	final net.minecraft.client.font.TextRenderer renderer;
@@ -45,7 +44,7 @@ public class Renderer2DImpl implements Render2D {
 	}
 
 	@Override
-	public SafeCloseable transform(Transform2D transform) {
+	public SafeCloseable transform(Transform2d transform) {
 		MatrixStack old = this.stack;
 		MatrixTransform3D t = Validate.instanceOf(transform, MatrixTransform3D.class, "Custom Transform2Ds not yet supported!");
 		old.push();
@@ -195,7 +194,6 @@ public class Renderer2DImpl implements Render2D {
 			@Override
 			public void takedown(BufferBuilder builder) {
 				DEFAULT.takedown(builder);
-				RenderSystem.disableColorLogicOp();
 				RenderSystem.enableTexture();
 				RenderSystem.depthMask(true);
 			}

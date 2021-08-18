@@ -4,7 +4,7 @@ import java.util.function.Function;
 
 import com.google.common.reflect.TypeToken;
 import io.github.astrarre.access.v0.api.FunctionAccess;
-import io.github.astrarre.access.v0.fabric.helper.TypeAccessHelper;
+import io.github.astrarre.access.v0.api.helper.ClassAccessHelper;
 import io.github.astrarre.util.v0.api.Id;
 import org.junit.Assert;
 import org.junit.Before;
@@ -12,12 +12,12 @@ import org.junit.Test;
 
 public class TypeAccessTest {
 	public FunctionAccess<Object, Integer> testAccess;
-	public TypeAccessHelper<Object, Function<Object, Integer>> helper;
+	public ClassAccessHelper<Object, Function<Object, Integer>> helper;
 
 	@Before
 	public void setup() {
 		this.testAccess = new FunctionAccess<>(Id.create("access-test", "test"));
-		this.helper = new TypeAccessHelper<>(this.testAccess, function -> o -> function.apply(o.getClass()).apply(o));
+		this.helper = new ClassAccessHelper<>(this.testAccess, function -> o -> function.apply(o.getClass()).apply(o));
 	}
 
 	@Test

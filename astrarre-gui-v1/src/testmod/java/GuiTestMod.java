@@ -1,14 +1,11 @@
-import com.google.gson.Gson;
-import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.astrarre.rendering.internal.Renderer3DImpl;
-import io.github.astrarre.rendering.v1.api.space.Render3D;
-import io.github.astrarre.rendering.v1.edge.OpenGLRenderer;
+import io.github.astrarre.rendering.v1.api.space.Render3d;
+import io.github.astrarre.rendering.v1.edge.VertexRenderer;
 import io.github.astrarre.rendering.v1.edge.vertex.VertexFormat;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
@@ -43,7 +40,7 @@ public class GuiTestMod implements ModInitializer {
 		@Override
 		public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 			super.render(matrices, mouseX, mouseY, delta);
-			Render3D render = new Renderer3DImpl(this.textRenderer, matrices, Tessellator.getInstance().getBuffer());
+			Render3d render = new Renderer3DImpl(this.textRenderer, matrices, Tessellator.getInstance().getBuffer(), itemRenderer);
 			try {
 				extracted(render);
 			} catch(Exception e) {
@@ -54,8 +51,8 @@ public class GuiTestMod implements ModInitializer {
 		}
 	}
 	// start = pos, end = end
-	private static void extracted(Render3D render) {
-		OpenGLRenderer renderer = render.ogl();
+	private static void extracted(Render3d render) {
+		VertexRenderer renderer = render.edge();
 		var icon = renderer.render(VertexFormat.POS_TEX).texture(DrawableHelper.GUI_ICONS_TEXTURE);
 		var stats = renderer.render(VertexFormat.POS_TEX).texture(DrawableHelper.STATS_ICON_TEXTURE);
 		icon.quad().pos(0, 0, 0).tex(0, 0);

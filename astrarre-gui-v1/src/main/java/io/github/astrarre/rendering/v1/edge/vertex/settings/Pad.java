@@ -13,7 +13,7 @@ import net.minecraft.client.render.VertexFormats;
 public class Pad<Next extends VertexSetting<?>> extends VertexSetting<Next> {
 	static final Type<Pad<?>> TYPE = type(Pad::new, VertexFormats.PADDING_ELEMENT);
 
-	public Pad(BufferSupplier builder, VertexFormat<?> settings, VertexSetting next) {
+	public Pad(BufferSupplier builder, VertexFormat<?> settings, VertexSetting<?> next) {
 		super(builder, settings, next);
 	}
 

@@ -19,7 +19,7 @@ public abstract class VertexSetting<Next extends VertexSetting> {
 	final VertexFormat<?> settings;
 	final Next next;
 
-	public VertexSetting(BufferSupplier builder, VertexFormat<?> settings, VertexSetting next) {
+	public VertexSetting(BufferSupplier builder, VertexFormat<?> settings, VertexSetting<?> next) {
 		this.builder = builder;
 		this.settings = settings;
 		this.next = (Next) next;
@@ -59,6 +59,6 @@ public abstract class VertexSetting<Next extends VertexSetting> {
 			return (VertexSetting<T>) this.create0(builder, settings, val);
 		}
 
-		A create0(BufferSupplier builder, VertexFormat<?> settings, VertexSetting next);
+		A create0(BufferSupplier builder, VertexFormat<?> settings, VertexSetting<?> next);
 	}
 }

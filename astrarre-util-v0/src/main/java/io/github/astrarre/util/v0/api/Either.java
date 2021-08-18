@@ -1,57 +1,102 @@
 package io.github.astrarre.util.v0.api;
 
 import java.util.Objects;
+import java.util.function.Function;
 
 import org.jetbrains.annotations.Nullable;
 
+@SuppressWarnings("unchecked")
 public final class Either<A, B> {
+	private static final Either<?, ?> EMPTY_LEFT = new Either<>(null, true), EMPTY_RIGHT = new Either<>(null, true);
 	private final Object obj;
-	private final boolean side;
+	private final boolean a;
 
-	private Either(Object obj, boolean side) {
+	private Either(Object obj, boolean a) {
 		this.obj = obj;
-		this.side = side;
+		this.a = a;
 	}
 
 	public static <A, B> Either<A, B> eitherOr(boolean val, A a, B b) {
 		if(val) {
-			return ofLeft(a);
+			return a(a);
 		} else {
-			return ofRight(b);
+			return b(b);
 		}
 	}
 
-	public static <A, B> Either<A, B> ofLeft(A val) {
-		return new Either<>(val, true);
+	public static <A, B> Either<A, B> a(A val) {
+		if(val == null) {
+			return (Either<A, B>) EMPTY_LEFT;
+		} else {
+			return new Either<>(val, true);
+		}
 	}
 
-	public static <A, B> Either<A, B> ofRight(B val) {
-		return new Either<>(val, false);
+	public static <A, B> Either<A, B> b(B val) {
+		if(val == null) {
+			return (Either<A, B>) EMPTY_RIGHT;
+		} else {
+			return new Either<>(val, false);
+		}
 	}
 
 	/**
+	 * Cast the non-present variable
+	 *
 	 * @return the same object
 	 * @throws IllegalStateException if the left value is present
 	 */
-	public <C> Either<C, B> asLeft() {
-		if (!this.side) {
+	public <C> Either<C, B> asA() {
+		if(!this.a) {
 			return (Either<C, B>) this;
 		} else {
 			throw new IllegalStateException("Left value is present!");
 		}
 	}
 
-	public <C> Either<A, C> asRight() {
-		if (this.side) {
+	/**
+	 * Cast the non-present variable
+	 *
+	 * @return the same object
+	 * @throws IllegalStateException if the left value is present
+	 */
+	public <C> Either<A, C> asB() {
+		if(this.a) {
 			return (Either<A, C>) this;
 		} else {
 			throw new IllegalStateException("Left value is present!");
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	public <C> Either<A, C> castB() {
+		return (Either<A, C>) this;
+	}
+
+	@SuppressWarnings("unchecked")
+	public <C> Either<C, B> castA() {
+		return (Either<C, B>) this;
+	}
+
+	public <C> Either<C, B> mapA(Function<A, C> function) {
+		if(this.a) {
+			return a(function.apply((A) this.obj));
+		} else {
+			return (Either<C, B>) this;
+		}
+	}
+
+	public <C> Either<A, C> mapB(Function<A, C> function) {
+		if(this.a) {
+			return (Either<A, C>) this;
+		} else {
+			return b(function.apply((A) this.obj));
+		}
+	}
+
 	@Nullable
-	public A getLeft() {
-		if (this.side) {
+	public A getA() {
+		if(this.a) {
 			return (A) this.obj;
 		} else {
 			return null;
@@ -59,52 +104,43 @@ public final class Either<A, B> {
 	}
 
 	@Nullable
-	public B getRight() {
-		if (this.side) {
+	public B getB() {
+		if(this.a) {
 			return null;
 		} else {
 			return (B) this.obj;
 		}
 	}
 
-	public boolean hasRight() {
-		return !this.side;
+	public boolean hasA() {
+		return !this.a;
 	}
 
-	public boolean hasLeft() {
-		return this.side;
+	public boolean hasB() {
+		return this.a;
 	}
 
 	@Override
 	public int hashCode() {
 		int result = this.obj != null ? this.obj.hashCode() : 0;
-		result = 31 * result + (this.side ? 1 : 0);
+		result = 31 * result + (this.a ? 1 : 0);
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) {
+		if(this == o) {
 			return true;
 		}
-		if (!(o instanceof Either)) {
-			return false;
-		}
-
-		Either<?, ?> either = (Either<?, ?>) o;
-
-		if (this.side != either.side) {
-			return false;
-		}
-		return Objects.equals(this.obj, either.obj);
+		return o instanceof Either<?, ?> either && this.a == either.a && Objects.equals(this.obj, either.obj);
 	}
 
 	@Override
 	public String toString() {
-		if (this.side) {
-			return "[" + this.obj + ", null]";
+		if(this.a) {
+			return "[" + this.obj + ", ()]";
 		} else {
-			return "[null, " + this.obj + "]";
+			return "[(), " + this.obj + "]";
 		}
 	}
 }

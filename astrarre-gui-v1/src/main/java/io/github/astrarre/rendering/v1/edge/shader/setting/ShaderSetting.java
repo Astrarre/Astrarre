@@ -1,8 +1,9 @@
-package io.github.astrarre.rendering.v1.edge.shader;
+package io.github.astrarre.rendering.v1.edge.shader.setting;
 
 import io.github.astrarre.rendering.internal.ogl.PrimitiveSupplier;
 import io.github.astrarre.rendering.v1.edge.mem.BuiltDataStack;
 import io.github.astrarre.rendering.v1.edge.mem.DataStack;
+import io.github.astrarre.rendering.v1.edge.shader.Global;
 import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.util.Identifier;
@@ -15,13 +16,13 @@ public abstract class ShaderSetting<Next extends Global> implements Global {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <Next extends Global> Factory<Image<Next>> image() {
-		return (Factory) Image.FACTORY;
+	public static <Next extends Global> Factory<Img<Next>> image() {
+		return (Factory) Img.FACTORY;
 	}
 
 	/**
 	 * This is where u upload your shader's parameters.
-	 * @see Image#texture(Identifier)
+	 * @see Img#texture(Identifier)
 	 */
 	@Override
 	public DataStack getActive() {
@@ -29,10 +30,10 @@ public abstract class ShaderSetting<Next extends Global> implements Global {
 	}
 
 	@ApiStatus.OverrideOnly
-	public abstract void takedown(BuiltDataStack stack);
+	public abstract void disable(BuiltDataStack stack);
 
 	@ApiStatus.OverrideOnly
-	public abstract void setup(BuiltDataStack stack);
+	public abstract void enable(BuiltDataStack stack);
 
 	public Next getNext() {
 		Next next = this.next;

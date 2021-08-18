@@ -8,6 +8,15 @@ public abstract class Point3D extends Point2D implements Cloneable {
 	public static class Float extends Point3D {
 		float x, y, z;
 
+		public Float() {
+		}
+
+		public Float(float x, float y, float z) {
+			this.x = x;
+			this.y = y;
+			this.z = z;
+		}
+
 		@Override
 		public double getZ() {
 			return this.z;

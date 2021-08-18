@@ -10,13 +10,13 @@ import io.github.astrarre.rendering.v1.edge.vertex.settings.VertexSetting;
 import net.minecraft.client.render.VertexFormat.DrawMode;
 
 public final class PrimitiveImpl<T extends VertexSetting<?>> implements Primitive<T> {
-	final OpenGLRendererImpl $;
+	final VertexRendererImpl $;
 	final T next;
 	final VertexFormat<?> format;
 	final BuiltDataStack stack;
 	Global outest;
 
-	public PrimitiveImpl(OpenGLRendererImpl $, VertexFormat<?> format, T next, BuiltDataStack stack) {
+	public PrimitiveImpl(VertexRendererImpl $, VertexFormat<?> format, T next, BuiltDataStack stack) {
 		this.$ = $;
 		this.next = next;
 		this.format = format;
@@ -25,7 +25,6 @@ public final class PrimitiveImpl<T extends VertexSetting<?>> implements Primitiv
 
 	@Override
 	public T quad() {
-		// todo setup shader settings
 		this.$.swapTo(this.outest, this.stack, this.format, DrawMode.QUADS);
 		return this.next;
 	}

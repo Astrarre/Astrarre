@@ -1,5 +1,6 @@
-package io.github.astrarre.rendering.v1.edge.shader;
+package io.github.astrarre.rendering.v1.edge.shader.setting;
 
+import io.github.astrarre.rendering.v1.edge.shader.Global;
 import org.jetbrains.annotations.ApiStatus;
 
 /**

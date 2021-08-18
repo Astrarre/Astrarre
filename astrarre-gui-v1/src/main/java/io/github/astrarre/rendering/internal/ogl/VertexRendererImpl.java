@@ -5,12 +5,12 @@ import java.util.WeakHashMap;
 import java.util.function.Function;
 
 import io.github.astrarre.rendering.internal.BufferSupplier;
-import io.github.astrarre.rendering.v1.edge.OpenGLRenderer;
+import io.github.astrarre.rendering.v1.edge.VertexRenderer;
 import io.github.astrarre.rendering.v1.edge.Primitive;
 import io.github.astrarre.rendering.v1.edge.mem.BuiltDataStack;
 import io.github.astrarre.rendering.v1.edge.shader.Global;
-import io.github.astrarre.rendering.v1.edge.shader.ShaderSetting;
-import io.github.astrarre.rendering.v1.edge.shader.ShaderSettingInternal;
+import io.github.astrarre.rendering.v1.edge.shader.setting.ShaderSetting;
+import io.github.astrarre.rendering.v1.edge.shader.setting.ShaderSettingInternal;
 import io.github.astrarre.rendering.v1.edge.vertex.VertexFormat;
 import io.github.astrarre.rendering.v1.edge.vertex.settings.End;
 import io.github.astrarre.rendering.v1.edge.vertex.settings.VertexSetting;
@@ -22,25 +22,19 @@ import net.minecraft.client.render.VertexFormat.DrawMode;
 import net.minecraft.client.util.math.MatrixStack;
 
 @SuppressWarnings("unchecked")
-public class OpenGLRendererImpl implements OpenGLRenderer, BufferSupplier, Function<VertexFormat<?>, Global> {
-	public MatrixStack stack;
+public class VertexRendererImpl implements VertexRenderer, BufferSupplier, Function<VertexFormat<?>, Global> {
 	final Map<VertexFormat<?>, Global> config;
 	final BufferBuilder buffer;
-
+	public MatrixStack stack;
 	VertexSetting<?> start = End.INSTANCE, current = End.INSTANCE;
 	VertexFormat<?> activeFormat;
 	Global oldOutest;
 	BuiltDataStack oldStack;
 	DrawMode activeMode;
 
-	public OpenGLRendererImpl(BufferBuilder buffer) {
+	public VertexRendererImpl(BufferBuilder buffer) {
 		this.buffer = buffer;
 		this.config = new WeakHashMap<>();
-	}
-
-	@Override
-	public void flush() {
-		this.swapTo(null, null, null, null);
 	}
 
 	@Override
@@ -49,14 +43,20 @@ public class OpenGLRendererImpl implements OpenGLRenderer, BufferSupplier, Funct
 	}
 
 	@Override
+	public void flush() {
+		this.swapTo(null, null, null, null);
+	}
+
+	@Override
 	public Global apply(VertexFormat<?> format) {
 		return format.create(this);
 	}
 
 	// this validates incomplete primitives
-	public void swapTo(Global outest, BuiltDataStack stack, VertexFormat<?> format, DrawMode mode) { // todo remove, redraw can be moved later
+	public void swapTo(Global outest, BuiltDataStack stack, VertexFormat<?> format, DrawMode mode) {
 		// if vertex format is different, we need to setup shaders again
-		boolean shaderInit = format != this.activeFormat || stack != this.oldStack; // todo we also need to check the datastack
+		VertexFormat<?> active = this.activeFormat;
+		boolean shaderInit = format != active || stack != this.oldStack;
 		if(shaderInit || mode != this.activeMode) {
 			BufferBuilder builder = this.buffer;
 			if(builder.isBuilding()) {
@@ -76,14 +76,19 @@ public class OpenGLRendererImpl implements OpenGLRenderer, BufferSupplier, Funct
 			BuiltDataStack oldStack = this.oldStack;
 			while(old instanceof ShaderSetting<?> setting) {
 				stack.reset();
-				setting.takedown(oldStack);
+				setting.disable(oldStack);
 				old = ShaderSettingInternal.next(setting);
 			}
+			if(active != null) {
+				active.takedownShader();
+			}
 
-			format.loadShader();
+			if(format != null) {
+				format.loadShader();
+			}
 			while(outest instanceof ShaderSetting<?> setting) {
 				stack.reset();
-				setting.setup(stack);
+				setting.enable(stack);
 				outest = ShaderSettingInternal.next(setting);
 			}
 			this.oldOutest = outest;
@@ -106,8 +111,7 @@ public class OpenGLRendererImpl implements OpenGLRenderer, BufferSupplier, Funct
 				this.start = setting;
 			} else { // invalid
 				throw new IllegalStateException(
-						"vertex settings inserted out of order! You must call all the VertexSettings settings before calling another method in the " +
-						"Renderer or " + Primitive.class);
+						"vertex settings inserted out of order! You must call all the VertexSettings settings before calling another method in the " + "Renderer or " + Primitive.class);
 			}
 		}
 

@@ -7,9 +7,12 @@ import org.lwjgl.opengl.GL11;
 
 /**
  * A stencil is like an IRL stencil, it's a template/shape that 'occludes' the 'paper' (screen) underneath so when you paint/draw over the whole
- * thing, only the part not occluded by the stencil is drawn on the paper below
+ * thing, only the part not occluded by the stencil is drawn on the paper below.
+ *
+ * todo make this per renderer and make it auto flush before each stage so u don't need to do it manually
  */
 @Edge
+@ApiStatus.Experimental
 public class Stencil {
 	/**
 	 * the maximum nesting for stencils

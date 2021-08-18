@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.github.astrarre.rendering.v1.edge.shader.Global;
-import io.github.astrarre.rendering.v1.edge.shader.ShaderSetting;
-import io.github.astrarre.rendering.v1.edge.shader.ShaderSettingInternal;
+import io.github.astrarre.rendering.v1.edge.shader.setting.ShaderSetting;
+import io.github.astrarre.rendering.v1.edge.shader.setting.ShaderSettingInternal;
 import io.github.astrarre.util.v0.api.Validate;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

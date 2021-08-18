@@ -3,7 +3,7 @@
   "package": "io.github.astrarre.rendering.internal.mixin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
-    "BufferBuilderMixin_BufferDataImpl",
+    "BufferBuilderMixin_AccessImpl",
     "FramebufferMixin_EnableStencil",
     "GameRendererMixin_LoadShaders"
   ],

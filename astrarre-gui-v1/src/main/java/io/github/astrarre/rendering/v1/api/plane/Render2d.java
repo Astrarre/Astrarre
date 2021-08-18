@@ -1,13 +1,7 @@
 package io.github.astrarre.rendering.v1.api.plane;
 
-import java.util.List;
-
 import io.github.astrarre.rendering.v1.api.util.AngleFormat;
-import io.github.astrarre.util.v0.api.Edge;
 import io.github.astrarre.util.v0.api.SafeCloseable;
-
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.Text;
 
 /**
  * todo make a transform builder or something, since we need to allocate an object for the closeable anyways
@@ -18,25 +12,25 @@ import net.minecraft.text.Text;
  * }
  * </code>
  */
-public interface Render2D {
+public interface Render2d {
 	/**
 	 * all render calls between this and when the closable is closed will have the given transformation applied to it.
 	 * Transformations do stack
 	 */
-	SafeCloseable transform(Transform2D transform);
+	SafeCloseable transform(Transform2d transform);
 
 	/**
-	 * @see #transform(Transform2D)
+	 * @see #transform(Transform2d)
 	 */
 	SafeCloseable translate(float offX, float offY);
 
 	/**
-	 * @see #transform(Transform2D)
+	 * @see #transform(Transform2d)
 	 */
 	SafeCloseable scale(float scaleX, float scaleY);
 
 	/**
-	 * @see #transform(Transform2D)
+	 * @see #transform(Transform2d)
 	 */
 	SafeCloseable rotate(AngleFormat format, float theta);
 
@@ -56,7 +50,7 @@ public interface Render2D {
 	TextRenderer text(int color, float x, float y, boolean shadow);
 
 	/**
-	 * @param color argb color
+	 * @param color argb argb
 	 */
 	void line(int color, float x1, float y1, float x2, float y2); // todo add width?
 

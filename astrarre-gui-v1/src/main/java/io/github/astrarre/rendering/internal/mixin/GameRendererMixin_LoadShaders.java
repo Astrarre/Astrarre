@@ -20,8 +20,8 @@ import net.minecraft.resource.ResourceManager;
 
 @Mixin(GameRenderer.class)
 public class GameRendererMixin_LoadShaders {
-	@Inject(method = "loadShaders", at = @At(value = "INVOKE", target = "Ljava/util/ArrayList;add(Ljava/lang/Object;)Z"), locals = LocalCapture.CAPTURE_FAILHARD)
-	public void onLoad(ResourceManager manager, CallbackInfo ci, List<Program> programs, ArrayList<Pair<Shader, Consumer<Shader>>> shaders)
+	@Inject(method = "loadShaders", at = @At(value = "INVOKE", target = "Lcom/mojang/datafixers/util/Pair;of(Ljava/lang/Object;Ljava/lang/Object;)Lcom/mojang/datafixers/util/Pair;"), locals = LocalCapture.CAPTURE_FAILHARD)
+	public void onLoad(ResourceManager manager, CallbackInfo ci, List<Program> programs, List<Pair<Shader, Consumer<Shader>>> shaders)
 			throws IOException {
 		for(VertexFormatImpl<?> format : VertexFormatImpl.VERTEX_FORMATS) {
 			shaders.add(Pair.of(new Shader(manager, format.shaderId.getNamespace(), format.asMinecraft()), (shader) -> format.shaderRef = shader));

@@ -8,7 +8,7 @@ import net.minecraft.client.render.VertexFormats;
 public final class Tex<Next extends VertexSetting> extends VertexSetting<Next> {
 	public static final Type<Tex<?>> TYPE = type(Tex::new, VertexFormats.TEXTURE_ELEMENT);
 
-	public Tex(BufferSupplier builder, VertexFormat<?> settings, VertexSetting next) {
+	public Tex(BufferSupplier builder, VertexFormat<?> settings, VertexSetting<?> next) {
 		super(builder, settings, next);
 	}
 
