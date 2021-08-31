@@ -1,14 +1,14 @@
 package io.github.astrarre.rendering.v1.edge.vertex.settings;
 
 import io.github.astrarre.rendering.internal.BufferSupplier;
-import io.github.astrarre.rendering.v1.edge.vertex.VertexFormat;
+import io.github.astrarre.rendering.v1.edge.vertex.RenderLayer;
 
 import net.minecraft.client.render.VertexFormats;
 
 public final class Tex<Next extends VertexSetting> extends VertexSetting<Next> {
 	public static final Type<Tex<?>> TYPE = type(Tex::new, VertexFormats.TEXTURE_ELEMENT);
 
-	public Tex(BufferSupplier builder, VertexFormat<?> settings, VertexSetting<?> next) {
+	public Tex(BufferSupplier builder, RenderLayer<?> settings, VertexSetting<?> next) {
 		super(builder, settings, next);
 	}
 

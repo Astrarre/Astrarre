@@ -4,28 +4,46 @@ import io.github.astrarre.util.v0.api.Edge;
 import io.github.astrarre.util.v0.api.Id;
 
 import net.minecraft.client.texture.Sprite;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.SpriteIdentifier;
+import net.minecraft.util.Identifier;
 
 /**
  * a section of an image
  */
 public record Texture(Id texture, float offX, float offY, float width, float height) {
-	static Texture create(Id texture) {
+	public static Texture create(Id texture) {
 		return new Texture(texture, 0, 0, 1, 1);
 	}
 
 	/**
 	 * @param texture the id of the image
 	 * @param imageWidth the width of the image
-	 * @param offX the offset in the image to start the 'crop'
+	 * @param offX the offset in the image len start the 'crop'
 	 * @param width the size of the texture
 	 */
-	static Texture create(Id texture, int imageWidth, int imageHeight, int offX, int offY, int width, int height) {
+	public static Texture create(Id texture, int imageWidth, int imageHeight, int offX, int offY, int width, int height) {
 		return new Texture(texture, offX / (float) imageWidth, offY / (float) imageHeight, width / (float) imageWidth, height / (float) imageHeight);
 	}
 
 	@Edge
-	static Texture create(Sprite sprite) {
+	public static Texture sprite(Sprite sprite) {
 		return new Texture(Id.of(sprite.getAtlas().getId()), sprite.getMinU(), sprite.getMinV(), sprite.getMaxU(), sprite.getMaxV());
+	}
+
+	@Edge
+	public static Texture sprite(SpriteIdentifier identifier) {
+		return sprite(identifier.getSprite());
+	}
+
+	@Edge
+	public static Texture blockSprite(Identifier identifier) {
+		return sprite(new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, identifier));
+	}
+
+	@Edge
+	public static Texture particleSprite(Identifier identifier) {
+		return sprite(new SpriteIdentifier(SpriteAtlasTexture.PARTICLE_ATLAS_TEXTURE, identifier));
 	}
 	
 	/**

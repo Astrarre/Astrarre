@@ -4,7 +4,7 @@ import io.github.astrarre.rendering.v1.edge.Primitive;
 import io.github.astrarre.rendering.v1.edge.mem.BuiltDataStack;
 import io.github.astrarre.rendering.v1.edge.mem.DataStack;
 import io.github.astrarre.rendering.v1.edge.shader.Global;
-import io.github.astrarre.rendering.v1.edge.vertex.VertexFormat;
+import io.github.astrarre.rendering.v1.edge.vertex.RenderLayer;
 import io.github.astrarre.rendering.v1.edge.vertex.settings.VertexSetting;
 
 import net.minecraft.client.render.VertexFormat.DrawMode;
@@ -12,11 +12,11 @@ import net.minecraft.client.render.VertexFormat.DrawMode;
 public final class PrimitiveImpl<T extends VertexSetting<?>> implements Primitive<T> {
 	final VertexRendererImpl $;
 	final T next;
-	final VertexFormat<?> format;
+	final RenderLayer<?> format;
 	final BuiltDataStack stack;
 	Global outest;
 
-	public PrimitiveImpl(VertexRendererImpl $, VertexFormat<?> format, T next, BuiltDataStack stack) {
+	public PrimitiveImpl(VertexRendererImpl $, RenderLayer<?> format, T next, BuiltDataStack stack) {
 		this.$ = $;
 		this.next = next;
 		this.format = format;

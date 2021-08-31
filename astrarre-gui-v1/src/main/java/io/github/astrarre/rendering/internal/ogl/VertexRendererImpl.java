@@ -9,25 +9,26 @@ import io.github.astrarre.rendering.v1.edge.VertexRenderer;
 import io.github.astrarre.rendering.v1.edge.Primitive;
 import io.github.astrarre.rendering.v1.edge.mem.BuiltDataStack;
 import io.github.astrarre.rendering.v1.edge.shader.Global;
-import io.github.astrarre.rendering.v1.edge.shader.setting.ShaderSetting;
-import io.github.astrarre.rendering.v1.edge.shader.setting.ShaderSettingInternal;
-import io.github.astrarre.rendering.v1.edge.vertex.VertexFormat;
+import io.github.astrarre.rendering.v1.edge.shader.settings.ShaderSetting;
+import io.github.astrarre.rendering.v1.edge.shader.settings.ShaderSettingInternal;
+import io.github.astrarre.rendering.v1.edge.vertex.RenderLayer;
 import io.github.astrarre.rendering.v1.edge.vertex.settings.End;
 import io.github.astrarre.rendering.v1.edge.vertex.settings.VertexSetting;
 import io.github.astrarre.rendering.v1.edge.vertex.settings.VertexSettingInternal;
 
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexFormat.DrawMode;
 import net.minecraft.client.util.math.MatrixStack;
 
 @SuppressWarnings("unchecked")
-public class VertexRendererImpl implements VertexRenderer, BufferSupplier, Function<VertexFormat<?>, Global> {
-	final Map<VertexFormat<?>, Global> config;
+public class VertexRendererImpl implements VertexRenderer, BufferSupplier, Function<RenderLayer<?>, Global> {
+	final Map<RenderLayer<?>, Global> config;
 	final BufferBuilder buffer;
 	public MatrixStack stack;
 	VertexSetting<?> start = End.INSTANCE, current = End.INSTANCE;
-	VertexFormat<?> activeFormat;
+	RenderLayer<?> activeFormat;
 	Global oldOutest;
 	BuiltDataStack oldStack;
 	DrawMode activeMode;
@@ -38,7 +39,7 @@ public class VertexRendererImpl implements VertexRenderer, BufferSupplier, Funct
 	}
 
 	@Override
-	public <F extends Global> F render(VertexFormat<F> format) {
+	public <F extends Global> F render(RenderLayer<F> format) {
 		return (F) this.config.computeIfAbsent(format, this);
 	}
 
@@ -48,14 +49,14 @@ public class VertexRendererImpl implements VertexRenderer, BufferSupplier, Funct
 	}
 
 	@Override
-	public Global apply(VertexFormat<?> format) {
+	public Global apply(RenderLayer<?> format) {
 		return format.create(this);
 	}
 
 	// this validates incomplete primitives
-	public void swapTo(Global outest, BuiltDataStack stack, VertexFormat<?> format, DrawMode mode) {
-		// if vertex format is different, we need to setup shaders again
-		VertexFormat<?> active = this.activeFormat;
+	public void swapTo(Global outest, BuiltDataStack stack, RenderLayer<?> format, DrawMode mode) {
+		// if vertex format is different, we need len setup shaders again
+		RenderLayer<?> active = this.activeFormat;
 		boolean shaderInit = format != active || stack != this.oldStack;
 		if(shaderInit || mode != this.activeMode) {
 			BufferBuilder builder = this.buffer;
@@ -98,13 +99,13 @@ public class VertexRendererImpl implements VertexRenderer, BufferSupplier, Funct
 
 	// this validates incomplete vertexes
 	@Override
-	public BufferBuilder getBuffer(VertexSetting<?> setting, VertexFormat<?> vertexFormat) {
+	public VertexConsumer getBuffer(VertexSetting<?> setting, RenderLayer<?> shader) {
 		VertexSetting<?> next = VertexSettingInternal.next(setting), current = this.current;
 		if(setting == this.start) {
 			this.buffer.next();
 		} else if(!(current == next || next == End.INSTANCE)) {
 			if(current == End.INSTANCE) { // starting new primitive of different type
-				if(vertexFormat != this.activeFormat) {
+				if(shader != this.activeFormat) {
 					throw new IllegalStateException(
 							"activeFormat is not the same as vertexFormat! This may be because you are storing the return of a " + Primitive.class + " method");
 				}

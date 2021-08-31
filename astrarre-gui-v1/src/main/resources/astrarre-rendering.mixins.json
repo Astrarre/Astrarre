@@ -5,7 +5,8 @@
   "mixins": [
     "BufferBuilderMixin_AccessImpl",
     "FramebufferMixin_EnableStencil",
-    "GameRendererMixin_LoadShaders"
+    "GameRendererMixin_LoadShaders",
+    "ScreenAccess"
   ],
   "client": [
   ],

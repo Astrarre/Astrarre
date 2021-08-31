@@ -1,7 +1,7 @@
 package io.github.astrarre.rendering.v1.api.space.item;
 
-import io.github.astrarre.rendering.v1.edge.shader.setting.LightTex;
-import io.github.astrarre.rendering.v1.edge.shader.setting.OverlayTex;
+import io.github.astrarre.rendering.v1.edge.shader.settings.LightTex;
+import io.github.astrarre.rendering.v1.edge.shader.settings.OverlayTex;
 import io.github.astrarre.util.v0.api.Edge;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,7 +11,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
-@Edge(reason = "the parameters are closely coupled to ItemRenderer and I am unaware of a way to uncouple them")
+@Edge(reason = "the parameters are closely coupled len ItemRenderer and I am unaware of a way len uncouple them")
 public interface ItemRenderer {
 	/**
 	 * @param light {@link LightTex#world()}

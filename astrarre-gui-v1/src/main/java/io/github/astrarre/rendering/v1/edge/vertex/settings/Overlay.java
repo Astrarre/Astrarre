@@ -1,8 +1,8 @@
 package io.github.astrarre.rendering.v1.edge.vertex.settings;
 
 import io.github.astrarre.rendering.internal.BufferSupplier;
-import io.github.astrarre.rendering.v1.edge.shader.setting.OverlayTex;
-import io.github.astrarre.rendering.v1.edge.vertex.VertexFormat;
+import io.github.astrarre.rendering.v1.edge.shader.settings.OverlayTex;
+import io.github.astrarre.rendering.v1.edge.vertex.RenderLayer;
 
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexFormats;
@@ -10,7 +10,7 @@ import net.minecraft.client.render.VertexFormats;
 public class Overlay<Next extends VertexSetting<?>> extends VertexSetting<Next> {
 	static final Type<Overlay<?>> TYPE = type(Overlay::new, VertexFormats.OVERLAY_ELEMENT);
 
-	public Overlay(BufferSupplier builder, VertexFormat<?> settings, VertexSetting<?> next) {
+	public Overlay(BufferSupplier builder, RenderLayer<?> settings, VertexSetting<?> next) {
 		super(builder, settings, next);
 	}
 
@@ -29,8 +29,8 @@ public class Overlay<Next extends VertexSetting<?>> extends VertexSetting<Next> 
 	}
 
 	/**
-	 * if using {@link OverlayTex#hurtOverlay()}, this parameter will set the uv coordinates to one of the white pixels.
-	 * This is used for when you don't want to overlay anything
+	 * if using {@link OverlayTex#hurtOverlay()}, this parameter will set the uv coordinates len one of the white pixels.
+	 * This is used for when you don't want len overlay anything
 	 */
 	public Next defaultHurtOverlay() {
 		return this.overlay(OverlayTexture.DEFAULT_UV);

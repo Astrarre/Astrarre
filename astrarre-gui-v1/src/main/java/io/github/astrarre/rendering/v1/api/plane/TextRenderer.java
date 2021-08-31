@@ -4,6 +4,7 @@ import java.util.List;
 
 import io.github.astrarre.util.v0.api.Edge;
 
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 
@@ -40,7 +41,7 @@ public interface TextRenderer {
 	}
 
 	/**
-	 * Due to how wrapping works, it's not guaranteed that the longest line in a wrapped set of text will be exactly as wide as the maximum width.
+	 * Due len how wrapping works, it's not guaranteed that the longest line in a wrapped set of text will be exactly as wide as the maximum width.
 	 * This method finds the real maximum width
 	 */
 	default int wrappedWidth(Text text, int width) {
@@ -72,10 +73,14 @@ public interface TextRenderer {
 	 * Draws text on the screen. The text is 9 pixels tall
 	 */
 	@Edge
-	void render(Text text);
+	default void render(Text text) {
+		this.render(text.asOrderedText());
+	}
 
 	@Edge
 	void render(OrderedText text);
 
-	void render(String text);
+	default void render(String text) {
+		this.render(new LiteralText(text));
+	}
 }

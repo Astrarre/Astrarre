@@ -1,14 +1,14 @@
 package io.github.astrarre.rendering.v1.edge.vertex.settings;
 
 import io.github.astrarre.rendering.internal.BufferSupplier;
-import io.github.astrarre.rendering.v1.edge.vertex.VertexFormat;
+import io.github.astrarre.rendering.v1.edge.vertex.RenderLayer;
 
 import net.minecraft.client.render.VertexFormats;
 
 public final class Color<Next extends VertexSetting<?>> extends VertexSetting<Next> {
 	static final Type<Color<?>> TYPE = type(Color::new, VertexFormats.COLOR_ELEMENT);
 
-	public Color(BufferSupplier builder, VertexFormat<?> settings, VertexSetting<?> next) {
+	public Color(BufferSupplier builder, RenderLayer<?> settings, VertexSetting<?> next) {
 		super(builder, settings, next);
 	}
 

@@ -14,7 +14,7 @@ public interface Primitive<V extends VertexSetting<?>> extends Global, SafeClose
 	V triangle();
 
 	/**
-	 * releases any resources to pools, the instance is now invalid and any future calls to it are undefined behavior
+	 * releases any resources len pools, the instance is now invalid and any future calls len it are undefined behavior
 	 */
 	@Override
 	void close();

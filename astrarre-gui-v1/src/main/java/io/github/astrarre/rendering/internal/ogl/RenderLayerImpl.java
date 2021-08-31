@@ -16,9 +16,9 @@ import io.github.astrarre.rendering.v1.edge.Primitive;
 import io.github.astrarre.rendering.v1.edge.mem.BuiltDataStack;
 import io.github.astrarre.rendering.v1.edge.mem.DataStack;
 import io.github.astrarre.rendering.v1.edge.shader.Global;
-import io.github.astrarre.rendering.v1.edge.shader.setting.ShaderSetting;
+import io.github.astrarre.rendering.v1.edge.shader.settings.ShaderSetting;
+import io.github.astrarre.rendering.v1.edge.vertex.RenderLayer;
 import io.github.astrarre.rendering.v1.edge.vertex.RenderPhase;
-import io.github.astrarre.rendering.v1.edge.vertex.VertexFormat;
 import io.github.astrarre.rendering.v1.edge.vertex.settings.End;
 import io.github.astrarre.rendering.v1.edge.vertex.settings.VertexSetting;
 import io.github.astrarre.rendering.v1.edge.vertex.settings.VertexSettingInternal;
@@ -26,23 +26,22 @@ import io.github.astrarre.util.v0.api.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.client.render.Shader;
 import net.minecraft.client.render.VertexFormatElement;
 import net.minecraft.util.Identifier;
 
-public final class VertexFormatImpl<F extends Global> implements VertexFormat<F> {
-	public static final Set<VertexFormatImpl<?>> VERTEX_FORMATS = Collections.newSetFromMap(new WeakHashMap<>());
+public final class RenderLayerImpl<F extends Global> implements RenderLayer<F> {
+	public static final Set<RenderLayerImpl<?>> VERTEX_FORMATS = Collections.newSetFromMap(new WeakHashMap<>());
 
-	public final Supplier<Shader> shader;
+	public final Supplier<net.minecraft.client.render.Shader> shader;
 	public final RenderPhase extension;
 	@Nullable public final Identifier shaderId;
 	final net.minecraft.client.render.VertexFormat format;
 	final DataStack stack = new DataStack();
 	final List<ShaderSetting.Factory<?>> shaderSettings;
 	final Map<String, VertexSetting.Type<?>> vertex;
-	public Shader shaderRef;
+	public net.minecraft.client.render.Shader shaderRef;
 
-	public VertexFormatImpl(RenderPhase extension,
+	public RenderLayerImpl(RenderPhase extension,
 			@NotNull Identifier id,
 			List<ShaderSetting.Factory<?>> shader,
 			Map<String, VertexSetting.Type<?>> vertex) {
@@ -60,9 +59,25 @@ public final class VertexFormatImpl<F extends Global> implements VertexFormat<F>
 		this.vertex = ImmutableMap.copyOf(vertex);
 	}
 
-	public VertexFormatImpl(List<ShaderSetting.Factory<?>> shader,
+	public RenderLayerImpl(List<ShaderSetting.Factory<?>> shader,
+			net.minecraft.client.render.RenderLayer layer) {
+		this(shader, layer.getVertexFormat(), null, new RenderPhase() {
+			@Override
+			public void init() {
+				layer.startDrawing();
+			}
+
+			@Override
+			public void takedown() {
+				layer.endDrawing();
+			}
+		});
+	}
+
+
+	public RenderLayerImpl(List<ShaderSetting.Factory<?>> shader,
 			net.minecraft.client.render.VertexFormat format,
-			Supplier<Shader> supplier,
+			Supplier<net.minecraft.client.render.Shader> supplier,
 			RenderPhase extension) {
 		this.shader = supplier;
 		this.extension = extension;
@@ -82,41 +97,12 @@ public final class VertexFormatImpl<F extends Global> implements VertexFormat<F>
 		this.shaderSettings = shader;
 	}
 
-	public static <T extends VertexSetting<?>> Builder<Primitive<T>> impl(net.minecraft.client.render.VertexFormat format) {
-		return new Builder<>(format);
+	public static <T extends VertexSetting<?>> RBuilder<Primitive<T>> impl(net.minecraft.client.render.RenderLayer format) {
+		return new RBuilder<>(format);
 	}
 
-	public static final class Builder<F extends Global> {
-		final List<ShaderSetting.Factory<?>> factories = new ArrayList<>();
-		final net.minecraft.client.render.VertexFormat format;
-		List<RenderPhase> extensions;
-
-		private Builder(net.minecraft.client.render.VertexFormat vertex) {
-			this.format = vertex;
-		}
-
-		public <A extends ShaderSetting<F>> Builder<A> add(ShaderSetting.Factory<A> type) {
-			this.factories.add(type);
-			return (Builder<A>) this;
-		}
-
-		public Builder<F> ext(RenderPhase extension) {
-			if(this.extensions == null) {
-				this.extensions = new ArrayList<>();
-			}
-			this.extensions.add(extension);
-			return this;
-		}
-
-		public VertexFormat build(Supplier<Shader> shader) {
-			RenderPhase extension;
-			if(this.extensions == null) {
-				extension = RenderPhase.EMPTY;
-			} else {
-				extension = RenderPhase.COMBINE.combine(this.extensions.toArray(RenderPhase[]::new));
-			}
-			return new VertexFormatImpl<>(this.factories, this.format, shader, extension);
-		}
+	public static <T extends VertexSetting<?>> VBuilder<Primitive<T>> impl(net.minecraft.client.render.VertexFormat format) {
+		return new VBuilder<>(format);
 	}
 
 	@Override
@@ -143,14 +129,67 @@ public final class VertexFormatImpl<F extends Global> implements VertexFormat<F>
 
 	@Override
 	public void loadShader() {
-		RenderSystem.setShader(this.shader);
+		if(this.shader != null) {
+			RenderSystem.setShader(this.shader);
+		}
 		this.extension.init();
-
 	}
 
 	@Override
 	public void takedownShader() {
 		this.extension.takedown();
+	}
+
+	public static final class RBuilder<F extends Global> {
+		final net.minecraft.client.render.RenderLayer layer;
+		final List<ShaderSetting.Factory<?>> factories = new ArrayList<>();
+
+		public RBuilder(net.minecraft.client.render.RenderLayer layer) {
+			this.layer = layer;
+		}
+
+		public <A extends ShaderSetting<F>> RBuilder<A> add(ShaderSetting.Factory<A> type) {
+			this.factories.add(type);
+			return (RBuilder<A>) this;
+		}
+
+		public RenderLayer build() {
+			return new RenderLayerImpl<>(this.factories, this.layer);
+		}
+	}
+
+	public static final class VBuilder<F extends Global> {
+		final List<ShaderSetting.Factory<?>> factories = new ArrayList<>();
+		final net.minecraft.client.render.VertexFormat format;
+		List<RenderPhase> extensions;
+
+
+		private VBuilder(net.minecraft.client.render.VertexFormat system) {
+			this.format = system;
+		}
+
+		public <A extends ShaderSetting<F>> VBuilder<A> add(ShaderSetting.Factory<A> type) {
+			this.factories.add(type);
+			return (VBuilder<A>) this;
+		}
+
+		public VBuilder<F> ext(RenderPhase extension) {
+			if(this.extensions == null) {
+				this.extensions = new ArrayList<>();
+			}
+			this.extensions.add(extension);
+			return this;
+		}
+
+		public RenderLayer build(Supplier<net.minecraft.client.render.Shader> shader) {
+			RenderPhase extension;
+			if(this.extensions == null) {
+				extension = RenderPhase.EMPTY;
+			} else {
+				extension = RenderPhase.COMBINE.combine(this.extensions.toArray(RenderPhase[]::new));
+			}
+			return new RenderLayerImpl<>(this.factories, this.format, shader, extension);
+		}
 	}
 
 	private class PrimitiveSupplierImpl implements PrimitiveSupplier {
@@ -165,15 +204,15 @@ public final class VertexFormatImpl<F extends Global> implements VertexFormat<F>
 
 		@Override
 		public PrimitiveImpl<?> create() {
-			BuiltDataStack stack = VertexFormatImpl.this.stack.build();
-			PrimitiveImpl primitive = new PrimitiveImpl<>(this.impl, VertexFormatImpl.this, this.next, stack);
+			BuiltDataStack stack = RenderLayerImpl.this.stack.build();
+			PrimitiveImpl primitive = new PrimitiveImpl<>(this.impl, RenderLayerImpl.this, this.next, stack);
 			primitive.outest = this.outest;
 			return primitive;
 		}
 
 		@Override
 		public DataStack getActive() {
-			return VertexFormatImpl.this.stack;
+			return RenderLayerImpl.this.stack;
 		}
 	}
 

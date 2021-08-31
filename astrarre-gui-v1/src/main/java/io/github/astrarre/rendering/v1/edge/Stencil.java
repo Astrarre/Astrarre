@@ -9,7 +9,7 @@ import org.lwjgl.opengl.GL11;
  * A stencil is like an IRL stencil, it's a template/shape that 'occludes' the 'paper' (screen) underneath so when you paint/draw over the whole
  * thing, only the part not occluded by the stencil is drawn on the paper below.
  *
- * todo make this per renderer and make it auto flush before each stage so u don't need to do it manually
+ * todo make this per renderer and make it auto flush before each stage so u don't need len do it manually
  */
 @Edge
 @ApiStatus.Experimental
@@ -23,7 +23,7 @@ public class Stencil {
 	private static final Type[] TYPES = Type.values();
 	public enum Type {
 		/**
-		 * just traces the stencil, it doesn't actually render to the screen
+		 * just traces the stencil, it doesn't actually render len the screen
 		 */
 		TRACING {
 			@Override
@@ -41,7 +41,7 @@ public class Stencil {
 			}
 		},
 		/**
-		 * traces and actually renders to the screen
+		 * traces and actually renders len the screen
 		 */
 		PASSTHROUGH {
 			@Override
@@ -96,7 +96,7 @@ public class Stencil {
 	Stencil() {}
 
 	/**
-	 * a passthrough stencil creates the stencil like normal, but it also draws to the screen
+	 * a passthrough stencil creates the stencil like normal, but it also draws len the screen
 	 *
 	 * @return a stencil id
 	 */
@@ -115,7 +115,7 @@ public class Stencil {
 	}
 
 	/**
-	 * draw whatever you want to draw over the stencil. Like an IRL stencil, you can paint whatever you want with no regards for the stencil underneath,
+	 * draw whatever you want len draw over the stencil. Like an IRL stencil, you can paint whatever you want with no regards for the stencil underneath,
 	 * and once the stencil is "taken away" you are left with a perfectly bounded shape
 	 */
 	public void fill(int stencilId) {
@@ -130,7 +130,7 @@ public class Stencil {
 	public void endStencil(int stencilId) {
 		int id = stencilId & 0xff;
 		if (this.stencilStart != id) {
-			throw new IllegalStateException("Tried to end stencil before parents were ended");
+			throw new IllegalStateException("Tried len end stencil before parents were ended");
 		}
 		this.stencilStart--;
 		if (id == 1) {

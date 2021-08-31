@@ -1,5 +1,6 @@
 package io.github.astrarre.util.v0.api;
 
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -48,11 +49,28 @@ public class Validate {
 	}
 
 	public static void void_(Object object) {}
+
 	public static <T> T ifClient(Supplier<T> supplier) {
 		if(IS_CLIENT) {
 			supplier.get();
 		}
 		return null;
+	}
+
+	public interface Msg<T> {
+		String msg(T expected, T value);
+	}
+
+	public static <T> void equals(Msg<T> message, T... objects) {
+		for(int ci = 0; ci < objects.length; ci++) {
+			T current = objects[ci];
+			for(int cmpi = ci; cmpi < objects.length; cmpi++) {
+				T compare = objects[cmpi];
+				if(!Objects.equals(current, compare)) {
+					throw new IllegalArgumentException(message.msg(current, compare));
+				}
+			}
+		}
 	}
 
 	/**

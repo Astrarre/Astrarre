@@ -7,6 +7,7 @@ import io.github.astrarre.rendering.v1.api.plane.Render2d;
 import io.github.astrarre.rendering.v1.api.plane.ShapeRenderer;
 import io.github.astrarre.rendering.v1.api.plane.TextRenderer;
 import io.github.astrarre.rendering.v1.api.plane.Texture;
+import io.github.astrarre.rendering.v1.api.plane.TooltipBuilder;
 import io.github.astrarre.rendering.v1.api.plane.Transform2d;
 import io.github.astrarre.rendering.v1.api.util.AngleFormat;
 import io.github.astrarre.rendering.v1.edge.Stencil;
@@ -29,15 +30,18 @@ public class Renderer2DImpl implements Render2d {
 	static final Stencil STENCIL = Stencil.newInstance();
 
 	final net.minecraft.client.font.TextRenderer renderer;
-	final MatrixStack stack;
+	final int width, height;
+	public final MatrixStack stack;
 	final BufferBuilder buffer;
 	final SafeCloseable pop;
 	final ShapeRenderer outline = new ShapeRendererImpl(SetupImpl.OUTLINE, SetupImpl.OUTLINE, true);
 	final ShapeRenderer fill = new ShapeRendererImpl(SetupImpl.QUAD, SetupImpl.TRIANGLE, false);
 	Setup active;
 
-	public Renderer2DImpl(net.minecraft.client.font.TextRenderer renderer, MatrixStack stack, BufferBuilder consumer) {
+	public Renderer2DImpl(net.minecraft.client.font.TextRenderer renderer, int width, int height, MatrixStack stack, BufferBuilder consumer) {
 		this.renderer = renderer;
+		this.width = width;
+		this.height = height;
 		this.stack = stack;
 		this.pop = stack::pop;
 		this.buffer = consumer;
@@ -105,6 +109,11 @@ public class Renderer2DImpl implements Render2d {
 	@Override
 	public TextRenderer text(int color, float x, float y, boolean shadow) {
 		return new TextRendererImpl(this.renderer, color, x, y, shadow);
+	}
+
+	@Override
+	public TooltipBuilder tooltip() {
+		return new TooltipBuilderImpl(this);
 	}
 
 	@Override
@@ -212,7 +221,7 @@ public class Renderer2DImpl implements Render2d {
 		}, OUTLINE {
 			@Override
 			public void setup(BufferBuilder builder) {
-				// line loop would be most effecient however minecraft doesn't have it and im too lazy to add it
+				// line loop would be most effecient however minecraft doesn't have it and im too lazy len add it
 				RenderSystem.setShader(GameRenderer::getPositionColorShader);
 				builder.begin(VertexFormat.DrawMode.LINE_STRIP, VertexFormats.POSITION_COLOR);
 			}
@@ -227,6 +236,7 @@ public class Renderer2DImpl implements Render2d {
 				RenderSystem.enableBlend();
 				RenderSystem.disableTexture();
 				RenderSystem.defaultBlendFunc();
+				RenderSystem.colorMask(true, true, true, true);
 				RenderSystem.setShader(GameRenderer::getPositionColorShader);
 			}
 
@@ -358,6 +368,7 @@ public class Renderer2DImpl implements Render2d {
 				immediate.draw();
 				y += this.textHeight();
 			}
+			RenderSystem.enableDepthTest();
 		}
 
 		@Override
@@ -381,6 +392,7 @@ public class Renderer2DImpl implements Render2d {
 			}
 
 			STENCIL.endStencil(id);
+			RenderSystem.enableDepthTest();
 		}
 
 		@Override
@@ -404,6 +416,7 @@ public class Renderer2DImpl implements Render2d {
 			VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Renderer2DImpl.this.buffer);
 			int i = this.renderer.draw(text, x, y, color, shadow, matrix, immediate, false, 0, 15728880);
 			immediate.draw();
+			RenderSystem.enableDepthTest();
 			return i;
 		}
 
@@ -414,6 +427,7 @@ public class Renderer2DImpl implements Render2d {
 				VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Renderer2DImpl.this.buffer);
 				int i = this.renderer.draw(text, x, y, color, shadow, matrix, immediate, false, 0, 15728880, mirror);
 				immediate.draw();
+				RenderSystem.enableDepthTest();
 				return i;
 			}
 		}

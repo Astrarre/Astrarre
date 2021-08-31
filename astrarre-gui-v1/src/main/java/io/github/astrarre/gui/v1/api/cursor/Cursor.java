@@ -3,35 +3,36 @@ package io.github.astrarre.gui.v1.api.cursor;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.function.LongSupplier;
+import java.util.function.Predicate;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.astrarre.rendering.v1.api.plane.Transform2d;
 import io.github.astrarre.rendering.v1.api.space.Render3d;
-import io.github.astrarre.util.v0.api.SafeCloseable;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.MinecraftClient;
 
-public interface Cursor extends SafeCloseable {
+public interface Cursor {
 	Key<List<Path>> FILES = (render, cursor, data) -> {}; // todo impl
-
-	List<Path> files();
 
 	float x();
 
 	float y();
 
-	Type getType();
+	CursorType getType();
 
-	void setType(Type type);
+	void setType(CursorType type);
 
-	<T> void set(Key<T> key, T value);
+	<T> void set(@NotNull Key<T> key, T value);
 
-	<T> T get(Key<T> key);
+	@Nullable
+	<T> T get(@NotNull Key<T> key);
 
-	boolean isPressed();
+	boolean isPressed(ClickType type);
 
 	Cursor transformed(Transform2d transform);
 
@@ -50,52 +51,5 @@ public interface Cursor extends SafeCloseable {
 		}
 	}
 
-	enum Type {
-		NORMAL(GLFW.GLFW_CURSOR_NORMAL),
-		HIDDEN(GLFW.GLFW_CURSOR_HIDDEN),
-		DISABLED(GLFW.GLFW_CURSOR_DISABLED),
-		ARROW(GLFW.GLFW_ARROW_CURSOR),
-		/**
-		 * the cursor for text boxes basically
-		 */
-		IBEAM(GLFW.GLFW_IBEAM_CURSOR),
-		CROSSHAIR(GLFW.GLFW_CROSSHAIR_CURSOR),
-		HAND(GLFW.GLFW_HAND_CURSOR),
-		/**
-		 * horizontal resize (like in ms paint)
-		 */
-		HRESIZE(GLFW.GLFW_HRESIZE_CURSOR),
-		/**
-		 * vertical resize (like in ms paint)
-		 */
-		VRESIZE(GLFW.GLFW_VRESIZE_CURSOR);
-		
-		final LongSupplier typeId;
 
-		Type(int typeId) {
-			this.typeId = new LongSupplier() {
-				long memoized;
-				@Override
-				public long getAsLong() {
-					long memo = this.memoized;
-					if(memo == 0) {
-						this.memoized = memo = GLFW.glfwCreateStandardCursor(typeId);
-					}
-					return memo;
-				}
-			};
-		}
-
-		public void bind() {
-			if (!RenderSystem.isOnRenderThread()) {
-				RenderSystem.recordRenderCall(this::bind0);
-			} else {
-				this.bind0();
-			}
-		}
-
-		private void bind0() {
-			GLFW.glfwSetCursor(MinecraftClient.getInstance().getWindow().getHandle(), this.typeId.getAsLong());
-		}
-	}
 }

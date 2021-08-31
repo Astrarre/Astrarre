@@ -9,12 +9,13 @@ import io.github.astrarre.rendering.v1.api.util.Point2f;
 import io.github.astrarre.rendering.v1.api.util.Point3D;
 import io.github.astrarre.rendering.v1.api.util.Point3f;
 
+import net.minecraft.util.Util;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec3f;
 
 public interface Transform3d extends Transform2d {
-	Transform3d IDENTITY = new MatrixTransform3D(new Matrix4f());
+	Transform3d IDENTITY = new MatrixTransform3D(Util.make(new Matrix4f(), Matrix4f::loadIdentity));
 
 	static Transform3d translate(float x, float y, float z) {
 		return new MatrixTransform3D(Matrix4f.translate(x, y, z));

@@ -1,13 +1,16 @@
-import io.github.astrarre.rendering.internal.Renderer3DImpl;
+import io.github.astrarre.gui.ElementRootPanel;
+import io.github.astrarre.gui.v1.api.AComponent;
+import io.github.astrarre.gui.v1.api.component.AButton;
+import io.github.astrarre.gui.v1.api.component.icon.Icon;
+import io.github.astrarre.gui.v1.api.component.icon.Icons;
+import io.github.astrarre.gui.v1.api.component.icon.ScrollingLabelIcon;
+import io.github.astrarre.gui.v1.api.cursor.Cursor;
 import io.github.astrarre.rendering.v1.api.space.Render3d;
-import io.github.astrarre.rendering.v1.edge.VertexRenderer;
-import io.github.astrarre.rendering.v1.edge.vertex.VertexFormat;
+import io.github.astrarre.rendering.v1.api.space.Transform3d;
+import io.github.astrarre.rendering.v1.api.util.AngleFormat;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.text.LiteralText;
@@ -35,39 +38,23 @@ public class GuiTestMod implements ModInitializer {
 	}
 
 	private static class TestScreen extends Screen {
-		public TestScreen() {super(new LiteralText("urmom"));}
+		final ElementRootPanel panel = new ElementRootPanel.ScreenImpl(this);
+
+		public TestScreen() {
+			super(new LiteralText("urmom"));
+			this.panel.add(AButton.icon(Icons.Groups.X).callback(() -> System.out.println("hello!")).tooltip((cursor, render) -> {
+				var builder = render.tooltip();
+				builder.textRenderer(0xffffffff, true).render("this is a button");
+				builder.add(Icons.FURNACE_FLAME_ON); // todo add a current width to the tooltip builder
+				builder.add(Icon.scrollingText(new LiteralText("This is a very long sentence, too long to fit"), 80));
+				builder.render();
+			}).addTransform(Transform3d.translate(30, 30, 0)));
+		}
 
 		@Override
-		public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-			super.render(matrices, mouseX, mouseY, delta);
-			Render3d render = new Renderer3DImpl(this.textRenderer, matrices, Tessellator.getInstance().getBuffer(), itemRenderer);
-			try {
-				extracted(render);
-			} catch(Exception e) {
-				e.printStackTrace();
-			} finally {
-				render.flush();
-			}
+		protected void init() {
+			super.init();
+			this.addDrawableChild(this.panel);
 		}
-	}
-	// start = pos, end = end
-	private static void extracted(Render3d render) {
-		VertexRenderer renderer = render.edge();
-		var icon = renderer.render(VertexFormat.POS_TEX).texture(DrawableHelper.GUI_ICONS_TEXTURE);
-		var stats = renderer.render(VertexFormat.POS_TEX).texture(DrawableHelper.STATS_ICON_TEXTURE);
-		icon.quad().pos(0, 0, 0).tex(0, 0);
-		icon.quad().pos(0, 25, 0).tex(0, 1);
-		icon.quad().pos(25, 25, 0).tex(1, 1);
-		icon.quad().pos(25, 0, 0).tex(1, 0);
-
-		stats.quad().pos(25, 0, 0).tex(0, 0);
-		stats.quad().pos(25, 25, 0).tex(0, 1);
-		stats.quad().pos(50, 25, 0).tex(1, 1);
-		stats.quad().pos(50, 0, 0).tex(1, 0);
-
-		icon.quad().pos(50, 0, 0).tex(0, 0);
-		icon.quad().pos(50, 25, 0).tex(0, 1);
-		icon.quad().pos(75, 25, 0).tex(1, 1);
-		icon.quad().pos(75, 0, 0).tex(1, 0);
 	}
 }

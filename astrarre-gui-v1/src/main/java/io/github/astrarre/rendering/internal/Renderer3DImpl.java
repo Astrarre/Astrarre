@@ -25,20 +25,19 @@ public class Renderer3DImpl extends Renderer2DImpl implements Render3d, ItemRend
 	final net.minecraft.client.render.item.ItemRenderer itemRenderer;
 	final VertexRendererImpl renderer;
 
-
 	public Renderer3DImpl(TextRenderer renderer,
 			MatrixStack stack,
 			BufferBuilder consumer,
-			net.minecraft.client.render.item.ItemRenderer itemRenderer) {
-		this(renderer, stack, consumer, itemRenderer, ((BufferBuilderAccess)consumer).getRenderer());
+			net.minecraft.client.render.item.ItemRenderer itemRenderer, int width, int height) {
+		this(renderer, stack, consumer, itemRenderer, ((BufferBuilderAccess)consumer).getRenderer(), width, height);
 	}
 
 	protected Renderer3DImpl(TextRenderer renderer,
 			MatrixStack stack,
 			BufferBuilder consumer,
 			net.minecraft.client.render.item.ItemRenderer itemRenderer,
-			VertexRendererImpl glRenderer) {
-		super(renderer, stack, consumer);
+			VertexRendererImpl glRenderer, int width, int height) {
+		super(renderer, width, height, stack, consumer);
 		this.itemRenderer = itemRenderer;
 		this.renderer = glRenderer;
 		glRenderer.stack = stack;
@@ -58,7 +57,9 @@ public class Renderer3DImpl extends Renderer2DImpl implements Render3d, ItemRend
 			int overlay,
 			long seed) {
 		boolean leftHanded = type instanceof ModelTransformType.Holding h && h.hand == ModelTransformType.Hand.LEFT;
-		this.itemRenderer.renderItem(entity, stack, type.getMode(), leftHanded, this.stack, VertexConsumerProvider.immediate(this.buffer), world, light, overlay, (int)seed);
+		var immediate = VertexConsumerProvider.immediate(this.buffer);
+		this.itemRenderer.renderItem(entity, stack, type.getMode(), leftHanded, this.stack, immediate, world, light, overlay, (int)seed);
+		immediate.draw();
 	}
 
 	@Override

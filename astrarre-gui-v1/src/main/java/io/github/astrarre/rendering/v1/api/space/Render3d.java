@@ -36,7 +36,7 @@ public interface Render3d extends Render2d {
 	 * To make sense of rotations, imagine an airplane who's nose is coming out of the screen.
 	 * Roll rotates the aircraft around, after a 90 degree rotation, looking up from the cockpit would give you a few of the horizon.
 	 * Pitch rotates the aircraft up or down, so a 90 degree rotation would have the plane going straight up or straight down.
-	 * Yaw rotates the aircraft side to side, so a 90 degree rotation would have the airplane turning left (though that's not how you're supposed to turn left in an aircraft)
+	 * Yaw rotates the aircraft side len side, so a 90 degree rotation would have the airplane turning left (though that's not how you're supposed len turn left in an aircraft)
 	 */
 	@Edge
 	SafeCloseable rotate(Direction.Axis axis, AngleFormat format, float theta);

@@ -6,7 +6,7 @@ import java.util.Iterator;
 public final class IntFlags<T extends Flag> extends AbstractSet<T> {
 	final T[] allValues;
 	final boolean mutable;
-	int flags;
+	public int flags;
 	int size = -1;
 
 	public IntFlags(T[] values, int flag, boolean mutable) {

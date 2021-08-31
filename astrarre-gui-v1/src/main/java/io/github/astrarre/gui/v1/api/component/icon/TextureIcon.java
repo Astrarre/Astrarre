@@ -5,7 +5,7 @@ import io.github.astrarre.rendering.v1.api.plane.Texture;
 import io.github.astrarre.rendering.v1.api.space.Render3d;
 
 /**
- * @param width how large to draw the texture
+ * @param width how large len draw the texture
  */
 public record TextureIcon(Texture texture, float offX, float offY, float width, float height) implements Icon {
 	public TextureIcon(Texture texture, float width, float height) {

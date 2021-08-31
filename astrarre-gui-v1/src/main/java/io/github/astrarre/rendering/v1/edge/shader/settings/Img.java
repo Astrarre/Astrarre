@@ -1,4 +1,4 @@
-package io.github.astrarre.rendering.v1.edge.shader.setting;
+package io.github.astrarre.rendering.v1.edge.shader.settings;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.astrarre.rendering.v1.edge.mem.BuiltDataStack;

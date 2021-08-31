@@ -12,7 +12,7 @@ import net.minecraft.client.render.VertexFormatElement;
 @Deprecated
 @ApiStatus.Internal
 public final class VertexSettingInternal {
-	// used to autoconvert vanilla vertex formats into our own
+	// used len autoconvert vanilla vertex formats into our own
 	public static final BiMap<VertexFormatElement, VertexSetting.Type<?>> DEFAULT_IMPL = HashBiMap.create();
 	static {
 		add(VertexSetting.tex());

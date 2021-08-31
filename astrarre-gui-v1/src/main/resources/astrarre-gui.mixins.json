@@ -5,6 +5,7 @@
   "mixins": [
   ],
   "client": [
+    "GLFWMixin_TrackCursorType"
   ],
   "injectors": {
     "defaultRequire": 1

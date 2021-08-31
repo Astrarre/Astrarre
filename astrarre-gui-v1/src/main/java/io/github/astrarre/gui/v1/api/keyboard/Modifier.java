@@ -9,6 +9,7 @@ import org.lwjgl.glfw.GLFW;
  * Can use reference equality
  */
 public interface Modifier extends Flag {
+
 	@ApiStatus.Internal
 	int glfwFlag();
 

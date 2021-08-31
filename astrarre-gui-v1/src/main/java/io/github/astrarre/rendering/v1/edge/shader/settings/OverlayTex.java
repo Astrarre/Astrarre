@@ -1,4 +1,4 @@
-package io.github.astrarre.rendering.v1.edge.shader.setting;
+package io.github.astrarre.rendering.v1.edge.shader.settings;
 
 import io.github.astrarre.rendering.v1.edge.shader.Global;
 
@@ -10,7 +10,7 @@ public class OverlayTex<T extends Global> extends Img<T> {
 	}
 
 	/**
-	 * Bind the overlay texture used to turn entities red when hit. It looks like this:
+	 * Bind the overlay texture used len turn entities red when hit. It looks like this:
 	 * <br>
 	 * <img src="{@docRoot}/doc-files/hurt_overlay.png">
 	 */

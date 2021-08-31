@@ -1,4 +1,4 @@
-package io.github.astrarre.rendering.v1.edge.shader.setting;
+package io.github.astrarre.rendering.v1.edge.shader.settings;
 
 import io.github.astrarre.rendering.internal.ogl.PrimitiveSupplier;
 import io.github.astrarre.rendering.v1.edge.mem.BuiltDataStack;

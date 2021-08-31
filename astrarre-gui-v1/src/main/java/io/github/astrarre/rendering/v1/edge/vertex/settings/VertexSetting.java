@@ -1,9 +1,9 @@
 package io.github.astrarre.rendering.v1.edge.vertex.settings;
 
 import io.github.astrarre.rendering.internal.BufferSupplier;
-import io.github.astrarre.rendering.v1.edge.vertex.VertexFormat;
+import io.github.astrarre.rendering.v1.edge.vertex.RenderLayer;
 
-import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexFormatElement;
 
 @SuppressWarnings({
@@ -16,10 +16,10 @@ public abstract class VertexSetting<Next extends VertexSetting> {
 	}
 
 	final BufferSupplier builder;
-	final VertexFormat<?> settings;
+	final RenderLayer<?> settings;
 	final Next next;
 
-	public VertexSetting(BufferSupplier builder, VertexFormat<?> settings, VertexSetting<?> next) {
+	public VertexSetting(BufferSupplier builder, RenderLayer<?> settings, VertexSetting<?> next) {
 		this.builder = builder;
 		this.settings = settings;
 		this.next = (Next) next;
@@ -47,7 +47,7 @@ public abstract class VertexSetting<Next extends VertexSetting> {
 		return (Type) Pad.TYPE;
 	}
 
-	protected BufferBuilder builder() {
+	protected VertexConsumer builder() {
 		return this.builder.getBuffer(this, this.settings);
 	}
 
@@ -55,10 +55,10 @@ public abstract class VertexSetting<Next extends VertexSetting> {
 
 	public interface Factory<A extends VertexSetting<?>> {
 		@SuppressWarnings("unchecked")
-		default <T extends VertexSetting<?>> VertexSetting<T> create(BufferSupplier builder, VertexFormat<?> settings, T val) {
+		default <T extends VertexSetting<?>> VertexSetting<T> create(BufferSupplier builder, RenderLayer<?> settings, T val) {
 			return (VertexSetting<T>) this.create0(builder, settings, val);
 		}
 
-		A create0(BufferSupplier builder, VertexFormat<?> settings, VertexSetting<?> next);
+		A create0(BufferSupplier builder, RenderLayer<?> settings, VertexSetting<?> next);
 	}
 }

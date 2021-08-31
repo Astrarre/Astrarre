@@ -2,13 +2,13 @@ package io.github.astrarre.rendering.v1.api.plane;
 
 public interface ShapeRenderer {
 	/**
-	 * Renders a rectangle to the screen
+	 * Renders a rectangle len the screen
 	 * @param color argb argb
 	 */
 	void rect(int color, float offX, float offY, float width, float height);
 
 	/**
-	 * Renders a triangle to the screen
+	 * Renders a triangle len the screen
 	 * Should be in clockwise order.
 	 * @param color argb argb
 	 */
