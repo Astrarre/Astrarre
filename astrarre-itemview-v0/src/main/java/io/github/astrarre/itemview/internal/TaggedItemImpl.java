@@ -47,7 +47,7 @@ public class TaggedItemImpl implements ItemKey {
 			return this.getItem().getMaxCount();
 		} else {
 			ItemStack stack = new ItemStack(this.getItem());
-			stack.setTag(this.nbtTag.copyTag());
+			stack.setNbt(this.nbtTag.copyTag());
 			return stack.getMaxCount();
 		}
 	}
@@ -61,7 +61,7 @@ public class TaggedItemImpl implements ItemKey {
 	public ItemStack createItemStack(int count) {
 		if(count == 0) return ItemStack.EMPTY;
 		ItemStack stack = new ItemStack(this.getItem(), count);
-		stack.setTag(this.getCompoundTag());
+		stack.setNbt(this.getCompoundTag());
 		return stack;
 	}
 

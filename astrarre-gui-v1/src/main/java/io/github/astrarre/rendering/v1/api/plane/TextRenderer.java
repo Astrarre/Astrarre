@@ -56,18 +56,25 @@ public interface TextRenderer {
 	}
 
 	@Edge
-	void renderWrappedText(Text text, int width);
+	default void renderWrappedText(Text text, int width) {
+		for(OrderedText orderedText : this.wrap(text, width)) {
+			this.render(orderedText);
+		}
+	}
 
 	/**
 	 * (the image is a gif, intellij is a bit fucky with those)
 	 * <img src="{@docRoot}/doc-files/scrolling_text.gif">
 	 *
-	 * imagine a window, in which your text is rendered, if the left side is x = 0, then `-offsetX` is where the first letter of your text is rendered.
-	 * The part of the text that is rendered past x = 0 and below x = width is actually rendered.
+	 * imagine a window, in which your text is rendered, if the left side is offX = 0, then `-offsetX` is where the first letter of your text is rendered.
+	 * The part of the text that is rendered past offX = 0 and below offX = width is actually rendered.
 	 * @param loop if true, the beginning part of the text is rendered after the end of the previous text.
 	 */
 	@Edge
 	void renderScrollingText(Text text, float offsetX, float width, boolean loop);
+
+	@Edge
+	void render(OrderedText text);
 
 	/**
 	 * Draws text on the screen. The text is 9 pixels tall
@@ -76,9 +83,6 @@ public interface TextRenderer {
 	default void render(Text text) {
 		this.render(text.asOrderedText());
 	}
-
-	@Edge
-	void render(OrderedText text);
 
 	default void render(String text) {
 		this.render(new LiteralText(text));

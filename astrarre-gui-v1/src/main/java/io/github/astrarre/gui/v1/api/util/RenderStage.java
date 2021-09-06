@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import io.github.astrarre.gui.v1.api.cursor.Cursor;
+import io.github.astrarre.gui.v1.api.listener.cursor.Cursor;
 import io.github.astrarre.rendering.v1.api.space.Render3d;
 import org.jetbrains.annotations.Nullable;
 

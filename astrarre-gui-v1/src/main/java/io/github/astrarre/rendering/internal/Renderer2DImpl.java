@@ -15,11 +15,7 @@ import io.github.astrarre.util.v0.api.SafeCloseable;
 import io.github.astrarre.util.v0.api.Validate;
 
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
@@ -29,7 +25,7 @@ import net.minecraft.util.math.Matrix4f;
 public class Renderer2DImpl implements Render2d {
 	static final Stencil STENCIL = Stencil.newInstance();
 
-	final net.minecraft.client.font.TextRenderer renderer;
+	final net.minecraft.client.font.TextRenderer textRenderer;
 	final int width, height;
 	public final MatrixStack stack;
 	final BufferBuilder buffer;
@@ -39,7 +35,7 @@ public class Renderer2DImpl implements Render2d {
 	Setup active;
 
 	public Renderer2DImpl(net.minecraft.client.font.TextRenderer renderer, int width, int height, MatrixStack stack, BufferBuilder consumer) {
-		this.renderer = renderer;
+		this.textRenderer = renderer;
 		this.width = width;
 		this.height = height;
 		this.stack = stack;
@@ -108,7 +104,7 @@ public class Renderer2DImpl implements Render2d {
 
 	@Override
 	public TextRenderer text(int color, float x, float y, boolean shadow) {
-		return new TextRendererImpl(this.renderer, color, x, y, shadow);
+		return new TextRendererImpl(this.textRenderer, color, x, y, shadow);
 	}
 
 	@Override
@@ -119,7 +115,7 @@ public class Renderer2DImpl implements Render2d {
 	@Override
 	public void line(int color, float x1, float y1, float x2, float y2) {
 		this.push(SetupImpl.LINE);
-		int r = color & 0xFF, g = (color >> 8) & 0xFF, b = (color >> 16) & 0xFF, a = (color >> 24) & 0xFF;
+		int b = color & 0xFF, g = (color >> 8) & 0xFF, r = (color >> 16) & 0xFF, a = (color >> 24) & 0xFF;
 		Matrix4f matrix = this.stack.peek().getModel();
 		this.buffer.vertex(matrix, x1, y1, 1).color(r, g, b, a).next();
 		this.buffer.vertex(matrix, x2, y2, 1).color(r, g, b, a).next();
@@ -180,97 +176,6 @@ public class Renderer2DImpl implements Render2d {
 		}
 	}
 
-	enum SetupImpl implements Setup {
-		DEFAULT {
-			@Override
-			public void setup(BufferBuilder builder) {
-
-			}
-
-			@Override
-			public void takedown(BufferBuilder builder) {
-				builder.end();
-				BufferRenderer.draw(builder);
-			}
-		}, LINE {
-			@Override
-			public void setup(BufferBuilder builder) {
-				RenderSystem.disableTexture();
-				RenderSystem.setShader(GameRenderer::getPositionColorShader);
-				builder.begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR);
-			}
-
-			@Override
-			public void takedown(BufferBuilder builder) {
-				DEFAULT.takedown(builder);
-				RenderSystem.enableTexture();
-				RenderSystem.depthMask(true);
-			}
-		}, TEXTURE {
-			@Override
-			public void setup(BufferBuilder builder) {
-
-				RenderSystem.setShader(GameRenderer::getPositionTexShader);
-				builder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
-			}
-
-			@Override
-			public void takedown(BufferBuilder builder) {
-				DEFAULT.takedown(builder);
-			}
-		}, OUTLINE {
-			@Override
-			public void setup(BufferBuilder builder) {
-				// line loop would be most effecient however minecraft doesn't have it and im too lazy len add it
-				RenderSystem.setShader(GameRenderer::getPositionColorShader);
-				builder.begin(VertexFormat.DrawMode.LINE_STRIP, VertexFormats.POSITION_COLOR);
-			}
-
-			@Override
-			public void takedown(BufferBuilder builder) {
-				LINE.takedown(builder);
-			}
-		}, POS_COLOR {
-			@Override
-			public void setup(BufferBuilder builder) {
-				RenderSystem.enableBlend();
-				RenderSystem.disableTexture();
-				RenderSystem.defaultBlendFunc();
-				RenderSystem.colorMask(true, true, true, true);
-				RenderSystem.setShader(GameRenderer::getPositionColorShader);
-			}
-
-			@Override
-			public void takedown(BufferBuilder builder) {
-				DEFAULT.takedown(builder);
-				RenderSystem.enableTexture();
-				RenderSystem.disableBlend();
-			}
-		}, QUAD {
-			@Override
-			public void setup(BufferBuilder builder) {
-				POS_COLOR.setup(builder);
-				builder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-			}
-
-			@Override
-			public void takedown(BufferBuilder builder) {
-				POS_COLOR.takedown(builder);
-			}
-		}, TRIANGLE {
-			@Override
-			public void setup(BufferBuilder builder) {
-				POS_COLOR.setup(builder);
-				builder.begin(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR);
-			}
-
-			@Override
-			public void takedown(BufferBuilder builder) {
-				POS_COLOR.takedown(builder);
-			}
-		}
-	}
-
 	interface Setup {
 		void setup(BufferBuilder builder);
 
@@ -290,32 +195,32 @@ public class Renderer2DImpl implements Render2d {
 		@Override
 		public void rect(int color, float offX, float offY, float width, float height) {
 			Renderer2DImpl.this.push(this.rect);
-			int r = color & 0xFF, g = (color >> 8) & 0xFF, b = (color >> 16) & 0xFF, a = (color >> 24) & 0xFF;
+			int b = color & 0xFF, g = (color >> 8) & 0xFF, r = (color >> 16) & 0xFF, a = (color >> 24) & 0xFF;
 			Matrix4f matrix = Renderer2DImpl.this.stack.peek().getModel();
 			float x2 = offX + width, y2 = offY + height;
-			Renderer2DImpl.this.buffer.vertex(matrix, offX, offY, 1).color(r, g, b, a).next();
-			Renderer2DImpl.this.buffer.vertex(matrix, offX, y2, 1).color(r, g, b, a).next();
-			Renderer2DImpl.this.buffer.vertex(matrix, x2, y2, 1).color(r, g, b, a).next();
-			Renderer2DImpl.this.buffer.vertex(matrix, x2, offY, 1).color(r, g, b, a).next();
+			Renderer2DImpl.this.buffer.vertex(matrix, offX, offY, 0).color(r, g, b, a).next();
+			Renderer2DImpl.this.buffer.vertex(matrix, offX, y2, 0).color(r, g, b, a).next();
+			Renderer2DImpl.this.buffer.vertex(matrix, x2, y2, 0).color(r, g, b, a).next();
+			Renderer2DImpl.this.buffer.vertex(matrix, x2, offY, 0).color(r, g, b, a).next();
 			if(this.close) {
-				Renderer2DImpl.this.buffer.vertex(matrix, offX, offY, 1).color(r, g, b, a).next();
+				Renderer2DImpl.this.buffer.vertex(matrix, offX, offY, 0).color(r, g, b, a).next();
 				Renderer2DImpl.this.push(null);
 			}
 		}
 
-		@Override
+		/*@Override
 		public void triangle(int color, float x1, float y1, float x2, float y2, float x3, float y3) {
 			Renderer2DImpl.this.push(this.tri);
 			int r = color & 0xFF, g = (color >> 8) & 0xFF, b = (color >> 16) & 0xFF, a = (color >> 24) & 0xFF;
 			Matrix4f matrix = Renderer2DImpl.this.stack.peek().getModel();
-			Renderer2DImpl.this.buffer.vertex(matrix, x1, y1, 1).color(r, g, b, a).next();
-			Renderer2DImpl.this.buffer.vertex(matrix, x2, y2, 1).color(r, g, b, a).next();
-			Renderer2DImpl.this.buffer.vertex(matrix, x3, y3, 1).color(r, g, b, a).next();
+			Renderer2DImpl.this.buffer.vertex(matrix, x1, y1, 0).color(r, g, b, a).next();
+			Renderer2DImpl.this.buffer.vertex(matrix, x2, y2, 0).color(r, g, b, a).next();
+			Renderer2DImpl.this.buffer.vertex(matrix, x3, y3, 0).color(r, g, b, a).next();
 			if(this.close) {
-				Renderer2DImpl.this.buffer.vertex(matrix, x1, y1, 1).color(r, g, b, a).next();
+				Renderer2DImpl.this.buffer.vertex(matrix, x1, y1, 0).color(r, g, b, a).next();
 				Renderer2DImpl.this.push(null);
 			}
-		}
+		}*/
 	}
 
 	class TextRendererImpl implements TextRenderer {
@@ -359,23 +264,9 @@ public class Renderer2DImpl implements Render2d {
 		}
 
 		@Override
-		public void renderWrappedText(Text text, int width) {
-			float y = this.y;
-			for(OrderedText line : this.renderer.wrapLines(text, width)) {
-				VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Renderer2DImpl.this.buffer);
-				Matrix4f matrix = Renderer2DImpl.this.stack.peek().getModel();
-				this.renderer.draw(line, this.x, y, this.color, this.shadow, matrix, immediate, false, 0, 15728880);
-				immediate.draw();
-				y += this.textHeight();
-			}
-			RenderSystem.enableDepthTest();
-		}
-
-		@Override
 		public void renderScrollingText(Text text, float offsetX, float width, boolean loop) {
 			int textWidth = this.width(text);
 			offsetX %= textWidth;
-
 
 			int id = STENCIL.startStencil(Stencil.Type.TRACING);
 
@@ -390,6 +281,8 @@ public class Renderer2DImpl implements Render2d {
 				this.draw(text.asOrderedText(), start, this.y, this.color, matrix, this.shadow);
 				start += textWidth + 3; // we use the computed textWidth instead cus otherwise it jitters
 			}
+
+			Renderer2DImpl.this.flush();
 
 			STENCIL.endStencil(id);
 			RenderSystem.enableDepthTest();

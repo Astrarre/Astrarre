@@ -6,7 +6,8 @@
     "BufferBuilderMixin_AccessImpl",
     "FramebufferMixin_EnableStencil",
     "GameRendererMixin_LoadShaders",
-    "ScreenAccess"
+    "ScreenAccess",
+    "ShaderMixin_Optimize"
   ],
   "client": [
   ],

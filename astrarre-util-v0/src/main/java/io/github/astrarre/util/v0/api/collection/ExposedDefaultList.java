@@ -11,9 +11,6 @@ import net.minecraft.util.collection.DefaultedList;
  * @param <T>
  */
 public class ExposedDefaultList<T> extends DefaultedList<T> {
-	public ExposedDefaultList() {
-	}
-
 	public ExposedDefaultList(List<T> delegate, @Nullable T initialElement) {
 		super(delegate, initialElement);
 	}

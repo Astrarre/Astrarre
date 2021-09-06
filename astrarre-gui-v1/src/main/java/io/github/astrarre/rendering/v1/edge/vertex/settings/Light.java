@@ -38,7 +38,7 @@ public class Light<Next extends VertexSetting<?>> extends VertexSetting<Next> {
 	 * full brightness uv coordinates if you're using {@link LightTex#world()}
 	 */
 	public Next emissive() {
-		this.builder().light(LightmapTextureManager.field_32767); // 240, 240
+		this.builder().light(LightmapTextureManager.MAX_LIGHT_COORDINATE); // 240, 240
 		// the other one is 240, 0
 		return this.next;
 	}

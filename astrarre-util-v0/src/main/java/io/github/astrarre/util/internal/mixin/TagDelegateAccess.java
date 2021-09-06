@@ -9,7 +9,7 @@ import net.minecraft.tag.Tag;
 import net.fabricmc.fabric.impl.tag.extension.TagDelegate;
 
 @ModEnvironment ("fabric-tag-extensions-v0")
-@Mixin (TagDelegate.class)
+@Mixin (value = TagDelegate.class, remap = false)
 public interface TagDelegateAccess {
 	@Invoker
 	<T> Tag<T> callGetTag();

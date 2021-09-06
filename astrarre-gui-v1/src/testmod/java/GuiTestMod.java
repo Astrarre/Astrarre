@@ -1,19 +1,14 @@
-import io.github.astrarre.gui.ElementRootPanel;
-import io.github.astrarre.gui.v1.api.AComponent;
-import io.github.astrarre.gui.v1.api.component.AButton;
-import io.github.astrarre.gui.v1.api.component.icon.Icon;
-import io.github.astrarre.gui.v1.api.component.icon.Icons;
-import io.github.astrarre.gui.v1.api.component.icon.ScrollingLabelIcon;
-import io.github.astrarre.gui.v1.api.cursor.Cursor;
-import io.github.astrarre.rendering.v1.api.space.Render3d;
-import io.github.astrarre.rendering.v1.api.space.Transform3d;
-import io.github.astrarre.rendering.v1.api.util.AngleFormat;
+import io.github.astrarre.gui.v1.api.component.AList;
+import io.github.astrarre.gui.v1.api.component.ASlot;
+import io.github.astrarre.gui.v1.api.server.ServerPanel;
+import io.github.astrarre.rendering.v1.api.util.Axis2d;
+import test.HugeChestBlock;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.text.LiteralText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -21,40 +16,48 @@ import net.minecraft.util.registry.Registry;
 import net.fabricmc.api.ModInitializer;
 
 public class GuiTestMod implements ModInitializer {
-	final Item h = new Item(new Item.Settings()) {
-		@Override
-		public ActionResult useOnBlock(ItemUsageContext context) {
-			if(context.getWorld().isClient) {
-				MinecraftClient client = MinecraftClient.getInstance();
-				client.openScreen(new TestScreen());
-			}
-			return super.useOnBlock(context);
-		}
-	};
+	/**
+	 * this is the maximum 'guaranteed' window in which you can render for GUIs
+	 * In auto gui mode (in video settings) will rescale the coordinate grid to ensure that this 'window' in the center of the screen is always visible.
+	 * For normal GUIs (centered guis, like inventories for example): it's recommended to use this scale.
+	 */
+	public static final int MAX_SAFE_WIDTH = 320, MAX_SAFE_HEIGHT = 240;
+	final Item h = new MyItem();
+	// 21x40
+	// 840 is max in theory
+	// 819 (21x39) is prolly good enough for margins
 
 	@Override
 	public void onInitialize() {
 		Registry.register(Registry.ITEM, new Identifier("mymod:y"), h);
+		Registry.register(Registry.BLOCK, new Identifier("mymod:z"), new HugeChestBlock(AbstractBlock.Settings.copy(Blocks.STONE)));
 	}
 
-	private static class TestScreen extends Screen {
-		final ElementRootPanel panel = new ElementRootPanel.ScreenImpl(this);
-
-		public TestScreen() {
-			super(new LiteralText("urmom"));
-			this.panel.add(AButton.icon(Icons.Groups.X).callback(() -> System.out.println("hello!")).tooltip((cursor, render) -> {
-				var builder = render.tooltip();
-				builder.textRenderer(0xffffffff, true).render("this is a button");
-				builder.add(Icons.FURNACE_FLAME_ON); // todo add a current width to the tooltip builder
-				builder.add(Icon.scrollingText(new LiteralText("This is a very long sentence, too long to fit"), 80));
-				builder.render();
-			}).addTransform(Transform3d.translate(30, 30, 0)));
-		}
+	private static class MyItem extends Item {
+		public MyItem() {super(new Settings());}
 
 		@Override
-		protected void init() {
-			super.init();
-			this.addDrawableChild(this.panel);
+		public ActionResult useOnBlock(ItemUsageContext context) {
+			PlayerEntity entity = context.getPlayer();
+			if(entity != null) {
+				try {
+					extracted(context, entity);
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+			return super.useOnBlock(context);
 		}
+	}
+
+	private static void extracted(ItemUsageContext context, PlayerEntity entity) {
+		var keys = ASlot.inv(entity.getInventory(), 0);
+		ServerPanel.openHandled(entity, (communication, panel) -> {
+			AList list = new AList(Axis2d.X, 1);
+			for(ASlot.Key key : keys) {
+				list.add(new ASlot(communication, panel, key));
+			}
+			panel.add(list);
+		}, (communication, panel) -> ASlot.linkAll(communication, panel, keys));
 	}
 }

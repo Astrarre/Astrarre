@@ -1,10 +1,10 @@
 package io.github.astrarre.gui.internal;
 
-import io.github.astrarre.gui.v1.api.cursor.ClickType;
-import io.github.astrarre.gui.v1.api.cursor.Cursor;
-import io.github.astrarre.gui.v1.api.cursor.MouseListener;
-import io.github.astrarre.gui.v1.api.focus.FocusDirection;
-import io.github.astrarre.gui.v1.api.keyboard.KeyboardListener;
+import io.github.astrarre.gui.v1.api.listener.cursor.ClickType;
+import io.github.astrarre.gui.v1.api.listener.cursor.Cursor;
+import io.github.astrarre.gui.v1.api.listener.cursor.MouseListener;
+import io.github.astrarre.gui.v1.api.listener.focus.FocusDirection;
+import io.github.astrarre.gui.v1.api.listener.keyboard.KeyboardListener;
 
 import net.minecraft.client.gui.Element;
 
@@ -39,16 +39,6 @@ public interface AComponentElement extends Element {
 	}
 
 	@Override
-	default void mouseMoved(double mouseX, double mouseY) {
-		Cursor curr = this.currentCursor(), at = this.createCursor(mouseX, mouseY);
-		float deltaX = (float) mouseX - curr.x(), deltaY = (float) mouseY - curr.y();
-		if(curr.isPressed(ClickType.Standard.LEFT)) {
-			this.listener().mouseDragged(at, ClickType.Standard.LEFT, deltaX, deltaY);
-		}
-		this.listener().mouseMoved(at, (float) mouseX - curr.x(), (float) mouseY - curr.y());
-	}
-
-	@Override
 	default boolean mouseClicked(double mouseX, double mouseY, int button) {
 		return this.listener().mouseClicked(this.createCursor(mouseX, mouseY), GuiInternal.clickTypeByGlfwId(button));
 	}
@@ -60,7 +50,7 @@ public interface AComponentElement extends Element {
 
 	@Override
 	default boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		return this.listener().mouseScrolled(this.createCursor(mouseX, mouseY), amount);
+		return this.listener().mouseScrolled(this.createCursor(mouseX, mouseY), (float) amount);
 	}
 
 	@Override

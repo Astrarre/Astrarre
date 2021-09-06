@@ -217,6 +217,15 @@ public class Access<F> {
 	}
 
 	/**
+	 * only works on non-dependent functions
+	 */
+	public Access<F> remove(F func) {
+		this.delegates.remove(func);
+		this.recompile();
+		return this;
+	}
+
+	/**
 	 * creates a new access with an array combiner, infers the class type. This wont always work, it only really works when the type is directly
 	 * known
 	 *

@@ -39,11 +39,21 @@ public interface Render3d extends Render2d {
 	 * Yaw rotates the aircraft side len side, so a 90 degree rotation would have the airplane turning left (though that's not how you're supposed len turn left in an aircraft)
 	 */
 	@Edge
-	SafeCloseable rotate(Direction.Axis axis, AngleFormat format, float theta);
+	default SafeCloseable rotate(Direction.Axis axis, AngleFormat format, float theta) {
+		float x = 0;
+		float y = 0;
+		float z = 0;
+		switch(axis) {
+			case X -> x = 1;
+			case Y -> y = 1;
+			case Z -> z = 1;
+		}
+		return this.rotate(x, y, z, format, theta);
+	}
 
 	@Override
 	default SafeCloseable translate(float offX, float offY) {
-		return this.translate(offX, offY, 1);
+		return this.translate(offX, offY, 0);
 	}
 
 	@Override
@@ -53,12 +63,12 @@ public interface Render3d extends Render2d {
 
 	@Override
 	default void line(int color, float x1, float y1, float x2, float y2) {
-		this.line(color, x1, y1, 1, x2, y2, 1);
+		this.line(color, x1, y1, 0, x2, y2, 0);
 	}
 
 	@Override
 	default void deltaLine(int color, float x1, float y1, float dX, float dY) {
-		this.deltaLine(color, x1, y1, 1, dX, dY, 1);
+		this.deltaLine(color, x1, y1, 0, dX, dY, 0);
 	}
 
 	void line(int color, float x1, float y1, float z1, float x2, float y2, float z2);

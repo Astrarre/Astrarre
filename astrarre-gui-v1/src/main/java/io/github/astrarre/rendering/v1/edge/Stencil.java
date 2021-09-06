@@ -134,6 +134,8 @@ public class Stencil {
 		}
 		this.stencilStart--;
 		if (id == 1) {
+			RenderSystem.clearStencil(0);
+			RenderSystem.clear(GL11.GL_STENCIL_BUFFER_BIT, false);
 			GL11.glDisable(GL11.GL_STENCIL_TEST);
 		}
 	}

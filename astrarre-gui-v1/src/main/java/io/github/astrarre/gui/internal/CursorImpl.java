@@ -1,16 +1,17 @@
 package io.github.astrarre.gui.internal;
 
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import io.github.astrarre.gui.v1.api.cursor.ClickType;
-import io.github.astrarre.gui.v1.api.cursor.Cursor;
-import io.github.astrarre.gui.v1.api.cursor.CursorType;
+import io.github.astrarre.gui.v1.api.listener.cursor.ClickType;
+import io.github.astrarre.gui.v1.api.listener.cursor.Cursor;
+import io.github.astrarre.gui.v1.api.listener.cursor.CursorType;
 import io.github.astrarre.rendering.v1.api.plane.Transform2d;
 import io.github.astrarre.rendering.v1.api.util.Point2f;
 import io.github.astrarre.util.v0.api.Validate;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.glfw.GLFW;
 
 public class CursorImpl implements Cursor {
 	public static CursorType type = CursorType.Standard.ARROW;
@@ -19,6 +20,10 @@ public class CursorImpl implements Cursor {
 	public float x, y;
 
 	public final Predicate<ClickType> pressed;
+
+	public CursorImpl(float x, float y) {
+		this(new HashMap<>(), x, y, type -> GLFW.glfwGetMouseButton(GuiInternal.Holder.WINDOW_HANDLE, type.glfwId()) == GLFW.GLFW_PRESS);
+	}
 
 	public CursorImpl(Map<Key<?>, Object> map, float x, float y, Predicate<ClickType> pressed) {
 		this.map = map;

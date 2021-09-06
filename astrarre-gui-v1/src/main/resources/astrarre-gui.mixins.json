@@ -3,6 +3,16 @@
   "package": "io.github.astrarre.gui.internal.mixin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
+    "ClientPlayNetworkHandlerMixin_Comms",
+    "HandledScreenMixin_Slot",
+    "PlayerEntityMixin_Access",
+    "ScreenHandlerAccess",
+    "ScreenHandlerMixin_ServerPanel",
+    "ScreenMixin_Access",
+    "ServerPlayerEntityMixin_Access",
+    "ServerPlayerEntityMixin_TickScreenHandler",
+    "ServerPlayNetworkHandlerMixin_Comms",
+    "SlotAccess"
   ],
   "client": [
     "GLFWMixin_TrackCursorType"

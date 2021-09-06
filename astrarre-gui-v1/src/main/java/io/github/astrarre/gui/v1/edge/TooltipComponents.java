@@ -1,7 +1,7 @@
 package io.github.astrarre.gui.v1.edge;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import io.github.astrarre.gui.v1.api.component.icon.Icon;
+import io.github.astrarre.rendering.v1.api.plane.icon.Icon;
 import io.github.astrarre.rendering.internal.Renderer2DImpl;
 import io.github.astrarre.rendering.internal.Renderer3DImpl;
 import io.github.astrarre.rendering.v1.api.space.Render3d;

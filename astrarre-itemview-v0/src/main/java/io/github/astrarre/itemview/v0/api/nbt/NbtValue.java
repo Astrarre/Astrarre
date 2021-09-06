@@ -69,4 +69,6 @@ public interface NbtValue extends Comparable<NbtValue> {
 		}
 		return compare;
 	}
+
+	I __();
 }

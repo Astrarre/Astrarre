@@ -3,9 +3,29 @@ package io.github.astrarre.rendering.v1.api.plane;
 import java.awt.geom.Point2D;
 
 import io.github.astrarre.rendering.v1.api.space.Transform3d;
+import io.github.astrarre.rendering.v1.api.util.AngleFormat;
+import io.github.astrarre.rendering.v1.api.util.Axis2d;
 import io.github.astrarre.rendering.v1.api.util.Point2f;
 
+import net.minecraft.util.math.Direction;
+
 public interface Transform2d {
+	static Transform3d translate(float offX, float offY) {
+		return Transform3d.translate(offX, offY, 0);
+	}
+
+	static Transform3d scale(float scaleX, float scaleY) {
+		return Transform3d.scale(scaleX, scaleY, 1);
+	}
+
+	static Transform3d rotate(AngleFormat format, float theta) {
+		return Transform3d.rotate(Direction.Axis.Z, format, theta);
+	}
+
+	static Transform3d rotate(float originX, float originY, AngleFormat format, float theta) {
+		return Transform3d.rotate(originX, originY, 0, 0, 0, 1, format, theta);
+	}
+
 	float transformX(float x, float y);
 
 	float transformY(float x, float y);

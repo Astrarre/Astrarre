@@ -31,3 +31,10 @@ accessible    field    net/minecraft/util/math/Matrix3f    a12    F
 accessible    field    net/minecraft/util/math/Matrix3f    a20    F
 accessible    field    net/minecraft/util/math/Matrix3f    a21    F
 accessible    field    net/minecraft/util/math/Matrix3f    a22    F
+
+accessible    method    net/minecraft/screen/ScreenHandlerType <init> (Lnet/minecraft/screen/ScreenHandlerType$Factory;)V
+accessible    method    net/minecraft/client/gui/screen/ingame/HandledScreens register (Lnet/minecraft/screen/ScreenHandlerType;Lnet/minecraft/client/gui/screen/ingame/HandledScreens$Provider;)V
+
+accessible    class     net/minecraft/screen/ScreenHandlerType$Factory
+accessible    class     net/minecraft/client/gui/screen/ingame/HandledScreens$Provider
+

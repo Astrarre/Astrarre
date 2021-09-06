@@ -29,7 +29,7 @@ public class ItemStacks {
 			return insert.copy();
 		}
 		int capacity = destination.getMaxCount() - destination.getCount();
-		if (capacity > 0 && ItemStack.areItemsEqual(destination, insert) && ItemStack.areTagsEqual(destination, insert)) {
+		if (capacity > 0 && ItemStack.areItemsEqual(destination, insert) && ItemStack.areNbtEqual(destination, insert)) {
 			ItemStack combined = destination.copy();
 			int toInsert = Math.min(capacity, insert.getCount());
 			combined.increment(toInsert);

@@ -3,14 +3,13 @@ package io.github.astrarre.gui.v1.edge;
 import java.util.Set;
 
 import io.github.astrarre.gui.internal.GuiInternal;
-import io.github.astrarre.gui.v1.api.Panel;
-import io.github.astrarre.gui.v1.api.cursor.ClickType;
-import io.github.astrarre.gui.v1.api.cursor.Cursor;
-import io.github.astrarre.gui.v1.api.cursor.MouseListener;
-import io.github.astrarre.gui.v1.api.focus.FocusDirection;
-import io.github.astrarre.gui.v1.api.keyboard.Key;
-import io.github.astrarre.gui.v1.api.keyboard.KeyboardListener;
-import io.github.astrarre.gui.v1.api.keyboard.Modifier;
+import io.github.astrarre.gui.v1.api.listener.cursor.ClickType;
+import io.github.astrarre.gui.v1.api.listener.cursor.Cursor;
+import io.github.astrarre.gui.v1.api.listener.cursor.MouseListener;
+import io.github.astrarre.gui.v1.api.listener.focus.FocusDirection;
+import io.github.astrarre.gui.v1.api.listener.keyboard.Key;
+import io.github.astrarre.gui.v1.api.listener.keyboard.KeyboardListener;
+import io.github.astrarre.gui.v1.api.listener.keyboard.Modifier;
 
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
@@ -19,12 +18,9 @@ import net.minecraft.client.gui.Element;
  * Allows minecraft's components to be used in astrarre's gui API
  */
 public class ElementComponent extends DrawableComponent implements KeyboardListener, MouseListener {
-	/**
-	 * @see Panel#asMinecraft() for parent element for things that need it
-	 */
 	<T extends Drawable & Element> ElementComponent(T drawable) {
 		super(drawable);
-		this.lockBounds(); // bounds don't really work for elements
+		this.lockBounds(true); // bounds don't really work for elements
 	}
 
 	@Override
@@ -48,7 +44,7 @@ public class ElementComponent extends DrawableComponent implements KeyboardListe
 	}
 
 	@Override
-	public boolean mouseScrolled(Cursor cursor, double scroll) {
+	public boolean mouseScrolled(Cursor cursor, float scroll) {
 		return this.e().mouseScrolled(cursor.x(), cursor.y(), scroll);
 	}
 

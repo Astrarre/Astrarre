@@ -176,7 +176,7 @@ public class FakeClientConnection extends ClientConnection {
 	}
 
 	@Override
-	public void setCompressionThreshold(int compressionThreshold) {
+	public void setCompressionThreshold(int compressionThreshold, boolean rejectsBadPackets) {
 	}
 
 	@Override

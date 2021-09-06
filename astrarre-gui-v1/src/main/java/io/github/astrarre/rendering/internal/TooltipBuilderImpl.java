@@ -3,21 +3,23 @@ package io.github.astrarre.rendering.internal;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.github.astrarre.gui.v1.api.component.icon.Icon;
-import io.github.astrarre.gui.v1.api.component.icon.ScrollingLabelIcon;
+import io.github.astrarre.rendering.v1.api.plane.icon.Icon;
+import io.github.astrarre.rendering.v1.api.plane.icon.ScrollingLabelIcon;
 import io.github.astrarre.gui.v1.edge.TooltipComponents;
 import io.github.astrarre.rendering.internal.mixin.ScreenAccess;
 import io.github.astrarre.rendering.v1.api.plane.TextRenderer;
 import io.github.astrarre.rendering.v1.api.plane.TooltipBuilder;
+import io.github.astrarre.rendering.v1.edge.vertex.settings.Tex;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
+import net.minecraft.text.TextColor;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vector4f;
 
 public class TooltipBuilderImpl implements TooltipBuilder {
@@ -36,23 +38,17 @@ public class TooltipBuilderImpl implements TooltipBuilder {
 	}
 
 	@Override
-	public TextRenderer textRenderer(int color, boolean shadow) {
+	public TextRenderer text(int color, boolean shadow) {
 		return new TextRender(color, shadow);
 	}
 
 	@Override
-	public void render() {
+	public void text() {
 		this.impl.flush();
 		MatrixStack stack = this.impl.stack;
-		Vector4f origin = new Vector4f(0, 0, 0, 1);
-		origin.transform(stack.peek().getModel());
 		Screen screen = new Screen(TEXT) {};
-		float x = origin.getX(), y = origin.getY();
-		screen.init(MinecraftClient.getInstance(), this.currentWidth(), this.currentHeight()); // this is wrong too
-		stack.push();
-		stack.translate(-x, -y, 0);
-		((ScreenAccess)screen).callRenderTooltipFromComponents(stack, this.components, (int) x, (int) y);
-		stack.pop();
+		screen.init(MinecraftClient.getInstance(), this.currentWidth() + 12, this.currentHeight() + 12); // this is wrong too
+		((ScreenAccess)screen).callRenderTooltipFromComponents(stack, this.components, 0, 12);
 	}
 
 	@Override
@@ -63,7 +59,7 @@ public class TooltipBuilderImpl implements TooltipBuilder {
 
 	@Override
 	public int currentHeight() {
-		return this.components.stream().mapToInt(t -> t.getHeight()).sum();
+		return this.components.stream().mapToInt(TooltipComponent::getHeight).sum();
 	}
 
 	final class TextRender implements TextRenderer {
@@ -99,11 +95,6 @@ public class TooltipBuilderImpl implements TooltipBuilder {
 		@Override
 		public List<OrderedText> wrap(Text text, int width) {
 			return this.renderer.wrap(text, width);
-		}
-
-		@Override
-		public void renderWrappedText(Text text, int width) {
-			TooltipBuilderImpl.this.components.add(TooltipComponents.from(new WrappedLabelIcon(this, text, width, this.color, this.shadow)));
 		}
 
 		@Override

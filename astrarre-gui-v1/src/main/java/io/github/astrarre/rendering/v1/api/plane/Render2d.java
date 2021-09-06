@@ -46,8 +46,17 @@ public interface Render2d {
 
 	/**
 	 * returns a text renderer
+	 * @param color argb (that means u must have 0xffRRGGBB if u want solid color)
 	 */
 	TextRenderer text(int color, float x, float y, boolean shadow);
+
+	default TextRenderer text(float x, float y, boolean shadow) {
+		return this.text(0xffffffff, x, y, shadow);
+	}
+
+	default TextRenderer text(boolean shadow) {
+		return this.text(0, 0, shadow);
+	}
 
 	/**
 	 * @return a new tooltip builder
@@ -55,7 +64,7 @@ public interface Render2d {
 	TooltipBuilder tooltip();
 
 	/**
-	 * @param color argb argb
+	 * @param color argb argb (that means u must have 0xffRRGGBB if u want solid color)
 	 */
 	void line(int color, float x1, float y1, float x2, float y2); // todo add width?
 

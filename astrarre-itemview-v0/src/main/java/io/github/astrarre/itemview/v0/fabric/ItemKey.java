@@ -25,8 +25,8 @@ public interface ItemKey extends Comparable<ItemKey> {
 	static ItemKey of(ItemStack stack) {
 		if (stack.isEmpty()) {
 			return EMPTY;
-		} else if (stack.hasTag()) {
-			return new TaggedItemImpl(stack.getItem(), stack.getTag());
+		} else if (stack.hasNbt()) {
+			return new TaggedItemImpl(stack.getItem(), stack.getNbt());
 		} else {
 			return of(stack.getItem());
 		}
@@ -47,7 +47,7 @@ public interface ItemKey extends Comparable<ItemKey> {
 	default ItemStack createItemStack(int count) {
 		if(count == 0) return ItemStack.EMPTY;
 		ItemStack stack = new ItemStack(this.getItem(), count);
-		stack.setTag(this.getTag().copyTag());
+		stack.setNbt(this.getTag().copyTag());
 		return stack;
 	}
 
@@ -67,7 +67,7 @@ public interface ItemKey extends Comparable<ItemKey> {
 	 * @return true if the item and compound tags are equal
 	 */
 	default boolean isEqual(ItemStack stack) {
-		return stack.getItem() == this.getItem() && this.getTag().equals(stack.getTag());
+		return stack.getItem() == this.getItem() && this.getTag().equals(stack.getNbt());
 	}
 
 	/**

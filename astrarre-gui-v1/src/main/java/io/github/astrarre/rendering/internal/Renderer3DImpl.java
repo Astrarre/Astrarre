@@ -1,5 +1,6 @@
 package io.github.astrarre.rendering.internal;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.astrarre.rendering.internal.access.BufferBuilderAccess;
 import io.github.astrarre.rendering.internal.ogl.VertexRendererImpl;
 import io.github.astrarre.rendering.v1.api.space.item.ItemRenderer;
@@ -9,6 +10,8 @@ import io.github.astrarre.rendering.v1.api.space.item.ModelTransformType;
 import io.github.astrarre.rendering.v1.api.util.AngleFormat;
 import io.github.astrarre.rendering.v1.edge.VertexRenderer;
 import io.github.astrarre.util.v0.api.SafeCloseable;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.font.TextRenderer;
@@ -17,7 +20,6 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.world.World;
 
@@ -48,6 +50,15 @@ public class Renderer3DImpl extends Renderer2DImpl implements Render3d, ItemRend
 		return this;
 	}
 
+	static class Warn {
+		static final Logger LOGGER = LogManager.getLogger(Renderer3DImpl.class);
+		static {
+			LOGGER.warn("Support for ModelTransformTypes other than GUI are flimsy at best!");
+		}
+
+		static void init() {}
+	}
+
 	@Override
 	public void render(ModelTransformType type,
 			@Nullable LivingEntity entity,
@@ -56,10 +67,25 @@ public class Renderer3DImpl extends Renderer2DImpl implements Render3d, ItemRend
 			int light,
 			int overlay,
 			long seed) {
-		boolean leftHanded = type instanceof ModelTransformType.Holding h && h.hand == ModelTransformType.Hand.LEFT;
-		var immediate = VertexConsumerProvider.immediate(this.buffer);
-		this.itemRenderer.renderItem(entity, stack, type.getMode(), leftHanded, this.stack, immediate, world, light, overlay, (int)seed);
-		immediate.draw();
+		if(type == ModelTransformType.Standard.GUI) {
+			this.flush();
+			// this is necessary, or something, tm
+			MatrixStack s = RenderSystem.getModelViewStack();
+			s.push();
+			s.method_34425(this.stack.peek().getModel().copy());
+			this.itemRenderer.renderInGuiWithOverrides(stack, 0, 0);
+			this.itemRenderer.renderGuiItemOverlay(this.textRenderer, stack, 0, 0);
+			RenderSystem.enableDepthTest();
+			s.pop();
+			RenderSystem.applyModelViewMatrix();
+		} else {
+			Warn.init();
+			this.push(SetupImpl.ITEM);
+			boolean leftHanded = type instanceof ModelTransformType.Holding h && h.hand == ModelTransformType.Hand.LEFT;
+			var immediate = VertexConsumerProvider.immediate(this.buffer);
+			this.itemRenderer.renderItem(entity, stack, type.getMode(), leftHanded, this.stack, immediate, world, light, overlay, (int) seed);
+			immediate.draw();
+		}
 	}
 
 	@Override
@@ -105,21 +131,7 @@ public class Renderer3DImpl extends Renderer2DImpl implements Render3d, ItemRend
 	}
 
 	@Override
-	public SafeCloseable rotate(Direction.Axis axis, AngleFormat format, float theta) {
-		float x = 0;
-		float y = 0;
-		float z = 0;
-		switch(axis) {
-			case X -> x = 1;
-			case Y -> y = 1;
-			case Z -> z = 1;
-		}
-		return this.rotate(x, y, z, format, theta);
-	}
-
-	@Override
 	public void line(int color, float x1, float y1, float z1, float x2, float y2, float z2) {
-
 		this.push(SetupImpl.LINE);
 		int r = color & 0xFF, g = (color >> 8) & 0xFF, b = (color >> 16) & 0xFF, a = (color >> 24) & 0xFF;
 		Matrix4f matrix = this.stack.peek().getModel();

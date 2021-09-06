@@ -148,7 +148,7 @@ public class ItemSlotParticipant implements Slot<ItemKey> {
 		ItemStack stack = this.type.get(null);
 		StringBuilder builder = new StringBuilder("[");
 		builder.append(stack.getItem().toString());
-		NbtCompound tag = stack.getTag();
+		NbtCompound tag = stack.getNbt();
 		if(tag != null && !tag.isEmpty()) {
 			builder.append(' ').append(tag);
 		}

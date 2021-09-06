@@ -44,30 +44,30 @@ public interface ItemRenderer {
 	}
 
 	default void render(ModelTransformType type, @Nullable LivingEntity entity, @Nullable World world, ItemStack stack, long seed) {
-		this.render(type, entity, world, stack, LightmapTextureManager.field_32767, OverlayTexture.DEFAULT_UV, seed);
+		this.render(type, entity, world, stack, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV, seed);
 	}
 
 	default void render(ModelTransformType type, LivingEntity entity, ItemStack stack, long seed) {
-		this.render(type, entity, entity.getEntityWorld(), stack, LightmapTextureManager.field_32767, OverlayTexture.DEFAULT_UV, seed);
+		this.render(type, entity, entity.getEntityWorld(), stack, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV, seed);
 	}
 
 	default void render(ModelTransformType type, LivingEntity entity, ItemStack stack) {
-		this.render(type, entity, stack, LightmapTextureManager.field_32767, OverlayTexture.DEFAULT_UV, 0);
+		this.render(type, entity, stack, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV, 0);
 	}
 
 	default void render(ModelTransformType type, World world, ItemStack stack, long seed) {
-		this.render(type, null, world, stack, LightmapTextureManager.field_32767, OverlayTexture.DEFAULT_UV, seed);
+		this.render(type, null, world, stack, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV, seed);
 	}
 
 	default void render(ModelTransformType type, World world, ItemStack stack) {
-		this.render(type, world, stack, LightmapTextureManager.field_32767, OverlayTexture.DEFAULT_UV, 0);
+		this.render(type, world, stack, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV, 0);
 	}
 
 	default void render(ModelTransformType type, ItemStack stack, long seed) {
-		this.render(type, null, null, stack, LightmapTextureManager.field_32767, OverlayTexture.DEFAULT_UV, seed);
+		this.render(type, null, null, stack, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV, seed);
 	}
 
 	default void render(ModelTransformType type, ItemStack stack) {
-		this.render(type, stack, LightmapTextureManager.field_32767, OverlayTexture.DEFAULT_UV, 0);
+		this.render(type, stack, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV, 0);
 	}
 }

@@ -105,11 +105,6 @@ allprojects {
         testImplementation('net.devtech:PotatoUnit:1.0.3') {
             exclude module: 'fabric-loader'
         }
-        //testmodImplementation sourceSets.main.output
-        testmodImplementation('com.github.astei:lazydfu:0.1.1') {
-            exclude module: 'fabric-loader'
-            exclude module: 'fabric-api'
-        }
 
         // check for conflicts
         modRuntime("net.fabricmc.fabric-api:fabric-api:${fabric_version}") {

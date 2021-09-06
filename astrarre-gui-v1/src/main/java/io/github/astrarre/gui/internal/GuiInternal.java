@@ -1,34 +1,41 @@
 package io.github.astrarre.gui.internal;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Set;
 
+import io.github.astrarre.gui.internal.std.StandardScreen;
+import io.github.astrarre.gui.internal.std.StandardScreenHandler;
 import io.github.astrarre.gui.internal.util.IntFlags;
-import io.github.astrarre.gui.v1.api.cursor.ClickType;
-import io.github.astrarre.gui.v1.api.cursor.Cursor;
-import io.github.astrarre.gui.v1.api.cursor.CursorType;
-import io.github.astrarre.gui.v1.api.keyboard.Key;
-import io.github.astrarre.gui.v1.api.keyboard.Modifier;
+import io.github.astrarre.gui.v1.api.listener.cursor.ClickType;
+import io.github.astrarre.gui.v1.api.listener.cursor.CursorType;
+import io.github.astrarre.gui.v1.api.listener.keyboard.Key;
+import io.github.astrarre.gui.v1.api.listener.keyboard.Modifier;
+import io.github.astrarre.util.v0.api.Id;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.ingame.HandledScreens;
+import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.text.LiteralText;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.registry.Registry;
 
 public class GuiInternal {
+	public static final Id SERVER = Id.create("astrarre", "server_panel");
+	public static final LiteralText TEXT = new LiteralText("Astrarre Gui");
 	static final Modifier[] MODIFIERS = new Modifier[32];
 	public static final Logger LOGGER = LogManager.getLogger(GuiInternal.class);
 	static ClickType[] clickTypes = ClickType.Standard.values();
 	static final ClickType UNKNOWN = () -> -1;
 	static final Int2ObjectMap<Key> GLFW_TO_KEY = new Int2ObjectOpenHashMap<>();
 	public static final Long2ObjectMap<CursorType> HANDLE_TO_TYPE = new Long2ObjectOpenHashMap<>();
-
+	public static final ScreenHandlerType<StandardScreenHandler> HANDLER_TYPE;
 	public static class Holder {
 		public static final long WINDOW_HANDLE = MinecraftClient.getInstance().getWindow().getHandle();
 	}
@@ -57,6 +64,10 @@ public class GuiInternal {
 				MODIFIERS[i] = () -> flag;
 			}
 		}
+
+		Identifier id = new Identifier("astrarre", "guidesktophandsplayed");
+		HANDLER_TYPE = Registry.register(Registry.SCREEN_HANDLER, id, new ScreenHandlerType<>(StandardScreenHandler::new));
+		HandledScreens.register(HANDLER_TYPE, StandardScreen::new);
 	}
 
 	public static Set<Modifier> modifiersByGlfwFlags(int modifiers) {

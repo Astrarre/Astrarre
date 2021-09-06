@@ -4,7 +4,7 @@ import java.util.List;
 
 import io.github.astrarre.gui.internal.CursorImpl;
 import io.github.astrarre.gui.internal.GuiInternal;
-import io.github.astrarre.gui.v1.api.cursor.CursorType;
+import io.github.astrarre.gui.v1.api.listener.cursor.CursorType;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

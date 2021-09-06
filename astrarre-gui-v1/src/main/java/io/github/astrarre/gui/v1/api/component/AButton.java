@@ -1,23 +1,24 @@
 package io.github.astrarre.gui.v1.api.component;
 
-import io.github.astrarre.gui.v1.api.AComponent;
-import io.github.astrarre.gui.v1.api.FocusableComponent;
-import io.github.astrarre.gui.v1.api.component.icon.Icon;
-import io.github.astrarre.gui.v1.api.cursor.ClickType;
-import io.github.astrarre.gui.v1.api.cursor.Cursor;
-import io.github.astrarre.gui.v1.api.cursor.CursorType;
-import io.github.astrarre.gui.v1.api.cursor.MouseListener;
+import java.util.function.Consumer;
+
+import io.github.astrarre.gui.v1.api.listener.cursor.ClickType;
+import io.github.astrarre.gui.v1.api.listener.cursor.Cursor;
+import io.github.astrarre.gui.v1.api.listener.cursor.CursorType;
+import io.github.astrarre.gui.v1.api.listener.cursor.MouseListener;
 import io.github.astrarre.gui.v1.api.util.GuiRenderable;
+import io.github.astrarre.rendering.v1.api.plane.TooltipBuilder;
+import io.github.astrarre.rendering.v1.api.plane.icon.Icon;
 import io.github.astrarre.rendering.v1.api.space.Render3d;
 import io.github.astrarre.util.v0.api.Validate;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * @see Standard
  */
-public abstract class AButton extends AComponent implements MouseListener {
+public abstract class AButton extends AHoverableComponent implements MouseListener, ToggleableComponent {
 	Runnable callback;
-	GuiRenderable tooltip;
 	boolean pressed;
 
 	/**
@@ -30,15 +31,15 @@ public abstract class AButton extends AComponent implements MouseListener {
 	/**
 	 * @see #callback(Runnable)
 	 */
-	public static Standard icon(Icon pressed, Icon hover, Icon default_) {
-		return new Standard(pressed, hover, default_, null);
+	public static Standard icon(Icon pressed, Icon hover, Icon default_, @Nullable Icon disabled) {
+		return new Standard(pressed, hover, default_, disabled, null);
 	}
 
 	/**
 	 * @see #callback(Runnable)
 	 */
 	public static Standard icon(Icon.Group group) {
-		return new Standard(group.pressed(), group.hover(), group.normal(), null);
+		return new Standard(group.pressed(), group.hover(), group.normal(), group.disabled(), null);
 	}
 
 	/**
@@ -49,15 +50,18 @@ public abstract class AButton extends AComponent implements MouseListener {
 		return this;
 	}
 
-	public AButton tooltip(@Nullable GuiRenderable renderable) {
-		this.tooltip = renderable;
+	public AButton tooltipDirect(@NotNull Consumer<TooltipBuilder> consumer) {
+		this.onHover.andThen((cursor, render) -> {
+			TooltipBuilder builder = render.tooltip();
+			consumer.accept(builder);
+			builder.text();
+		});
 		return this;
 	}
 
 	@Override
 	public boolean mouseClicked(Cursor cursor, ClickType type) {
-		this.pressed = true;
-		return true;
+		return (this.pressed = this.isEnabled());
 	}
 
 	@Override
@@ -65,19 +69,18 @@ public abstract class AButton extends AComponent implements MouseListener {
 		if(this.pressed) {
 			this.onClick();
 		}
-		return true;
+		return this.pressed;
 	}
 
 	@Override
 	protected void render0(Cursor cursor, Render3d render) {
 		this.pressed &= cursor.isPressed(ClickType.Standard.LEFT);
-		if(this.pressed) {
+		if(!this.isEnabled()) {
+			this.renderDisabled(cursor, render);
+		} else if(this.pressed) {
 			this.renderPressed(cursor, render);
 		} else if(this.isIn(cursor)) {
 			this.renderHighlighted(cursor, render);
-			if(this.tooltip != null) {
-				this.tooltip.render(cursor, render);
-			}
 		} else {
 			this.renderDefault(cursor, render);
 		}
@@ -85,12 +88,16 @@ public abstract class AButton extends AComponent implements MouseListener {
 
 	@Override
 	protected void onMouseEnter(Cursor cursor, Render3d render) {
-		cursor.setType(CursorType.Standard.HAND);
+		if(this.isEnabled()) {
+			cursor.setType(CursorType.Standard.HAND);
+		}
 	}
 
 	@Override
 	protected void onMouseExit(Cursor cursor, Render3d render) {
-		cursor.setType(CursorType.Standard.ARROW);
+		if(this.isEnabled()) {
+			cursor.setType(CursorType.Standard.ARROW);
+		}
 	}
 
 	protected abstract void renderPressed(Cursor cursor, Render3d render);
@@ -99,6 +106,8 @@ public abstract class AButton extends AComponent implements MouseListener {
 
 	protected abstract void renderDefault(Cursor cursor, Render3d render);
 
+	protected abstract void renderDisabled(Cursor cursor, Render3d render);
+
 	protected void onClick() {
 		if(this.callback != null) {
 			this.callback.run();
@@ -106,19 +115,29 @@ public abstract class AButton extends AComponent implements MouseListener {
 	}
 
 	public static class Standard extends AButton implements FocusableComponent {
-		Icon press, hover, state;
+		Icon press, hover, state, disabled;
 
 		/**
 		 * {@inheritDoc}
 		 */
-		public Standard(Icon pressed, Icon hover, Icon default_, @Nullable Runnable callback) {
+		public Standard(Icon pressed, Icon hover, Icon default_, @Nullable Icon disabled, @Nullable Runnable callback) {
 			super(callback);
 			this.press = pressed;
 			this.hover = hover;
 			this.state = default_;
+			this.disabled = disabled;
 			this.validate();
 			this.setBounds(pressed.width(), pressed.height());
-			this.lockBounds();
+			this.lockBounds(true);
+		}
+
+		public Icon getDisabled() {
+			return this.disabled;
+		}
+
+		public Standard setDisabled(Icon disabled) {
+			this.disabled = disabled;
+			return this;
 		}
 
 		public Icon pressed() {
@@ -157,9 +176,7 @@ public abstract class AButton extends AComponent implements MouseListener {
 		}
 
 		protected void renderFocusedBackground(Cursor cursor, Render3d render) {
-			try(var ignore = render.translate(-5, -5)) {
-				render.fill().rect(0xFF3333FF, 0, 0, this.press.width() + 10, this.press.height() + 10);
-			}
+			render.fill().rect(0xFF3333FF, -2, -2, this.press.width() + 4, this.press.height() + 4);
 		}
 
 		@Override
@@ -184,6 +201,13 @@ public abstract class AButton extends AComponent implements MouseListener {
 				this.renderFocusedBackground(cursor, render);
 			}
 			this.state.render(render);
+		}
+
+		@Override
+		protected void renderDisabled(Cursor cursor, Render3d render) {
+			if(this.disabled != null) {
+				this.disabled.render(render);
+			}
 		}
 	}
 }
