@@ -20,8 +20,10 @@ enum SetupImpl implements Renderer2DImpl.Setup {
 
 		@Override
 		public void takedown(BufferBuilder builder) {
-			builder.end();
-			BufferRenderer.draw(builder);
+			if(builder.isBuilding()) {
+				builder.end();
+				BufferRenderer.draw(builder);
+			}
 		}
 	}, LINE {
 		@Override

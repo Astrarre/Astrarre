@@ -1,13 +1,13 @@
 package io.github.astrarre.gui.internal.std;
 
 import io.github.astrarre.gui.internal.GuiInternal;
-import org.jetbrains.annotations.Nullable;
+import io.github.astrarre.gui.v1.api.component.slot.ASlot;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.screen.slot.Slot;
 
 public class StandardScreenHandler extends ScreenHandler {
 	public StandardScreenHandler(int syncId) {
@@ -16,6 +16,17 @@ public class StandardScreenHandler extends ScreenHandler {
 
 	public StandardScreenHandler(int syncId, PlayerInventory inventory) {
 		super(GuiInternal.HANDLER_TYPE, syncId);
+	}
+
+	@Override
+	public ItemStack transferSlot(PlayerEntity player, int index) {
+		Slot slot = this.slots.get(index);
+		if(slot instanceof ASlot.Minecraft m) {
+			ItemStack stack = m.transferToLinked();
+			return slot.getStack() == stack ? ItemStack.EMPTY : stack; // avoid infinite loop
+		}
+
+		return ItemStack.EMPTY;
 	}
 
 	@Override

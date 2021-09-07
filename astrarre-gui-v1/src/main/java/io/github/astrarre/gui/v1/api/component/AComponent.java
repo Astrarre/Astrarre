@@ -4,13 +4,13 @@ import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.gui.v1.api.listener.component.ResizeListener;
 import io.github.astrarre.gui.v1.api.listener.cursor.Cursor;
 import io.github.astrarre.gui.v1.api.listener.cursor.MouseListener;
-import io.github.astrarre.gui.v1.api.util.ComponentTransform;
+import io.github.astrarre.gui.v1.api.util.Transformed;
 import io.github.astrarre.gui.v1.api.util.RenderStage;
 import io.github.astrarre.rendering.v1.api.space.Render3d;
 import io.github.astrarre.rendering.v1.api.space.Transform3d;
 import io.github.astrarre.util.v0.api.Validate;
 
-public abstract class AComponent implements ComponentTransform<AComponent> {
+public abstract class AComponent implements Transformed<AComponent> {
 	public final Access<ResizeListener> onResize = new Access<>("astrarre", "resize", array -> (w, h) -> {
 		for(ResizeListener listener : array) {
 			listener.onResize(w, h);

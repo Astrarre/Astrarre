@@ -18,6 +18,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
+/**
+ * A root gui object
+ */
 public class ARootPanel extends APanel {
 	public final Access<Runnable> onClose = new Access<>(Id.create("astrarre", "root_panel_close"), array -> () -> {
 		for(Runnable runnable : array) {
@@ -60,7 +63,6 @@ public class ARootPanel extends APanel {
 	}
 
 
-
 	/**
 	 * Opens a new client-only gui
 	 * @see ServerPanel#openHandled(PlayerEntity, ServerPanel.ClientInit, ServerPanel.ServerInit)
@@ -80,7 +82,7 @@ public class ARootPanel extends APanel {
 
 	@Override
 	protected boolean cursor(Cursor cursor, CursorCallback consumer) {
-		if(this.focused(this.focused, t -> { // maybe instead just temporary disable the listeners or smth
+		if(this.find(this.focused, t -> { // maybe instead just temporary disable the listeners or smth
 			this.focused.set(AComponent.SKIP_MOUSEVENT, true);
 			if(t.component() instanceof MouseListener l) {
 				Cursor transformed = cursor.transformed(t.transform().invert());

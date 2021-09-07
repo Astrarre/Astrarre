@@ -212,11 +212,15 @@ public interface Icon {
 	}
 
 	default Icon highlighted() {
-		return this.andThen(color(0xaaddddff, this.width(), this.height()));
+		return this.colored(0xaaddddff);
 	}
 
 	default Icon darkened() {
-		return this.andThen(color(0x77000000, this.width(), this.height()));
+		return this.colored(0x77000000);
+	}
+
+	default Icon colored(int argb) {
+		return this.andThen(color(argb, this.width(), this.height()));
 	}
 
 	record Group(Icon normal, Icon hover, Icon pressed, Icon disabled) {

@@ -67,7 +67,7 @@ public interface ItemKey extends Comparable<ItemKey> {
 	 * @return true if the item and compound tags are equal
 	 */
 	default boolean isEqual(ItemStack stack) {
-		return stack.getItem() == this.getItem() && this.getTag().equals(stack.getNbt());
+		return stack.getItem() == this.getItem() && this.getTag().equals(FabricViews.view(stack.getNbt()));
 	}
 
 	/**

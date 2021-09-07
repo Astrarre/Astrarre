@@ -25,6 +25,13 @@ public final class Lazy<T> implements Supplier<T> {
 	private Supplier<T> supplier;
 	private T instance;
 
+	public static Lazy<Void> init(Runnable runnable) {
+		return of(() -> {
+			runnable.run();
+			return null;
+		});
+	}
+
 	public static <T> Lazy<T> of(Supplier<T> supplier) {
 		return new Lazy<>(supplier);
 	}
@@ -71,8 +78,7 @@ public final class Lazy<T> implements Supplier<T> {
 		T instance = this.instance;
 		Supplier<T> supplier = this.supplier;
 		if(supplier != null) {
-			instance = Objects.requireNonNull(supplier.get(), "Lazy supplier may not return null!");
-			this.instance = instance;
+			this.instance = instance = supplier.get();
 			this.supplier = null;
 		}
 		return instance;
@@ -143,9 +149,7 @@ public final class Lazy<T> implements Supplier<T> {
 	@Contract("-> new")
 	public net.minecraft.util.Lazy<T> toMC() {
 		if(this.supplier == null) {
-			net.minecraft.util.Lazy<T> lazy = new net.minecraft.util.Lazy<>(null);
-			((LazyAccess)lazy).setSupplier(() -> this.instance);
-			return lazy;
+			return new net.minecraft.util.Lazy<>(() -> this.instance);
 		} else {
 			// has to be `this`/`this::get`, because we don't want to evaluate the supplier twice on accident
 			return new net.minecraft.util.Lazy<>(this);

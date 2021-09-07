@@ -23,7 +23,7 @@ import net.minecraft.util.math.Matrix3f;
 import net.minecraft.util.math.Matrix4f;
 
 public class Renderer2DImpl implements Render2d {
-	static final Stencil STENCIL = Stencil.newInstance();
+	public static final Stencil STENCIL = Stencil.newInstance();
 
 	final net.minecraft.client.font.TextRenderer textRenderer;
 	final int width, height;

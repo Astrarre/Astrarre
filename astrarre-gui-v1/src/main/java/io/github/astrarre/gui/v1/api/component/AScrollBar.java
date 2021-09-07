@@ -16,9 +16,10 @@ import io.github.astrarre.rendering.v1.api.util.Axis2d;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 
-public class ASlider extends AHoverableComponent implements MouseListener, FocusableComponent, ToggleableComponent {
-	public static final Transform3d RIGHT_ANGLE = Transform3d.rotate(0, 0, 1, AngleFormat.DEGREES, -90);
-	public static final Transform3d UPSIDE_DOWN = Transform3d.rotate(0, 0, 1, AngleFormat.DEGREES, 180);
+/**
+ * A scrollbar or slider
+ */
+public class AScrollBar extends AHoverableComponent implements MouseListener, FocusableComponent, ToggleableComponent {
 
 	public final Access<ProgressChangeListener> onChange = new Access<>("astrarre", "on_change", array -> (old, new_) -> {
 		for(ProgressChangeListener listener : array) {
@@ -32,7 +33,7 @@ public class ASlider extends AHoverableComponent implements MouseListener, Focus
 	public final Axis2d axis;
 	float progress, oldProgress;
 
-	public ASlider(ARootPanel root, Icon.Group bar, Icon background, Axis2d axis) {
+	public AScrollBar(ARootPanel root, Icon.Group bar, Icon background, Axis2d axis) {
 		this.root = root;
 		this.axis = axis;
 		bar.requireUniformSize();
@@ -42,6 +43,9 @@ public class ASlider extends AHoverableComponent implements MouseListener, Focus
 		this.lockBounds(true);
 	}
 
+	/**
+	 * Creates a new component that is this component paired with an up and down button
+	 */
 	public APanel withButtons() {
 		Axis2d axis = this.axis;
 		float dims = axis.n(this.background.height(), this.background.width());
@@ -127,7 +131,7 @@ public class ASlider extends AHoverableComponent implements MouseListener, Focus
 		return this.progress;
 	}
 
-	public ASlider setProgress(float progress) {
+	public AScrollBar setProgress(float progress) {
 		progress = MathHelper.clamp(progress, 0, 1);
 		if(this.oldProgress != progress) {
 			this.onUpdateProgress(this.oldProgress, progress);

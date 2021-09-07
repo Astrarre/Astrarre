@@ -52,7 +52,7 @@ public class Recipes {
 		Registry.register(Registry.RECIPE_TYPE, recipeId, recipeType);
 		CustomRecipeSerializer<?> serializer = new CustomRecipeSerializer<>(type, recipeType, gson);
 		Registry.register(Registry.RECIPE_SERIALIZER, recipeId, serializer);
-		Val<List<T>> values = new Val<>();
+		Val<List<T>> values = new Val<>(new ArrayList<>());
 		RecipePostReloadEvent.EVENT.addListener((manager, recipes) -> {
 			Map<Identifier, net.minecraft.recipe.Recipe<?>> rec = recipes.get(recipeType);
 			if(rec == null) return;

@@ -7,21 +7,23 @@ import java.util.List;
 
 import io.github.astrarre.gui.v1.api.listener.component.ResizeListener;
 import io.github.astrarre.gui.v1.api.listener.focus.FocusDirection;
-import io.github.astrarre.gui.v1.api.util.ComponentTransform;
-import io.github.astrarre.gui.internal.TransformedComponentImpl;
+import io.github.astrarre.gui.v1.api.util.Transformed;
 import io.github.astrarre.rendering.v1.api.plane.Transform2d;
 import io.github.astrarre.rendering.v1.api.space.Transform3d;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * An appendable group of components
+ */
 public class APanel extends AGroup {
-	protected final List<ComponentTransform<?>> cmps = new ArrayList<>();
+	protected final List<Transformed<?>> cmps = new ArrayList<>();
 	final ResizeListener listener = (width, height) -> this.recomputeBounds();
 	float minX, minY;
 
 	@NotNull
 	@Override
-	public Iterator<ComponentTransform<?>> iterator() {
+	public Iterator<Transformed<?>> iterator() {
 		return this.cmps.iterator();
 	}
 
@@ -48,18 +50,18 @@ public class APanel extends AGroup {
 		return index == -1 || index == (this.cmps.size() - 1) ? null : this.cmps.get(index + 1).component();
 	}
 
-	public APanel add(ComponentTransform<?>... component) {
+	public APanel add(Transformed<?>... component) {
 		this.cmps.addAll(Arrays.asList(component));
 		this.recomputeBounds();
-		for(ComponentTransform<?> transform : component) {
+		for(Transformed<?> transform : component) {
 			transform.component().onResize.andThen(this.listener);
 		}
 		return this;
 	}
 
-	public APanel remove(ComponentTransform<?>... component) {
+	public APanel remove(Transformed<?>... component) {
 		this.cmps.removeAll(Arrays.asList(component));
-		for(ComponentTransform<?> transform : component) {
+		for(Transformed<?> transform : component) {
 			if(transform.component() == this.focused) {
 				this.focused = null;
 				this.next(FocusDirection.FORWARD);
@@ -72,16 +74,14 @@ public class APanel extends AGroup {
 	
 	protected void recomputeBounds() {
 		float maxX = 0, maxY = 0, minX = Float.POSITIVE_INFINITY, minY = Float.POSITIVE_INFINITY;
-		for(ComponentTransform<?> t : this) {
+		for(Transformed<?> t : this) {
 			Transform3d tr = t.transform();
 			AComponent c = t.component();
-			float w = c.getWidth(), h = c.getHeight();
-			float x = max(Transform2d::transformX, tr, w, h);
-			float y = max(Transform2d::transformY, tr, w, h);
-			maxX = Math.max(maxX, x);
-			maxY = Math.max(maxY, y);
-			minX = Math.min(minX, x);
-			minY = Math.min(minY, y);
+			Rect rect = bounds(tr, c.getWidth(), c.getHeight());
+			maxX = Math.max(maxX, rect.maxX);
+			maxY = Math.max(maxY, rect.maxY);
+			minX = Math.min(minX, rect.minX);
+			minY = Math.min(minY, rect.minY);
 		}
 
 		this.lockBounds(false);
@@ -91,16 +91,32 @@ public class APanel extends AGroup {
 		this.minY = minY;
 	}
 
+	public record Rect(float minX, float minY, float maxX, float maxY) {}
+
 	public interface CoordinateTransformer {
 		float accept(Transform2d accept, float x, float y);
 	}
 
-	public static float max(CoordinateTransformer t, Transform2d transform, float w, float h) {
-		float a = t.accept(transform, w, h);
-		float b = t.accept(transform, 0, h);
-		float c = t.accept(transform, w, 0);
-		float d = t.accept(transform, 0, 0);
-		return Math.max(Math.max(a, b), Math.max(c, d));
+	public static Rect bounds(Transform2d tr, float w, float h) {
+		float mxx, mxy, mnx, mny;
+		{
+			float a = tr.transformX(w, h);
+			float b = tr.transformX(0, h);
+			float c = tr.transformX(w, 0);
+			float d = tr.transformX(0, 0);
+			mxx = Math.max(Math.max(a, b), Math.max(c, d));
+			mnx = Math.min(Math.min(a, b), Math.min(c, d));
+		}
+		{
+			float a = tr.transformY(w, h);
+			float b = tr.transformY(0, h);
+			float c = tr.transformY(w, 0);
+			float d = tr.transformY(0, 0);
+			mxy = Math.max(Math.max(a, b), Math.max(c, d));
+			mny = Math.min(Math.min(a, b), Math.min(c, d));
+		}
+
+		return new Rect(mnx, mny, mxx, mxy);
 	}
 
 	public float getMinX() {

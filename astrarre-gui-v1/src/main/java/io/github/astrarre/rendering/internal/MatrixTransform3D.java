@@ -84,4 +84,28 @@ public record MatrixTransform3D(Matrix4f matrix) implements Transform3d {
 			return Transform3d.super.andThen(transform);
 		}
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Translate: ")
+				.append("[")
+				.append(this.matrix.a30)
+				.append(", ")
+				.append(this.matrix.a31)
+				.append(", ")
+				.append(this.matrix.a32)
+				.append("]\n");
+		builder.append("Scale: ")
+				.append("[")
+				.append(this.matrix.a00)
+				.append(", ")
+				.append(this.matrix.a11)
+				.append(", ")
+				.append(this.matrix.a22)
+				.append("]\n");
+		builder.append("theta: ")
+				.append(Math.acos(this.matrix.a22));
+		return builder.toString();
+	}
 }

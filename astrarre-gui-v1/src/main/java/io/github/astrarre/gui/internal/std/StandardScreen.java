@@ -13,6 +13,12 @@ public class StandardScreen extends HandledScreen<StandardScreenHandler> {
 	}
 
 	@Override
+	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		super.render(matrices, mouseX, mouseY, delta);
+		this.drawMouseoverTooltip(matrices, mouseX, mouseY);
+	}
+
+	@Override
 	protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
 	}
 

@@ -67,8 +67,8 @@ public class Renderer3DImpl extends Renderer2DImpl implements Render3d, ItemRend
 			int light,
 			int overlay,
 			long seed) {
+		this.push(SetupImpl.ITEM);
 		if(type == ModelTransformType.Standard.GUI) {
-			this.flush();
 			// this is necessary, or something, tm
 			MatrixStack s = RenderSystem.getModelViewStack();
 			s.push();
@@ -80,7 +80,6 @@ public class Renderer3DImpl extends Renderer2DImpl implements Render3d, ItemRend
 			RenderSystem.applyModelViewMatrix();
 		} else {
 			Warn.init();
-			this.push(SetupImpl.ITEM);
 			boolean leftHanded = type instanceof ModelTransformType.Holding h && h.hand == ModelTransformType.Hand.LEFT;
 			var immediate = VertexConsumerProvider.immediate(this.buffer);
 			this.itemRenderer.renderItem(entity, stack, type.getMode(), leftHanded, this.stack, immediate, world, light, overlay, (int) seed);

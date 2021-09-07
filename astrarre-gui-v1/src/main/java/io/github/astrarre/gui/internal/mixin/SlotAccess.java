@@ -13,6 +13,6 @@ public interface SlotAccess {
 	void setX(int x);
 
 	@Mutable
-	@Accessor("y")
+	@Accessor("x")
 	void setY(int y);
 }

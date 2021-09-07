@@ -26,7 +26,7 @@ public abstract class ScreenMixin_Access implements PanelScreenAccess {
 	@Inject(method = "init(Lnet/minecraft/client/MinecraftClient;II)V", at = @At("RETURN"))
 	public void onInit(MinecraftClient client, int width, int height, CallbackInfo ci) {
 		if(this.panel != null) {
-			this.panel.setBoundsInternal(width, height);
+			this.panel.setBoundsInternal(this.width, this.height);
 			this.addDrawableChild(this.panel);
 		}
 	}

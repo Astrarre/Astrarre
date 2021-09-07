@@ -3,6 +3,8 @@
   "id": "astrarre-gui-testmod-v0",
   "version": "${version}",
   "entrypoints": {
-    "main": ["GuiTestMod"]
+    "main": [
+      "insane_crafting.InsaneCrafting"
+    ]
   }
 }
