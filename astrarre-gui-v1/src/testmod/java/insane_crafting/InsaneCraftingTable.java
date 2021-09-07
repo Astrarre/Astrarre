@@ -162,7 +162,7 @@ public class InsaneCraftingTable extends Block {
 					}
 				}
 
-				this.previewStack = recipe.output;
+				this.previewStack = recipe.output.copy();
 				return;
 			}
 			this.previewStack = ItemStack.EMPTY;
