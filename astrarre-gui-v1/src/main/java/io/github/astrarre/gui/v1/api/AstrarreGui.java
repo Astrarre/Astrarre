@@ -1,7 +1,7 @@
 package io.github.astrarre.gui.v1.api;
 
 import io.github.astrarre.access.v0.api.Access;
-import io.github.astrarre.gui.internal.SlotAuditor;
+import io.github.astrarre.gui.internal.slot.SlotAuditor;
 import io.github.astrarre.util.v0.api.Id;
 
 public class AstrarreGui {

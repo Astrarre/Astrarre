@@ -40,6 +40,11 @@ public abstract class ScreenMixin_Access implements PanelScreenAccess {
 	}
 
 	@Override
+	public boolean hasRootPanel() {
+		return this.panel != null;
+	}
+
+	@Override
 	public void setRootPanel(ARootPanel panel) {
 		this.panel = (ElementRootPanel.ScreenImpl) panel;
 		this.panel.setBoundsInternal(this.width, this.height);

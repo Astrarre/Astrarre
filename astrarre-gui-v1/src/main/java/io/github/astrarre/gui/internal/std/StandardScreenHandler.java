@@ -1,7 +1,7 @@
 package io.github.astrarre.gui.internal.std;
 
 import io.github.astrarre.gui.internal.GuiInternal;
-import io.github.astrarre.gui.v1.api.component.slot.ASlot;
+import io.github.astrarre.gui.internal.slot.SlotAdapter;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -21,7 +21,7 @@ public class StandardScreenHandler extends ScreenHandler {
 	@Override
 	public ItemStack transferSlot(PlayerEntity player, int index) {
 		Slot slot = this.slots.get(index);
-		if(slot instanceof ASlot.Minecraft m) {
+		if(slot instanceof SlotAdapter m) {
 			ItemStack stack = m.transferToLinked();
 			return slot.getStack() == stack ? ItemStack.EMPTY : stack; // avoid infinite loop
 		}

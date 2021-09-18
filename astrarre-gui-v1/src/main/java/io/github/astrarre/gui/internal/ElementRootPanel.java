@@ -26,7 +26,7 @@ import net.minecraft.client.util.math.MatrixStack;
 
 public abstract class ElementRootPanel extends ARootPanel implements AComponentElement, Drawable, Selectable {
 	public ParentElement element;
-	final CursorImpl impl = new CursorImpl(0, 0);
+	final CursorImpl impl = new CursorImpl(0, 0, MinecraftClient.getInstance().player);
 
 	public ElementRootPanel(ParentElement element) {
 		this.element = element;

@@ -1,11 +1,13 @@
 package io.github.astrarre.util.v0.api;
 
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.Nullable;
 
 import net.fabricmc.api.EnvType;
@@ -52,13 +54,14 @@ public class Validate {
 
 	public static <T> T ifClient(Supplier<T> supplier) {
 		if(IS_CLIENT) {
-			supplier.get();
+			return supplier.get();
+		} else {
+			return null;
 		}
-		return null;
 	}
 
-	public interface Msg<T> {
-		String msg(T expected, T value);
+	public static <T> T orDefault(T val, T def) {
+		return val == null ? def : val;
 	}
 
 	public static <T> void equals(Msg<T> message, T... objects) {
@@ -74,10 +77,10 @@ public class Validate {
 	}
 
 	/**
-	 * @throws T rethrows {@code throwable}
 	 * @return nothing, because it throws
+	 * @throws T rethrows {@code throwable}
 	 */
-	@SuppressWarnings ("unchecked")
+	@SuppressWarnings("unchecked")
 	public static <T extends Throwable> RuntimeException rethrow(Throwable throwable) throws T {
 		throw (T) throwable;
 	}
@@ -97,7 +100,7 @@ public class Validate {
 	 * @throws IllegalArgumentException if {@code val} < {@code comp}
 	 */
 	public static int greaterThanEqualTo(int val, int comp, String name) {
-		if (val >= comp) {
+		if(val >= comp) {
 			return val;
 		}
 		throw new IllegalArgumentException(String.format("%s (%d) < %d!", name, val, comp));
@@ -109,28 +112,28 @@ public class Validate {
 	 * @throws IllegalArgumentException if {@code val} <= {@code comp}
 	 */
 	public static int greaterThan(int val, int comp, String name) {
-		if (val > comp) {
+		if(val > comp) {
 			return val;
 		}
 		throw new IllegalArgumentException(String.format("%s (%d) <= %d!", name, val, comp));
 	}
 
 	public static <T> T notNull(T object, String message) {
-		if (object == null) {
+		if(object == null) {
 			throw new IllegalArgumentException(message);
 		}
 		return object;
 	}
 
 	public static <A, B> B instanceOf(A object, Class<B> cls, String message) {
-		if (cls.isInstance(object)) {
+		if(cls.isInstance(object)) {
 			return (B) object;
 		}
 		throw new IllegalArgumentException(message);
 	}
 
 	public static <A, B> B filter(A a, Class<B> cls) {
-		if (cls.isInstance(a)) {
+		if(cls.isInstance(a)) {
 			return (B) a;
 		} else {
 			return null;
@@ -139,7 +142,7 @@ public class Validate {
 
 	@Nullable
 	public static <A> A filter(A obj, Predicate<A> a) {
-		if (a.test(obj)) {
+		if(a.test(obj)) {
 			return obj;
 		} else {
 			return null;
@@ -147,7 +150,7 @@ public class Validate {
 	}
 
 	public static void isTrue(boolean va, String msg) {
-		if (!va) {
+		if(!va) {
 			throw new IllegalArgumentException(msg);
 		}
 	}
@@ -159,18 +162,22 @@ public class Validate {
 	}
 
 	public static void lessThan(int index, int length, String s) {
-		if (index >= length) {
+		if(index >= length) {
 			throw new IllegalArgumentException(s);
 		}
 	}
 
 	public static <A, B> B transform(A input, Function<A, B> transform) {
-		if(input == null) return null;
+		if(input == null) {
+			return null;
+		}
 		return transform.apply(input);
 	}
 
 	public static <A, B, C> C transform(A input, B context, BiFunction<A, B, C> transform) {
-		if(input == null) return null;
+		if(input == null) {
+			return null;
+		}
 		return transform.apply(input, context);
 	}
 
@@ -180,5 +187,17 @@ public class Validate {
 
 	public static int b2i(boolean bool) {
 		return bool ? 1 : 0;
+	}
+
+	public static int min(int... a) {
+		int smol = Integer.MAX_VALUE;
+		for(int i : a) {
+			smol = Math.min(smol, i);
+		}
+		return smol;
+	}
+
+	public interface Msg<T> {
+		String msg(T expected, T value);
 	}
 }

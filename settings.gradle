@@ -21,5 +21,6 @@ include 'astrarre-components-v0'
 include 'astrarre-event-core-v0'
 include 'astrarre-event-entity-v0'
 include 'astrarre-gui-v1'
+include 'astrarre-rendering-v1'
 include 'astrarre-hash-v0'
 

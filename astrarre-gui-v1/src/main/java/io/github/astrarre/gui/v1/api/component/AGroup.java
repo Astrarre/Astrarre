@@ -138,7 +138,7 @@ public abstract class AGroup extends AComponent implements KeyboardListener, Mou
 	}
 
 	public AComponent getAtRecursive(float x, float y) {
-		CursorImpl impl = new CursorImpl(x, y);
+		CursorImpl impl = new CursorImpl(x, y, null);
 		for(Transformed<?> component : this) {
 			AComponent c = component.component();
 			Cursor transformed = impl.transformed(component.transform().invert());
@@ -157,7 +157,7 @@ public abstract class AGroup extends AComponent implements KeyboardListener, Mou
 	protected boolean cursor(Cursor cursor, CursorCallback consumer) {
 		for(Transformed<?> component : this) {
 			AComponent c = component.component();
-			if(c instanceof MouseListener l && !c.is(AComponent.SKIP_MOUSEVENT)) {
+			if(c instanceof MouseListener l && !c.is(AComponent.SKIP_MOUSE_EVENT)) {
 				Cursor transformed = cursor.transformed(component.transform().invert());
 				if(c.isIn(transformed) && consumer.accept(transformed, component, l)) {
 					return true;
@@ -186,14 +186,13 @@ public abstract class AGroup extends AComponent implements KeyboardListener, Mou
 	 * Searches for all instances of a given component inside this group recursively, and combines relavent transformations
 	 */
 	public boolean find(AComponent component, Predicate<Transformed<?>> transform) {
-		if(component == null) {
-			return false;
-		}
 		for(var form : this) {
-			if(form.component() == component) {
-				return transform.test(form);
-			} else if(form.component() instanceof AGroup a) {
+			if(form.component() instanceof AGroup a) {
 				a.find(component, t -> transform.test(t.with(form.transform().andThen(t.transform()))));
+			} else if(form.component() == component) {
+				return transform.test(form);
+			} else if(component == null) {
+				transform.test(form);
 			}
 		}
 		return false;

@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
+import io.github.astrarre.gui.v1.api.component.button.AButton;
 import io.github.astrarre.gui.v1.api.listener.focus.FocusDirection;
 import io.github.astrarre.gui.v1.api.util.Transformed;
 import io.github.astrarre.rendering.v1.api.plane.icon.Icon;
@@ -169,9 +170,7 @@ public class PaginatedPanel extends APanel {
 
 		Icon finalNext = next;
 		var group = Icons.Groups.button(width, height).transform(icon -> icon.overlayCentered(finalNext));
-		var button = AButton.icon(group);
-		button.callback(callback);
-		return button;
+		return AButton.button(group, c -> callback.run());
 	}
 
 	public enum Position {

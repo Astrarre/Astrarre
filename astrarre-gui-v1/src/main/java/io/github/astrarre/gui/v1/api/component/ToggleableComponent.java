@@ -2,11 +2,11 @@ package io.github.astrarre.gui.v1.api.component;
 
 public interface ToggleableComponent {
 	default void enable() {
-		((AComponent)this).set(AComponent.DISABLED, false);
+		this.able(true);
 	}
 
 	default void disable() {
-		((AComponent)this).set(AComponent.DISABLED, true);
+		this.able(false);
 	}
 
 	default void able(boolean enabled) {

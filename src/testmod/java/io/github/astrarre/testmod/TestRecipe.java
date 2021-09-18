@@ -19,7 +19,6 @@ public class TestRecipe extends Recipe implements Provider {
 
 	@Override
 	public void onInit() {
-
 	}
 
 	@Override

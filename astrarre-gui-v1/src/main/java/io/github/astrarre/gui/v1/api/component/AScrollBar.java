@@ -1,6 +1,7 @@
 package io.github.astrarre.gui.v1.api.component;
 
 import io.github.astrarre.access.v0.api.Access;
+import io.github.astrarre.gui.v1.api.component.button.AButton;
 import io.github.astrarre.gui.v1.api.listener.component.ProgressChangeListener;
 import io.github.astrarre.gui.v1.api.listener.cursor.ClickType;
 import io.github.astrarre.gui.v1.api.listener.cursor.Cursor;
@@ -63,8 +64,9 @@ public class AScrollBar extends AHoverableComponent implements MouseListener, Fo
 		}
 
 		APanel panel = new APanel();
-		AButton up = AButton.icon(upGroup), down = AButton.icon(downGroup);
-		up.callback(() -> this.setProgress(this.getProgress() - .1f));
+		AButton up = AButton.button(upGroup, c -> this.setProgress(this.getProgress() - .1f)),
+				down = AButton.button(downGroup, c -> this.setProgress(this.getProgress() + .1f));
+
 		panel.add(up);
 
 		float offX = dims, offY = dims;
@@ -75,7 +77,6 @@ public class AScrollBar extends AHoverableComponent implements MouseListener, Fo
 		offY += this.background.height();
 		next = Transform3d.translate(axis.x(offX), axis.y(offY), 0);
 
-		down.callback(() -> this.setProgress(this.getProgress() + .1f));
 		panel.add(down.with(next));
 
 		return panel;

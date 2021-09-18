@@ -14,8 +14,6 @@ import io.github.astrarre.transfer.v0.api.transaction.Key;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import io.github.astrarre.transfer.v0.api.transaction.keys.ObjectKeyImpl;
 import io.github.astrarre.transfer.v0.fabric.participants.FabricParticipants;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
@@ -80,7 +78,7 @@ public class TestModMain implements ModInitializer {
 		}
 
 		@Override
-		public @Nullable Object get(Access<?> access, Direction direction, ItemKey key, int count, Object container) {
+		public Object get(Access<?> access, Direction direction, ItemKey key, int count, Object container) {
 			if (access == FabricParticipants.FLUID_ITEM) {
 				ReplacingParticipant<ItemKey> participant = (ReplacingParticipant<ItemKey>) container;
 				return new FluidCellParticipant(participant, key);
@@ -111,7 +109,7 @@ public class TestModMain implements ModInitializer {
 		}
 
 		@Override
-		public void extract(@Nullable Transaction transaction, Insertable<Fluid> insertable) {
+		public void extract(Transaction transaction, Insertable<Fluid> insertable) {
 			ItemKey current = this.current.get(transaction);
 			Fluid fluid = Registry.FLUID.get(new Identifier(current.getTag().getString("fluid")));
 			if (fluid != Fluids.EMPTY) {
@@ -133,7 +131,7 @@ public class TestModMain implements ModInitializer {
 		}
 
 		@Override
-		public int insert(@Nullable Transaction transaction, @NotNull Fluid type, int quantity) {
+		public int insert(Transaction transaction, Fluid type, int quantity) {
 			if (quantity == 0 || Fluids.EMPTY == type) {
 				return 0;
 			}

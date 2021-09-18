@@ -1,4 +1,6 @@
 dependencies {
-    implementation 'com.github.Chocohead:fabric-asm:v2.1'
+    implementation('com.github.Chocohead:fabric-asm:v2.1') {
+        exclude module: "fabric-api"
+    }
     include 'com.github.Chocohead:fabric-asm:v2.1'
 }

@@ -11,7 +11,6 @@ import io.github.astrarre.transfer.v0.api.participants.FixedObjectVolume;
 import io.github.astrarre.transfer.v0.api.player.PlayerParticipant;
 import io.github.astrarre.transfer.v0.api.transaction.Transaction;
 import io.github.astrarre.transfer.v0.fabric.participants.FabricParticipants;
-import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
@@ -53,7 +52,6 @@ public class MyTankBlock extends Block implements BlockEntityProvider {
 		return ActionResult.CONSUME;
 	}
 
-	@Nullable
 	@Override
 	public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
 		return new Tile(pos, state);
@@ -78,7 +76,7 @@ public class MyTankBlock extends Block implements BlockEntityProvider {
 		}
 
 		@Override
-		public @Nullable Object get(Access<?> access, Direction direction) {
+		public Object get(Access<?> access, Direction direction) {
 			if(access == FabricParticipants.FLUID_WORLD) {
 				return this.volume;
 			}

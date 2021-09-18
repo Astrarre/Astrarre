@@ -48,23 +48,28 @@ dependencies {
     modCompileOnly("alexiil.mc.lib:libblockattributes-all:0.8.4") {
         exclude module: 'fabric-loader'
         exclude module: 'fabric-api'
+        exclude module: "fabric-rendering-fluids-v1"
     }
     modCompileOnly('RebornCore:RebornCore-1.16:4.7.2+build.134') {
         exclude module: 'fabric-loader'
         exclude module: 'fabric-api'
+        exclude module: "fabric-rendering-fluids-v1"
     }
 
-    modRuntime('TechReborn:TechReborn-1.16:3.8.3+build.231') {
+    /*modRuntime('TechReborn:TechReborn-1.16:3.8.3+build.231') {
         exclude module: 'fabric-loader'
         exclude module: 'fabric-api'
+        exclude module: "fabric-rendering-fluids-v1"
     }
     modRuntime("net.fabricmc.fabric-api:fabric-api:$fabric_version") {
         exclude module: 'fabric-loader'
+        exclude module: "fabric-rendering-fluids-v1"
     }
     modRuntime('me.steven:Industrial-Revolution:1.9.13-BETA') {
         exclude module: 'fabric-loader'
         exclude module: 'fabric-api'
-    }
+        exclude module: "fabric-rendering-fluids-v1"
+    }*/
 }
 
 sourceSets {

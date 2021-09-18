@@ -3,6 +3,7 @@ package io.github.astrarre.gui.v1.api.component;
 import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.gui.internal.GuiInternal;
 import io.github.astrarre.gui.internal.access.PanelScreenAccess;
+import io.github.astrarre.gui.internal.std.StandardScreen;
 import io.github.astrarre.gui.v1.api.listener.cursor.Cursor;
 import io.github.astrarre.gui.v1.api.listener.cursor.MouseListener;
 import io.github.astrarre.gui.v1.api.server.ServerPanel;
@@ -69,7 +70,7 @@ public class ARootPanel extends APanel {
 	 */
 	@Environment(EnvType.CLIENT)
 	public static ARootPanel open() {
-		var screen = new Screen(GuiInternal.TEXT) {};
+		var screen = new StandardScreen();
 		MinecraftClient.getInstance().setScreen(screen);
 		return getPanel(screen);
 	}
@@ -82,8 +83,8 @@ public class ARootPanel extends APanel {
 
 	@Override
 	protected boolean cursor(Cursor cursor, CursorCallback consumer) {
-		if(this.find(this.focused, t -> { // maybe instead just temporary disable the listeners or smth
-			this.focused.set(AComponent.SKIP_MOUSEVENT, true);
+		if(this.focused != null && this.find(this.focused, t -> { // maybe instead just temporary disable the listeners or smth
+			this.focused.set(AComponent.SKIP_MOUSE_EVENT, true);
 			if(t.component() instanceof MouseListener l) {
 				Cursor transformed = cursor.transformed(t.transform().invert());
 				return t.component().isIn(transformed) && consumer.accept(transformed, t, l);
@@ -95,7 +96,7 @@ public class ARootPanel extends APanel {
 
 		boolean value = super.cursor(cursor, consumer);
 		if(this.focused != null) {
-			this.focused.set(AComponent.SKIP_MOUSEVENT, false);
+			this.focused.set(AComponent.SKIP_MOUSE_EVENT, false);
 		}
 		return value;
 	}

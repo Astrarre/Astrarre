@@ -6,4 +6,6 @@ public interface PanelScreenAccess {
 	ARootPanel getRootPanel();
 
 	void setRootPanel(ARootPanel panel);
+
+	boolean hasRootPanel();
 }

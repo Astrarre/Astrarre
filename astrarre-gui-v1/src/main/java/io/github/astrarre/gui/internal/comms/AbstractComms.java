@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import io.github.astrarre.gui.internal.access.ServerPlayerEntityAccess;
 import io.github.astrarre.gui.v1.api.comms.PacketHandler;
 import io.github.astrarre.gui.v1.api.comms.PacketKey;
@@ -34,9 +36,19 @@ public abstract class AbstractComms implements PacketHandler {
 
 	public static final Identifier PACKET_ID = new Identifier("astrarre", "gui_comms");
 
-	final Map<HashKey, Consumer<NBTagView>> tag = new HashMap<>();
+	final Multimap<HashKey, Consumer<NBTagView>> tag = HashMultimap.create();
 	final Map<HashKey, NBTagView> queue = new HashMap<>();
 	final HashKey uniqueId;
+	PacketByteBuf packetQueue;
+	int queueCounter;
+
+	public PacketByteBuf getPacketQueue() {
+		PacketByteBuf buf = this.packetQueue;
+		if(buf == null) {
+			this.packetQueue = buf = new PacketByteBuf(Unpooled.buffer());
+		}
+		return buf;
+	}
 
 	protected AbstractComms(HashKey id) {
 		this.uniqueId = id;
@@ -46,51 +58,71 @@ public abstract class AbstractComms implements PacketHandler {
 	public void listen(PacketKey key, Consumer<NBTagView> consumer) {
 		HashKey hash = key.hash();
 		this.tag.put(hash, consumer);
+
 		NBTagView view = this.queue.remove(hash);
 		if(view != null) {
-			consumer.accept(view);
+			for(Consumer<NBTagView> cons : this.tag.get(hash)) {
+				cons.accept(view);
+			}
 		}
 	}
 
-	public static PacketHandler getOrOpenPlayerComms(PlayerEntity entity, HashKey uniqueId, boolean isClient) {
+	public static AbstractComms getOrOpenPlayerComms(PlayerEntity entity, HashKey uniqueId, boolean isClient) {
 		if(isClient) {
 			return CLIENT_PAIRS.computeIfAbsent(uniqueId, i -> new Client(CLIENT.getNetworkHandler(), i));
 		} else {
 			var v = ((ServerPlayerEntityAccess)entity).astrarre_coms();
-			Server server = new Server((ServerPlayerEntity) entity, uniqueId);
-			v.put(uniqueId, server);
-			return server;
+			return v.computeIfAbsent(uniqueId, key -> new Server((ServerPlayerEntity) entity, uniqueId));
 		}
 	}
 
 	protected abstract void send(PacketByteBuf buf);
 
 	@Override
-	public void sendInfo(PacketKey key, Consumer<NBTagView.Builder> packet) { // todo add batched packets
-		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+	public void startQueue() {
+		if(this.queueCounter <= 0 && this.packetQueue != null) {
+			this.send(this.packetQueue);
+			this.packetQueue = null;
+		}
+		this.queueCounter++;
+	}
+
+	@Override
+	public void flushQueue() {
+		if(--this.queueCounter <= 0 && this.packetQueue != null) {
+			this.send(this.packetQueue);
+			this.packetQueue = null;
+			this.queueCounter = 0;
+		}
+	}
+
+	@Override
+	public void sendInfo(PacketKey key, NBTagView packet) { // todo add batched packets
+		PacketByteBuf buf = this.queueCounter > 0 ? this.getPacketQueue() : new PacketByteBuf(Unpooled.buffer());
 		NbtCompound compound = new NbtCompound();
+		compound.put("packet", packet.toTag());
 
-		compound.put("key", key.hash().write().asMinecraft());
-
-		NBTagView.Builder builder = NBTagView.builder();
-		packet.accept(builder);
-		compound.put("packet", builder.toTag());
-
-		this.uniqueId.write(buf);
+		if((this.packetQueue != null && this.packetQueue.writerIndex() == 0) || this.queueCounter <= 0) {
+			this.uniqueId.write(buf);
+		}
+		key.hash().write(buf);
 		buf.writeNbt(compound);
-		this.send(buf);
+		if(this.queueCounter <= 0) {
+			this.send(buf);
+		}
 	}
 
 	public void onReceive(PacketByteBuf buf) {
+		HashKey key = new HashKey(buf);
 		NBTagView view = FabricViews.view(buf.readNbt());
 		NBTagView packet = view.getTag("packet");
-
-		HashKey key = new HashKey(view.getValue("key"));
 		var cons = this.tag.get(key);
-		if(cons == null) {
+		if(cons == null || cons.isEmpty()) {
 			this.queue.put(key, packet);
 		} else {
-			cons.accept(packet);
+			for(Consumer<NBTagView> con : cons) {
+				con.accept(packet);
+			}
 		}
 	}
 

@@ -19,8 +19,8 @@ public class ClientPlayNetworkHandlerMixin_Comms {
 			PacketByteBuf buf = packet.getData();
 			HashKey key = new HashKey(buf);
 			var client = AbstractComms.getOrOpenPlayerComms(null, key, true);
-			if(client instanceof AbstractComms a) {
-				a.onReceive(buf);
+			while(buf.readableBytes() > 0) {
+				client.onReceive(buf);
 			}
 			ci.cancel();
 		}

@@ -1,18 +1,27 @@
 package io.github.astrarre.transfer.v0.fabric.inventory;
 
-import java.util.AbstractList;
+import java.util.List;
+
+import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.collection.DefaultedList;
 
 /**
  * a list implementation for the Inventory class
  */
-public class InventoryList extends AbstractList<ItemStack> {
+public class InventoryList extends DefaultedList<ItemStack> {
 	public final Inventory inventory;
 
 	public InventoryList(Inventory inventory) {
+		super(List.of(), ItemStack.EMPTY);
 		this.inventory = inventory;
+	}
+
+	@Override
+	public @NotNull ItemStack get(int index) {
+		return this.inventory.getStack(index);
 	}
 
 	@Override
@@ -23,8 +32,8 @@ public class InventoryList extends AbstractList<ItemStack> {
 	}
 
 	@Override
-	public ItemStack get(int index) {
-		return this.inventory.getStack(index);
+	public ItemStack remove(int index) {
+		return this.inventory.removeStack(index);
 	}
 
 	@Override

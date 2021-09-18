@@ -2,6 +2,7 @@ package io.github.astrarre.gui.internal.mixin;
 
 import io.github.astrarre.gui.v1.api.component.slot.ASlot;
 import io.github.astrarre.gui.v1.api.component.slot.ASlotInternalAccess;
+import io.github.astrarre.gui.internal.slot.SlotAdapter;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -37,13 +38,20 @@ public abstract class HandledScreenMixin_Slot extends ScreenMixin_Access {
 		}
 	}
 
+	@Inject(method = "mouseReleased", at = @At("HEAD"), cancellable = true)
+	public void getMouseReleased(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
+		if(this.panel != null && this.panel.mouseReleased(mouseX, mouseY, button)) {
+			cir.setReturnValue(true);
+		}
+	}
+
 	@Inject(method = "drawSlot", at = {
 			@At(value = "INVOKE",
 					target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;fill(Lnet/minecraft/client/util/math/MatrixStack;IIIII)V"),
 			@At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;enableDepthTest()V")
 	}, cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
 	public void onDrawSlot(MatrixStack matrices, Slot slot, CallbackInfo ci, int i, int j, ItemStack renderStack, boolean highlightOverride) {
-		if(slot instanceof ASlot.Minecraft a) {
+		if(slot instanceof SlotAdapter a) {
 			ASlotInternalAccess.setRender(a.slot(), renderStack, highlightOverride);
 			ci.cancel();
 		}
@@ -63,7 +71,7 @@ public abstract class HandledScreenMixin_Slot extends ScreenMixin_Access {
 			at = @At(value = "INVOKE",
 					target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;isPointOverSlot(Lnet/minecraft/screen/slot/Slot;DD)Z"))
 	public Slot skipRender(Slot slot) {
-		if(slot instanceof ASlot.Minecraft) {
+		if(slot instanceof SlotAdapter) {
 			this.noPoint = true;
 		}
 		return slot;
@@ -74,7 +82,7 @@ public abstract class HandledScreenMixin_Slot extends ScreenMixin_Access {
 		if(this.noPoint) {
 			this.noPoint = false;
 			cir.setReturnValue(false);
-		} else if(slot instanceof ASlot.Minecraft a) {
+		} else if(slot instanceof SlotAdapter a) {
 			var s = a.slot();
 			if(this.panel.getAtRecursive((float) pointX, (float) pointY) == s) {
 				cir.setReturnValue(true);

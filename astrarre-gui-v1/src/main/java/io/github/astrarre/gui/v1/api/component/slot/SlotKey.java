@@ -3,6 +3,8 @@ package io.github.astrarre.gui.v1.api.component.slot;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.github.astrarre.gui.internal.mixin.ScreenHandlerAccess;
+import io.github.astrarre.gui.internal.slot.SlotAdapter;
 import io.github.astrarre.gui.v1.api.comms.PacketHandler;
 import io.github.astrarre.gui.v1.api.comms.PacketKey;
 import io.github.astrarre.gui.v1.api.server.ServerPanel;
@@ -10,11 +12,14 @@ import io.github.astrarre.hash.v0.api.Hasher;
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import io.github.astrarre.util.v0.api.Id;
 
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.ScreenHandler;
 
 /**
- * @see ASlotHelper#linkFromServer(PacketHandler, ServerPanel, SlotKey)
+ * @see SlotKey#sync(PacketHandler, ServerPanel)
  */
 public class SlotKey extends PacketKey {
 	private static final Id ID = Id.create("astrarre", "slot_key");
@@ -29,7 +34,7 @@ public class SlotKey extends PacketKey {
 	 * @param inventoryId a unique int id for this inventory, this is used to link the inventory to it's serverside counterpart
 	 * @param slotIndex the slot (index in inventory) this slot represents
 	 */
-	protected SlotKey(Inventory inventory, int inventoryId, int slotIndex) {
+	public SlotKey(Inventory inventory, int inventoryId, int slotIndex) {
 		super(ID);
 		this.inventory = inventory;
 		this.inventoryId = inventoryId;
@@ -95,38 +100,99 @@ public class SlotKey extends PacketKey {
 	 * @return the amount actually inserted
 	 */
 	public int insert(ItemKey key, int count, boolean simulate) {
-		if(count == 0 || key.isEmpty()) {
+		ItemStack current = this.getStack();
+		count = Math.min(Math.min(key.getMaxStackSize(), this.getMaxCount(key)) - current.getCount(), count);
+		ItemStack copy = key.createItemStack(count);
+		if(count <= 0 || key.isEmpty() || !this.isValid(copy)) {
 			return 0;
 		}
-		ItemStack current = this.getStack();
+
 		if(current.isEmpty()) {
 			if(!simulate) {
-				this.setStack(key.createItemStack(count));
+				this.setStack(copy);
 			}
 			return count;
 		} else if(key.isEqual(current)) {
-			int toInsert = Math.min(current.getMaxCount() - current.getCount(), count);
 			if(!simulate) {
-				current.increment(toInsert);
+				copy.setCount(current.getCount() + count);
+				this.setStack(copy);
 			}
-			return toInsert;
+			return count;
 		} else {
 			return 0;
 		}
+	}
+
+	public static void syncAll(PacketHandler handler, ServerPanel panel, List<SlotKey> keys) {
+		for(SlotKey key : keys) {
+			key.sync(handler, panel);
+		}
+	}
+
+	/**
+	 * This method must be called from the server init in {@link ServerPanel#openHandled(PlayerEntity, ServerPanel.ClientInit,
+	 * ServerPanel.ServerInit)}. It links the slots on the server with the ones on the client, allowing the itemstacks in the inventory to be
+	 * synchronized.
+	 */
+	public void sync(PacketHandler packet, ServerPanel panel) {
+		ScreenHandler handler = panel.screenHandler();
+		packet.sendInfo(this, builder -> {
+			var mc = new SlotAdapter(this.inventory, this.slotIndex, this);
+			((ScreenHandlerAccess) handler).callAddSlot(mc);
+			builder.putInt("index", mc.id);
+		});
+	}
+
+	public static List<SlotKey> player(PlayerEntity entity, int inventoryId) {
+		return player(entity.getInventory(), inventoryId);
+	}
+
+	/**
+	 * @return a list of slot keys, for a player's inventory ordered 0-36. Links hotbar and main inventory together for shift-click transfer.
+	 */
+	public static List<SlotKey> player(PlayerInventory inventory, int inventoryId) {
+		List<SlotKey> hotbar = inv(inventory, 0, 9, inventoryId), main = inv(inventory, 9, 36, inventoryId);
+		hotbar.forEach(key -> key.linkAll(main));
+		main.forEach(key -> key.linkAll(hotbar));
+
+		List<SlotKey> combined = new ArrayList<>(hotbar.size() + main.size());
+		combined.addAll(hotbar);
+		combined.addAll(main);
+		return combined;
+	}
+
+	public static List<SlotKey> inv(Inventory inventory, int inventoryId) {
+		return inv(inventory, 0, inventory.size(), inventoryId);
+	}
+
+	public static List<SlotKey> inv(Inventory inventory, int from, int len, int inventoryId) {
+		List<SlotKey> keys = new ArrayList<>(inventory.size());
+		for(int i = 0; i < len; i++) {
+			keys.add(new SlotKey(inventory, inventoryId, i + from));
+		}
+		return keys;
+	}
+
+	protected ItemStack removeStack(int count) {
+		return this.inventory.removeStack(this.slotIndex, count);
+	}
+
+	protected boolean isValid(ItemStack stack) {
+		return this.inventory.isValid(this.slotIndex, stack);
 	}
 
 	/**
 	 * @return the amount actually extracted
 	 */
 	public int extract(ItemKey key, int count, boolean simulate) {
-		if(count == 0 || key.isEmpty()) {
+		if(count <= 0 || key.isEmpty()) {
 			return 0;
 		}
 		ItemStack current = this.getStack();
 		if(!current.isEmpty() && key.isEqual(current)) {
 			int toExtract = Math.min(current.getCount(), count);
 			if(!simulate) {
-				current.decrement(toExtract);
+				this.removeStack(toExtract);
 			}
 			return toExtract;
 		}

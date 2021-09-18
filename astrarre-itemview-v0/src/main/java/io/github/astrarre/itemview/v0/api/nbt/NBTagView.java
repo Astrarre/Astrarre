@@ -250,6 +250,20 @@ public interface NBTagView extends Iterable<String>, NbtValue {
 		return this.get(path, type, null);
 	}
 
+	default <T> T get(String path, Serializer<T> serializer) {
+		return this.get(path, serializer, null);
+	}
+
+	default <T> T get(String path, Serializer<T> serializer, T def) {
+		try {
+			NbtValue value = this.getValue(path);
+			T val = serializer.read(value);
+			return val == null ? def : val;
+		} catch(Throwable t) {
+			return def;
+		}
+	}
+
 	/**
 	 * @return an unmodifiable iterator over the keys of this tag
 	 */

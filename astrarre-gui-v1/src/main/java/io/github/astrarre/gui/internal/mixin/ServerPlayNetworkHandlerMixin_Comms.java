@@ -26,8 +26,8 @@ public abstract class ServerPlayNetworkHandlerMixin_Comms implements ServerPlayP
 			PacketByteBuf buf = packet.getData();
 			HashKey key = new HashKey(buf);
 			var client = AbstractComms.getOrOpenPlayerComms(this.player, key, false);
-			if(client instanceof AbstractComms a) {
-				a.onReceive(buf);
+			while(buf.readableBytes() > 0) {
+				client.onReceive(buf);
 			}
 			ci.cancel();
 		}

@@ -10,7 +10,6 @@
     "ScreenHandlerMixin_ServerPanel",
     "ScreenMixin_Access",
     "ServerPlayerEntityMixin_Access",
-    "ServerPlayerEntityMixin_TickScreenHandler",
     "ServerPlayNetworkHandlerMixin_Comms",
     "SlotAccess"
   ],

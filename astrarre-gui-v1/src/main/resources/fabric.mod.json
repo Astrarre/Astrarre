@@ -17,8 +17,10 @@
     "fabricloader": ">=0.8.9"
   },
   "mixins": [
-    "astrarre-gui.mixins.json",
-    "astrarre-rendering.mixins.json"
+    "astrarre-gui.mixins.json"
   ],
-  "accessWidener": "astrarre-rendering.accesswidener"
+  "entrypoints": {
+    "rei_plugins": ["io.github.astrarre.gui.internal.AstrarreGuiReiPlugin"]
+  },
+  "accessWidener": "astrarre-gui.accesswidener"
 }

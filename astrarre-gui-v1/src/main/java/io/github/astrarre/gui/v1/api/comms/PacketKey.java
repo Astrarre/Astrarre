@@ -24,4 +24,21 @@ public abstract class PacketKey {
 	}
 
 	protected abstract void hash0(Hasher hasher);
+
+	private static final Id INT = Id.create("astrarre", "packet_key_int");
+	/**
+	 * A packet key based on integer id, I would only recommend using this occasionally, and never from inside components.
+	 */
+	public static final class Int extends PacketKey {
+		private final int val;
+		public Int(int val) {
+			super(INT);
+			this.val = val;
+		}
+
+		@Override
+		protected void hash0(Hasher hasher) {
+			hasher.putInt(this.val);
+		}
+	}
 }

@@ -1,7 +1,20 @@
 loom {
-    accessWidener = file("$projectDir/src/main/resources/astrarre-rendering.accesswidener")
+    accessWidener = file("$projectDir/src/main/resources/astrarre-gui.accesswidener")
+}
+
+sourceSets {
+    testmod {
+        java {
+            exclude "ex/**"
+        }
+    }
 }
 
 dependencies {
     testmodImplementation project(":astrarre-recipe-v0")
+    testmodImplementation project(":astrarre-transfer-v0")
+    modImplementation ("me.shedaniel:RoughlyEnoughItems-fabric:6.0.279-alpha") {
+        exclude module: 'fabric-api'
+        exclude module: 'fabric-loader'
+    }
 }

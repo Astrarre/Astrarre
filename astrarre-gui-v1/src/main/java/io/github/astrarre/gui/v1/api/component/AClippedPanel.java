@@ -6,6 +6,7 @@ import com.google.common.collect.Iterators;
 import io.github.astrarre.gui.v1.api.listener.cursor.Cursor;
 import io.github.astrarre.gui.v1.api.util.Transformed;
 import io.github.astrarre.rendering.internal.Renderer2DImpl;
+import io.github.astrarre.rendering.v1.api.plane.icon.wrapper.TransformedIcon;
 import io.github.astrarre.rendering.v1.api.space.Render3d;
 import io.github.astrarre.rendering.v1.edge.Stencil;
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +35,7 @@ public class AClippedPanel extends APanel {
 		if(this.boundsClipping) {
 			return Iterators.filter(super.iterator(), input -> {
 				var c = input.component();
-				Rect rect = bounds(input.transform(), c.getWidth(), c.getHeight());
+				TransformedIcon.Rect rect = TransformedIcon.bounds(input.transform(), c.getWidth(), c.getHeight());
 				return !(rect.maxX() < 0 || rect.maxY() < 0 || rect.minX() > this.width || rect.minY() > this.height);
 			});
 		} else {
