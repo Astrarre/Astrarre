@@ -42,23 +42,11 @@ public class BlockEntityMixin implements DataObjectHolder {
 
 	@Inject(method = "writeNbt", at = @At("RETURN"))
 	public void writeNbt(NbtCompound nbt, CallbackInfoReturnable<NbtCompound> cir) {
-		NbtCompound componentData = new NbtCompound();
-		for (Map.Entry<String, Pair<Component<BlockEntity, ?>, Serializer<?>>> entry : ComponentsInternal.SERIALIZE_BLOCK_ENTITY_INTERNAL.entrySet()) {
-			Pair<Component<BlockEntity, ?>, Serializer<?>> value = entry.getValue();
-			componentData.put(entry.getKey(), FabricComponents.serialize((BlockEntity) (Object) this, (Component)value.getFirst(), value.getSecond()));
-		}
-		nbt.put("astrarre_components", componentData);
+		nbt.put("astrarre_components", ComponentsInternal.write((BlockEntity) (Object) this, ComponentsInternal.SERIALIZE_BLOCK_ENTITY_INTERNAL));
 	}
 
 	@Inject(method = "readNbt", at = @At("RETURN"))
 	public void readNbt(NbtCompound nbt, CallbackInfo ci) {
-		NbtCompound componentData = nbt.getCompound("astrarre_components");
-		for (String key : componentData.getKeys()) {
-			Pair<Component<BlockEntity, ?>, Serializer<?>> pair = ComponentsInternal.SERIALIZE_BLOCK_ENTITY_INTERNAL.get(key);
-			if(pair != null) {
-				FabricComponents.deserialize(componentData.get(key), (BlockEntity) (Object) this, (Component) pair.getFirst(), (Serializer) pair.getSecond());
-			}
-			// name changed, perhaps some DFU stuff later(?)
-		}
+		ComponentsInternal.read(nbt.getCompound("astrarre_components"), (BlockEntity) (Object) this, ComponentsInternal.SERIALIZE_BLOCK_ENTITY_INTERNAL);
 	}
 }

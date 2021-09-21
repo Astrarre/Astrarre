@@ -16,6 +16,10 @@ public class Event<T> {
 		this(func.asIter(type));
 	}
 
+	public Event(ArrayFunc<T> func) {
+		this(func.asIter());
+	}
+
 	public Event(IterFunc<T> combiner) {
 		this.combiner = combiner;
 	}

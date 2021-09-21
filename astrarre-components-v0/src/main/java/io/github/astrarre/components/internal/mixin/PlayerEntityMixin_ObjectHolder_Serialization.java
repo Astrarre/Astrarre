@@ -42,9 +42,9 @@ public class PlayerEntityMixin_ObjectHolder_Serialization implements PlayerDataO
 	@Inject (method = "writeCustomDataToNbt", at = @At ("RETURN"))
 	public void writeNbt(NbtCompound nbt, CallbackInfo ci) {
 		NbtCompound componentData = new NbtCompound();
-		for (Map.Entry<String, Pair<Component<PlayerEntity, ?>, Serializer<?>>> entry : ComponentsInternal.SERIALIZE_PLAYER_INTERNAL.entrySet()) {
-			Pair<Component<PlayerEntity, ?>, Serializer<?>> value = entry.getValue();
-			componentData.put(entry.getKey(), FabricComponents.serialize((Entity) (Object) this, (Component)value.getFirst(), value.getSecond()));
+		for (var entry : ComponentsInternal.SERIALIZE_PLAYER_INTERNAL.entrySet()) {
+			var value = entry.getValue();
+			FabricComponents.serialize(componentData, entry.getKey(),(Entity) (Object) this, (Component)value.getFirst(), value.getSecond());
 		}
 		nbt.put("astrarre_components", componentData);
 	}
@@ -53,7 +53,7 @@ public class PlayerEntityMixin_ObjectHolder_Serialization implements PlayerDataO
 	public void readNbt(NbtCompound nbt, CallbackInfo ci) {
 		NbtCompound componentData = nbt.getCompound("astrarre_components");
 		for (String key : componentData.getKeys()) {
-			Pair<Component<PlayerEntity, ?>, Serializer<?>> pair = ComponentsInternal.SERIALIZE_PLAYER_INTERNAL.get(key);
+			var pair = ComponentsInternal.SERIALIZE_PLAYER_INTERNAL.get(key);
 			if(pair != null) {
 				FabricComponents.deserialize(componentData.get(key), (Entity) (Object) this, (Component) pair.getFirst(), (Serializer) pair.getSecond());
 			}

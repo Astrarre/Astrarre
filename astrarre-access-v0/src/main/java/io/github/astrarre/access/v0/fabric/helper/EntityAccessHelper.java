@@ -5,6 +5,7 @@ import java.util.function.Function;
 
 import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.access.v0.api.helper.AbstractAccessHelper;
+import io.github.astrarre.access.v0.api.helper.AccessHelpers;
 import io.github.astrarre.access.v0.api.helper.FunctionAccessHelper;
 import io.github.astrarre.util.v0.api.func.IterFunc;
 
@@ -23,39 +24,23 @@ public class EntityAccessHelper<F> extends AbstractAccessHelper<Entity, F> {
 	protected final RegistryAccessHelper<EntityType<?>, F> entityTypeRegistry;
 	protected final ItemAccessHelper<F>[] equipment = new ItemAccessHelper[EQUIPMENT_SLOTS.length];
 
-	public EntityAccessHelper(AbstractAccessHelper<Entity, F> copyFrom) {
-		this(copyFrom.iterFunc, copyFrom.andThen, copyFrom.empty);
-	}
-
-	public EntityAccessHelper(Access<F> func, Function<Function<Entity, F>, F> adder, F empty) {
-		this(func.combiner, f -> func.andThen(adder.apply(f)), empty);
-	}
-
-	public EntityAccessHelper(Access<F> func, Function<Function<Entity, F>, F> adder) {
-		this(func, adder, null);
-	}
-
-	public EntityAccessHelper(IterFunc<F> func, Consumer<Function<Entity, F>> adder) {
-		this(func, adder, null);
-	}
-
-	public EntityAccessHelper(IterFunc<F> func, Consumer<Function<Entity, F>> adder, F empty) {
-		super(func, adder, empty);
-		this.entity = new FunctionAccessHelper<>(this);
-		this.entityType = FunctionAccessHelper.create(this, Entity::getType);
-		this.entityTag = TaggedAccessHelper.create(this, Entity::getType);
-		this.entityTypeRegistry = RegistryAccessHelper.create(Registry.ENTITY_TYPE, this, Entity::getType);
-
+	public EntityAccessHelper(AccessHelpers.Context<Entity, F> copyFrom) {
+		super(copyFrom);
+		this.entity = new FunctionAccessHelper<>(copyFrom);
+		this.entityType = new FunctionAccessHelper<>(copyFrom.map(Entity::getType));
+		this.entityTag = new TaggedAccessHelper<>(copyFrom.map(Entity::getType));
+		this.entityTypeRegistry = new RegistryAccessHelper<>(Registry.ENTITY_TYPE, copyFrom.map(Entity::getType));
 		for (EquipmentSlot slot : EQUIPMENT_SLOTS) {
-			this.equipment[slot.ordinal()] = ItemAccessHelper.create(this, e -> {
+			this.equipment[slot.ordinal()] = new ItemAccessHelper<>(copyFrom.map(e -> {
 				if (e instanceof LivingEntity l) {
 					return l.getEquippedStack(slot).getItem();
 				} else {
 					return Items.AIR;
 				}
-			});
+			}));
 		}
 	}
+
 
 	public ItemAccessHelper<F> getForEquipment(EquipmentSlot slot) {
 		return this.equipment[slot.ordinal()];

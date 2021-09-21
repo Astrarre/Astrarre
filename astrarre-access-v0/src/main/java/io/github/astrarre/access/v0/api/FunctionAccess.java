@@ -1,16 +1,14 @@
 package io.github.astrarre.access.v0.api;
 
-import java.util.Objects;
 import java.util.function.Function;
 
-import com.google.common.collect.Iterators;
 import com.google.common.reflect.TypeToken;
+import io.github.astrarre.access.v0.api.helper.AccessHelpers;
 import io.github.astrarre.access.v0.api.helper.FunctionAccessHelper;
-import io.github.astrarre.util.v0.api.Validate;
-import io.github.astrarre.util.v0.api.func.ArrayFunc;
-import io.github.astrarre.util.v0.api.func.IterFunc;
 import io.github.astrarre.access.v0.api.provider.Provider;
 import io.github.astrarre.util.v0.api.Id;
+import io.github.astrarre.util.v0.api.func.ArrayFunc;
+import io.github.astrarre.util.v0.api.func.IterFunc;
 
 public class FunctionAccess<A, B> extends Access<Function<A, B>> {
 	public final FunctionAccessHelper<A, Function<A, B>> accessHelper;
@@ -28,27 +26,23 @@ public class FunctionAccess<A, B> extends Access<Function<A, B>> {
 				}
 			}
 			return null;
-		});
+		}, a -> null);
 	}
 
 	public FunctionAccess(Id id, ArrayFunc<Function<A, B>> iterFunc) {
-		this(id, iterFunc.asIter());
+		this(id, iterFunc, iterFunc.empty());
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public FunctionAccess(Id id, IterFunc<Function<A, B>> iterFunc) {
+	public FunctionAccess(Id id, ArrayFunc<Function<A, B>> iterFunc, Function<A, B> empty) {
 		super(id, iterFunc);
-		this.accessHelper = new FunctionAccessHelper<>(this, f -> a -> Validate.transform(f.apply(a), a, Function::apply));
+		this.accessHelper = new FunctionAccessHelper<>(AccessHelpers.ctx(this, f -> a -> f.apply(a).apply(a), empty));
 	}
 
 	/**
 	 * @param combiner combines the return value of the function
 	 */
 	public static <A, B> FunctionAccess<A, B> newInstance(Id id, IterFunc<B> combiner) {
-		return new FunctionAccess<>(id, functions -> a -> combiner.combine(() -> Iterators.filter(Iterators.transform(functions.iterator(),
-				input -> input.apply(a)), Objects::nonNull)));
+		return new FunctionAccess<>(id, functions -> a -> transform(functions, f -> f.apply(a), combiner));
 	}
 
 	/**

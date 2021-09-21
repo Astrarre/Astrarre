@@ -43,9 +43,9 @@ public class EntityMixin_ObjectHolder_Serialization implements DataObjectHolder 
 	@Inject(method = "writeNbt", at = @At("RETURN"))
 	public void writeNbt(NbtCompound nbt, CallbackInfoReturnable<NbtCompound> cir) {
 		NbtCompound componentData = new NbtCompound();
-		for (Map.Entry<String, Pair<Component<Entity, ?>, Serializer<?>>> entry : ComponentsInternal.SERIALIZE_ENTITY_INTERNAL.entrySet()) {
-			Pair<Component<Entity, ?>, Serializer<?>> value = entry.getValue();
-			componentData.put(entry.getKey(), FabricComponents.serialize((Entity) (Object) this, (Component)value.getFirst(), value.getSecond()));
+		for (var entry : ComponentsInternal.SERIALIZE_ENTITY_INTERNAL.entrySet()) {
+			var value = entry.getValue();
+			FabricComponents.serialize(componentData, entry.getKey(), (Entity) (Object) this, (Component)value.getFirst(), value.getSecond());
 		}
 		nbt.put("astrarre_components", componentData);
 	}
@@ -54,7 +54,7 @@ public class EntityMixin_ObjectHolder_Serialization implements DataObjectHolder 
 	public void readNbt(NbtCompound nbt, CallbackInfo ci) {
 		NbtCompound componentData = nbt.getCompound("astrarre_components");
 		for (String key : componentData.getKeys()) {
-			Pair<Component<Entity, ?>, Serializer<?>> pair = ComponentsInternal.SERIALIZE_ENTITY_INTERNAL.get(key);
+			var pair = ComponentsInternal.SERIALIZE_ENTITY_INTERNAL.get(key);
 			if(pair != null) {
 				FabricComponents.deserialize(componentData.get(key), (Entity) (Object) this, (Component) pair.getFirst(), (Serializer) pair.getSecond());
 			}
@@ -64,7 +64,7 @@ public class EntityMixin_ObjectHolder_Serialization implements DataObjectHolder 
 
 	@Inject(method = "copyFrom", at = @At("RETURN"))
 	public void copyFrom(Entity original, CallbackInfo ci) {
-		for (Pair<Component<Entity, ?>, Copier<?>> pair : ComponentsInternal.COPY_ENTITY_INTENRAL) {
+		for (var pair : ComponentsInternal.COPY_ENTITY_INTENRAL) {
 			FabricComponents.copy(original, (Entity) (Object) this, (Component)pair.getFirst(), pair.getSecond());
 		}
 	}

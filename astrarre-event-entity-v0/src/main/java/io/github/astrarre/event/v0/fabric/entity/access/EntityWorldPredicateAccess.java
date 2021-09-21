@@ -8,6 +8,8 @@ import io.github.astrarre.event.v0.fabric.entity.func.EntityWorldPredicate;
 import io.github.astrarre.util.v0.api.Id;
 import org.jetbrains.annotations.NotNull;
 
+import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 
 public class EntityWorldPredicateAccess<E extends Entity> extends Access<EntityWorldPredicate<E>> {
@@ -17,18 +19,10 @@ public class EntityWorldPredicateAccess<E extends Entity> extends Access<EntityW
 
 	public EntityWorldPredicateAccess(Id id) {
 		super(id, EntityWorldPredicate.skipIfTrue());
-		this.entityFilter = new EntityAccessHelper<>(
-				this,
-				f -> (e, world, pos, state, entity) -> f.apply(e).canDoAction(e, world, pos, state, entity),
-				(e, world, pos, state, entity) -> true);
-		this.blockEntityHelper = new BlockEntityAccessHelper<>(
-				this,
-				f -> (e, world, pos, state, entity) -> f.apply(entity).canDoAction(e, world, pos, state, entity),
-				(e, world, pos, state, entity) -> true);
-		this.blockStateHelper = new BlockStateAccessHelper<>(
-				this,
-				f -> (e, world, pos, state, entity) -> f.apply(state).canDoAction(e, world, pos, state, entity),
-				(e, world, pos, state, entity) -> true);
+		EntityWorldPredicate<E> predicate = (e, world, pos, state, entity) -> true;
+		this.entityFilter = new EntityAccessHelper<>(this.funcFilter_(Entity.class, predicate));
+		this.blockEntityHelper = new BlockEntityAccessHelper<>(this.funcFilter_(BlockEntity.class, predicate));
+		this.blockStateHelper = new BlockStateAccessHelper<>(this.funcFilter_(BlockState.class, predicate));
 	}
 
 	/**

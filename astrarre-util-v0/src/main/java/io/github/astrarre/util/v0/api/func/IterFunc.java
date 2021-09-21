@@ -11,7 +11,7 @@ public interface IterFunc<A> extends ArrayFunc<A> {
 	/**
 	 * finds the first non-null value in the list, otherwise returns null
 	 */
-	IterFunc NON_NULL = arr -> {
+	IterFunc NON_NULL = (IterFunc<?>) arr -> {
 		for (Object a : arr) {
 			if(a != null) {
 				return a;
@@ -25,6 +25,7 @@ public interface IterFunc<A> extends ArrayFunc<A> {
 		return this.combine(Arrays.asList(array));
 	}
 
+	@Override
 	default A empty() {
 		return this.combine(Collections.emptyList());
 	}

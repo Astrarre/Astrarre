@@ -5,6 +5,7 @@ import java.util.function.Function;
 
 import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.access.v0.api.helper.AbstractAccessHelper;
+import io.github.astrarre.access.v0.api.helper.AccessHelpers;
 import io.github.astrarre.access.v0.api.helper.FunctionAccessHelper;
 import io.github.astrarre.util.v0.api.func.IterFunc;
 
@@ -21,29 +22,14 @@ public class BlockEntityAccessHelper<F> extends AbstractAccessHelper<BlockEntity
 	protected final TaggedAccessHelper<BlockEntityType<?>, F> blockEntityTag;
 	protected final RegistryAccessHelper<BlockEntityType<?>, F> blockEntityTypeRegistry;
 
-	public BlockEntityAccessHelper(AbstractAccessHelper<BlockEntity, F> copyFrom) {
-		this(copyFrom.iterFunc, copyFrom.andThen, copyFrom.empty);
+	public BlockEntityAccessHelper(AccessHelpers.Context<BlockEntity, F> copyFrom) {
+		super(copyFrom);
+		this.blockEntity = new FunctionAccessHelper<>(copyFrom);
+		this.blockEntityType = new FunctionAccessHelper<>(copyFrom.map(BlockEntity::getType));
+		this.blockEntityTag = new TaggedAccessHelper<>(copyFrom.map(BlockEntity::getType));
+		this.blockEntityTypeRegistry = new RegistryAccessHelper<>(Registry.BLOCK_ENTITY_TYPE, copyFrom.map(BlockEntity::getType));
 	}
 
-	public BlockEntityAccessHelper(Access<F> func, Function<Function<BlockEntity, F>, F> adder, F empty) {
-		this(func.combiner, f -> func.andThen(adder.apply(f)), empty);
-	}
-
-	public BlockEntityAccessHelper(Access<F> func, Function<Function<BlockEntity, F>, F> adder) {
-		this(func, adder, null);
-	}
-
-	public BlockEntityAccessHelper(IterFunc<F> func, Consumer<Function<BlockEntity, F>> adder) {
-		this(func, adder, null);
-	}
-
-	public BlockEntityAccessHelper(IterFunc<F> func, Consumer<Function<BlockEntity, F>> adder, F empty) {
-		super(func, adder, empty);
-		this.blockEntity = new FunctionAccessHelper<>(this);
-		this.blockEntityType = FunctionAccessHelper.create(this, BlockEntity::getType);
-		this.blockEntityTag = TaggedAccessHelper.create(this, BlockEntity::getType);
-		this.blockEntityTypeRegistry = RegistryAccessHelper.create(Registry.BLOCK_ENTITY_TYPE, this, BlockEntity::getType);
-	}
 
 	public FunctionAccessHelper<BlockEntity, F> getBlockEntity() {
 		return this.blockEntity;

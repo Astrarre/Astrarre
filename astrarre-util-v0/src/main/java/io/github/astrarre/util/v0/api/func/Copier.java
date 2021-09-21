@@ -10,4 +10,8 @@ public interface Copier<T> {
 	}
 
 	T copy(T val);
+
+	default boolean copiesNulls() {
+		return false;
+	}
 }

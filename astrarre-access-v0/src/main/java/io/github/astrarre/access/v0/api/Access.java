@@ -1,10 +1,12 @@
 package io.github.astrarre.access.v0.api;
 
+import static com.google.common.collect.Iterables.elementsEqual;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -14,11 +16,13 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import io.github.astrarre.access.v0.api.entry.AccessAPIEntrypoint;
 import io.github.astrarre.access.v0.api.entry.AccessInitEntrypoint;
+import io.github.astrarre.access.v0.api.util.FilteredFunc;
 import io.github.astrarre.access.v0.fabric.EntityAccess;
 import io.github.astrarre.access.v0.fabric.ItemAccess;
 import io.github.astrarre.access.v0.fabric.WorldAccess;
 import io.github.astrarre.util.v0.api.Id;
 import io.github.astrarre.util.v0.api.func.ArrayFunc;
+import io.github.astrarre.util.v0.api.func.FuncFinder;
 import io.github.astrarre.util.v0.api.func.IterFunc;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -43,22 +47,29 @@ import net.fabricmc.loader.entrypoint.minecraft.hooks.EntrypointUtils;
 })
 public class Access<F> {
 	/**
+	 * An id for Access's that don't really have an API that needs to be exposed via {@link AccessInitEntrypoint}
+	 */
+	public static final Id API_LESS = Id.create("astrarre", "api_less");
+
+	/**
 	 * fired when a new access is created
 	 *
 	 * @deprecated {@link AccessInitEntrypoint}
 	 */
-	@Deprecated public static final Access<Consumer<Access<?>>> ON_ACCESS_INIT = new Access<>(Id.create("astrarre-access-v0", "on_access_init"),
-	                                                                                          arr -> access -> {
-		                                                                                          for(Consumer<Access<?>> consumer : arr) {
-			                                                                                          consumer.accept(access);
-		                                                                                          }
-	                                                                                          });
+	@Deprecated //
+	public static final Access<Consumer<Access<?>>> ON_ACCESS_INIT = new Access<>("astrarre",
+	                                                                              "on_access_init",
+	                                                                              ArrayFunc.builder()
+			                                                                              .voidMethod(FuncFinder.byName("accept"))
+			                                                                              .buildInfer());
 
 	static {
 		EntrypointUtils.invoke("astrarre-transfer-v0:access_entrypoint", AccessAPIEntrypoint.class, AccessAPIEntrypoint::onAccessAPIInit);
 	}
 
 	public final IterFunc<F> combiner;
+	final Class<F> functionType;
+
 	/**
 	 * the id of this access
 	 */
@@ -68,47 +79,30 @@ public class Access<F> {
 	protected F compiledFunction;
 
 	/**
-	 * @param combiner andThen
+	 * Uses some cursed generic trickery to determine the type for you
 	 */
 	public Access(Id id, ArrayFunc<F> combiner) {
-		this(id, combiner.asIter());
+		this(id, combiner, combiner.getType());
 	}
 
-	/**
-	 * @param combiner andThen
-	 */
-	public Access(Id id, IterFunc<F> combiner) {
+	public Access(Id id, ArrayFunc<F> combiner, Class<F> function) {
 		this.id = id;
-		this.combiner = combiner;
+		this.combiner = combiner.asIter();
+		this.functionType = function;
 		this.recompile();
 
 		if(ON_ACCESS_INIT != null) {
 			ON_ACCESS_INIT.get().accept(this);
 		}
 
-		EntrypointUtils.invoke("astrarre:access", AccessInitEntrypoint.Generic.class, generic -> generic.onInit(this.id.mod(), this.id.path(),
-		                                                                                                        this));
-		EntrypointUtils.invoke("astrarre:access{" + id + "}", AccessInitEntrypoint.class, init -> init.onInit(this.id.mod(), this.id.path(), this));
-	}
-
-	/**
-	 * @param combiner andThen
-	 */
-	public Access(Id id, ArrayFunc<F> combiner, Class<F> function) {
-		this(id, combiner.asIter(function));
+		EntrypointUtils.invoke("astrarre:access", AccessInitEntrypoint.Generic.class, g -> g.onInit(this.id.mod(), this.id.path(), this));
+		EntrypointUtils.invoke("astrarre:access{" + id + "}", AccessInitEntrypoint.class, i -> i.onInit(this.id.mod(), this.id.path(), this));
 	}
 
 	/**
 	 * @see #Access(Id, ArrayFunc)
 	 */
 	public Access(String modid, String path, ArrayFunc<F> combiner) {
-		this(Id.create(modid, path), combiner);
-	}
-
-	/**
-	 * @see #Access(Id, IterFunc)
-	 */
-	public Access(String modid, String path, IterFunc<F> combiner) {
 		this(Id.create(modid, path), combiner);
 	}
 
@@ -244,6 +238,10 @@ public class Access<F> {
 		return function -> adder.apply(i -> function.apply(mapper.apply(i)));
 	}
 
+	public static <F> Access<F> apiLess(ArrayFunc<F> combiner) {
+		return new Access<>(API_LESS, combiner);
+	}
+
 	private static <A> A compile(Iterable<Object> vals, IterFunc<A> combine) {
 		return combine.combine(Iterables.transform(vals, o -> {
 			if(o instanceof Func) {
@@ -259,13 +257,13 @@ public class Access<F> {
 			                           if(delegate instanceof Func) {
 				                           // our own delegate
 				                           Func<SilenceGenerics, F> current = (Func<SilenceGenerics, F>) delegate;
-				                           Func<SilenceGenerics, F> copied = new Func<>(current.dep, current.mapping);
+				                           Func<SilenceGenerics, F> copied = new Func<>(current.dep, current.map);
 
 				                           HashSet<Access<?>> newAccesses = new HashSet<>(accesses);
 				                           newAccesses.add(this);
 				                           Iterable<Object> val = current.dep.getWithout(newAccesses);
 				                           copied.inputs = val;
-				                           copied.delegate = current.mapping.apply(compile(val, current.dep.combiner));
+				                           copied.delegate = current.map.apply(compile(val, current.dep.combiner));
 				                           return copied;
 			                           }
 			                           return delegate;
@@ -282,7 +280,7 @@ public class Access<F> {
 		Consumer<Access<E>> consumer = a -> {
 			HashSet<Access<?>> accesses = new HashSet<>();
 			Iterable<Object> inputs = a.getWithout(accesses);
-			if(dependency.inputs == null || !Iterables.elementsEqual(inputs, dependency.inputs)) {
+			if(dependency.inputs == null || !elementsEqual(inputs, dependency.inputs)) {
 				dependency.inputs = inputs;
 				dependency.delegate = function.apply(compile(inputs, a.combiner));
 				this.recompile();
@@ -305,6 +303,58 @@ public class Access<F> {
 		}
 	}
 
+	/**
+	 * creates a func filter, only useful for FunctionalInterfaces {@link FunctionalInterface} (basically only useful for lambda accesses)
+	 */
+	public <T, I> FilteredFunc.AddingImpl<I, F> funcFilter(Class<T> paramType, int ordinal, Function<T, I> extracter) {
+		return this.funcFilter(paramType, ordinal, extracter, this.combiner.empty());
+	}
+
+	/**
+	 * the underslash exists due to a generics conflict, it's a normal api
+	 */
+	public <I> FilteredFunc.AddingImpl<I, F> funcFilter_(Class<I> paramType, int ordinal, F empty) {
+		return FilteredFunc.builder(paramType)
+				.ordinal(FuncFinder.onlyAbstract(), ordinal)
+				.build(this.functionType, empty)
+				.then(this);
+	}
+
+	public <T, I> FilteredFunc.AddingImpl<I, F> funcFilter(Class<T> paramType, Function<T, I> extracter) {
+		return this.funcFilter(paramType, extracter, this.combiner.empty());
+	}
+
+	/**
+	 * the underslash exists due to a generics conflict, it's a normal api
+	 */
+	public <I> FilteredFunc.AddingImpl<I, F> funcFilter_(Class<I> paramType, F empty) {
+		return this.funcFilter_(paramType, 0, empty);
+	}
+
+	/**
+	 * creates a func filter, only useful for FunctionalInterfaces {@link FunctionalInterface} (basically only useful for lambda accesses)
+	 */
+	public <T, I> FilteredFunc.AddingImpl<I, F> funcFilter(Class<T> paramType, int ordinal, Function<T, I> extracter, F empty) {
+		return FilteredFunc.<I>builder(null)
+				       .ordinal(FuncFinder.onlyAbstract(), paramType, ordinal, extracter)
+				       .build(this.functionType, empty)
+				       .then(this);
+	}
+
+	public <T, I> FilteredFunc.AddingImpl<I, F> funcFilter(Class<T> paramType, Function<T, I> extracter, F empty) {
+		return this.funcFilter(paramType, 0, extracter, empty);
+	}
+
+	public <I> FilteredFunc.AddingImpl<I, F> funcFilter(Class<I> paramType, int ordinal) {
+		return this.funcFilter_(paramType, ordinal, this.combiner.empty());
+	}
+
+
+	public <I> FilteredFunc.AddingImpl<I, F> funcFilter(Class<I> paramType) {
+		return this.funcFilter_(paramType, this.combiner.empty());
+	}
+
+
 	protected F get(Object o) {
 		if(o instanceof Access.Func) {
 			return ((Func<?, F>) o).delegate;
@@ -314,19 +364,19 @@ public class Access<F> {
 
 	private static final class Func<Entries, Target> {
 		private final Access<Entries> dep;
-		private final Function<Entries, Target> mapping;
+		private final Function<Entries, Target> map;
 		private Target delegate;
 		private Iterable<Object> inputs;
 
 		private Func(Access<Entries> dep, Function<Entries, Target> mapping) {
 			this.dep = dep;
-			this.mapping = mapping;
+			this.map = mapping;
 		}
 
 		@Override
 		public int hashCode() {
 			int result = this.dep != null ? this.dep.hashCode() : 0;
-			result = 31 * result + (this.mapping != null ? this.mapping.hashCode() : 0);
+			result = 31 * result + (this.map != null ? this.map.hashCode() : 0);
 			result = 31 * result + (this.delegate != null ? this.delegate.hashCode() : 0);
 			return result;
 		}
@@ -336,19 +386,12 @@ public class Access<F> {
 			if(this == o) {
 				return true;
 			}
-			if(!(o instanceof Func)) {
-				return false;
-			}
-
-			Func<?, ?> func = (Func<?, ?>) o;
-
-			if(!Objects.equals(this.dep, func.dep)) {
-				return false;
-			}
-			if(!Objects.equals(this.mapping, func.mapping)) {
-				return false;
-			}
-			return Iterables.elementsEqual(this.inputs, func.inputs);
+			return o instanceof Func func && this.dep.equals(func.dep) && this.map.equals(func.map) && elementsEqual(this.inputs, func.inputs);
 		}
+	}
+
+	public static <F, A> A transform(F[] input, com.google.common.base.Function<F, A> function, IterFunc<A> func) {
+		Iterable<A> transformed = Iterables.transform(Arrays.asList(input), function);
+		return func.combine(transformed);
 	}
 }

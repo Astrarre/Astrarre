@@ -56,10 +56,10 @@ public class EntityComponentBuilder<C extends Entity, V, T extends Component<C, 
 		} else {
 			T component = this.manager.create(type, id.getNamespace(), id.getPath());
 			if (this.copy) {
-				this.copyInternal.add(new Pair(component, this.copier));
+				this.copyInternal.add(new Pair<>(component, this.copier));
 			}
 			if (this.synchronizing) {
-				this.synchronize.put(component.getMod() + ":" + component.getId(), new Pair(component, this.serializer));
+				this.synchronize.put(component.getMod() + ":" + component.getId(), new Pair<>(component, this.serializer));
 				this.setSynchronizing(component);
 			}
 			return component;
@@ -92,25 +92,10 @@ public class EntityComponentBuilder<C extends Entity, V, T extends Component<C, 
 	}
 
 	public static <V, C extends Entity> Packet<?> sync(Identifier packetId, FabricByteSerializer<V> serializer, Component<C, V> component, C context, boolean send) {
-		World world = context.getEntityWorld();
-		if (!world.isClient) {
-			ServerChunkManager manager = ((ServerChunkManager) world.getChunkManager());
-			PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-			buf.writeInt(context.getId());
-			buf.writeString(component.getMod() + ":" + component.getId());
-			try {
-				FabricComponents.serialize(buf, context, component, serializer);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-
-			Packet<?> packet = new CustomPayloadS2CPacket(packetId, buf);
-			if (send) {
-				manager.sendToNearbyPlayers(context, packet);
-			}
-			return packet;
-		}
-		return null;
+		return SerializableComponentBuilder.syncWorldBased(packetId, serializer, component, context, send, Entity::getEntityWorld, (c, p) -> {
+			ServerChunkManager manager = ((ServerChunkManager) c.getEntityWorld().getChunkManager());
+			manager.sendToNearbyPlayers(c, p);
+		}, (c, b) -> b.writeInt(c.getId()));
 	}
 
 	/**

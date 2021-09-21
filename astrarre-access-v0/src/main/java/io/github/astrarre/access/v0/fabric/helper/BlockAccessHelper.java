@@ -6,6 +6,7 @@ import java.util.function.Function;
 import io.github.astrarre.access.internal.AccessInternal;
 import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.access.v0.api.helper.AbstractAccessHelper;
+import io.github.astrarre.access.v0.api.helper.AccessHelpers;
 import io.github.astrarre.access.v0.api.helper.FunctionAccessHelper;
 import io.github.astrarre.util.v0.api.func.IterFunc;
 
@@ -23,59 +24,15 @@ public class BlockAccessHelper<F> extends AbstractAccessHelper<Block, F> {
 	protected final FunctionAccessHelper<Fluid, F> fluid;
 	protected final TaggedAccessHelper<Block, F> blockTag;
 	protected final TaggedAccessHelper<Fluid, F> fluidTag;
-	/**
-	 * creates a new function helper who's incoming type is not the same as the type being filtered
-	 */
-	public static <I, F> BlockAccessHelper<F> create(IterFunc<F> func, Consumer<Function<I, F>> adder, Function<I, Block> mapper, F empty) {
-		return new BlockAccessHelper<>(func, Access.map(adder, mapper), empty);
-	}
 
-	/**
-	 * creates a new function helper who's incoming type is not the same as the type being filtered
-	 */
-	public static <I, F> BlockAccessHelper<F> create(IterFunc<F> func, Consumer<Function<I, F>> adder, Function<I, Block> mapper) {
-		return new BlockAccessHelper<>(func, Access.map(adder, mapper), null);
-	}
-
-	public static <I, F> BlockAccessHelper<F> create(Access<F> func, Function<Function<I, F>, F> and, Function<I, Block> mapper, F empty) {
-		return new BlockAccessHelper<>(func, Access.map(and, mapper), empty);
-	}
-
-	public static <I, F> BlockAccessHelper<F> create(Access<F> func, Function<Function<I, F>, F> and, Function<I, Block> mapper) {
-		return create(func, and, mapper, null);
-	}
-
-	/**
-	 * creates a new function helper who's incoming type is not the same as the type being filtered
-	 */
-	public static <I, F> BlockAccessHelper<F> create(AbstractAccessHelper<I, F> copyFrom, Function<I, Block> mapper) {
-		return new BlockAccessHelper<>(copyFrom.iterFunc, Access.map(copyFrom.andThen, mapper), copyFrom.empty);
-	}
-
-	public BlockAccessHelper(Access<F> func, Function<Function<Block, F>, F> and, F empty) {
-		this(func.combiner, f -> func.andThen(and.apply(f)), empty);
-	}
-
-	public BlockAccessHelper(Access<F> func, Function<Function<Block, F>, F> adder) {
-		this(func, adder, null);
-	}
-
-	public BlockAccessHelper(IterFunc<F> func, Consumer<Function<Block, F>> adder) {
-		this(func, adder, null);
-	}
-
-	public BlockAccessHelper(AbstractAccessHelper<Block, F> copyFrom) {
-		this(copyFrom.iterFunc, copyFrom.andThen, copyFrom.empty);
-	}
-
-	public BlockAccessHelper(IterFunc<F> func, Consumer<Function<Block, F>> andThen, F empty) {
-		super(func, andThen, empty);
-		this.block = new FunctionAccessHelper<>(this);
-		this.fluid = FunctionAccessHelper.create(this, AccessInternal::from);
-		this.blockTag = new TaggedAccessHelper<>(this);
-		this.fluidTag = TaggedAccessHelper.create(this, AccessInternal::from);
-		this.blockRegistry = new RegistryAccessHelper<>(Registry.BLOCK, this);
-		this.fluidRegistry = RegistryAccessHelper.create(Registry.FLUID, this, AccessInternal::from);
+	public BlockAccessHelper(AccessHelpers.Context<Block, F> copyFrom) {
+		super(copyFrom);
+		this.block = new FunctionAccessHelper<>(copyFrom);
+		this.fluid = new FunctionAccessHelper<>(copyFrom.map(AccessInternal::from));
+		this.blockTag = new TaggedAccessHelper<>(copyFrom);
+		this.fluidTag = new TaggedAccessHelper<>(copyFrom.map(AccessInternal::from));
+		this.blockRegistry = new RegistryAccessHelper<>(Registry.BLOCK, copyFrom);
+		this.fluidRegistry = new RegistryAccessHelper<>(Registry.FLUID, copyFrom.map(AccessInternal::from));
 	}
 
 	/**

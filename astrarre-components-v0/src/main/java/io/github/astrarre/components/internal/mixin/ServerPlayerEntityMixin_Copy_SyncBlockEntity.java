@@ -28,32 +28,32 @@ public class ServerPlayerEntityMixin_Copy_SyncBlockEntity extends PlayerEntityMi
 
 	@Inject(method = "copyFrom", at = @At("HEAD"))
 	public void copyFrom(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
-		for (Pair<Component<PlayerEntity, ?>, Copier<?>> pair : ComponentsInternal.COPY_PLAYER_ALWAYS) {
+		for (var pair : ComponentsInternal.COPY_PLAYER_ALWAYS) {
 			FabricComponents.copy(oldPlayer, (Entity) (Object) this, (Component)pair.getFirst(), pair.getSecond());
 		}
 	}
 
 	@Inject(method = "copyFrom", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;setHealth(F)V"))
 	public void copyFromAlive(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
-		for (Pair<Component<PlayerEntity, ?>, Copier<?>> pair : ComponentsInternal.COPY_PLAYER_ALIVE) {
+		for (var pair : ComponentsInternal.COPY_PLAYER_ALIVE) {
 			FabricComponents.copy(oldPlayer, (Entity) (Object) this, (Component)pair.getFirst(), pair.getSecond());
 		}
-		for (Pair<Component<Entity, ?>, Copier<?>> pair : ComponentsInternal.COPY_ENTITY_INTENRAL) {
+		for (var pair : ComponentsInternal.COPY_ENTITY_INTENRAL) {
 			FabricComponents.copy(oldPlayer, (Entity) (Object) this, (Component)pair.getFirst(), pair.getSecond());
 		}
 	}
 
 	@Inject(method = "copyFrom", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;setScore(I)V", ordinal = 1))
 	public void copyFromInventory(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
-		for (Pair<Component<PlayerEntity, ?>, Copier<?>> pair : ComponentsInternal.COPY_PLAYER_INVENTORY) {
+		for (var pair : ComponentsInternal.COPY_PLAYER_INVENTORY) {
 			FabricComponents.copy(oldPlayer, (Entity) (Object) this, (Component)pair.getFirst(), pair.getSecond());
 		}
 	}
 
 	@Inject(method = "sendBlockEntityUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/BlockEntity;toUpdatePacket()Lnet/minecraft/network/packet/s2c/play/BlockEntityUpdateS2CPacket;"))
 	public void toUpdate(BlockEntity blockEntity, CallbackInfo ci) {
-		for (Map.Entry<String, Pair<Component<BlockEntity, ?>, FabricByteSerializer<?>>> entry : ComponentsInternal.SYNC_BLOCK_ENTITY_INTERNAL.entrySet()) {
-			Pair<Component<BlockEntity, ?>, FabricByteSerializer<?>> pair = entry.getValue();
+		for (var entry : ComponentsInternal.SYNC_BLOCK_ENTITY_INTERNAL.entrySet()) {
+			var pair = entry.getValue();
 			Packet<?> packet = BlockEntityComponentBuilder.sync(ComponentsInternal.SYNC_BLOCK_ENTITY,
 					pair.getSecond(),
 					(Component) pair.getFirst(),

@@ -13,7 +13,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
-public record SkippingWorldFunc<T>(Iterable<WorldFunc<T>> functions, Predicate<T> predicate, T defaultValue) implements WorldFunc<T> {
+public record SkippingWorldFunc<T>(Iterable<WorldFunc<T>> functions, Predicate<T> predicate, WorldFunc<T> defaultValue) implements WorldFunc<T> {
 	public T get(@Nullable BlockState state, World world, BlockPos pos, @Nullable BlockEntity entity, boolean hasBlockEntity) {
 		for (WorldFunc<T> function : this.functions) {
 			entity = BaseWorldFunction.queryBlockEntity(function, state, world, pos, entity, hasBlockEntity);
@@ -24,7 +24,11 @@ public record SkippingWorldFunc<T>(Iterable<WorldFunc<T>> functions, Predicate<T
 				return val;
 			}
 		}
-		return this.defaultValue;
+
+		var func = this.defaultValue;
+		entity = BaseWorldFunction.queryBlockEntity(func, state, world, pos, entity, hasBlockEntity);
+		state = BaseWorldFunction.queryBlockState(func, state, world, pos, entity);
+		return func.get(state, world, pos, entity);
 	}
 
 	@Override

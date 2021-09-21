@@ -128,4 +128,8 @@ public interface Serializer<T> extends Copier<T> {
 	default T copy(T val) {
 		return this.read(this.save(val));
 	}
+
+	default boolean serializesNulls() {
+		return false;
+	}
 }

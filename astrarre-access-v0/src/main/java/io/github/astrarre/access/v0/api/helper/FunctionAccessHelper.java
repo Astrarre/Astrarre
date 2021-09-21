@@ -24,50 +24,12 @@ public class FunctionAccessHelper<T, F> extends AbstractAccessHelper<T, F> {
 	protected final CompiledFunctionClassValue<F> filterClassExact;
 	protected boolean addedDirectImplementation, addedGenericProvider;
 
-	public FunctionAccessHelper(AbstractAccessHelper<T, F> copyFrom) {
-		this(copyFrom.iterFunc, copyFrom.andThen, copyFrom.empty);
-	}
-
-	/**
-	 * @param func the iter func passed in the constructor
-	 * @param adder Registers a function in the access. The passed function provides the method to find the function with the given value, may
-	 * 		return null.
-	 */
-	public FunctionAccessHelper(IterFunc<F> func, Consumer<Function<T, F>> adder, F empty) {
-		super(func, adder, empty);
-		this.filterStrong = new MapFilter<>(func, empty, false);
-		this.filterWeak = new MapFilter<>(func, empty, true);
-		this.filterExact = new MapFilter<>(func, empty, () -> new MapMaker().weakKeys().makeMap());
-		this.filterClassExact = new CompiledFunctionClassValue<>(func, empty);
-	}
-
-	public FunctionAccessHelper(Access<F> func, Function<Function<T, F>, F> adder) {
-		this(func.combiner, f -> func.andThen(adder.apply(f)), null);
-	}
-
-	public FunctionAccessHelper(IterFunc<F> func, Consumer<Function<T, F>> adder) {
-		this(func, adder, null);
-	}
-
-	/**
-	 * creates a new function helper who's incoming type is not the same as the type being filtered
-	 */
-	public static <I, T, F> FunctionAccessHelper<T, F> create(AbstractAccessHelper<I, F> copyFrom, Function<I, T> mapper) {
-		return new FunctionAccessHelper<>(copyFrom.iterFunc, Access.map(copyFrom.andThen, mapper), copyFrom.empty);
-	}
-
-	/**
-	 * creates a new function helper who's incoming type is not the same as the type being filtered
-	 */
-	public static <I, T, F> FunctionAccessHelper<T, F> create(IterFunc<F> func, Consumer<Function<I, F>> adder, Function<I, T> mapper, F empty) {
-		return new FunctionAccessHelper<>(func, Access.map(adder, mapper), empty);
-	}
-
-	/**
-	 * creates a new function helper who's incoming type is not the same as the type being filtered
-	 */
-	public static <I, T, F> FunctionAccessHelper<T, F> create(IterFunc<F> func, Consumer<Function<I, F>> adder, Function<I, T> mapper) {
-		return new FunctionAccessHelper<>(func, Access.map(adder, mapper), null);
+	public FunctionAccessHelper(AccessHelpers.Context<T, F> copyFrom) {
+		super(copyFrom);
+		this.filterStrong = new MapFilter<>(this.iterFunc, this.empty, false);
+		this.filterWeak = new MapFilter<>(this.iterFunc, this.empty, true);
+		this.filterExact = new MapFilter<>(this.iterFunc, this.empty, () -> new MapMaker().weakKeys().makeMap());
+		this.filterClassExact = new CompiledFunctionClassValue<>(this.iterFunc, this.empty);
 	}
 
 	/**

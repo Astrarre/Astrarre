@@ -3,6 +3,7 @@ package io.github.astrarre.access.internal.world_function;
 import java.util.function.Predicate;
 
 import io.github.astrarre.access.v0.fabric.func.BaseWorldFunction;
+import io.github.astrarre.access.v0.fabric.func.WorldFunc;
 import io.github.astrarre.access.v0.fabric.func.WorldFunction;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,7 +13,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
-public record SkippingWorldFunction<T>(Iterable<WorldFunction<T>> functions, Predicate<T> predicate, T defaultValue) implements WorldFunction<T> {
+public record SkippingWorldFunction<T>(Iterable<WorldFunction<T>> functions, Predicate<T> predicate, WorldFunction<T> defaultValue) implements WorldFunction<T> {
 	public T get(@Nullable Direction direction, @Nullable BlockState state, World world, BlockPos pos, @Nullable BlockEntity entity, boolean hasBlockEntity) {
 		for (WorldFunction<T> function : this.functions) {
 			entity = BaseWorldFunction.queryBlockEntity(function, state, world, pos, entity, hasBlockEntity);
@@ -23,7 +24,11 @@ public record SkippingWorldFunction<T>(Iterable<WorldFunction<T>> functions, Pre
 				return val;
 			}
 		}
-		return this.defaultValue;
+
+		WorldFunction<T> function = this.defaultValue;
+		entity = BaseWorldFunction.queryBlockEntity(function, state, world, pos, entity, hasBlockEntity);
+		state = BaseWorldFunction.queryBlockState(function, state, world, pos, entity);
+		return function.get(direction, state, world, pos, entity);
 	}
 
 	@Override

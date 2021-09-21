@@ -6,13 +6,17 @@ import com.google.common.collect.Iterables;
 import com.google.common.reflect.TypeToken;
 import io.github.astrarre.access.v0.api.Access;
 import io.github.astrarre.access.v0.api.FunctionAccess;
+import io.github.astrarre.access.v0.api.helper.AccessHelpers;
 import io.github.astrarre.access.v0.api.helper.FunctionAccessHelper;
+import io.github.astrarre.access.v0.fabric.func.WorldFunction;
 import io.github.astrarre.access.v0.fabric.helper.EntityAccessHelper;
+import io.github.astrarre.util.v0.api.func.ArrayFunc;
 import io.github.astrarre.util.v0.api.func.IterFunc;
 import io.github.astrarre.access.v0.fabric.func.EntityFunction;
 import io.github.astrarre.access.v0.fabric.provider.EntityProvider;
 import io.github.astrarre.util.v0.api.Id;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.Item;
@@ -29,17 +33,20 @@ public class EntityAccess<T> extends Access<EntityFunction<T>> {
 	 * @see FunctionAccess
 	 */
 	public EntityAccess(Id id, T defaultValue) {
-		this(id, EntityFunction.skipIfNull(defaultValue));
+		this(id, EntityFunction.skipIfNull(defaultValue), (direction, entity) -> null);
 	}
 
-	public EntityAccess(Id id, IterFunc<EntityFunction<T>> iterFunc) {
+	public EntityAccess(Id id, ArrayFunc<EntityFunction<T>> iterFunc) {
+		this(id, iterFunc, iterFunc.empty());
+	}
+
+	public EntityAccess(Id id, ArrayFunc<EntityFunction<T>> iterFunc, EntityFunction<T> empty) {
 		super(id, iterFunc);
-		IterFunc<EntityFunction<T>> comb = EntityFunction.skipIfNull(null);
-		this.helper = new EntityAccessHelper<>(comb, function -> this.andThen((d, e) -> function.apply(e).get(d, e)), (d, e) -> null);
+		this.helper = new EntityAccessHelper<>(this.funcFilter_(Entity.class, empty));
 	}
 
 	public static <T> EntityAccess<T> newInstance(Id id, IterFunc<T> combiner) {
-		return new EntityAccess<>(id, (functions) -> (d, e) -> combiner.combine(Iterables.filter(Iterables.transform(functions, f -> f.get(d, e)), Objects::nonNull)));
+		return new EntityAccess<>(id, functions -> (d, e) -> transform(functions, f -> f.get(d, e), combiner));
 	}
 
 	private boolean addedProviderFunction, addedInstanceofFunction;

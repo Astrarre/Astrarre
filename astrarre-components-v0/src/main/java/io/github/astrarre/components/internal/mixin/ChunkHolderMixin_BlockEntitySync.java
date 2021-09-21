@@ -26,8 +26,8 @@ public abstract class ChunkHolderMixin_BlockEntitySync {
 
 	@Inject(method = "sendBlockEntityUpdatePacket", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/BlockEntity;toUpdatePacket()Lnet/minecraft/network/packet/s2c/play/BlockEntityUpdateS2CPacket;"), locals = LocalCapture.CAPTURE_FAILHARD)
 	public void onSync(World world, BlockPos pos, CallbackInfo ci, BlockEntity blockEntity) {
-		for (Map.Entry<String, Pair<Component<BlockEntity, ?>, FabricByteSerializer<?>>> entry : ComponentsInternal.SYNC_BLOCK_ENTITY_INTERNAL.entrySet()) {
-			Pair<Component<BlockEntity, ?>, FabricByteSerializer<?>> pair = entry.getValue();
+		for (var entry : ComponentsInternal.SYNC_BLOCK_ENTITY_INTERNAL.entrySet()) {
+			var pair = entry.getValue();
 			Packet<?> packet = BlockEntityComponentBuilder.sync(ComponentsInternal.SYNC_BLOCK_ENTITY,
 					pair.getSecond(),
 					(Component) pair.getFirst(),

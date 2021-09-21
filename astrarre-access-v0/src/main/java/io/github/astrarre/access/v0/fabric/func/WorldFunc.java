@@ -40,7 +40,7 @@ public interface WorldFunc<T> extends BaseWorldFunction {
 	 * finds the first non-default, non-null value, else returns the default value
 	 */
 	static <T> IterFunc<WorldFunc<T>> skipIf(Predicate<T> predicate, T defaultValue) {
-		return (functions) -> new SkippingWorldFunc<>(functions, predicate, defaultValue);
+		return (functions) -> new SkippingWorldFunc<>(functions, predicate, (WorldFunc.NoBlock<T>) (w, p) -> defaultValue);
 	}
 
 	/**

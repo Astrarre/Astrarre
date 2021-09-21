@@ -110,7 +110,7 @@ public final class FabricParticipants {
 	 */
 	public static final BiFunctionAccess<Direction, Inventory, Participant<ItemKey>> FROM_INVENTORY = new BiFunctionAccess<>(id("from_inventory"));
 
-	protected static final Map<PlayerInventory, PlayerInventoryParticipant> PLAYER_INVENTORY_PARTICIPANT_MAP = new WeakHashMap<>();
+	private static final Map<PlayerInventory, PlayerInventoryParticipant> PLAYER_INVENTORY_PARTICIPANT_MAP = new WeakHashMap<>();
 	public static PlayerParticipant forPlayerInventory(PlayerInventory inventory) {
 		// todo maybe store on player inventory
 		return PLAYER_INVENTORY_PARTICIPANT_MAP.computeIfAbsent(inventory, PlayerInventoryParticipant::new);

@@ -16,6 +16,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.world.ServerChunkManager;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.registry.Registry;
@@ -41,26 +42,13 @@ public class BlockEntityComponentBuilder<V, T extends Component<BlockEntity, V>>
 	}
 
 	public static <V> CustomPayloadS2CPacket sync(Identifier packetId, FabricByteSerializer<V> serializer, Component<BlockEntity, V> component, BlockEntity context, boolean send) {
-		World world = context.getWorld();
-		if (world != null && !world.isClient) {
-			ServerChunkManager manager = ((ServerChunkManager) world.getChunkManager());
-			PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+		return syncWorldBased(packetId, serializer, component, context, send, BlockEntity::getWorld, (entity, packet) -> {
+			ServerChunkManager manager = ((ServerWorld)entity.getWorld()).getChunkManager();
+			manager.threadedAnvilChunkStorage.getPlayersWatchingChunk(new ChunkPos(context.getPos()), false)
+					.forEach(e -> e.networkHandler.sendPacket(packet));
+		}, (entity, buf) -> {
 			buf.writeString(Registry.BLOCK_ENTITY_TYPE.getId(context.getType()).toString());
 			buf.writeBlockPos(context.getPos());
-			buf.writeString(component.getMod() + ":" + component.getId());
-			try {
-				FabricComponents.serialize(buf, context, component, serializer);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-
-			CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(packetId, buf);
-			if (send) {
-				manager.threadedAnvilChunkStorage.getPlayersWatchingChunk(new ChunkPos(context.getPos()), false)
-					.forEach(entity -> entity.networkHandler.sendPacket(packet));
-			}
-			return packet;
-		}
-		return null;
+		});
 	}
 }
