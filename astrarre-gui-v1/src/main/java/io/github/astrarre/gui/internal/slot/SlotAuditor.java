@@ -12,14 +12,22 @@ import io.github.astrarre.gui.v1.api.component.slot.ASlot;
 import io.github.astrarre.gui.v1.api.component.slot.ASlotInternalAccess;
 import io.github.astrarre.gui.v1.api.component.slot.SlotKey;
 import io.github.astrarre.gui.v1.api.util.TransformedComponent;
+import io.github.astrarre.util.v0.api.Validate;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class SlotAuditor implements Auditor {
+	private static final Logger LOGGER = LogManager.getLogger("SlotAuditor");
 	@Override
 	public void auditClient(PacketHandler comms, ARootPanel panel) throws Throwable {
 		var list = new ArrayList<SlotKey>();
 		this.searchSlots(panel, list);
-		if(list.size() >= 2) {
-			throw new IllegalArgumentException("Slot was not linked to any other slots, shift clicking will not work!");
+		if(list.size() >= 2 && Validate.IS_DEV) {
+			LOGGER.warn("Slot was not linked to any other slots, shift clicking will not work!");
+			LOGGER.warn("You can safely ignore this message if the following slots are not meant to have shift-clicking support");
+			for(SlotKey key : list) {
+				LOGGER.warn("\t- " + key);
+			}
 		}
 	}
 
