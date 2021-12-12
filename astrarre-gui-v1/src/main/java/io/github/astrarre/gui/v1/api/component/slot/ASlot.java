@@ -18,8 +18,10 @@ import io.github.astrarre.gui.v1.api.component.ARootPanel;
 import io.github.astrarre.gui.v1.api.component.ToggleableComponent;
 import io.github.astrarre.gui.v1.api.listener.cursor.Cursor;
 import io.github.astrarre.gui.v1.api.server.ServerPanel;
+import io.github.astrarre.rendering.v1.api.plane.Transform2d;
 import io.github.astrarre.rendering.v1.api.plane.icon.Icon;
 import io.github.astrarre.rendering.v1.api.space.Render3d;
+import io.github.astrarre.rendering.v1.api.space.Transform3d;
 import io.github.astrarre.rendering.v1.api.space.item.ModelTransformType;
 import io.github.astrarre.rendering.v1.api.util.Axis2d;
 import io.github.astrarre.util.v0.api.Lazy;
@@ -95,7 +97,7 @@ public class ASlot extends AHoverableComponent implements ToggleableComponent {
 	public static APanel playerInv(PacketHandler handler, ARootPanel panel, List<SlotKey> player) {
 		AList playerInv = new AList(Axis2d.Y); // 68 pixels tall
 
-		AGrid grid = new AGrid(16, 9, 3);
+		AGrid grid = new AGrid(18, 9, 3);
 		for(int row = 0; row < 3; row++) {
 			for(int column = 0; column < 9; column++) { // 144 pixels wide
 				int index = 9 + (row * 9) + column;
@@ -108,6 +110,7 @@ public class ASlot extends AHoverableComponent implements ToggleableComponent {
 			hotbar.add(new ASlot(handler, panel, player.get(i)));
 		}
 
+		playerInv.add(grid, hotbar.with(Transform3d.translate(0, 4, 0)));
 		return playerInv;
 	}
 

@@ -9,7 +9,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import io.github.astrarre.gui.v1.api.component.button.AButton;
 import io.github.astrarre.gui.v1.api.listener.focus.FocusDirection;
-import io.github.astrarre.gui.v1.api.util.Transformed;
+import io.github.astrarre.gui.v1.api.util.TransformedComponent;
 import io.github.astrarre.rendering.v1.api.plane.icon.Icon;
 import io.github.astrarre.rendering.v1.api.plane.icon.Icons;
 import io.github.astrarre.rendering.v1.api.plane.icon.PixelatedTriangleIcon;
@@ -130,7 +130,7 @@ public class PaginatedPanel extends APanel {
 	}
 
 	@Override
-	public @NotNull Iterator<Transformed<?>> iterator() {
+	public @NotNull Iterator<TransformedComponent> iterator() {
 		if(this.focused != null) {
 			return Iterators.singletonIterator(this.focused);
 		} else {
@@ -139,7 +139,7 @@ public class PaginatedPanel extends APanel {
 	}
 
 	@Override
-	public APanel add(Transformed<?>... component) {
+	public APanel add(TransformedComponent... component) {
 		super.add(component);
 		this.next(FocusDirection.FORWARD);
 		return this;

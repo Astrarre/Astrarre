@@ -1,21 +1,32 @@
 package io.github.astrarre.gui.v1.api.component;
 
-import io.github.astrarre.gui.v1.api.util.Transformed;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import io.github.astrarre.gui.v1.api.util.TransformedComponent;
 
 public abstract class ATransformingPanel extends APanel {
+	protected final List<TransformedComponent> original = new ArrayList<>();
+
 	@Override
-	public APanel add(Transformed<?>... component) {
-		var copied = new Transformed<?>[component.length];
-		for(int i = 0; i < component.length; i++) {
-			var c = component[i].component();
-			copied[i] = this.transform(component[i], c.getWidth(), c.getHeight());
-		}
-		return super.add(copied);
+	public APanel add(TransformedComponent... component) {
+		this.original.addAll(Arrays.asList(component));
+		return super.add(component);
 	}
 
-	public APanel add(AComponent component, float width, float height) {
-		return super.add(this.transform(component, width, height));
+	@Override
+	public APanel remove(TransformedComponent... component) {
+		this.original.removeAll(Arrays.asList(component));
+		return super.remove(component);
 	}
 
-	protected abstract Transformed<?> transform(Transformed<?> current, float cw, float ch);
+	@Override
+	protected void recomputeBounds() {
+		this.cmps.clear();
+		this.cmps.addAll(this.transformAll(this.original));
+		super.recomputeBounds();
+	}
+
+	protected abstract List<TransformedComponent> transformAll(List<TransformedComponent> originalComponents);
 }

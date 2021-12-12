@@ -59,7 +59,7 @@ public class Renderer3DImpl extends Renderer2DImpl implements Render3d, ItemRend
 			// this is necessary, or something, tm
 			MatrixStack s = RenderSystem.getModelViewStack();
 			s.push();
-			s.method_34425(this.stack.peek().getModel().copy());
+			s.multiplyPositionMatrix(this.stack.peek().getPositionMatrix().copy());
 			this.itemRenderer.renderInGuiWithOverrides(stack, 0, 0);
 			this.itemRenderer.renderGuiItemOverlay(this.textRenderer, stack, 0, 0);
 			RenderSystem.enableDepthTest();
@@ -107,7 +107,7 @@ public class Renderer3DImpl extends Renderer2DImpl implements Render3d, ItemRend
 		float w = (float) Math.cos(theta / 2.0F);
 		this.stack.push();
 		MatrixStack.Entry entry = this.stack.peek();
-		multiply(entry.getModel(), entry.getNormal(), x, y, z, w);
+		multiply(entry.getPositionMatrix(), entry.getNormalMatrix(), x, y, z, w);
 		return this.pop;
 	}
 
@@ -115,7 +115,7 @@ public class Renderer3DImpl extends Renderer2DImpl implements Render3d, ItemRend
 	public void line(int color, float x1, float y1, float z1, float x2, float y2, float z2) {
 		this.push(SetupImpl.LINE);
 		int r = color & 0xFF, g = (color >> 8) & 0xFF, b = (color >> 16) & 0xFF, a = (color >> 24) & 0xFF;
-		Matrix4f matrix = this.stack.peek().getModel();
+		Matrix4f matrix = this.stack.peek().getPositionMatrix();
 
 		this.buffer.vertex(matrix, x1, y1, z1).color(r, g, b, a).next();
 		this.buffer.vertex(matrix, x2, y2, z2).color(r, g, b, a).next();

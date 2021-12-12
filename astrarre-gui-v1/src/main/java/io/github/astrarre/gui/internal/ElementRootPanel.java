@@ -11,7 +11,7 @@ import io.github.astrarre.gui.v1.api.listener.cursor.ClickType;
 import io.github.astrarre.gui.v1.api.listener.cursor.Cursor;
 import io.github.astrarre.gui.v1.api.listener.cursor.MouseListener;
 import io.github.astrarre.gui.v1.api.listener.keyboard.KeyboardListener;
-import io.github.astrarre.gui.v1.api.util.Transformed;
+import io.github.astrarre.gui.v1.api.util.TransformedComponent;
 import io.github.astrarre.rendering.internal.Renderer3DImpl;
 import org.jetbrains.annotations.Nullable;
 
@@ -124,13 +124,13 @@ public abstract class ElementRootPanel extends ARootPanel implements AComponentE
 	}
 
 	@Override
-	public APanel add(Transformed<?>... component) {
+	public APanel add(TransformedComponent... component) {
 		this.cmps.addAll(Arrays.asList(component));
 		return this;
 	}
 
 	@Override
-	public APanel remove(Transformed<?>... component) {
+	public APanel remove(TransformedComponent... component) {
 		this.cmps.addAll(Arrays.asList(component));
 		return this;
 	}

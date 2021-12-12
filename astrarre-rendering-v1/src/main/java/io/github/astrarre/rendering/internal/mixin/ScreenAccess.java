@@ -16,7 +16,4 @@ import net.minecraft.client.util.math.MatrixStack;
 public interface ScreenAccess {
 	@Invoker
 	void callRenderTooltipFromComponents(MatrixStack matrices, List<TooltipComponent> components, int x, int y);
-
-	@Invoker
-	<T extends Element & Drawable & Selectable> T callAddDrawableChild(T drawableElement);
 }

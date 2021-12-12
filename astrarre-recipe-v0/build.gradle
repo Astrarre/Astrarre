@@ -1,8 +1,9 @@
-fapi(project, 'fabric-resource-loader-v0', 'fabric-tag-extensions-v0', 'fabric-api-base')
+/*fapi(project, 'fabric-resource-loader-v0', 'fabric-tag-extensions-v0', 'fabric-api-base')*/
 
 dependencies {
-    modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:5.11.188") {
-        exclude module: 'fabric-loader'
-        exclude module: 'fabric-api'
-    }
+    implementation minecraft
+    implementation reiImpl
+    
+    api project(":astrarre-util-v0")
+    api project(":astrarre-access-v0")
 }

@@ -4,6 +4,7 @@ import io.github.astrarre.itemview.internal.TaggedItemImpl;
 import io.github.astrarre.itemview.v0.api.Serializer;
 import io.github.astrarre.itemview.v0.api.nbt.NBTagView;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -59,6 +60,7 @@ public interface ItemKey extends Comparable<ItemKey> {
 	@NotNull
 	NBTagView getTag();
 
+	@Nullable
 	default NbtCompound getCompoundTag() {
 		return this.getTag().copyTag();
 	}

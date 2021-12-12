@@ -41,6 +41,10 @@ public interface Icon {
 		return new FlatColorIcon(color, 0, 0, width, height);
 	}
 
+	static Icon repeat(TextureIcon icon, float repeatX, float repeatY) {
+		return new TextureIcon.Repeating(icon, repeatX, repeatY);
+	}
+
 	/**
 	 * @return an icon that cycles between displaying each of the items
 	 */

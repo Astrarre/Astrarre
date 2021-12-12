@@ -48,7 +48,7 @@ public class Renderer2DImpl implements Render2d {
 		MatrixStack old = this.stack;
 		MatrixTransform3D t = Validate.instanceOf(transform, MatrixTransform3D.class, "Custom Transform2Ds not yet supported!");
 		old.push();
-		old.method_34425(t.matrix());
+		old.multiplyPositionMatrix(t.matrix());
 		return this.pop;
 	}
 
@@ -78,8 +78,8 @@ public class Renderer2DImpl implements Render2d {
 		float z = (float) Math.sin(theta / 2.0F);
 		float w = (float) Math.cos(theta / 2.0F);
 
-		Matrix4f model = old.peek().getModel();
-		Matrix3f normal = old.peek().getNormal();
+		Matrix4f model = old.peek().getPositionMatrix();
+		Matrix3f normal = old.peek().getNormalMatrix();
 		float l = 2.0F * z * z;
 		normal.a00 = model.a00 = 1.0F - l;
 		normal.a11 = model.a11 = 1.0F - l;
@@ -116,7 +116,7 @@ public class Renderer2DImpl implements Render2d {
 	public void line(int color, float x1, float y1, float x2, float y2) {
 		this.push(SetupImpl.LINE);
 		int b = color & 0xFF, g = (color >> 8) & 0xFF, r = (color >> 16) & 0xFF, a = (color >> 24) & 0xFF;
-		Matrix4f matrix = this.stack.peek().getModel();
+		Matrix4f matrix = this.stack.peek().getPositionMatrix();
 		this.buffer.vertex(matrix, x1, y1, 1).color(r, g, b, a).next();
 		this.buffer.vertex(matrix, x2, y2, 1).color(r, g, b, a).next();
 	}
@@ -125,7 +125,7 @@ public class Renderer2DImpl implements Render2d {
 	public void texture(Texture texture, float offX, float offY, float width, float height) {
 		this.push(SetupImpl.TEXTURE);
 		RenderSystem.setShaderTexture(0, texture.texture().to());
-		Matrix4f matrix = this.stack.peek().getModel();
+		Matrix4f matrix = this.stack.peek().getPositionMatrix();
 		float x2 = offX + width, y2 = offY + height;
 		float vx = texture.offX() + texture.width(), vy = texture.offY() + texture.height();
 		this.buffer.vertex(matrix, offX, offY, 1).texture(texture.offX(), texture.offY()).next();
@@ -196,7 +196,7 @@ public class Renderer2DImpl implements Render2d {
 		public void rect(int color, float offX, float offY, float width, float height) {
 			Renderer2DImpl.this.push(this.rect);
 			int b = color & 0xFF, g = (color >> 8) & 0xFF, r = (color >> 16) & 0xFF, a = (color >> 24) & 0xFF;
-			Matrix4f matrix = Renderer2DImpl.this.stack.peek().getModel();
+			Matrix4f matrix = Renderer2DImpl.this.stack.peek().getPositionMatrix();
 			float x2 = offX + width, y2 = offY + height;
 			Renderer2DImpl.this.buffer.vertex(matrix, offX, offY, 0).color(r, g, b, a).next();
 			Renderer2DImpl.this.buffer.vertex(matrix, offX, y2, 0).color(r, g, b, a).next();
@@ -276,7 +276,7 @@ public class Renderer2DImpl implements Render2d {
 			STENCIL.fill(id);
 
 			float start = this.x - offsetX;
-			Matrix4f matrix = Renderer2DImpl.this.stack.peek().getModel();
+			Matrix4f matrix = Renderer2DImpl.this.stack.peek().getPositionMatrix();
 			while(start < (this.x + width)) {
 				this.draw(text.asOrderedText(), start, this.y, this.color, matrix, this.shadow);
 				start += textWidth + 3; // we use the computed textWidth instead cus otherwise it jitters
@@ -295,13 +295,13 @@ public class Renderer2DImpl implements Render2d {
 
 		@Override
 		public void render(OrderedText text) {
-			Matrix4f matrix = Renderer2DImpl.this.stack.peek().getModel();
+			Matrix4f matrix = Renderer2DImpl.this.stack.peek().getPositionMatrix();
 			this.draw(text, this.x, this.y, this.color, matrix, this.shadow);
 		}
 
 		@Override
 		public void render(String text) {
-			Matrix4f matrix = Renderer2DImpl.this.stack.peek().getModel();
+			Matrix4f matrix = Renderer2DImpl.this.stack.peek().getPositionMatrix();
 			this.draw(text, this.x, this.y, this.color, matrix, this.shadow, this.renderer.isRightToLeft());
 		}
 

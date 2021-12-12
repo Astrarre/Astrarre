@@ -8,8 +8,7 @@ import java.util.List;
 
 import io.github.astrarre.gui.v1.api.listener.component.ResizeListener;
 import io.github.astrarre.gui.v1.api.listener.focus.FocusDirection;
-import io.github.astrarre.gui.v1.api.util.Transformed;
-import io.github.astrarre.rendering.v1.api.plane.Transform2d;
+import io.github.astrarre.gui.v1.api.util.TransformedComponent;
 import io.github.astrarre.rendering.v1.api.plane.icon.wrapper.TransformedIcon;
 import io.github.astrarre.rendering.v1.api.space.Transform3d;
 import org.jetbrains.annotations.NotNull;
@@ -19,13 +18,13 @@ import org.jetbrains.annotations.Nullable;
  * An appendable group of components
  */
 public class APanel extends AGroup implements ToggleableComponent {
-	protected final List<Transformed<?>> cmps = new ArrayList<>();
+	protected final List<TransformedComponent> cmps = new ArrayList<>();
 	final ResizeListener listener = (width, height) -> this.recomputeBounds();
 	float minX, minY;
 
 	@NotNull
 	@Override
-	public Iterator<Transformed<?>> iterator() {
+	public Iterator<TransformedComponent> iterator() {
 		return this.isEnabled() ? this.cmps.iterator() : Collections.emptyIterator();
 	}
 
@@ -58,18 +57,18 @@ public class APanel extends AGroup implements ToggleableComponent {
 		return index == -1 || index == (this.cmps.size() - 1) ? null : this.cmps.get(index + 1).component();
 	}
 
-	public APanel add(Transformed<?>... component) {
+	public APanel add(TransformedComponent... component) {
 		this.cmps.addAll(Arrays.asList(component));
 		this.recomputeBounds();
-		for(Transformed<?> transform : component) {
+		for(TransformedComponent transform : component) {
 			transform.component().onResize.andThen(this.listener);
 		}
 		return this;
 	}
 
-	public APanel remove(Transformed<?>... component) {
+	public APanel remove(TransformedComponent... component) {
 		this.cmps.removeAll(Arrays.asList(component));
-		for(Transformed<?> transform : component) {
+		for(TransformedComponent transform : component) {
 			if(transform.component() == this.focused) {
 				this.focused = null;
 				this.next(FocusDirection.FORWARD);
@@ -80,15 +79,9 @@ public class APanel extends AGroup implements ToggleableComponent {
 		return this;
 	}
 
-	public void addCenter(AComponent component) {
-		Runnable recomputeOffset = () -> {};
-		this.onResize.andThen((w, h) -> recomputeOffset.run());
-		component.onResize.andThen((w, h) -> recomputeOffset.run());
-	}
-
 	protected void recomputeBounds() {
 		float maxX = 0, maxY = 0, minX = Float.POSITIVE_INFINITY, minY = Float.POSITIVE_INFINITY;
-		for(Transformed<?> t : this) {
+		for(TransformedComponent t : this) {
 			TransformedIcon.Rect rect = bounds(t);
 			maxX = Math.max(maxX, rect.maxX());
 			maxY = Math.max(maxY, rect.maxY());
@@ -103,7 +96,7 @@ public class APanel extends AGroup implements ToggleableComponent {
 		this.minY = minY;
 	}
 
-	public static TransformedIcon.Rect bounds(Transformed<?> t) {
+	public static TransformedIcon.Rect bounds(TransformedComponent t) {
 		Transform3d tr = t.transform();
 		AComponent c = t.component();
 		return TransformedIcon.bounds(tr, c.getWidth(), c.getHeight());

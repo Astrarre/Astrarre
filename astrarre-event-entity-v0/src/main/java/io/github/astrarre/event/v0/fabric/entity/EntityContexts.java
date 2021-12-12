@@ -27,7 +27,6 @@ public class EntityContexts {
 		Contexts.copyForAll(INTERACT_BLOCK, s -> s);
 		Contexts.copyForAll(INTERACT_ITEM, s -> s);
 		Contexts.copyForAll(BREAK_BLOCK, s -> s);
-
 		Contexts.copyForAll(TICK_ENTITY, s -> s);
 		Contexts.copyForAll(MOVE_ENTITY, s -> s);
 

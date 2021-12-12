@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "id": "astrarre-rendering-v0",
-  "name": "Astrarre Gui v0 Fabric",
-  "description": "Astrarre's gui abstractions",
+  "id": "astrarre-rendering-v1",
+  "name": "Astrarre Rendering v1 Fabric",
+  "description": "Astrarre's rendering abstractions",
   "version": "${version}",
   "environment": "*",
   "license": "LGPL-3.0",

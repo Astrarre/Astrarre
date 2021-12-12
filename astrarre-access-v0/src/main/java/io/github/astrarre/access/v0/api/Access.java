@@ -27,7 +27,8 @@ import io.github.astrarre.util.v0.api.func.IterFunc;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import net.fabricmc.loader.entrypoint.minecraft.hooks.EntrypointUtils;
+import net.fabricmc.loader.impl.entrypoint.EntrypointUtils;
+
 
 /**
  * An access is essentially a list of functions, like an event handler. Like a function, it allows for any number of inputs and an output. To create

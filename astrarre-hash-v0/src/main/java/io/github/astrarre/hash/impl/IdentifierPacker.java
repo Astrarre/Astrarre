@@ -52,7 +52,7 @@ public final class IdentifierPacker {
 		ID_TO_CHAR = Arrays.copyOf(toChar, current);
 		VALID_CHARACTERS = validChars;
 
-		BITS_PER_CHAR = MathHelper.log2DeBruijn(current);
+		BITS_PER_CHAR = MathHelper.ceilLog2(current);
 		CHAR_MASK = (1 << BITS_PER_CHAR) - 1;
 		STR_LEN_BITS_SIZE = Long.SIZE % BITS_PER_CHAR;
 		STR_LEN_MASK = (1 << STR_LEN_BITS_SIZE) - 1;

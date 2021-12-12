@@ -16,6 +16,7 @@ import io.github.astrarre.recipe.internal.vanilla.CustomRecipeType;
 import io.github.astrarre.recipe.internal.vanilla.RecipeWrapper;
 import io.github.astrarre.recipe.v0.fabric.RecipePostReloadEvent;
 import io.github.astrarre.util.v0.api.Val;
+import me.shedaniel.math.Rectangle;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityType;

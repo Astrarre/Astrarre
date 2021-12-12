@@ -27,7 +27,7 @@ public final class FastMatrix4f {
 	}
 
 	public static Translate translate(MatrixStack stack, float offX, float offY, float offZ) {
-		return translate(stack.peek().getModel(), offX, offY, offZ);
+		return translate(stack.peek().getPositionMatrix(), offX, offY, offZ);
 	}
 
 	public static abstract class Reverter implements SafeCloseable {

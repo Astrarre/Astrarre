@@ -44,7 +44,7 @@ public class TooltipBuilderImpl implements TooltipBuilder {
 		this.impl.flush();
 		MatrixStack stack = this.impl.stack;
 		Vector4f tooltip = new Vector4f(0, 0, 0, 1);
-		tooltip.transform(stack.peek().getModel());
+		tooltip.transform(stack.peek().getPositionMatrix());
 		stack.push();
 		stack.loadIdentity();
 		Screen screen = new Screen(TEXT) {};

@@ -4,7 +4,7 @@ import java.util.Iterator;
 
 import com.google.common.collect.Iterators;
 import io.github.astrarre.gui.v1.api.listener.cursor.Cursor;
-import io.github.astrarre.gui.v1.api.util.Transformed;
+import io.github.astrarre.gui.v1.api.util.TransformedComponent;
 import io.github.astrarre.rendering.internal.Renderer2DImpl;
 import io.github.astrarre.rendering.v1.api.plane.icon.wrapper.TransformedIcon;
 import io.github.astrarre.rendering.v1.api.space.Render3d;
@@ -31,7 +31,7 @@ public class AClippedPanel extends APanel {
 	}
 
 	@Override
-	public @NotNull Iterator<Transformed<?>> iterator() {
+	public @NotNull Iterator<TransformedComponent> iterator() {
 		if(this.boundsClipping) {
 			return Iterators.filter(super.iterator(), input -> {
 				var c = input.component();

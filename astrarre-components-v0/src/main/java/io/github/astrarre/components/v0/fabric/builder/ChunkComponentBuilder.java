@@ -26,8 +26,8 @@ public class ChunkComponentBuilder<V, T extends Component<WorldChunk, V>> extend
 
 	public static <V, T extends Component<WorldChunk, V>> ChunkComponentBuilder<V, T> chunk() {
 		return new ChunkComponentBuilder<>(ComponentsInternal.CHUNK_MANAGER,
-		                                   ComponentsInternal.SYNC_CHUNK_INTERNAL,
-		                                   ComponentsInternal.SERIALIZE_CHUNK_INTERNAL);
+				ComponentsInternal.SYNC_CHUNK_INTERNAL,
+				ComponentsInternal.SERIALIZE_CHUNK_INTERNAL);
 	}
 
 	@Nullable
@@ -37,15 +37,16 @@ public class ChunkComponentBuilder<V, T extends Component<WorldChunk, V>> extend
 			C context,
 			boolean send) {
 		return syncWorldBased(packetId,
-		                      serializer,
-		                      component,
-		                      context,
-		                      send,
-		                      WorldChunk::getWorld,
-		                      (c, pkt) -> ((ServerWorld) c.getWorld()).getChunkManager().threadedAnvilChunkStorage.getPlayersWatchingChunk(c.getPos(), false)
-				                      .map(m -> m.networkHandler)
-				                      .forEach(m -> m.sendPacket(pkt)),
-		                      (c, buf) -> buf.writeChunkPos(c.getPos()));
+				serializer,
+				component,
+				context,
+				send,
+				WorldChunk::getWorld,
+				(c, pkt) -> ((ServerWorld) c.getWorld()).getChunkManager().threadedAnvilChunkStorage.getPlayersWatchingChunk(c.getPos(), false)
+						.stream()
+						.map(m -> m.networkHandler)
+						.forEach(m -> m.sendPacket(pkt)),
+				(c, buf) -> buf.writeChunkPos(c.getPos()));
 	}
 
 	@Nullable

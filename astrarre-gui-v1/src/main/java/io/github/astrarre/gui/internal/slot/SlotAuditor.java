@@ -11,7 +11,7 @@ import io.github.astrarre.gui.v1.api.component.ARootPanel;
 import io.github.astrarre.gui.v1.api.component.slot.ASlot;
 import io.github.astrarre.gui.v1.api.component.slot.ASlotInternalAccess;
 import io.github.astrarre.gui.v1.api.component.slot.SlotKey;
-import io.github.astrarre.gui.v1.api.util.Transformed;
+import io.github.astrarre.gui.v1.api.util.TransformedComponent;
 
 public class SlotAuditor implements Auditor {
 	@Override
@@ -25,7 +25,7 @@ public class SlotAuditor implements Auditor {
 
 	void searchSlots(AComponent component, List<SlotKey> keys) {
 		if(component instanceof AGroup g) {
-			for(Transformed<?> transform : g) {
+			for(TransformedComponent transform : g) {
 				this.searchSlots(transform.component(), keys);
 			}
 		} else if(component instanceof ASlot a) {

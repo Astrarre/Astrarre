@@ -1,0 +1,5 @@
+dependencies {
+    implementation minecraft
+    
+    api project(":astrarre-util-v0")
+}

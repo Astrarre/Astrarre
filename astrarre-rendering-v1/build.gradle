@@ -1,3 +1,7 @@
-loom {
-    accessWidener = file("$projectDir/src/main/resources/astrarre-rendering.accesswidener")
+dependencies {
+    implementation ag.accessWidener(minecraft) {
+        accessWidener(files("$projectDir/src/main/resources/astrarre-rendering.accesswidener"))
+    }
+    
+    api project(":astrarre-itemview-v0")
 }

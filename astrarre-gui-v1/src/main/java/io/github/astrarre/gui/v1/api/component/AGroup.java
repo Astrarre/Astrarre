@@ -14,7 +14,7 @@ import io.github.astrarre.gui.v1.api.listener.focus.FocusHandler;
 import io.github.astrarre.gui.v1.api.listener.keyboard.Key;
 import io.github.astrarre.gui.v1.api.listener.keyboard.KeyboardListener;
 import io.github.astrarre.gui.v1.api.listener.keyboard.Modifier;
-import io.github.astrarre.gui.v1.api.util.Transformed;
+import io.github.astrarre.gui.v1.api.util.TransformedComponent;
 import io.github.astrarre.rendering.v1.api.space.Render3d;
 import io.github.astrarre.rendering.v1.api.space.Transform3d;
 import org.jetbrains.annotations.Nullable;
@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @see APanel
  */
-public abstract class AGroup extends AComponent implements KeyboardListener, MouseListener, Iterable<Transformed<?>> {
+public abstract class AGroup extends AComponent implements KeyboardListener, MouseListener, Iterable<TransformedComponent> {
 	AComponent focused;
 
 	protected AGroup() {
@@ -33,7 +33,7 @@ public abstract class AGroup extends AComponent implements KeyboardListener, Mou
 
 	@Override
 	public boolean inBounds(float x, float y) {
-		for(Transformed<?> cmp : this) {
+		for(TransformedComponent cmp : this) {
 			if(cmp.component().inBounds(cmp.localizeX(x, y), cmp.localizeY(x, y))) {
 				return true;
 			}
@@ -43,7 +43,7 @@ public abstract class AGroup extends AComponent implements KeyboardListener, Mou
 
 	@Override
 	protected void render0(Cursor cursor, Render3d render) {
-		for(Transformed<?> component : this) {
+		for(TransformedComponent component : this) {
 			if(component.transform() == Transform3d.IDENTITY) {
 				component.component().render(cursor, render);
 			} else {
@@ -139,7 +139,7 @@ public abstract class AGroup extends AComponent implements KeyboardListener, Mou
 
 	public AComponent getAtRecursive(float x, float y) {
 		CursorImpl impl = new CursorImpl(x, y, null);
-		for(Transformed<?> component : this) {
+		for(TransformedComponent component : this) {
 			AComponent c = component.component();
 			Cursor transformed = impl.transformed(component.transform().invert());
 			if(c instanceof AGroup a) {
@@ -155,7 +155,7 @@ public abstract class AGroup extends AComponent implements KeyboardListener, Mou
 	}
 
 	protected boolean cursor(Cursor cursor, CursorCallback consumer) {
-		for(Transformed<?> component : this) {
+		for(TransformedComponent component : this) {
 			AComponent c = component.component();
 			if(c instanceof MouseListener l && !c.is(AComponent.SKIP_MOUSE_EVENT)) {
 				Cursor transformed = cursor.transformed(component.transform().invert());
@@ -172,7 +172,7 @@ public abstract class AGroup extends AComponent implements KeyboardListener, Mou
 
 	@Nullable
 	protected AComponent after(AComponent component) {
-		Iterator<Transformed<?>> iter = this.iterator();
+		Iterator<TransformedComponent> iter = this.iterator();
 		while(iter.hasNext()) {
 			var cmp = iter.next();
 			if(component == cmp.component() && iter.hasNext()) {
@@ -185,7 +185,7 @@ public abstract class AGroup extends AComponent implements KeyboardListener, Mou
 	/**
 	 * Searches for all instances of a given component inside this group recursively, and combines relavent transformations
 	 */
-	public boolean find(AComponent component, Predicate<Transformed<?>> transform) {
+	public boolean find(AComponent component, Predicate<TransformedComponent> transform) {
 		for(var form : this) {
 			if(form.component() instanceof AGroup a) {
 				a.find(component, t -> transform.test(t.with(form.transform().andThen(t.transform()))));
@@ -203,7 +203,7 @@ public abstract class AGroup extends AComponent implements KeyboardListener, Mou
 			return true;
 		}
 
-		for(Transformed<?> component : this) {
+		for(TransformedComponent component : this) {
 			if(this.focused != component.component() && component.component() instanceof KeyboardListener l) {
 				if(callback.accept(component.component(), l)) {
 					return true;
@@ -219,6 +219,6 @@ public abstract class AGroup extends AComponent implements KeyboardListener, Mou
 	}
 
 	protected interface CursorCallback {
-		boolean accept(Cursor transformed, Transformed<?> component, MouseListener listener);
+		boolean accept(Cursor transformed, TransformedComponent component, MouseListener listener);
 	}
 }

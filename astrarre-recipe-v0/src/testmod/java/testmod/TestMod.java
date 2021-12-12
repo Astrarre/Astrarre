@@ -1,5 +1,8 @@
 package testmod;
 
+import java.io.BufferedReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import io.github.astrarre.recipe.v0.api.Recipe;
@@ -17,9 +20,11 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
 
 public class TestMod implements ModInitializer {
 	public static final List<TestRecipe> TEST_RECIPE = Recipes.createRecipe(new Identifier("testmod:test_recipe"), TestRecipe.class);
+
 	public static class TestRecipe extends Recipe {
 		public final Tag<Block> tag;
 		public final Ingredient ingredient;

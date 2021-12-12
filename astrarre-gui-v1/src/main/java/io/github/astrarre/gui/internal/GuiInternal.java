@@ -14,6 +14,8 @@ import io.github.astrarre.gui.v1.api.listener.keyboard.Modifier;
 import io.github.astrarre.util.v0.api.Id;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import org.apache.logging.log4j.LogManager;
@@ -31,6 +33,8 @@ import net.minecraft.util.registry.Registry;
 public class GuiInternal {
 	public static final Id OPEN = Id.create("astrarre", "open_server_panel");
 	public static final Id EDIT = Id.create("astrarre", "edit");
+
+	public static int active;
 
 	public static final LiteralText TEXT = new LiteralText("Astrarre Gui");
 	static final Modifier[] MODIFIERS = new Modifier[32];
@@ -64,7 +68,7 @@ public class GuiInternal {
 		}
 
 		for(Modifier.Standard standard : Modifier.Standard.values()) {
-			MODIFIERS[MathHelper.log2(standard.glfwFlag())] = standard;
+			MODIFIERS[MathHelper.floorLog2(standard.glfwFlag())] = standard;
 		}
 		for(int i = 0; i < MODIFIERS.length; i++) {
 			Modifier modifier = MODIFIERS[i];

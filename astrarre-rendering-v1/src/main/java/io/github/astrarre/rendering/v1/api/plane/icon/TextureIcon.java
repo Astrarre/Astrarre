@@ -19,4 +19,29 @@ public record TextureIcon(Texture texture, float offX, float offY, float width, 
 	public void render(Render3d render) {
 		render.texture(this.texture, this.offX, this.offY, this.width, this.height);
 	}
+
+	public record Repeating(TextureIcon icon, float repeatX, float repeatY) implements Icon {
+		@Override
+		public float width() {
+			return icon.width() * repeatX;
+		}
+
+		@Override
+		public float height() {
+			return icon.height() * repeatY;
+		}
+
+		@Override
+		public void render(Render3d render) {
+			for(int x = 0; x < this.repeatX; x++) {
+				float sizeX = Math.min(this.repeatX - x, 1);
+				for(int y = 0; y < this.repeatY; y++) {
+					float sizeY = Math.min(this.repeatY - y, 1);
+					try(var ignore = render.translate(this.icon.width() * x, this.icon.height() * y)) {
+						render.texture(icon.texture.crop(sizeX, sizeY), icon.offX, icon.offY, icon.width * sizeX, icon.height * sizeY);
+					}
+				}
+			}
+		}
+	}
 }

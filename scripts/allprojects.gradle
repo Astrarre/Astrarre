@@ -1,200 +1,128 @@
-import java.nio.file.Files
+subprojects {
+    sourceCompatibility = JavaVersion.VERSION_16
+    targetCompatibility = JavaVersion.VERSION_16
+    group = 'io.github.astrarre'
+    plugins.apply 'java'
+    plugins.apply 'java-library'
+    plugins.apply 'maven-publish'
+    plugins.apply "amalgamation-minecraft"
+    plugins.apply "org.jetbrains.gradle.plugin.idea-ext"
+}
 
-static String computeVersion(Project project) {
-    if(project.hasProperty("deps") || project == project.rootProject) {
-        def projects = project == project.rootProject ? project.subprojects : project.deps.split(",").collect { project.rootProject.project(it) }
-        def curr = project.vers.split("\\.")
-        int major = Integer.parseInt(curr[0]), minor = Integer.parseInt(curr[1]), build = Integer.parseInt(curr[2])
-        projects.each {
-            def depVers = computeVersion(it)
-            def str = depVers.split("\\.")
-            major += Math.max(Integer.parseInt(str[0])-1, 0)
-            minor += Integer.parseInt(str[1])
-            build += Integer.parseInt(str[2])
-        }
-        return major + "." + minor + "." + build
-    } else {
-        return project.vers
+def intermediaryMinecraft = ag.map {
+    mappings(ag.intermediary(minecraft_version))
+    inputGlobal(ag.mojmerged(minecraft_version))
+}
+
+def mc
+def fapi
+def reiImpl
+def map = "net.fabricmc:yarn:${yarn_mappings}:v2"
+def libs = ag.libraries(minecraft_version)
+def floader = ag.fabricLoader("0.12.5")
+ag.map {
+    mappings(map, 'intermediary', 'named')
+    mc = inputGlobal(intermediaryMinecraft)
+    fapi = inputLocal("net.fabricmc.fabric-api:fabric-api:${fabric_version}") {
+        exclude module: 'fabric-loader'
+    }
+    reiImpl = inputLocal("me.shedaniel:RoughlyEnoughItems-fabric:7.0.346") {
+        exclude group: "net.fabricmc.fabric-api"
+        exclude module: 'fabric-loader'
     }
 }
 
 allprojects {
-    sourceCompatibility = JavaVersion.VERSION_16
-    targetCompatibility = JavaVersion.VERSION_16
-    group = 'io.github.astrarre'
-    if (project != rootProject) {
-        plugins.apply 'java'
-        plugins.apply 'idea'
-        plugins.apply 'eclipse'
-        plugins.apply 'java-library'
-        plugins.apply 'maven-publish'
-        plugins.apply "fabric-loom"
-    }
+    ext.fabric = fapi
+    ext.minecraft = mc
+    ext.reiImpl = reiImpl
+    ext.mcLibs = libs
 
-    version = computeVersion(project)
-    println name + ":" + version
-    afterEvaluate {
-        if (project.hasProperty("deps") || project == rootProject) {
-            def projs = project == project.rootProject ? project.subprojects : project.deps.split(",").collect { project.rootProject.project(it) }
-            projs.each {
-                it.tasks.publish.doLast(() -> project.tasks.publish)
-                project.tasks.publish.dependsOn(it.tasks.publish)
-            }
-            publishing {
-                publications {
-                    mavenJava(MavenPublication) {
-                        pom.withXml {
-                            def depsNode = getOrCreateNode(asNode(), "dependencies")
-                            projs.each {
-                                def depNode = depsNode.appendNode("dependency")
-                                depNode.appendNode("groupId", it.group)
-                                depNode.appendNode("artifactId", "$it.name-fabric")
-                                depNode.appendNode("version", it.version)
-                                depNode.appendNode("scope", "compile")
-                            }
-                        }
-                    }
+    sourceSets { testmod {} }
 
-                    mavenJava2(MavenPublication) {
-                        pom.withXml {
-                            def depsNode = getOrCreateNode(asNode(), "dependencies")
-                            projs.each {
-                                def depNode = depsNode.appendNode("dependency")
-                                depNode.appendNode("groupId", it.group)
-                                depNode.appendNode("artifactId", "$it.name-fabric-lite")
-                                depNode.appendNode("version", it.version)
-                                depNode.appendNode("scope", "compile")
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+    version vers
 
-    minecraft {}
     repositories {
         mavenLocal()
         mavenCentral()
-        maven { url 'https://raw.githubusercontent.com/Devan-Kerman/Devan-Repo/master/' }
         maven { url 'https://maven.fabricmc.net/' }
         maven { url 'https://jitpack.io' }
         maven { url 'https://maven.legacyfabric.net/' }
         maven { url "https://maven.shedaniel.me/" }
     }
 
-    sourceSets {
-        testmod {
-            compileClasspath += sourceSets.main.runtimeClasspath
-            runtimeClasspath += sourceSets.main.runtimeClasspath
-        }
+    configureCompile(project, "", map)
+    configureCompile(project, "testmod", map)
 
-        test {
-            compileClasspath += sourceSets.main.compileClasspath
-            runtimeClasspath += sourceSets.main.compileClasspath
+    java {
+        registerFeature('minecraftLibraries') {
+            usingSourceSet(sourceSets.main)
         }
+    }
+
+    configurations {
+        annotationProcessor.extendsFrom(implementation)
+        annotationProcessor.extendsFrom(api)
+        annotationProcessor.extendsFrom(minecraftLibrariesImplementation)
+        testmodAnnotationProcessor.extendsFrom(annotationProcessor)
     }
 
     dependencies {
-        minecraft "com.mojang:minecraft:${minecraft_version}"
-        mappings "net.fabricmc:yarn:${yarn_mappings}:v2"
-        modImplementation "net.fabricmc:fabric-loader:${loader_version}"
+        annotationProcessor ("net.fabricmc:fabric-mixin-compile-extensions:0.4.6")
+
         testImplementation('junit:junit:4.13.1') {
             exclude module: 'fabric-loader'
         }
-        testImplementation('net.devtech:PotatoUnit:1.0.3') {
+
+        implementation floader
+        minecraftLibrariesImplementation mcLibs
+
+        implementation 'org.jetbrains:annotations:23.0.0'
+        implementation map
+        /*testImplementation('net.devtech:PotatoUnit:1.0.3') {
             exclude module: 'fabric-loader'
-        }
+        }*/
 
-        // check for conflicts
-        modRuntime("net.fabricmc.fabric-api:fabric-api:${fabric_version}") {
-            exclude module: 'fabric-loader'
-        }
+        testmodImplementation(fapi)
+    }
 
-        if (project.hasProperty("deps") || project == rootProject) {
-            def projs = project == project.rootProject ? project.subprojects : project.deps.split(",").collect { project.rootProject.project(it) }
-            projs.each {
-                println "\t|- " + it.name
-                api it
-            }
+    sourceSets {
+        testmod {
+            compileClasspath += main.output + main.compileClasspath
+            runtimeClasspath += main.runtimeClasspath
+        }
+        test {
+            compileClasspath += main.output + main.compileClasspath
+            runtimeClasspath += main.compileClasspath
         }
     }
 
-    loom {
-        runs {
-            testmodClient {
-                client()
-                ideConfigGenerated project.rootProject == project
-                name = "Testmod Client"
-                source sourceSets.testmod
-            }
-            testmodServer {
-                server()
-                ideConfigGenerated project.rootProject == project
-                name = "Testmod Server"
-                source sourceSets.testmod
-            }
-        }
-    }
-
-    processResources {
-        inputs.property "version", project.version
-        filesMatching("fabric.mod.json") {
-            expand "version": project.version
-        }
-    }
-
-    task sourcesJar(type: Jar) {
-        group = "astrarre"
-        archiveClassifier = "sources"
-        from sourceSets.main.allSource
-    }
-
-    afterEvaluate {
-        task remapJar2(type: remapJar.class) {
-            group = "astrarre"
-            addNestedDependencies = remapJar.addNestedDependencies
-            addDefaultNestedDependencies = false
-            remapAccessWidener = remapJar.remapAccessWidener
-            jarRemapper = remapJar.jarRemapper
-            input = remapJar.input
-        }
-        remapJar2.dependsOn(remapJar)
-
-        publishing {
-            publications {
-                mavenJava(MavenPublication) {
-                    artifactId = "$project.name-fabric"
-                    // regular old implementation jar
-                    artifact(remapJar) {
-                        builtBy remapJar
-                    }
-
-                    // sources for ye normal folk
-                    artifact(sourcesJar) {
-                        builtBy remapSourcesJar
-                    }
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                artifactId = "$project.name-fabric"
+                from components.java
+                setArtifacts([])
+                ag.fixPom(it)
+                artifact(remapJar) {
+                    builtBy remapJar
                 }
-                mavenJava2(MavenPublication) {
-                    artifactId = "$project.name-fabric-lite"
-                    artifact(remapJar2) {
-                        builtBy remapJar2
-                    }
-                    artifact(sourcesJar) {
-                        builtBy remapSourcesJar
-                    }
+
+                // sources for ye normal folk
+                artifact(remapSourcesJar) {
+                    builtBy remapSourcesJar
                 }
             }
+        }
 
-            repositories {
-                maven {
-                    def mavenUrl = project.hasProperty('maven_url') ? project.property('maven_url') : ""
-                    url mavenUrl
-                    if (mavenUrl.startsWith("http")) {
-                        credentials {
-                            username project.hasProperty('maven_username') ? project.property('maven_username') : ""
-                            password project.hasProperty('maven_password') ? project.property('maven_password') : ""
-                        }
+        repositories {
+            maven {
+                def mavenUrl = project.hasProperty('maven_url') ? project.property('maven_url') : ""
+                url mavenUrl
+                if (mavenUrl.startsWith("http")) {
+                    credentials {
+                        username project.hasProperty('maven_username') ? project.property('maven_username') : ""
+                        password project.hasProperty('maven_password') ? project.property('maven_password') : ""
                     }
                 }
             }
@@ -205,18 +133,85 @@ allprojects {
         from "$rootProject.projectDir/LICENSE"
     }
 
-    task moveMigrates {
-        doLast {
-            file("src/main/java").deleteDir()
-            Files.move(file("remappedSrc").toPath(), file("src/main/java").toPath())
+    task doNothing {}
+
+    task runClient(type: JavaExec) {
+        group = "Minecraft"
+        description = "Test Diff:tm:"
+        classpath sourceSets.testmod.runtimeClasspath
+        main = "net.fabricmc.loader.launch.knot.KnotClient"
+        def natives = ag.natives(minecraft_version)
+        systemProperty("fabric.development", true)
+        systemProperty("fabric.gameVersion", minecraft_version)
+        systemProperty("java.library.globalCache", natives)
+        systemProperty("org.lwjgl.librarypath", natives)
+        def assets = ag.assets(minecraft_version)
+        args("--assetIndex", assets.getAssetIndex(), "--assetsDir", assets.getAssetsDir())
+        workingDir("$rootDir/run")
+        dependsOn tasks.testmodClasses
+    }
+    ag.idea().java(runClient) {
+        it.customName = name + "_runClient"
+    }
+}
+
+void configureCompile(Project project, String str, String map) {
+    def real = str.isEmpty() ? "main" : str
+    def upper = str.isEmpty() ? "" : str.substring(0, 1).toUpperCase() + str.substring(1)
+    project.configure(project) {
+        tasks.getByName("process${upper}Resources") {
+            inputs.property "version", project.version
+            filesMatching("fabric.mod.json") {
+                expand "version": project.version
+            }
+            filesMatching("*.mixins.json") {
+                def first = true
+                filter { String ln ->
+                    if (first) {
+                        int index = ln.indexOf('{')
+                        if (index != -1) {
+                            first = false
+                            def rep = ln.replaceFirst("\\{", "{\"refmap\":\"$real-refmap.json\",")
+                            return rep
+                        }
+                    }
+                    return ln
+                }
+            }
+        }
+
+        def compile = tasks.getByName("compile${upper}Java") {
+            def compilerArgs = options.compilerArgs
+            compilerArgs.add("-AinMapFileNamedIntermediary=$rootProject.buildDir/unzip/mappings/mappings.tiny" as String)
+            compilerArgs.add("-AoutMapFileNamedIntermediary=$buildDir/${real}.tiny" as String)
+            // I have no idea what this does btw
+            compilerArgs.add("-AoutRefMapFile=${destinationDirectory.get().asFile}/$real-refmap.json" as String)
+            compilerArgs.add("-AdefaultObfuscationEnv=named:intermediary" as String)
+            dependsOn rootProject.tasks.unzip
+        }
+
+        tasks.create(type: RemapJar, name: "remap${upper}Jar") {
+            group = "build"
+            if (str.isEmpty()) {
+                with jar
+            } else {
+                from sourceSets.getByName(real).output
+            }
+            classpath = sourceSets.getByName(real).compileClasspath
+            remapAw()
+            mappings(map, 'named', 'intermediary')
+            if(file("$buildDir${File.separator}${real}.tiny").exists()) {
+                mappings(files("$buildDir${File.separator}${real}.tiny"), 'named', 'intermediary')
+            }
+            dependsOn(compile)
+        }
+
+        tasks.create(type: RemapSourcesJar, dependsOn: classes, name: "remap${upper}SourcesJar") {
+            group = "build"
+            classifier = 'sources'
+            from sourceSets.getByName(real).allSource
+            classpath = sourceSets.getByName(real).compileClasspath
+            mappings(map, 'named', 'intermediary')
         }
     }
-
-    migrateMappings {
-        mappings("1.17-pre1+build.4")
-    }
-
-    tasks.moveMigrates.dependsOn(tasks.migrateMappings)
-
-    task doNothing {}
 }

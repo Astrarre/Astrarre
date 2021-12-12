@@ -21,7 +21,7 @@ public abstract class ServerPlayNetworkHandlerMixin_Comms implements ServerPlayP
 
 	@Inject(method = "onCustomPayload", at = @At("HEAD"), cancellable = true)
 	public void enforce(CustomPayloadC2SPacket packet, CallbackInfo ci) {
-		NetworkThreadUtils.forceMainThread(packet, this, this.player.getServerWorld());
+		NetworkThreadUtils.forceMainThread(packet, this, this.player.getWorld());
 		if(AbstractComms.PACKET_ID.equals(packet.getChannel())) {
 			PacketByteBuf buf = packet.getData();
 			HashKey key = new HashKey(buf);

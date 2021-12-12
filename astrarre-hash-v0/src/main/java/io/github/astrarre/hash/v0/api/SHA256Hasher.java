@@ -1,12 +1,14 @@
 package io.github.astrarre.hash.v0.api;
 
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
+import com.google.common.hash.PrimitiveSink;
 import io.github.astrarre.util.v0.api.Validate;
 import org.apache.commons.io.output.NullOutputStream;
 
@@ -82,6 +84,12 @@ public class SHA256Hasher extends AbstractHasher implements AutoCloseable {
 		if(this.index != -1) {
 			POOL.set(this.index, this);
 		}
+	}
+
+	@Override
+	public PrimitiveSink putBytes(ByteBuffer bytes) {
+		this.digest.update(bytes);
+		return this;
 	}
 
 	@Override

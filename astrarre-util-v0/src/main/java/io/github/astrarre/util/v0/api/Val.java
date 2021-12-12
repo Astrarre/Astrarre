@@ -53,7 +53,7 @@ public class Val<V> {
 
 	public void set(V val) {
 		V old = this.val;
-		if(val != old) {
+		if(!val.equals(old)) {
 			this.val = val;
 			List<Listener<V>> list = this.listeners;
 			if (list != null) {

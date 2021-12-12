@@ -9,7 +9,6 @@
     "LivingEntityMixin_FakePlayerEntity",
     "MinecraftServerMixin_ActiveServer",
     "SetTagAccess",
-    "TagDelegateAccess",
     "TagWrapperAccess"
   ],
   "injectors": {

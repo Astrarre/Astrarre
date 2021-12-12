@@ -11,9 +11,14 @@ import com.google.common.collect.ForwardingCollection;
 import com.google.common.collect.ForwardingList;
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.types.Func;
+import dev.architectury.fluid.FluidStack;
 import io.github.astrarre.recipe.v0.api.Recipe;
 import io.github.astrarre.util.v0.fabric.Tags;
-import me.shedaniel.rei.api.EntryStack;
+import me.shedaniel.rei.api.common.entry.EntryIngredient;
+import me.shedaniel.rei.api.common.entry.EntryStack;
+import me.shedaniel.rei.api.common.entry.type.VanillaEntryTypes;
+import me.shedaniel.rei.api.common.util.EntryIngredients;
+import me.shedaniel.rei.api.common.util.EntryStacks;
 import org.jetbrains.annotations.Contract;
 
 import net.minecraft.client.resource.language.I18n;
@@ -69,33 +74,48 @@ public class RecipeDisplayBuilder<T extends Recipe> {
 		};
 	}
 
+	/**
+	 * @param input a required item, that is not consumed
+	 */
 	@Contract("_ -> this")
 	public RecipeDisplayBuilder<T> addInput(Tag<Item> input) {
-		this.inputs.add(of(input, EntryStack::create));
+		this.inputs.add(of(input, EntryStacks::of));
 		return this;
 	}
 
+	/**
+	 * @param input a required item, that is not consumed
+	 */
 	@Contract("_ -> this")
 	public RecipeDisplayBuilder<T> addInput(Ingredient input) {
-		this.inputs.add(EntryStack.ofIngredient(input));
+		this.inputs.add((List)EntryIngredients.ofIngredient(input).cast());
 		return this;
 	}
 
+	/**
+	 * @param input a required item, that is not consumed
+	 */
 	@Contract("_ -> this")
 	public RecipeDisplayBuilder<T> addInputStacks(List<ItemStack> input) {
-		this.inputs.add(EntryStack.ofItemStacks(input));
+		this.inputs.add((List)input.stream().map(EntryStacks::of).toList());
 		return this;
 	}
 
+	/**
+	 * @param input a required item, that is not consumed
+	 */
 	@Contract("_ -> this")
 	public RecipeDisplayBuilder<T> addInput(ItemStack... input) {
-		this.inputs.add(EntryStack.ofItemStacks(Arrays.asList(input)));
+		this.inputs.add((List)Arrays.stream(input).map(EntryStacks::of).toList());
 		return this;
 	}
 
+	/**
+	 * @param input a required item, that is not consumed
+	 */
 	@Contract("_ -> this")
 	public RecipeDisplayBuilder<T> addInput(ItemConvertible... input) {
-		this.inputs.add(EntryStack.ofItems(Arrays.asList(input)));
+		this.inputs.add((List)Arrays.stream(input).map(ItemConvertible::asItem).map(ItemStack::new).map(EntryStacks::of).toList());
 		return this;
 	}
 
@@ -110,7 +130,7 @@ public class RecipeDisplayBuilder<T extends Recipe> {
 	 */
 	@Contract("_,_ -> this")
 	public RecipeDisplayBuilder<T> addInput(Tag<Fluid> input, int droplets) {
-		this.inputs.add(of(input, fluid -> EntryStack.create(fluid, droplets)));
+		this.inputs.add(of(input, fluid -> EntryStacks.of(fluid, droplets)));
 		return this;
 	}
 
@@ -119,7 +139,7 @@ public class RecipeDisplayBuilder<T extends Recipe> {
 	 */
 	@Contract("_,_ -> this")
 	public RecipeDisplayBuilder<T> addInput(Fluid input, int droplets) {
-		this.inputs.add(Collections.singletonList(EntryStack.create(input, droplets)));
+		this.inputs.add(Collections.singletonList(EntryStacks.of(input, droplets)));
 		return this;
 	}
 	
@@ -137,31 +157,31 @@ public class RecipeDisplayBuilder<T extends Recipe> {
 
 	@Contract("_ -> this")
 	public RecipeDisplayBuilder<T> addOutput(Tag<Item> output) {
-		this.outputs.add(of(output, EntryStack::create));
+		this.outputs.add(of(output, EntryStacks::of));
 		return this;
 	}
 
 	@Contract("_ -> this")
 	public RecipeDisplayBuilder<T> addOutput(Ingredient output) {
-		this.outputs.add(EntryStack.ofIngredient(output));
+		this.outputs.add((List)EntryIngredients.ofIngredient(output).cast());
 		return this;
 	}
 
 	@Contract("_ -> this")
 	public RecipeDisplayBuilder<T> addOutputStacks(List<ItemStack> output) {
-		this.outputs.add(EntryStack.ofItemStacks(output));
+		this.outputs.add((List)output.stream().map(EntryStacks::of).toList());
 		return this;
 	}
 
 	@Contract("_ -> this")
 	public RecipeDisplayBuilder<T> addOutput(ItemStack... output) {
-		this.outputs.add(EntryStack.ofItemStacks(Arrays.asList(output)));
+		this.outputs.add((List)Arrays.stream(output).map(EntryStacks::of).toList());
 		return this;
 	}
 
 	@Contract("_ -> this")
 	public RecipeDisplayBuilder<T> addOutput(ItemConvertible... output) {
-		this.outputs.add(EntryStack.ofItems(Arrays.asList(output)));
+		this.outputs.add((List)Arrays.stream(output).map(ItemConvertible::asItem).map(ItemStack::new).map(EntryStacks::of).toList());
 		return this;
 	}
 
@@ -176,7 +196,7 @@ public class RecipeDisplayBuilder<T extends Recipe> {
 	 */
 	@Contract("_,_ -> this")
 	public RecipeDisplayBuilder<T> addOutput(Tag<Fluid> output, int droplets) {
-		this.outputs.add(of(output, fluid -> EntryStack.create(fluid, droplets)));
+		this.outputs.add(of(output, fluid -> EntryStacks.of(fluid, droplets)));
 		return this;
 	}
 
@@ -185,7 +205,7 @@ public class RecipeDisplayBuilder<T extends Recipe> {
 	 */
 	@Contract("_,_ -> this")
 	public RecipeDisplayBuilder<T> addOutput(Fluid output, int droplets) {
-		this.outputs.add(Collections.singletonList(EntryStack.create(output, droplets)));
+		this.outputs.add(Collections.singletonList(EntryStacks.of(output, droplets)));
 		return this;
 	}
 	
@@ -206,7 +226,7 @@ public class RecipeDisplayBuilder<T extends Recipe> {
 	 */
 	@Contract("_ -> this")
 	public RecipeDisplayBuilder<T> addCatalyst(Tag<Item> catalyst) {
-		this.catalysts.add(of(catalyst, EntryStack::create));
+		this.catalysts.add(of(catalyst, EntryStacks::of));
 		return this;
 	}
 
@@ -215,7 +235,7 @@ public class RecipeDisplayBuilder<T extends Recipe> {
 	 */
 	@Contract("_ -> this")
 	public RecipeDisplayBuilder<T> addCatalyst(Ingredient catalyst) {
-		this.catalysts.add(EntryStack.ofIngredient(catalyst));
+		this.catalysts.add((List)EntryIngredients.ofIngredient(catalyst).cast());
 		return this;
 	}
 
@@ -224,7 +244,7 @@ public class RecipeDisplayBuilder<T extends Recipe> {
 	 */
 	@Contract("_ -> this")
 	public RecipeDisplayBuilder<T> addCatalystStacks(List<ItemStack> catalyst) {
-		this.catalysts.add(EntryStack.ofItemStacks(catalyst));
+		this.catalysts.add((List)catalyst.stream().map(EntryStacks::of).toList());
 		return this;
 	}
 
@@ -233,7 +253,7 @@ public class RecipeDisplayBuilder<T extends Recipe> {
 	 */
 	@Contract("_ -> this")
 	public RecipeDisplayBuilder<T> addCatalyst(ItemStack... catalyst) {
-		this.catalysts.add(EntryStack.ofItemStacks(Arrays.asList(catalyst)));
+		this.catalysts.add((List)Arrays.stream(catalyst).map(EntryStacks::of).toList());
 		return this;
 	}
 
@@ -242,7 +262,7 @@ public class RecipeDisplayBuilder<T extends Recipe> {
 	 */
 	@Contract("_ -> this")
 	public RecipeDisplayBuilder<T> addCatalyst(ItemConvertible... catalyst) {
-		this.catalysts.add(EntryStack.ofItems(Arrays.asList(catalyst)));
+		this.catalysts.add((List)Arrays.stream(catalyst).map(ItemConvertible::asItem).map(ItemStack::new).map(EntryStacks::of).toList());
 		return this;
 	}
 
@@ -257,7 +277,7 @@ public class RecipeDisplayBuilder<T extends Recipe> {
 	 */
 	@Contract("_,_ -> this")
 	public RecipeDisplayBuilder<T> addCatalyst(Tag<Fluid> catalyst, int droplets) {
-		this.catalysts.add(of(catalyst, fluid -> EntryStack.create(fluid, droplets)));
+		this.catalysts.add(of(catalyst, fluid -> EntryStacks.of(fluid, droplets)));
 		return this;
 	}
 
@@ -266,7 +286,7 @@ public class RecipeDisplayBuilder<T extends Recipe> {
 	 */
 	@Contract("_,_ -> this")
 	public RecipeDisplayBuilder<T> addCatalyst(Fluid catalyst, int droplets) {
-		this.catalysts.add(Collections.singletonList(EntryStack.create(catalyst, droplets)));
+		this.catalysts.add(Collections.singletonList(EntryStacks.of(catalyst, droplets)));
 		return this;
 	}
 

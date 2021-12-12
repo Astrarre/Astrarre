@@ -280,7 +280,7 @@ public interface NBTagView extends Iterable<String>, NbtValue {
 	@Nullable
 	default NbtCompound copyTag() {
 		NbtCompound tag = this.toTag();
-		return tag == null ? null : tag.copy();
+		return (tag == null || this.isEmpty()) ? null : tag.copy();
 	}
 
 	boolean isEmpty();

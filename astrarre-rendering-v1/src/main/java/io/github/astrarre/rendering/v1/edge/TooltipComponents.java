@@ -30,7 +30,7 @@ public class TooltipComponents {
 			@Override
 			public void drawText(TextRenderer textRenderer, int x, int y, Matrix4f matrix4f, VertexConsumerProvider.Immediate immediate) {
 				MatrixStack stack = new MatrixStack();
-				stack.method_34425(matrix4f);
+				stack.multiplyPositionMatrix(matrix4f);
 				stack.translate(x, y, 0);
 
 				MinecraftClient client = MinecraftClient.getInstance(); // todo change the API to allow it to use VertexConsumerProviders instead
@@ -66,7 +66,7 @@ public class TooltipComponents {
 			public void render(Render3d render) {
 				if(render instanceof Renderer2DImpl r) {
 					TextRenderer renderer = MinecraftClient.getInstance().textRenderer;
-					component.drawText(renderer, 0, 0, r.stack.peek().getModel(), VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer()));
+					component.drawText(renderer, 0, 0, r.stack.peek().getPositionMatrix(), VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer()));
 				} else {
 					throw new UnsupportedOperationException("unsupported renderer class " + render);
 				}

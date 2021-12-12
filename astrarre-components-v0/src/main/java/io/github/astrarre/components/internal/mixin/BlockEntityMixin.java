@@ -41,7 +41,7 @@ public class BlockEntityMixin implements DataObjectHolder {
 	}
 
 	@Inject(method = "writeNbt", at = @At("RETURN"))
-	public void writeNbt(NbtCompound nbt, CallbackInfoReturnable<NbtCompound> cir) {
+	public void writeNbt(NbtCompound nbt, CallbackInfo cir) {
 		nbt.put("astrarre_components", ComponentsInternal.write((BlockEntity) (Object) this, ComponentsInternal.SERIALIZE_BLOCK_ENTITY_INTERNAL));
 	}
 

@@ -17,7 +17,7 @@ import net.minecraft.client.gui.screen.Screen;
 
 @Mixin(Screen.class)
 public abstract class ScreenMixin_Access implements PanelScreenAccess {
-	@Shadow protected abstract <T extends Element & Drawable & Selectable> T addDrawableChild(T drawableElement);
+	@Shadow protected abstract Element addDrawableChild(Element drawableElement);
 
 	@Shadow public int width;
 	@Shadow public int height;

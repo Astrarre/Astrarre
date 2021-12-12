@@ -25,8 +25,6 @@ import io.github.astrarre.rendering.v1.api.plane.icon.backgrounds.ContainerBackg
 import io.github.astrarre.rendering.v1.api.plane.icon.wrapper.MutableIcon;
 import io.github.astrarre.rendering.v1.api.space.Transform3d;
 import io.github.astrarre.rendering.v1.api.util.Axis2d;
-import io.github.astrarre.transfer.v0.fabric.inventory.CombinedInventory;
-import io.github.astrarre.transfer.v0.fabric.inventory.ForwardingInventory;
 import io.github.astrarre.util.v0.api.Id;
 import io.github.astrarre.util.v0.api.Val;
 
@@ -35,7 +33,9 @@ import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.texture.Sprite;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
@@ -50,6 +50,11 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
+import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRenderHandler;
+import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+
 public class InsaneCraftingTable extends Block implements BlockEntityProvider {
 	public InsaneCraftingTable(Settings settings) {
 		super(settings);
@@ -58,7 +63,13 @@ public class InsaneCraftingTable extends Block implements BlockEntityProvider {
 	@Override
 	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
 		if(world.getBlockEntity(pos) instanceof Tile t) {
-			this.openGui(t, player);
+			//this.openGui(t, player);// a
+			ServerPanel.openHandled(player, (communication, panel) -> {
+				Sprite sprite = FluidVariantRendering.getSprite(FluidVariant.of(Fluids.WATER));
+				panel.add(new AIcon(
+					Icon.tex(Texture.sprite(sprite), 200, 200)
+				));
+			}, (communication, panel) -> {});
 		}
 		return ActionResult.CONSUME;
 	}
@@ -254,7 +265,7 @@ public class InsaneCraftingTable extends Block implements BlockEntityProvider {
 		}
 
 		@Override
-		public NbtCompound writeNbt(NbtCompound nbt) {
+		public void writeNbt(NbtCompound nbt) {
 			NbtList list = new NbtList();
 			for(int i = 0; i < this.realInventory.size(); i++) {
 				NbtCompound compound = new NbtCompound();
@@ -262,8 +273,6 @@ public class InsaneCraftingTable extends Block implements BlockEntityProvider {
 				list.add(compound);
 			}
 			nbt.put("Items", list);
-
-			return super.writeNbt(nbt);
 		}
 
 		@Override

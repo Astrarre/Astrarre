@@ -40,21 +40,17 @@ public class AButton extends AHoverableComponent implements MouseListener, Toggl
 
 	void validateState(State state) {
 		state.group.requireUniformSize();
-		var normal = state.group.normal();
-		if(normal.width() != this.getWidth() || normal.height() != this.getHeight()) {
-			throw new IllegalArgumentException("Icons must be all of same size!");
-		}
 	}
 
 	public AButton(List<State> states) {
 		if(states.isEmpty()) {
 			throw new IllegalStateException("Must have atleast one state!");
 		}
+		states.forEach(this::validateState);
+
 		var first = states.get(0);
-		first.group.requireUniformSize();
 		var normal = first.group.normal();
 		this.setBounds(normal.width(), normal.height());
-		states.forEach(this::validateState);
 		this.states = new ArrayList<>(states);
 	}
 
@@ -79,8 +75,7 @@ public class AButton extends AHoverableComponent implements MouseListener, Toggl
 		boolean released = this.isEnabled() && this.pressed;
 		if(released) {
 			this.states.get(this.activeState).callback.accept(cursor);
-			this.activeState++;
-			this.activeState %= this.states.size();
+			this.setActiveState(this.states.get(this.activeState + 1));
 		}
 		return released;
 	}
@@ -107,6 +102,9 @@ public class AButton extends AHoverableComponent implements MouseListener, Toggl
 			throw new IllegalStateException(state + " is not a valid state in " + this);
 		} else {
 			this.activeState = index;
+			state.group.requireUniformSize();
+			var normal = state.group.normal();
+			this.setBounds(normal.width(), normal.height());
 		}
 	}
 

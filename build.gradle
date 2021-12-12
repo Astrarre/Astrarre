@@ -4,103 +4,23 @@ plugins {
     id 'eclipse'
     id 'java-library'
     id 'maven-publish'
-    id "fabric-loom" version "0.8.9"
+    id 'amalgamation-minecraft' version "2.3.0"
+    id 'org.jetbrains.gradle.plugin.idea-ext' version '1.1'
+}
+
+repositories {
+    maven { url 'https://maven.fabricmc.net/' }
 }
 
 group = 'io.github.astrarre'
 
-loom {
-    shareCaches = true
-    //runDir = "run"
+def map = dependencies.create("net.fabricmc:yarn:${yarn_mappings}:v2")
+task unzip(type: Copy) {
+    inputs.files(ag.resolve([map]))
+    from provider {
+        zipTree(ag.resolve([map]).first())
+    }
+    into "$buildDir/unzip/"
 }
-
 
 apply from: 'scripts/allprojects.gradle'
-
-static def fapi(Project proj, String... modules) {
-    fapi(true, proj, modules)
-}
-static def fapi(boolean addToMaven, Project proj, String... modules) {
-    proj.extensions.add("fapi_deps", modules)
-    proj.configure(proj) {
-        dependencies {
-            if(modules.length == 0) {
-                modImplementation("net.fabricmc.fabric-api:fabric-api:${fabric_version}") {
-                    exclude module: 'fabric-loader'
-                }
-            } else {
-                modules.each {
-                    include(modImplementation(fabricApi.module(it, fabric_version)) {
-                        exclude module: 'fabric-loader'
-                    })
-                }
-            }
-        }
-
-        if(addToMaven) {
-            modules.each {
-                def str = it
-                publishing {
-                    publications {
-                        mavenJava2(MavenPublication) {
-                            pom.withXml {
-                                def depsNode = getOrCreateNode(asNode(), "dependencies")
-                                proj.each {
-                                    def depNode = depsNode.appendNode("dependency")
-                                    depNode.appendNode("groupId", "net.fabricmc.fabric-api")
-                                    depNode.appendNode("artifactId", str)
-                                    depNode.appendNode("version", fabricApi.moduleVersion(str, fabric_version))
-                                    depNode.appendNode("scope", "compile")
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-dependencies {
-    modImplementation("me.shedaniel:RoughlyEnoughItems:5.11.188") {
-        exclude module: 'fabric-api'
-        exclude module: 'fabric-loader'
-    }
-}
-
-fapi(project)
-
-static def nanoevents(Project proj) {
-    proj.configure(proj) {
-        def nano_events_ver = "3.0.6"
-        def nano_events_ap = "1.0.4"
-        modImplementation("net.devtech:NanoEvents:$nano_events_ver") {
-            transitive = false
-        }
-
-        testmodImplementationOnly "net.devtech:nanoevents-ap:$nano_events_ap"
-        compileOnly "net.devtech:nanoevents-ap:$nano_events_ap"
-        annotationProcessor "net.devtech:nanoevents-ap:$nano_events_ap"
-        testmodAnnotationProcessor "net.devtech:nanoevents-ap:$nano_events_ap"
-
-        processResources {
-            from(sourceSets.main.output.classesDirs.singleFile) {
-                include "nanoevents/**"
-            }
-        }
-    }
-}
-
-static Node getOrCreateNode(Node node, String name) {
-    Node dependencies = null
-    for(Node n : node) {
-        if(name == n.name()) {
-            dependencies = n
-            break
-        }
-    }
-    if(dependencies == null) {
-        dependencies = node.appendNode(name)
-    }
-    return dependencies
-}

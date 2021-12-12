@@ -21,7 +21,6 @@ import net.minecraft.world.poi.PointOfInterestStorage;
 public class ChunkSerializerMixin_ChunkComponents {
 	@Inject(method = "deserialize", at = @At("RETURN"))
 	private static void deserializer(ServerWorld world,
-			StructureManager structureManager,
 			PointOfInterestStorage poiStorage,
 			ChunkPos pos,
 			NbtCompound nbt,

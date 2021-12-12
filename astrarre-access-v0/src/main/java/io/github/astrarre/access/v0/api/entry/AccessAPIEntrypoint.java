@@ -12,5 +12,6 @@ public interface AccessAPIEntrypoint {
 	 * @see Access#ON_ACCESS_INIT
 	 * @deprecated {@link AccessInitEntrypoint}
 	 */
+	@Deprecated
 	void onAccessAPIInit();
 }

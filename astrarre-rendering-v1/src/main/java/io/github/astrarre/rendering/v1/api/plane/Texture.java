@@ -28,7 +28,9 @@ public record Texture(Id texture, float offX, float offY, float width, float hei
 
 	@Edge
 	public static Texture sprite(Sprite sprite) {
-		return new Texture(Id.of(sprite.getAtlas().getId()), sprite.getMinU(), sprite.getMinV(), sprite.getMaxU(), sprite.getMaxV());
+		float u = sprite.getMinU(), v = sprite.getMinV();
+		float width = sprite.getMaxU() - u, height = sprite.getMaxV() - v;
+		return new Texture(Id.of(sprite.getAtlas().getId()), u, v, width, height);
 	}
 
 	@Edge

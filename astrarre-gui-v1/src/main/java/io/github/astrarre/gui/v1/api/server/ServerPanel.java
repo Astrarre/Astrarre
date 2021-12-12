@@ -57,26 +57,36 @@ public interface ServerPanel {
 	static void openClient(ClientPlayerEntity entity, ClientInit init) {
 		var comms = PacketHandler.player(GuiInternal.OPEN, entity);
 		var packet = new SingleUsePacket();
+		GuiInternal.active++;
 		comms.listen(packet, view -> {
 			try {
 				int syncId = view.getInt("id");
 				MinecraftClient mc = MinecraftClient.getInstance();
 				Screen screen = mc.currentScreen;
 				ScreenHandler handler = screen instanceof HandledScreen<?> s ? s.getScreenHandler() : null;
-				if(handler != null && handler.syncId == syncId) {
+				if(handler == null) {
+					GuiInternal.LOGGER.warn("No Screen is open on the client! Maybe the packets arrived in the wrong order?");
+					comms.close();
+				} else if(handler.syncId != syncId) {
+					if(GuiInternal.active == 1) {
+						GuiInternal.LOGGER.warn("syncId does not match, and active screen is different! Maybe the packets arrived in the wrong order?");
+						comms.close();
+					} else {
+						GuiInternal.LOGGER.warn("screen mismatch! syncId does not match! Maybe the packets arrived in the wrong order?");
+					}
+				} else {
 					ARootPanel panel = ARootPanel.getPanel(screen);
 					comms.startQueue();
 					init.onInit(comms, panel);
 					comms.flushQueue();
 					((ServerPanel) handler).addCloseListener(comms::close);
 					AstrarreGui.AUDITORS.get().auditClient(comms, panel);
-				} else {
-					GuiInternal.LOGGER.warn("syncId does not match! Maybe the packets arrived in the wrong order?");
-					comms.close();
 				}
 			} catch(Throwable e) {
 				comms.close();
 				throw Validate.rethrow(e);
+			} finally {
+				GuiInternal.active--;
 			}
 		});
 	}

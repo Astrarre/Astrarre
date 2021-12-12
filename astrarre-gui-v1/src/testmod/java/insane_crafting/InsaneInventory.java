@@ -13,7 +13,11 @@ public class InsaneInventory implements Inventory {
 	@SuppressWarnings("MismatchedReadAndWriteOfArray") private static final ItemStack[] NULL_INVENTORY = new ItemStack[SIZE];
 
 	final ItemStack[] inventory = new ItemStack[SIZE];
-	final Access<Runnable> change = new Access<>("insane_crafting", "insane_inv_change", a -> () -> a.forEach(Runnable::run));
+	final Access<Runnable> change = new Access<>("insane_crafting", "insane_inv_change", a -> () -> {
+		for(Runnable runnable : a) {
+			runnable.run();
+		}
+	});
 	int first = Integer.MAX_VALUE, last = SIZE - 1;
 	boolean empty = true;
 
