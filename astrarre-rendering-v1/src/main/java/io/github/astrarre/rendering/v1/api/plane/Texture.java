@@ -8,6 +8,9 @@ import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.util.Identifier;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 /**
  * a section of an image
  */
@@ -27,6 +30,7 @@ public record Texture(Id texture, float offX, float offY, float width, float hei
 	}
 
 	@Edge
+	@Environment(EnvType.CLIENT)
 	public static Texture sprite(Sprite sprite) {
 		float u = sprite.getMinU(), v = sprite.getMinV();
 		float width = sprite.getMaxU() - u, height = sprite.getMaxV() - v;
@@ -34,6 +38,7 @@ public record Texture(Id texture, float offX, float offY, float width, float hei
 	}
 
 	@Edge
+	@Environment(EnvType.CLIENT)
 	public static Texture sprite(SpriteIdentifier identifier) {
 		return sprite(identifier.getSprite());
 	}

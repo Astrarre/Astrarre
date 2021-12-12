@@ -190,6 +190,7 @@ void configureCompile(Project project, String str, String map) {
             dependsOn rootProject.tasks.unzip
         }
 
+
         tasks.create(type: RemapJar, name: "remap${upper}Jar") {
             group = "build"
             if (str.isEmpty()) {

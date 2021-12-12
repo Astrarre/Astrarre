@@ -4,18 +4,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.github.astrarre.gui.internal.access.TickingPanel;
+import io.github.astrarre.gui.internal.slot.SlotAdapter;
 import io.github.astrarre.gui.v1.api.server.ServerPanel;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.Slot;
 
 @Mixin(ScreenHandler.class)
 public class ScreenHandlerMixin_ServerPanel implements ServerPanel, TickingPanel {
 	final List<Runnable> tick = new ArrayList<>(), close = new ArrayList<>();
+
+	@Inject(method = "canInsertItemIntoSlot", at = @At("HEAD"), cancellable = true)
+	private static void canInsert(Slot $$0, ItemStack $$1, boolean $$2, CallbackInfoReturnable<Boolean> cir) {
+		if($$0 instanceof SlotAdapter) {
+			cir.setReturnValue(true);
+		}
+	}
 
 	@Override
 	public ScreenHandler screenHandler() {

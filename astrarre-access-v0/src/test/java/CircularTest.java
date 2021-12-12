@@ -1,12 +1,10 @@
 import io.github.astrarre.access.v0.api.FunctionAccess;
 import io.github.astrarre.util.v0.api.Id;
-import net.devtech.potatounit.TestRunner;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-@RunWith(TestRunner.Client.class)
 public class CircularTest {
 	public FunctionAccess<String, Integer> legacyAPI;
 	public FunctionAccess<String, Float> newAPI;

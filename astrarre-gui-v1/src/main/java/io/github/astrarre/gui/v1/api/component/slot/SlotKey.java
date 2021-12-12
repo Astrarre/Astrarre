@@ -92,6 +92,10 @@ public class SlotKey extends PacketKey {
 		return item.createItemStack(count);
 	}
 
+	public boolean isValid(ItemKey key) {
+		return this.inventory.isValid(this.slotIndex, key.createItemStack(1));
+	}
+
 	/**
 	 * Attempt to insert the given stack into the slot
 	 *
@@ -103,7 +107,7 @@ public class SlotKey extends PacketKey {
 		ItemStack current = this.getStack();
 		count = Math.min(Math.min(key.getMaxStackSize(), this.getMaxCount(key)) - current.getCount(), count);
 		ItemStack copy = key.createItemStack(count);
-		if(count <= 0 || key.isEmpty() || !this.isValid(copy)) {
+		if(count <= 0 || key.isEmpty() || !this.isValid(key)) {
 			return 0;
 		}
 
@@ -121,6 +125,24 @@ public class SlotKey extends PacketKey {
 		} else {
 			return 0;
 		}
+	}
+
+	/**
+	 * @return the amount actually extracted
+	 */
+	public int extract(ItemKey key, int count, boolean simulate) {
+		if(count <= 0 || key.isEmpty()) {
+			return 0;
+		}
+		ItemStack current = this.getStack();
+		if(!current.isEmpty() && key.isEqual(current)) {
+			int toExtract = Math.min(current.getCount(), count);
+			if(!simulate) {
+				this.removeStack(toExtract);
+			}
+			return toExtract;
+		}
+		return 0;
 	}
 
 	public static void syncAll(PacketHandler handler, ServerPanel panel, List<SlotKey> keys) {
@@ -151,7 +173,7 @@ public class SlotKey extends PacketKey {
 	 * @return a list of slot keys, for a player's inventory ordered 0-36. Links hotbar and main inventory together for shift-click transfer.
 	 */
 	public static List<SlotKey> player(PlayerInventory inventory, int inventoryId) {
-		List<SlotKey> hotbar = inv(inventory, 0, 9, inventoryId), main = inv(inventory, 9, 36, inventoryId);
+		List<SlotKey> hotbar = inv(inventory, 0, 9, inventoryId), main = inv(inventory, 9, 27, inventoryId);
 		hotbar.forEach(key -> key.linkAll(main));
 		main.forEach(key -> key.linkAll(hotbar));
 
@@ -175,28 +197,6 @@ public class SlotKey extends PacketKey {
 
 	protected ItemStack removeStack(int count) {
 		return this.inventory.removeStack(this.slotIndex, count);
-	}
-
-	protected boolean isValid(ItemStack stack) {
-		return this.inventory.isValid(this.slotIndex, stack);
-	}
-
-	/**
-	 * @return the amount actually extracted
-	 */
-	public int extract(ItemKey key, int count, boolean simulate) {
-		if(count <= 0 || key.isEmpty()) {
-			return 0;
-		}
-		ItemStack current = this.getStack();
-		if(!current.isEmpty() && key.isEqual(current)) {
-			int toExtract = Math.min(current.getCount(), count);
-			if(!simulate) {
-				this.removeStack(toExtract);
-			}
-			return toExtract;
-		}
-		return 0;
 	}
 
 	/**

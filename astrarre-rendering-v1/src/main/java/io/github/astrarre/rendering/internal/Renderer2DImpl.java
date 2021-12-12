@@ -24,10 +24,9 @@ import net.minecraft.util.math.Matrix4f;
 
 public class Renderer2DImpl implements Render2d {
 	public static final Stencil STENCIL = Stencil.newInstance();
-
+	public final MatrixStack stack;
 	final net.minecraft.client.font.TextRenderer textRenderer;
 	final int width, height;
-	public final MatrixStack stack;
 	final BufferBuilder buffer;
 	final SafeCloseable pop;
 	final ShapeRenderer outline = new ShapeRendererImpl(SetupImpl.OUTLINE, SetupImpl.OUTLINE, true);
@@ -166,13 +165,14 @@ public class Renderer2DImpl implements Render2d {
 	final void push(Setup setup) {
 		Setup active = this.active;
 		BufferBuilder builder = this.buffer;
-		if(active != null) {
-			active.takedown(builder);
-		}
-
-		this.active = setup;
-		if(setup != null) {
-			setup.setup(builder);
+		if(active != setup) {
+			if(active != null) {
+				active.takedown(builder);
+			}
+			this.active = setup;
+			if(setup != null) {
+				setup.setup(builder);
+			}
 		}
 	}
 
@@ -289,14 +289,14 @@ public class Renderer2DImpl implements Render2d {
 		}
 
 		@Override
-		public void render(Text text) {
-			this.render(text.asOrderedText());
-		}
-
-		@Override
 		public void render(OrderedText text) {
 			Matrix4f matrix = Renderer2DImpl.this.stack.peek().getPositionMatrix();
 			this.draw(text, this.x, this.y, this.color, matrix, this.shadow);
+		}
+
+		@Override
+		public void render(Text text) {
+			this.render(text.asOrderedText());
 		}
 
 		@Override
@@ -314,7 +314,7 @@ public class Renderer2DImpl implements Render2d {
 		}
 
 		private int draw(String text, float x, float y, int color, Matrix4f matrix, boolean shadow, boolean mirror) {
-			if (text == null) {
+			if(text == null) {
 				return 0;
 			} else {
 				VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Renderer2DImpl.this.buffer);

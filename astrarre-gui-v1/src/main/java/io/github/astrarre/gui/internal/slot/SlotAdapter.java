@@ -47,7 +47,7 @@ public class SlotAdapter extends Slot {
 
 	@Override
 	public boolean canInsert(ItemStack stack) {
-		return this.key.insert(ItemKey.ofStack(stack), stack.getCount(), true) != 0;
+		return this.key.isValid(ItemKey.ofStack(stack));
 	}
 
 	@Override

@@ -101,7 +101,7 @@ public interface Icon {
 	 * @param texture the texture to display
 	 * @param width how large to show the item
 	 */
-	static Icon tex(Texture texture, float width, float height) {
+	static TextureIcon tex(Texture texture, float width, float height) {
 		return new TextureIcon(texture, width, height);
 	}
 

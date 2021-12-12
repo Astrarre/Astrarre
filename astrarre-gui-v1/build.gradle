@@ -13,6 +13,7 @@ dependencies {
 
     testmodImplementation project(":astrarre-recipe-v0")
     implementation reiImpl
+    compileOnly fabric
 
     api project(":astrarre-hash-v0")
     api project(":astrarre-access-v0")

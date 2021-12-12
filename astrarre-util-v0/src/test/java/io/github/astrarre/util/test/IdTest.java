@@ -3,13 +3,11 @@ package io.github.astrarre.util.test;
 import static org.junit.Assert.*;
 
 import io.github.astrarre.util.v0.api.Id;
-import net.devtech.potatounit.TestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import net.minecraft.util.Identifier;
 
-@RunWith(TestRunner.Client.class)
 public class IdTest {
 	@Test
 	public void parseTest() {

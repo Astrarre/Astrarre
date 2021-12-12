@@ -63,13 +63,7 @@ public class InsaneCraftingTable extends Block implements BlockEntityProvider {
 	@Override
 	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
 		if(world.getBlockEntity(pos) instanceof Tile t) {
-			//this.openGui(t, player);// a
-			ServerPanel.openHandled(player, (communication, panel) -> {
-				Sprite sprite = FluidVariantRendering.getSprite(FluidVariant.of(Fluids.WATER));
-				panel.add(new AIcon(
-					Icon.tex(Texture.sprite(sprite), 200, 200)
-				));
-			}, (communication, panel) -> {});
+			this.openGui(t, player);// a
 		}
 		return ActionResult.CONSUME;
 	}
@@ -78,7 +72,8 @@ public class InsaneCraftingTable extends Block implements BlockEntityProvider {
 		InsaneInventory inventory = tile.inventory; // todo local comms nessesary for REI
 		PacketKey.Int pkt = new PacketKey.Int(0);
 
-		List<SlotKey> inv = SlotKey.inv(inventory, 1), player = SlotKey.player(entity, 0);
+		List<SlotKey> inv = SlotKey.inv(inventory, 1);
+		List<SlotKey> player = SlotKey.player(entity, 0);
 		player.forEach(k -> k.linkAllPre(inv));
 		inv.forEach(k -> k.linkAllPre(player));
 
@@ -91,17 +86,17 @@ public class InsaneCraftingTable extends Block implements BlockEntityProvider {
 			// construct player inventory
 			AList playerInv = new AList(Axis2d.Y); // 68 pixels tall
 
+			AList hotbar = new AList(Axis2d.X);
+			for(int i = 0; i < 9; i++) {
+				hotbar.add(new ASlot(communication, panel, player.get(i), tileIcon));
+			}
+
 			AGrid grid = new AGrid(8, 9, 3);
 			for(int row = 0; row < 3; row++) {
 				for(int column = 0; column < 9; column++) { // 144 pixels wide
 					int index = 9 + (row * 9) + column;
 					grid.add(new ASlot(communication, panel, player.get(index), tileIcon));
 				}
-			}
-
-			AList hotbar = new AList(Axis2d.X);
-			for(int i = 0; i < 9; i++) {
-				hotbar.add(new ASlot(communication, panel, player.get(i), tileIcon));
 			}
 
 			playerInv.add(grid);

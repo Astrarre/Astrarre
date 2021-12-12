@@ -14,10 +14,10 @@ import io.github.astrarre.gui.v1.api.listener.cursor.CursorType;
 import io.github.astrarre.gui.v1.api.listener.cursor.MouseListener;
 import io.github.astrarre.rendering.v1.api.plane.icon.Icon;
 import io.github.astrarre.rendering.v1.api.space.Render3d;
-import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 
 /**
  * A button that can cycle between multiple states. The code here is generic enough to allow for toggle based or single click (normal) buttons.
+ *
  * @see #button(Icon.Group, Consumer)
  * @see #toggle(Icon.Group, Icon.Group, ToggleListener)
  */
@@ -25,22 +25,6 @@ public class AButton extends AHoverableComponent implements MouseListener, Toggl
 	final List<State> states;
 	boolean pressed;
 	int activeState;
-
-	interface ToggleListener {
-		void accept(Cursor cursor, boolean state);
-	}
-
-	public static AButton button(Icon.Group group, Consumer<Cursor> callback) {
-		return new AButton(group, callback);
-	}
-
-	public static AButton toggle(Icon.Group on, Icon.Group off, ToggleListener callback) {
-		return new AButton(new State(on, c -> callback.accept(c,true)), new State(off, c -> callback.accept(c,false)));
-	}
-
-	void validateState(State state) {
-		state.group.requireUniformSize();
-	}
 
 	public AButton(List<State> states) {
 		if(states.isEmpty()) {
@@ -63,6 +47,14 @@ public class AButton extends AHoverableComponent implements MouseListener, Toggl
 	 */
 	public AButton(Icon.Group group, Consumer<Cursor> callback) {
 		this(new State(group, callback));
+	}
+
+	public static AButton button(Icon.Group group, Consumer<Cursor> callback) {
+		return new AButton(group, callback);
+	}
+
+	public static AButton toggle(Icon.Group on, Icon.Group off, ToggleListener callback) {
+		return new AButton(new State(on, c -> callback.accept(c, true)), new State(off, c -> callback.accept(c, false)));
 	}
 
 	@Override
@@ -108,6 +100,10 @@ public class AButton extends AHoverableComponent implements MouseListener, Toggl
 		}
 	}
 
+	void validateState(State state) {
+		state.group.requireUniformSize();
+	}
+
 	@Override
 	protected void render0(Cursor cursor, Render3d render) {
 		this.pressed &= cursor.isPressed(ClickType.Standard.LEFT);
@@ -135,6 +131,10 @@ public class AButton extends AHoverableComponent implements MouseListener, Toggl
 		if(this.isEnabled()) {
 			cursor.setType(CursorType.Standard.ARROW);
 		}
+	}
+
+	interface ToggleListener {
+		void accept(Cursor cursor, boolean state);
 	}
 
 	public static final class State {
