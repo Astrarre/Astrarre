@@ -6,7 +6,6 @@ subprojects {
     plugins.apply 'java-library'
     plugins.apply 'maven-publish'
     plugins.apply "amalgamation-minecraft"
-    plugins.apply "org.jetbrains.gradle.plugin.idea-ext"
 }
 
 def intermediaryMinecraft = ag.map {
@@ -54,31 +53,21 @@ allprojects {
     configureCompile(project, "", map)
     configureCompile(project, "testmod", map)
 
-    java {
-        registerFeature('minecraftLibraries') {
-            usingSourceSet(sourceSets.main)
-        }
-    }
-
     configurations {
-        annotationProcessor.extendsFrom(implementation)
-        annotationProcessor.extendsFrom(api)
-        annotationProcessor.extendsFrom(minecraftLibrariesImplementation)
-        testmodAnnotationProcessor.extendsFrom(annotationProcessor)
+        minecraftConfig {}
+        implementation.extendsFrom(minecraftConfig)
     }
 
     dependencies {
-        annotationProcessor ("net.fabricmc:fabric-mixin-compile-extensions:0.4.6")
-
         testImplementation('junit:junit:4.13.1') {
             exclude module: 'fabric-loader'
         }
 
-        implementation floader
-        minecraftLibrariesImplementation mcLibs
+        minecraftConfig floader
+        minecraftConfig mcLibs
 
         implementation 'org.jetbrains:annotations:23.0.0'
-        implementation map
+        minecraftConfig map
         /*testImplementation('net.devtech:PotatoUnit:1.0.3') {
             exclude module: 'fabric-loader'
         }*/
@@ -96,13 +85,13 @@ allprojects {
             runtimeClasspath += main.compileClasspath
         }
     }
-
     publishing {
         publications {
             mavenJava(MavenPublication) {
-                artifactId = "$project.name-fabric"
+                artifactId = "$project.name-house"
                 from components.java
                 setArtifacts([])
+                ag.excludeConfiguration(it, configurations.minecraftConfig)
                 ag.fixPom(it)
                 artifact(remapJar) {
                     builtBy remapJar
@@ -118,7 +107,7 @@ allprojects {
         repositories {
             maven {
                 def mavenUrl = project.hasProperty('maven_url') ? project.property('maven_url') : ""
-                url mavenUrl
+                url "https://tiny-potato.xyz/half"
                 if (mavenUrl.startsWith("http")) {
                     credentials {
                         username project.hasProperty('maven_username') ? project.property('maven_username') : ""
@@ -150,9 +139,9 @@ allprojects {
         workingDir("$rootDir/run")
         dependsOn tasks.testmodClasses
     }
-    ag.idea().java(runClient) {
+    /*ag.idea().java(runClient) {
         it.customName = name + "_runClient"
-    }
+    }*/
 }
 
 void configureCompile(Project project, String str, String map) {
@@ -164,32 +153,7 @@ void configureCompile(Project project, String str, String map) {
             filesMatching("fabric.mod.json") {
                 expand "version": project.version
             }
-            filesMatching("*.mixins.json") {
-                def first = true
-                filter { String ln ->
-                    if (first) {
-                        int index = ln.indexOf('{')
-                        if (index != -1) {
-                            first = false
-                            def rep = ln.replaceFirst("\\{", "{\"refmap\":\"$real-refmap.json\",")
-                            return rep
-                        }
-                    }
-                    return ln
-                }
-            }
         }
-
-        def compile = tasks.getByName("compile${upper}Java") {
-            def compilerArgs = options.compilerArgs
-            compilerArgs.add("-AinMapFileNamedIntermediary=$rootProject.buildDir/unzip/mappings/mappings.tiny" as String)
-            compilerArgs.add("-AoutMapFileNamedIntermediary=$buildDir/${real}.tiny" as String)
-            // I have no idea what this does btw
-            compilerArgs.add("-AoutRefMapFile=${destinationDirectory.get().asFile}/$real-refmap.json" as String)
-            compilerArgs.add("-AdefaultObfuscationEnv=named:intermediary" as String)
-            dependsOn rootProject.tasks.unzip
-        }
-
 
         tasks.create(type: RemapJar, name: "remap${upper}Jar") {
             group = "build"
@@ -200,11 +164,8 @@ void configureCompile(Project project, String str, String map) {
             }
             classpath = sourceSets.getByName(real).compileClasspath
             remapAw()
+            enableExperimentalMixinRemapper()
             mappings(map, 'named', 'intermediary')
-            if(file("$buildDir${File.separator}${real}.tiny").exists()) {
-                mappings(files("$buildDir${File.separator}${real}.tiny"), 'named', 'intermediary')
-            }
-            dependsOn(compile)
         }
 
         tasks.create(type: RemapSourcesJar, dependsOn: classes, name: "remap${upper}SourcesJar") {

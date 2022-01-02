@@ -79,6 +79,8 @@ public interface Render2d {
 	 */
 	void texture(Texture texture, float offX, float offY, float width, float height);
 
+	void texture(Texture texture, int color, float offX, float offY, float width, float height);
+
 	/**
 	 * immediately renders any remaining bits len the screen
 	 */

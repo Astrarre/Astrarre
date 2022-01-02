@@ -5,8 +5,6 @@
   "compatibilityLevel": "JAVA_16",
   "mixins": [
     "IdentifierMixin_Id",
-    "LazyAccess",
-    "LivingEntityMixin_FakePlayerEntity",
     "MinecraftServerMixin_ActiveServer",
     "SetTagAccess",
     "TagWrapperAccess"

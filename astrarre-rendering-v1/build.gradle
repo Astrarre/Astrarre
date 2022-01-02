@@ -1,5 +1,5 @@
 dependencies {
-    implementation ag.accessWidener(minecraft) {
+    minecraftConfig ag.accessWidener(minecraft) {
         accessWidener(files("$projectDir/src/main/resources/astrarre-rendering.accesswidener"))
     }
     

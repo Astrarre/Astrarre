@@ -4,8 +4,7 @@ plugins {
     id 'eclipse'
     id 'java-library'
     id 'maven-publish'
-    id 'amalgamation-minecraft' version "2.3.0"
-    id 'org.jetbrains.gradle.plugin.idea-ext' version '1.1'
+    id 'amalgamation-minecraft' version "1.0.0.0"
 }
 
 repositories {
@@ -13,14 +12,5 @@ repositories {
 }
 
 group = 'io.github.astrarre'
-
-def map = dependencies.create("net.fabricmc:yarn:${yarn_mappings}:v2")
-task unzip(type: Copy) {
-    inputs.files(ag.resolve([map]))
-    from provider {
-        zipTree(ag.resolve([map]).first())
-    }
-    into "$buildDir/unzip/"
-}
 
 apply from: 'scripts/allprojects.gradle'

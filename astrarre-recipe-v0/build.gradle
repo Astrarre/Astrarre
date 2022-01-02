@@ -1,7 +1,7 @@
 /*fapi(project, 'fabric-resource-loader-v0', 'fabric-tag-extensions-v0', 'fabric-api-base')*/
 
 dependencies {
-    implementation minecraft
+    minecraftConfig minecraft
     implementation reiImpl
     
     api project(":astrarre-util-v0")

@@ -134,6 +134,19 @@ public class Renderer2DImpl implements Render2d {
 	}
 
 	@Override
+	public void texture(Texture texture, int color, float offX, float offY, float width, float height) {
+		this.push(SetupImpl.COLORED_TEXTURE);
+		RenderSystem.setShaderTexture(0, texture.texture().to());
+		Matrix4f matrix = this.stack.peek().getPositionMatrix();
+		float x2 = offX + width, y2 = offY + height;
+		float vx = texture.offX() + texture.width(), vy = texture.offY() + texture.height();
+		this.buffer.vertex(matrix, offX, offY, 1).color(color).texture(texture.offX(), texture.offY()).next();
+		this.buffer.vertex(matrix, offX, y2, 1).color(color).texture(texture.offX(), vy).next();
+		this.buffer.vertex(matrix, x2, y2, 1).color(color).texture(vx, vy).next();
+		this.buffer.vertex(matrix, x2, offY, 1).color(color).texture(vx, texture.offY()).next();
+	}
+
+	@Override
 	public void flush() {
 		this.push(null);
 	}

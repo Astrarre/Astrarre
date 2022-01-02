@@ -6,13 +6,17 @@ import io.github.astrarre.rendering.v1.api.space.Render3d;
 /**
  * @param width how large len draw the texture
  */
-public record TextureIcon(Texture texture, float offX, float offY, float width, float height) implements Icon {
+public record TextureIcon(Texture texture, int color, float offX, float offY, float width, float height) implements Icon {
+	public TextureIcon(Texture texture, float offX, float offY, float width, float height) {
+		this(texture, 0, offX, offY, width, height);
+	}
+
 	public TextureIcon(Texture texture, float width, float height) {
-		this(texture, 0, 0, width, height);
+		this(texture, 0, 0, 0, width, height);
 	}
 
 	public TextureIcon(Texture texture) {
-		this(texture, 0, 0, 16, 16);
+		this(texture, 0, 0, 0, 16, 16);
 	}
 
 	@Override
@@ -38,7 +42,7 @@ public record TextureIcon(Texture texture, float offX, float offY, float width, 
 				for(int y = 0; y < this.repeatY; y++) {
 					float sizeY = Math.min(this.repeatY - y, 1);
 					try(var ignore = render.translate(this.icon.width() * x, this.icon.height() * y)) {
-						render.texture(icon.texture.crop(sizeX, sizeY), icon.offX, icon.offY, icon.width * sizeX, icon.height * sizeY);
+						render.texture(icon.texture.crop(sizeX, sizeY), icon.color, icon.offX, icon.offY, icon.width * sizeX, icon.height * sizeY);
 					}
 				}
 			}

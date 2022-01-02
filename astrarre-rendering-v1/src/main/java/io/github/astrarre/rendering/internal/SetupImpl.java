@@ -52,6 +52,18 @@ enum SetupImpl implements Renderer2DImpl.Setup {
 		public void takedown(BufferBuilder builder) {
 			DEFAULT.takedown(builder);
 		}
+	},
+	COLORED_TEXTURE {
+		@Override
+		public void setup(BufferBuilder builder) {
+			RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
+			builder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
+		}
+
+		@Override
+		public void takedown(BufferBuilder builder) {
+			DEFAULT.takedown(builder);
+		}
 	}, OUTLINE {
 		@Override
 		public void setup(BufferBuilder builder) {

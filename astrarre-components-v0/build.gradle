@@ -4,7 +4,7 @@ sourceSets {
 }
 
 dependencies {
-    implementation minecraft
+    minecraftConfig minecraft
     
     api project(":astrarre-itemview-v0")
 }

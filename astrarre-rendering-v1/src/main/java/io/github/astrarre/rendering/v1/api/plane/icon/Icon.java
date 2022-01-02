@@ -105,6 +105,10 @@ public interface Icon {
 		return new TextureIcon(texture, width, height);
 	}
 
+	static TextureIcon tex(Texture texture, int color, float width, float height) {
+		return new TextureIcon(texture, color, 0, 0, width, height);
+	}
+
 	@Edge
 	static Icon text(OrderedText text, int color, boolean shadow) {
 		return new LabelIcon(text, color, shadow);
