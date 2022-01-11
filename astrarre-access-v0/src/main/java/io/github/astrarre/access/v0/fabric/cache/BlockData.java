@@ -14,11 +14,11 @@ import net.minecraft.world.chunk.WorldChunk;
  * A temporary version of {@link BlockCache}, all references are not auto-invalidated.
  */
 public final class BlockData {
-	private final World world;
-	private final BlockPos pos;
-	private WorldChunk chunk;
-	private BlockState state;
-	private BlockEntity entity;
+	final World world;
+	final BlockPos pos;
+	WorldChunk chunk;
+	BlockState state;
+	BlockEntity entity;
 
 	public BlockData(@NotNull BlockEntity entity) {
 		this(Validate.notNull(entity.getWorld(), "world == null!"), null, entity.getPos(), entity.getCachedState(), entity);

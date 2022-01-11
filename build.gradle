@@ -4,7 +4,7 @@ plugins {
     id 'eclipse'
     id 'java-library'
     id 'maven-publish'
-    id 'amalgamation-minecraft' version "1.0.0.0"
+    id 'amalgamation-minecraft' version "1.0.0.5"
 }
 
 repositories {
@@ -14,3 +14,7 @@ repositories {
 group = 'io.github.astrarre'
 
 apply from: 'scripts/allprojects.gradle'
+
+dependencies {
+    api subprojects
+}

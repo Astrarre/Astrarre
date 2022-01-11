@@ -22,7 +22,6 @@
     "fabricloader": ">=0.8.9"
   },
   "mixins": [
-    "astrarre-transfer.mixins.json",
-    "astrarre-transfer-reborncore.mixins.json"
+    "astrarre-transfer.mixins.json"
   ]
 }

@@ -1,11 +1,16 @@
 subprojects {
-    sourceCompatibility = JavaVersion.VERSION_16
-    targetCompatibility = JavaVersion.VERSION_16
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
     group = 'io.github.astrarre'
     plugins.apply 'java'
     plugins.apply 'java-library'
     plugins.apply 'maven-publish'
     plugins.apply "amalgamation-minecraft"
+}
+
+task remapAll(type: RemapAllJars) {
+}
+task remapAllSources(type: RemapAllSourcesJars) {
 }
 
 def intermediaryMinecraft = ag.map {
@@ -88,9 +93,9 @@ allprojects {
     publishing {
         publications {
             mavenJava(MavenPublication) {
-                artifactId = "$project.name-house"
+                artifactId = "$project.name-fabric"
                 from components.java
-                setArtifacts([])
+                artifacts = []
                 ag.excludeConfiguration(it, configurations.minecraftConfig)
                 ag.fixPom(it)
                 artifact(remapJar) {
@@ -107,7 +112,7 @@ allprojects {
         repositories {
             maven {
                 def mavenUrl = project.hasProperty('maven_url') ? project.property('maven_url') : ""
-                url "https://tiny-potato.xyz/half"
+                url mavenUrl
                 if (mavenUrl.startsWith("http")) {
                     credentials {
                         username project.hasProperty('maven_username') ? project.property('maven_username') : ""
@@ -155,7 +160,7 @@ void configureCompile(Project project, String str, String map) {
             }
         }
 
-        tasks.create(type: RemapJar, name: "remap${upper}Jar") {
+        def remap = tasks.create(type: RemapJar, name: "remap${upper}Jar") {
             group = "build"
             if (str.isEmpty()) {
                 with jar
@@ -164,16 +169,64 @@ void configureCompile(Project project, String str, String map) {
             }
             classpath = sourceSets.getByName(real).compileClasspath
             remapAw()
-            enableExperimentalMixinRemapper()
+            useExperimentalMixinRemapper()
             mappings(map, 'named', 'intermediary')
         }
 
-        tasks.create(type: RemapSourcesJar, dependsOn: classes, name: "remap${upper}SourcesJar") {
+        def remapSources = tasks.create(type: RemapSourcesJar, dependsOn: classes, name: "remap${upper}SourcesJar") {
             group = "build"
             classifier = 'sources'
             from sourceSets.getByName(real).allSource
             classpath = sourceSets.getByName(real).compileClasspath
             mappings(map, 'named', 'intermediary')
         }
+
+        if(upper.isEmpty()) {
+            project.rootProject.tasks.remapAll.addTask(remap)
+            project.rootProject.tasks.remapAllSources.addTask(remapSources)
+        }
     }
+}
+
+def all = allprojects
+int count = all.size()
+allprojects {
+    afterEvaluate {
+        if(--count == 0) {
+            all.each {
+                def vers = computeVersion(it)
+                it.version(vers)
+                println("$it @ $vers")
+            }
+        }
+    }
+}
+
+static def computeVersion(Project project) {
+    List<Integer> versArr = (project.vers.split("\\.")).collect{ Integer.parseInt(it) }
+    Task publish = project.tasks.publish, publishLocal = project.tasks.publishToMavenLocal
+    def projectConsumer = {Project depProject ->
+        depProject.tasks.publish.finalizedBy({publish})
+        depProject.tasks.publishToMavenLocal.finalizedBy({publishLocal})
+        List<Integer> versB = (computeVersion(depProject).split("\\.")).collect{ Integer.parseInt(it) }
+        versB.eachWithIndex({val, i -> {
+            if(i == 0) {
+                versArr.set(1, versArr.get(i)+versArr.get(1)+val)
+            } else {
+                versArr.set(i, versArr.get(i)+val)
+            }
+        }})
+    }
+    if(project == project.rootProject) {
+        project.subprojects.each(projectConsumer)
+    } else {
+        def copy = project.configurations.api.copy()
+        copy.setCanBeResolved(true)
+        copy.dependencies.forEach(d -> {
+            if (d instanceof ProjectDependency) {
+                projectConsumer(d.dependencyProject)
+            }
+        })
+    }
+    return versArr.join(".")
 }

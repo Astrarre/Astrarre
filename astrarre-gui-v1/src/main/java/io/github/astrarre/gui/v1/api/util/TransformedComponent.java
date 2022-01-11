@@ -28,4 +28,5 @@ public interface TransformedComponent {
 	default TransformedComponent before(Transform3d transform) {
 		return this.with(transform.andThen(this.transform()));
 	}
+
 }

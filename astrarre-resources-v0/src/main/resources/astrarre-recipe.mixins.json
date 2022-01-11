@@ -1,0 +1,17 @@
+{
+  "required": true,
+  "package": "io.github.astrarre.recipe.internal.mixin",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+    "MinecraftServerMixin_Invalidate",
+    "RecipeManagerAccess",
+    "ServerResourceManagerMixin_UpdateRegistry",
+    "SinglePreperationResourceReloadListenerMixin_RecipePostReloadEvent"
+  ],
+  "client": [
+    "MinecraftClientMixin_UpdateRegistry"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

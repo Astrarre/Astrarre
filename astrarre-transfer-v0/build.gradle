@@ -1,75 +1,7 @@
-
-repositories {
-    maven {
-        url = 'https://maven.fabricmc.net'
-        content {
-            includeGroup "RebornCore"
-            includeGroup "TechReborn"
-        }
-    }
-    maven {
-        url 'https://maven.blamejared.com'
-        content {
-            includeGroup "vazkii.patchouli"
-        }
-    }
-    maven {
-        name = "Technici4n"
-        url = "https://raw.githubusercontent.com/Technici4n/Technici4n-maven/master/"
-        content {
-            includeGroup "dev.technici4n"
-        }
-    }
-    maven {
-        url 'http://server.bbkr.space:8081/artifactory/libs-release'
-        allowInsecureProtocol = true
-        content {
-            includeGroup "io.github.cottonmc"
-        }
-    }
-    maven {
-        url = "https://maven.cafeteria.dev/releases/"
-        content {
-            includeGroup "me.steven"
-        }
-    }
-    maven {
-        name = "BuildCraft"
-        url = "https://mod-buildcraft.com/maven"
-    }
-    maven {
-        name = "dblsaiko"
-        url = "https://maven.dblsaiko.net/"
-    }
-    mavenLocal()
-}
-
 dependencies {
-    modCompileOnly("alexiil.mc.lib:libblockattributes-all:0.8.4") {
-        exclude module: 'fabric-loader'
-        exclude module: 'fabric-api'
-        exclude module: "fabric-rendering-fluids-v1"
-    }
-    modCompileOnly('RebornCore:RebornCore-1.16:4.7.2+build.134') {
-        exclude module: 'fabric-loader'
-        exclude module: 'fabric-api'
-        exclude module: "fabric-rendering-fluids-v1"
-    }
-
-    /*modRuntime('TechReborn:TechReborn-1.16:3.8.3+build.231') {
-        exclude module: 'fabric-loader'
-        exclude module: 'fabric-api'
-        exclude module: "fabric-rendering-fluids-v1"
-    }
-    modRuntime("net.fabricmc.fabric-api:fabric-api:$fabric_version") {
-        exclude module: 'fabric-loader'
-        exclude module: "fabric-rendering-fluids-v1"
-    }
-    modRuntime('me.steven:Industrial-Revolution:1.9.13-BETA') {
-        exclude module: 'fabric-loader'
-        exclude module: 'fabric-api'
-        exclude module: "fabric-rendering-fluids-v1"
-    }*/
+    minecraftConfig minecraft
+    api project(":astrarre-access-v0")
+    compileOnly fabric
 }
 
 sourceSets {

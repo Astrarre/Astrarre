@@ -24,6 +24,7 @@ public final class BlockCache {
 	protected final World world;
 	protected BlockState state;
 	protected WeakReference<BlockEntity> reference; // weak reference just in case
+	final BlockData data;
 
 	public static BlockCache getOrCreate(BlockPos pos, World world) {
 		WorldChunk chunk = world.getWorldChunk(pos);
@@ -40,6 +41,7 @@ public final class BlockCache {
 	private BlockCache(World world, BlockPos pos) {
 		this.pos = pos;
 		this.world = world;
+		this.data = new BlockData(world, pos);
 	}
 
 	private BlockCache(World world, BlockPos pos, BlockState state, BlockEntity entity) {
@@ -52,19 +54,31 @@ public final class BlockCache {
 
 	public void invalidateBlockState() {
 		this.state = null;
+		this.data.state = null;
+		this.data.chunk = null;
 	}
 
 	public void invalidateBlockEntity() {
 		this.reference = null;
+		this.data.entity = null;
+		this.data.chunk = null;
 	}
 
 	public <T> T get(Access<WorldFunction<T>> access, Direction direction) {
 		return access.get().get(direction, this.getBlockState(), this.world, this.pos, this.getBlockEntity());
 	}
 
+	public BlockPos getPos() {
+		return this.pos;
+	}
+
+	public World getWorld() {
+		return this.world;
+	}
+
 	public BlockState getBlockState() {
 		if(this.state == null) {
-			return this.state = this.world.getBlockState(this.pos);
+			return this.data.state = this.state = this.world.getBlockState(this.pos);
 		}
 		return this.state;
 	}
@@ -73,7 +87,7 @@ public final class BlockCache {
 		if((this.reference == null || this.reference.get() == null) && this.getBlockState().hasBlockEntity()) {
 			BlockEntity entity = this.world.getBlockEntity(this.pos);
 			if(entity != null) {
-				this.reference = new WeakReference<>(entity);
+				this.reference = new WeakReference<>(this.data.entity = entity);
 				((BlockEntityAccess)entity).astrarre_addRemoveOrMoveListener(e -> this.invalidateBlockEntity());
 			}
 			return entity;

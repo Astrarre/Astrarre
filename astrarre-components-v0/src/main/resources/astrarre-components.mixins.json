@@ -7,16 +7,16 @@
     "ChunkDataS2CPacketMixin_SyncBlockEntity",
     "ChunkHolderMixin_BlockEntitySync",
     "ChunkSerializerMixin_ChunkComponents",
-    "ClientPlayerNetworkHandlerMixin_BlockEntityAccept",
-    "ClientPlayNetworkHandlerMixin_SyncAccept",
     "EntityMixin_ObjectHolder_Serialization",
     "EntityTrackerEntryMixin_Sync",
-    "MinecraftServerAccess",
     "PlayerEntityMixin_ObjectHolder_Serialization",
     "ProtoChunkMixin_AccessImpl",
     "ReadOnlyChunkAccess",
     "ServerPlayerEntityMixin_Copy_SyncBlockEntity",
     "WorldChunkMixin_DeserializeProtoData"
+  ],
+  "client": [
+    "ClientPlayNetworkHandlerMixin_SyncAccept"
   ],
   "injectors": {
     "defaultRequire": 1

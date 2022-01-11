@@ -11,7 +11,7 @@ dependencies {
         accessWidener(files("$projectDir/src/main/resources/astrarre-gui.accesswidener"))
     }
 
-    testmodImplementation project(":astrarre-recipe-v0")
+    testmodImplementation project(":astrarre-resources-v0")
     implementation reiImpl
     compileOnly fabric
 
